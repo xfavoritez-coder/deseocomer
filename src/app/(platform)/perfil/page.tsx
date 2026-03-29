@@ -81,7 +81,7 @@ export default function PerfilPage() {
           </div>
           <div style={{ flex: 1 }}>
             <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
               letterSpacing: "0.3em", textTransform: "uppercase",
               color: "var(--oasis-bright)", marginBottom: "8px",
             }}>
@@ -105,13 +105,13 @@ export default function PerfilPage() {
             onClick={() => { logout(); router.push("/"); }}
             style={{
               alignSelf: "flex-start",
-              fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.7rem, 2vw, 0.8rem)",
               letterSpacing: "0.12em", textTransform: "uppercase",
               background: "transparent",
               border: "1px solid var(--border-color)",
               borderRadius: "20px", padding: "8px 18px",
               color: "var(--text-muted)", cursor: "pointer",
-              transition: "border-color 0.2s, color 0.2s",
+              transition: "border-color 0.2s, color 0.2s", minHeight: "40px",
             }}
           >
             Cerrar sesión
@@ -183,7 +183,7 @@ export default function PerfilPage() {
                 Comparte tu link de un concurso para empezar a sumar puntos.
               </p>
               <Link href="/concursos" style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+                fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
                 letterSpacing: "0.12em", textTransform: "uppercase",
                 background: "var(--accent)", color: "var(--bg-primary)",
                 fontWeight: 700, padding: "12px 28px", borderRadius: "30px",
@@ -287,12 +287,12 @@ export default function PerfilPage() {
                               : "transparent",
                             border: "1px solid var(--accent)",
                             borderRadius: "8px",
-                            fontFamily: "var(--font-cinzel)", fontSize: "0.58rem",
+                            fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
                             letterSpacing: "0.1em", textTransform: "uppercase",
                             color: copied === concursoId ? "var(--bg-primary)" : "var(--accent)",
                             padding: "8px 16px", cursor: "pointer",
                             fontWeight: 700, transition: "all 0.2s",
-                            minHeight: "36px",
+                            minHeight: "44px",
                           }}
                         >
                           {copied === concursoId ? "✓ Copiado" : "Copiar link"}

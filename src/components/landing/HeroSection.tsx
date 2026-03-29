@@ -159,8 +159,8 @@ export default function HeroSection() {
       }}>
         <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(1.8rem, 6vw, 5rem)",
-          lineHeight: 1.15,
+          fontSize: "clamp(2.2rem, 7vw, 6rem)",
+          lineHeight: 1.1,
           marginBottom: "24px",
           animation: "fadeUp 0.8s 0.4s both",
           textShadow: TEXT_SHADOW,
@@ -183,10 +183,10 @@ export default function HeroSection() {
 
         <p className="dc-hero-subtitle" style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)",
+          fontSize: "clamp(1.1rem, 3vw, 1.4rem)",
           fontWeight: 300,
           color: "rgba(255,255,255,0.9)",
-          lineHeight: 1.75,
+          lineHeight: 1.8,
           animation: "fadeUp 0.8s 0.65s both",
           textShadow: TEXT_SHADOW,
           maxWidth: "560px",
@@ -203,31 +203,32 @@ export default function HeroSection() {
         }}>
           <Link href="/concursos" className="dc-hero-btn dc-hero-btn--primary" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.75rem",
-            letterSpacing: "0.1em",
+            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             background: "var(--accent)",
             color: "var(--bg-primary)",
-            padding: "14px 28px",
-            borderRadius: "50px",
+            padding: "16px 32px",
+            borderRadius: "16px",
             textDecoration: "none",
             fontWeight: 700,
             boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
             transition: "background 2s ease, color 2s ease",
             display: "flex", alignItems: "center", justifyContent: "center",
             whiteSpace: "nowrap",
+            minHeight: "56px",
           }}>
             🎪 Ver Concursos
           </Link>
           <Link href="/locales" className="dc-hero-btn dc-hero-btn--secondary" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.75rem",
-            letterSpacing: "0.1em",
+            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             border: "2px solid rgba(255,255,255,0.75)",
             color: "white",
-            padding: "14px 28px",
-            borderRadius: "50px",
+            padding: "16px 32px",
+            borderRadius: "16px",
             textDecoration: "none",
             fontWeight: 600,
             background: "rgba(0,0,0,0.3)",
@@ -235,6 +236,7 @@ export default function HeroSection() {
             textShadow: "0 1px 4px rgba(0,0,0,0.8)",
             display: "flex", alignItems: "center", justifyContent: "center",
             whiteSpace: "nowrap",
+            minHeight: "56px",
           }}>
             🗺️ Explorar Locales
           </Link>
@@ -276,8 +278,8 @@ export default function HeroSection() {
           .dc-sky--sunrise  { font-size: 50px !important; bottom: 25% !important; }
           .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; bottom: 20% !important; }
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
-          .dc-hero-cta      { flex-wrap: wrap; gap: 10px !important; }
-          .dc-hero-btn      { padding: 12px 24px !important; font-size: 0.7rem !important; }
+          .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; justify-content: center; }
+          .dc-hero-cta      { flex-direction: column; align-items: stretch; gap: 12px !important; }
           .dc-hero-subtitle br { display: none; }
         }
 

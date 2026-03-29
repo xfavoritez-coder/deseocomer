@@ -152,7 +152,7 @@ export default function PromocionesPage() {
         <div style={{ position: "relative", textAlign: "center" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
             color: "var(--oasis-bright)",
@@ -162,7 +162,7 @@ export default function PromocionesPage() {
           </p>
           <h1 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
+            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
             color: "var(--accent)",
             textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)",
             marginBottom: "20px",
@@ -172,12 +172,12 @@ export default function PromocionesPage() {
           </h1>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(0.95rem, 2vw, 1.15rem)",
+            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
             color: "var(--text-primary)",
             fontWeight: 300,
             maxWidth: "540px",
             margin: "0 auto 40px",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
           }}>
             Descuentos reales, happy hours y cupones exclusivos en los mejores locales de Santiago. Activos ahora mismo.
           </p>
@@ -714,7 +714,7 @@ export default function PromocionesPage() {
         /* Pills (shared) */
         .dc-promo-pill {
           font-family: var(--font-cinzel);
-          font-size: 0.6rem;
+          font-size: clamp(0.75rem, 2vw, 0.85rem);
           letter-spacing: 0.08em;
           text-transform: uppercase;
           padding: 7px 13px;
@@ -728,6 +728,7 @@ export default function PromocionesPage() {
           align-items: center;
           gap: 5px;
           white-space: nowrap;
+          min-height: 44px;
         }
         .dc-promo-pill:hover {
           border-color: var(--accent);
@@ -961,7 +962,7 @@ function PromoCard({
         {/* Título + descripción */}
         <h3 style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "1rem",
+          fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
           color: "var(--accent)",
           marginBottom: "8px",
           lineHeight: 1.3,
@@ -970,9 +971,9 @@ function PromoCard({
         </h3>
         <p style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "0.85rem",
+          fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
           color: "var(--text-muted)",
-          lineHeight: 1.6,
+          lineHeight: 1.7,
           marginBottom: "20px",
         }}>
           {promo.descripcion}
@@ -1136,15 +1137,15 @@ function PromoCard({
               ? "linear-gradient(135deg, #c8850a, #d4a017)"
               : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
             border: "none",
-            borderRadius: "12px",
+            borderRadius: "16px",
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
-            letterSpacing: "0.15em",
+            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
             color: "#07040f",
             fontWeight: 700,
             cursor: "pointer",
-            minHeight: "48px",
+            minHeight: "56px",
             transition: "opacity 0.2s",
             marginTop: isUltimasHoras ? "0" : "0",
           }}

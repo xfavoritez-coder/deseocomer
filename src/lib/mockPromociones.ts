@@ -11,6 +11,7 @@ export interface Promocion {
   tipo: TipoPromocion;
   categoria: CategoriaPromocion;
   imagen: string;          // emoji
+  imagenUrl: string;
   titulo: string;
   descripcion: string;
   precioOriginal?: number;
@@ -42,6 +43,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "happy_hour",
     categoria: "bebidas",
     imagen: "🍕",
+    imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
     titulo: "Happy Hour: Pizza + Cerveza 30% OFF",
     descripcion: "30% de descuento en toda la carta de pizzas y cervezas artesanales. El mejor Happy Hour de Providencia.",
     precioOriginal: 2500,
@@ -65,6 +67,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "2x1",
     categoria: "almuerzo",
     imagen: "🍣",
+    imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600",
     titulo: "2x1 en Rolls de Entrada — Almuerzo",
     descripcion: "Lleva 2 rolls de entrada pagando solo 1. Válido en todo el menú de rolls durante el almuerzo. ¡El sushi nunca fue tan conveniente!",
     precioOriginal: 6500,
@@ -86,6 +89,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "precio_especial",
     categoria: "almuerzo",
     imagen: "🍲",
+    imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600",
     titulo: "Almuerzo Completo — Solo $3.990",
     descripcion: "Sopa o entrada + plato de fondo + postre + jugo natural por solo $3.990. La comida casera más sabrosa de Barrio Italia.",
     precioOriginal: 5900,
@@ -111,6 +115,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "cupon",
     categoria: "desayuno",
     imagen: "☕",
+    imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600",
     titulo: "25% OFF en Desayuno con Cupón",
     descripcion: "Usa el código y obtén 25% de descuento en cualquier combo de desayuno. Incluye café de especialidad + pastelería seleccionada.",
     precioOriginal: 4500,
@@ -137,6 +142,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "2x1",
     categoria: "cena",
     imagen: "🍝",
+    imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600",
     titulo: "2x1 en Pastas Frescas — Cena",
     descripcion: "Paga una pasta y lleva dos. Aplica en toda la carta de pastas frescas elaboradas cada mañana. Ideal para compartir en pareja.",
     precioOriginal: 12500,
@@ -158,6 +164,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "descuento",
     categoria: "almuerzo",
     imagen: "🍔",
+    imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600",
     titulo: "Bebida Gratis con Cualquier Burger",
     descripcion: "Pide cualquier burger de la carta y llévate una bebida mediana gratis. ¡El combo perfecto para el fin de semana!",
     precioOriginal: 11500,
@@ -181,6 +188,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "2x1",
     categoria: "postres",
     imagen: "🍦",
+    imagenUrl: "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=600",
     titulo: "2x1 en Helados y Postres Artesanales",
     descripcion: "Todos los días en la tarde, lleva 2 helados o postres pagando solo 1. Más de 30 sabores artesanales para elegir.",
     precioOriginal: 3200,
@@ -202,6 +210,7 @@ export const PROMOCIONES: Promocion[] = [
     tipo: "happy_hour",
     categoria: "bebidas",
     imagen: "🍹",
+    imagenUrl: "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=600",
     titulo: "Happy Hour: Cócteles a Mitad de Precio",
     descripcion: "Cócteles de autor al 50% de descuento. Mojitos, Negronis, Aperol Spritz y más. La mejor terraza de Bellavista.",
     precioOriginal: 9500,

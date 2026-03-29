@@ -5,12 +5,12 @@ import Link from "next/link";
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
 
 const localesMock = [
-  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia." },
-  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  descripcion: "Omakase y rolls creativos con ingredientes del Pacífico." },
-  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela." },
-  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 4.6, precio: "$$",   isOpen: false, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas." },
-  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 4.5, precio: "$$",   isOpen: false, descripcion: "Cocina plant-based de autor, menú cambiante según temporada." },
-  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo." },
+  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" },
+  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600" },
+  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600" },
+  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 4.6, precio: "$$",   isOpen: false, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
+  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 4.5, precio: "$$",   isOpen: false, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600" },
+  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600" },
 ];
 
 export default function LocalesSection() {
@@ -27,18 +27,18 @@ export default function LocalesSection() {
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
-            color: "var(--oasis-bright)",
+            color: "var(--color-label)",
             marginBottom: "16px",
           }}>
             Explorador de Locales
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(2rem, 5vw, 3.5rem)",
-            color: "var(--accent)",
+            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+            color: "var(--color-title)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
@@ -46,12 +46,12 @@ export default function LocalesSection() {
           </h2>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2vw, 1.1rem)",
-            color: "var(--text-primary)",
+            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
+            color: "var(--color-text)",
             fontWeight: 300,
             maxWidth: "500px",
             margin: "0 auto",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
           }}>
             Los mejores locales gastronómicos de Santiago, curados y verificados.
           </p>
@@ -93,87 +93,92 @@ export default function LocalesSection() {
               textDecoration: "none",
               display: "block",
             }}>
-              {/* Línea 1: emoji + nombre */}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                <span style={{ fontSize: "2rem", flexShrink: 0, lineHeight: 1 }}>{local.emoji}</span>
-                <h3 style={{
-                  fontFamily: "var(--font-cinzel-decorative)",
-                  fontSize: "1rem",
-                  color: "var(--accent)",
-                  lineHeight: 1.2,
-                  minWidth: 0,
-                }}>{local.nombre}</h3>
+              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0 }}>
+                <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
+              <div style={{ padding: "20px 24px 24px" }}>
+                {/* Línea 1: emoji + nombre */}
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
+                  <span style={{ fontSize: "2rem", flexShrink: 0, lineHeight: 1 }}>{local.emoji}</span>
+                  <h3 style={{
+                    fontFamily: "var(--font-cinzel-decorative)",
+                    fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+                    color: "var(--color-title)",
+                    lineHeight: 1.2,
+                    minWidth: 0,
+                  }}>{local.nombre}</h3>
+                </div>
 
-              {/* Línea 2: pin + barrio / precio */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <span style={{
-                  fontFamily: "var(--font-lato)",
-                  fontSize: "0.8rem",
-                  color: "var(--oasis-bright)",
-                }}>📍 {local.barrio}</span>
-                <span style={{
-                  fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.8rem",
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.05em",
-                }}>{local.precio}</span>
-              </div>
-
-              {/* Línea 3: descripción */}
-              <p style={{
-                fontFamily: "var(--font-lato)",
-                fontSize: "0.95rem",
-                color: "var(--text-muted)",
-                lineHeight: 1.6,
-                fontWeight: 300,
-                marginBottom: "18px",
-              }}>{local.descripcion}</p>
-
-              {/* Línea 4: footer */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{
-                  fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: "var(--text-muted)",
-                  background: "rgba(0,0,0,0.2)",
-                  padding: "4px 10px",
-                  borderRadius: "20px",
-                  border: "1px solid var(--border-color)",
-                }}>{local.categoria}</span>
-
-                <span style={{
-                  fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.6rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: local.isOpen ? "#3db89e" : "#ff6b6b",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                }}>
+                {/* Línea 2: pin + barrio / precio */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                   <span style={{
-                    width: "6px", height: "6px", borderRadius: "50%",
-                    background: local.isOpen ? "#3db89e" : "#ff6b6b",
-                    display: "inline-block",
-                    flexShrink: 0,
-                  }} />
-                  {local.isOpen ? "Abierto" : "Cerrado"}
-                </span>
+                    fontFamily: "var(--font-lato)",
+                    fontSize: "0.8rem",
+                    color: "var(--color-link)",
+                  }}>📍 {local.barrio}</span>
+                  <span style={{
+                    fontFamily: "var(--font-cinzel)",
+                    fontSize: "0.8rem",
+                    color: "var(--text-muted)",
+                    letterSpacing: "0.05em",
+                  }}>{local.precio}</span>
+                </div>
 
-                <span style={{
-                  fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.75rem",
-                  color: "var(--accent)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}>
-                  ⭐ {local.rating}
-                  <span className="dc-loc-arrow">→</span>
-                </span>
+                {/* Línea 3: descripción */}
+                <p style={{
+                  fontFamily: "var(--font-lato)",
+                  fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
+                  color: "var(--text-muted)",
+                  lineHeight: 1.7,
+                  fontWeight: 300,
+                  marginBottom: "18px",
+                }}>{local.descripcion}</p>
+
+                {/* Línea 4: footer */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{
+                    fontFamily: "var(--font-cinzel)",
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "var(--text-muted)",
+                    background: "rgba(0,0,0,0.2)",
+                    padding: "4px 10px",
+                    borderRadius: "20px",
+                    border: "1px solid var(--border-color)",
+                  }}>{local.categoria}</span>
+
+                  <span style={{
+                    fontFamily: "var(--font-cinzel)",
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: local.isOpen ? "#3db89e" : "#ff6b6b",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}>
+                    <span style={{
+                      width: "6px", height: "6px", borderRadius: "50%",
+                      background: local.isOpen ? "#3db89e" : "#ff6b6b",
+                      display: "inline-block",
+                      flexShrink: 0,
+                    }} />
+                    {local.isOpen ? "Abierto" : "Cerrado"}
+                  </span>
+
+                  <span style={{
+                    fontFamily: "var(--font-cinzel)",
+                    fontSize: "0.75rem",
+                    color: "var(--accent)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}>
+                    ⭐ {local.rating}
+                    <span className="dc-loc-arrow">→</span>
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
@@ -182,10 +187,10 @@ export default function LocalesSection() {
         <div style={{ textAlign: "center", marginTop: "48px" }}>
           <Link href="/locales" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.8rem",
+            fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
-            color: "var(--oasis-bright)",
+            color: "var(--color-link)",
             textDecoration: "none",
             borderBottom: "1px solid rgba(61,184,158,0.4)",
             paddingBottom: "4px",
@@ -218,7 +223,8 @@ export default function LocalesSection() {
 
         .dc-loc-card {
           border: 1px solid var(--border-color);
-          padding: 24px;
+          padding: 0;
+          overflow: hidden;
           cursor: pointer;
           transition: transform 0.2s ease, border-color 0.2s ease;
         }

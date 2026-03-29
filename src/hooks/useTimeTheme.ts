@@ -18,6 +18,10 @@ export interface TimeTheme {
   heroGradient: string;
   heroAtmosphere: string;
   starCount: number;
+  colorTitle: string;
+  colorLink:  string;
+  colorLabel: string;
+  colorText:  string;
 }
 
 export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
@@ -35,6 +39,10 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     heroGradient:   "linear-gradient(180deg, #020108 0%, #080420 30%, #120830 60%, #0a0618 85%, #15100a 100%)",
     heroAtmosphere: "radial-gradient(ellipse at 50% 40%, rgba(124,63,168,0.25) 0%, transparent 65%)",
     starCount: 140,
+    colorTitle: "#c4853a",
+    colorLink:  "#3db89e",
+    colorLabel: "#5a3c18",
+    colorText:  "#c0a060",
   },
 
   manana: {
@@ -50,6 +58,10 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     heroGradient:   "linear-gradient(180deg, #ff6010 0%, #ff9030 12%, #ffbe50 28%, #ffd878 48%, #ffe8a8 68%, #d4c890 82%, #c09858 100%)",
     heroAtmosphere: "radial-gradient(ellipse at 50% 20%, rgba(255,200,80,0.35) 0%, transparent 60%)",
     starCount: 0,
+    colorTitle: "#e07030",
+    colorLink:  "#2aac9a",
+    colorLabel: "#804818",
+    colorText:  "#d4a870",
   },
 
   mediodia: {
@@ -65,6 +77,10 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     heroGradient:   "linear-gradient(180deg, #0a5090 0%, #1878b8 15%, #2898d8 35%, #50b8e8 55%, #90d4f4 74%, #c8eef8 88%, #e0f4fa 100%)",
     heroAtmosphere: "radial-gradient(ellipse at 50% 15%, rgba(255,255,200,0.4) 0%, transparent 55%)",
     starCount: 0,
+    colorTitle: "#e8a020",
+    colorLink:  "#1aa098",
+    colorLabel: "#706018",
+    colorText:  "#cca858",
   },
 
   tarde: {
@@ -80,6 +96,10 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     heroGradient:   "linear-gradient(180deg, #100018 0%, #38004a 8%, #800028 18%, #c02018 30%, #e04010 45%, #f07018 58%, #d05818 72%, #901808 88%, #500808 100%)",
     heroAtmosphere: "radial-gradient(ellipse at 50% 55%, rgba(255,100,20,0.3) 0%, transparent 60%)",
     starCount: 12,
+    colorTitle: "#e04820",
+    colorLink:  "#3db8a8",
+    colorLabel: "#701818",
+    colorText:  "#cc8860",
   },
 
   noche: {
@@ -95,6 +115,10 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     heroGradient:   "linear-gradient(180deg, #020306 0%, #040a1e 22%, #060c28 55%, #050a20 80%, #080c14 100%)",
     heroAtmosphere: "radial-gradient(ellipse at 50% 35%, rgba(40,60,160,0.2) 0%, transparent 65%)",
     starCount: 110,
+    colorTitle: "#b8860b",
+    colorLink:  "#3db89e",
+    colorLabel: "#282e48",
+    colorText:  "#b0a8c8",
   },
 };
 
@@ -113,6 +137,10 @@ export function applyThemeVars(theme: TimeTheme) {
   root.style.setProperty("--theme-bg",     theme.bg);
   root.style.setProperty("--theme-text",   theme.text);
   root.style.setProperty("--theme-accent", theme.accent);
+  root.style.setProperty("--color-title",  theme.colorTitle);
+  root.style.setProperty("--color-link",   theme.colorLink);
+  root.style.setProperty("--color-label",  theme.colorLabel);
+  root.style.setProperty("--color-text",   theme.colorText);
 }
 
 function getPeriod(hour: number): TimePeriod {

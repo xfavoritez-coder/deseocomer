@@ -5,18 +5,18 @@ import Link from "next/link";
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café", "Italiano", "Mexicano"];
 
 const localesMock = [
-  { id: 1,  nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia." },
-  { id: 2,  nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  descripcion: "Omakase y rolls creativos con ingredientes del Pacífico." },
-  { id: 3,  nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela." },
-  { id: 4,  nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 4.6, precio: "$$",   isOpen: false, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas." },
-  { id: 5,  nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 4.5, precio: "$$",   isOpen: false, descripcion: "Cocina plant-based de autor, menú cambiante según temporada." },
-  { id: 6,  nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo." },
-  { id: 7,  nombre: "La Trattoria",          categoria: "Italiano", barrio: "Lastarria",       emoji: "🍝", rating: 4.6, precio: "$$$",  isOpen: true,  descripcion: "Pastas frescas artesanales y risotto al estilo de la nonna en pleno Lastarria." },
-  { id: 8,  nombre: "Taquería del Desierto", categoria: "Mexicano", barrio: "Ñuñoa",           emoji: "🌮", rating: 4.4, precio: "$$",   isOpen: true,  descripcion: "Tacos al pastor auténticos, mezcal artesanal y ambiente festivo." },
-  { id: 9,  nombre: "Ramen Noche",           categoria: "Sushi",    barrio: "Providencia",     emoji: "🍜", rating: 4.8, precio: "$$",   isOpen: false, descripcion: "Ramen tonkotsu cocido 18 horas, gyozas caseras y sake importado." },
-  { id: 10, nombre: "Parrilla del Sur",      categoria: "Almuerzo", barrio: "Maipú",           emoji: "🥩", rating: 4.5, precio: "$$",   isOpen: true,  descripcion: "Cortes premium a las brasas, chimichurri secreto de la casa." },
-  { id: 11, nombre: "Vegan Garden",          categoria: "Vegano",   barrio: "Providencia",     emoji: "🌱", rating: 4.3, precio: "$",    isOpen: true,  descripcion: "Bowl therapy, wraps energéticos y jugos cold press." },
-  { id: 12, nombre: "Espresso Duna",         categoria: "Café",     barrio: "Las Condes",      emoji: "☕", rating: 4.6, precio: "$",    isOpen: false, descripcion: "Café de especialidad de origen único, té de autor y cheesecake de temporada." },
+  { id: 1,  nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia." },
+  { id: 2,  nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", descripcion: "Omakase y rolls creativos con ingredientes del Pacífico." },
+  { id: 3,  nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 4.7, precio: "$",    isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600", descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela." },
+  { id: 4,  nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 4.6, precio: "$$",   isOpen: false, imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas." },
+  { id: 5,  nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 4.5, precio: "$$",   isOpen: false, imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", descripcion: "Cocina plant-based de autor, menú cambiante según temporada." },
+  { id: 6,  nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 4.7, precio: "$",    isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo." },
+  { id: 7,  nombre: "La Trattoria",          categoria: "Italiano", barrio: "Lastarria",       emoji: "🍝", rating: 4.6, precio: "$$$",  isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600", descripcion: "Pastas frescas artesanales y risotto al estilo de la nonna en pleno Lastarria." },
+  { id: 8,  nombre: "Taquería del Desierto", categoria: "Mexicano", barrio: "Ñuñoa",           emoji: "🌮", rating: 4.4, precio: "$$",   isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=600", descripcion: "Tacos al pastor auténticos, mezcal artesanal y ambiente festivo." },
+  { id: 9,  nombre: "Ramen Noche",           categoria: "Sushi",    barrio: "Providencia",     emoji: "🍜", rating: 4.8, precio: "$$",   isOpen: false, imagenUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600", descripcion: "Ramen tonkotsu cocido 18 horas, gyozas caseras y sake importado." },
+  { id: 10, nombre: "Parrilla del Sur",      categoria: "Almuerzo", barrio: "Maipú",           emoji: "🥩", rating: 4.5, precio: "$$",   isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600", descripcion: "Cortes premium a las brasas, chimichurri secreto de la casa." },
+  { id: 11, nombre: "Vegan Garden",          categoria: "Vegano",   barrio: "Providencia",     emoji: "🌱", rating: 4.3, precio: "$",    isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", descripcion: "Bowl therapy, wraps energéticos y jugos cold press." },
+  { id: 12, nombre: "Espresso Duna",         categoria: "Café",     barrio: "Las Condes",      emoji: "☕", rating: 4.6, precio: "$",    isOpen: false, imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", descripcion: "Café de especialidad de origen único, té de autor y cheesecake de temporada." },
 ];
 
 export default function LocalesPage() {
@@ -39,7 +39,7 @@ export default function LocalesPage() {
         <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
             color: "var(--oasis-bright)",
@@ -58,12 +58,12 @@ export default function LocalesPage() {
           </h1>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
             color: "var(--text-primary)",
             fontWeight: 300,
             maxWidth: "500px",
             margin: "0 auto",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
           }}>
             Los mejores locales gastronómicos de Santiago, curados y verificados.
           </p>
@@ -79,7 +79,7 @@ export default function LocalesPage() {
             style={{
               width: "100%",
               fontFamily: "var(--font-lato)",
-              fontSize: "0.9rem",
+              fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
               color: "var(--text-primary)",
               background: "var(--bg-secondary)",
               border: "1px solid var(--border-color)",
@@ -100,7 +100,7 @@ export default function LocalesPage() {
                 onClick={() => setCategoriaActiva(cat)}
                 style={{
                   fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.7rem",
+                  fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
                   borderRadius: "30px",
@@ -111,7 +111,7 @@ export default function LocalesPage() {
                   fontWeight: isActive ? 700 : 400,
                   whiteSpace: "nowrap",
                   padding: "10px 20px",
-                  minHeight: "40px",
+                  minHeight: "44px",
                 }}>
                 {cat}
               </button>
@@ -122,7 +122,7 @@ export default function LocalesPage() {
         {/* Contador */}
         <p style={{
           fontFamily: "var(--font-cinzel)",
-          fontSize: "0.65rem",
+          fontSize: "clamp(0.7rem, 2vw, 0.8rem)",
           letterSpacing: "0.15em",
           textTransform: "uppercase",
           color: "var(--text-muted)",
@@ -146,7 +146,7 @@ export default function LocalesPage() {
                   <span style={{ fontSize: "2rem", flexShrink: 0, lineHeight: 1 }}>{local.emoji}</span>
                   <h2 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
-                    fontSize: "1rem",
+                    fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
                     color: "var(--accent)",
                     lineHeight: 1.2,
                     minWidth: 0,
@@ -171,9 +171,9 @@ export default function LocalesPage() {
                 {/* Línea 3: descripción */}
                 <p style={{
                   fontFamily: "var(--font-lato)",
-                  fontSize: "0.95rem",
+                  fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
                   color: "var(--text-muted)",
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
                   fontWeight: 300,
                   marginBottom: "18px",
                 }}>{local.descripcion}</p>

@@ -27,7 +27,7 @@ export default function CTASection() {
 
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
             color: "var(--oasis-bright)",
@@ -38,7 +38,7 @@ export default function CTASection() {
 
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(2rem, 5vw, 3.5rem)",
+            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
             color: "var(--accent)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "24px",
@@ -49,7 +49,7 @@ export default function CTASection() {
 
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2vw, 1.1rem)",
+            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
             color: "var(--text-primary)",
             fontWeight: 300,
             lineHeight: 1.8,
@@ -95,13 +95,13 @@ export default function CTASection() {
           <div className="dc-cta-btns">
             <a href="/registro" style={{
               fontFamily: "var(--font-cinzel)",
-              fontSize: "0.85rem",
-              letterSpacing: "0.1em",
+              fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               background: "var(--accent)",
               color: "var(--bg-primary)",
-              padding: "18px 44px",
-              borderRadius: "50px",
+              padding: "16px 40px",
+              borderRadius: "16px",
               textDecoration: "none",
               fontWeight: 700,
               boxShadow: "0 0 40px color-mix(in srgb, var(--accent) 35%, transparent)",
@@ -112,13 +112,13 @@ export default function CTASection() {
             </a>
             <a href="/panel/dashboard" style={{
               fontFamily: "var(--font-cinzel)",
-              fontSize: "0.85rem",
-              letterSpacing: "0.1em",
+              fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
               border: "1px solid rgba(61,184,158,0.5)",
               color: "var(--oasis-bright)",
-              padding: "18px 44px",
-              borderRadius: "50px",
+              padding: "16px 40px",
+              borderRadius: "16px",
               textDecoration: "none",
               fontWeight: 600,
               display: "flex", alignItems: "center", justifyContent: "center",

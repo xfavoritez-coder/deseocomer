@@ -35,6 +35,7 @@ type FormState = {
   fechaVencimiento: string;
   limiteUsos: string;
   categoria: CategoriaPromocion;
+  imagenUrl: string;
 };
 
 const FORM_INICIAL: FormState = {
@@ -52,6 +53,7 @@ const FORM_INICIAL: FormState = {
   fechaVencimiento: "",
   limiteUsos: "",
   categoria: "almuerzo",
+  imagenUrl: "",
 };
 
 function generarCodigo(): string {
@@ -86,7 +88,8 @@ export default function PanelPromocionesPage() {
       comuna: "Providencia",
       tipo: form.tipo,
       categoria: form.categoria,
-      imagen: "🍕",
+      imagen: form.imagenUrl || "🍕",
+      imagenUrl: form.imagenUrl,
       titulo: form.titulo,
       descripcion: form.descripcion,
       precioOriginal: form.precioOriginal ? Number(form.precioOriginal) : undefined,

@@ -60,18 +60,18 @@ export default function PromocionesSection() {
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
-            color: "#d4a017",
+            color: "var(--color-label)",
             marginBottom: "16px",
           }}>
             Ofertas de hoy
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(2rem, 5vw, 3.5rem)",
-            color: "var(--accent)",
+            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+            color: "var(--color-title)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
@@ -79,12 +79,12 @@ export default function PromocionesSection() {
           </h2>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2vw, 1.1rem)",
-            color: "var(--text-primary)",
+            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
+            color: "var(--color-text)",
             fontWeight: 300,
             maxWidth: "500px",
             margin: "0 auto 24px",
-            lineHeight: 1.7,
+            lineHeight: 1.8,
           }}>
             Descuentos, happy hours y cupones exclusivos en los mejores locales de Santiago. Algunos terminan hoy.
           </p>
@@ -159,7 +159,14 @@ export default function PromocionesSection() {
                     top: 0, left: 0, right: 0,
                     height: "3px",
                     background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)",
+                    zIndex: 1,
                   }} />
+                )}
+
+                {promo.imagenUrl && (
+                  <div style={{ height: "160px", overflow: "hidden", flexShrink: 0 }}>
+                    <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
                 )}
 
                 <div className="dc-ps-card-inner">
@@ -181,7 +188,7 @@ export default function PromocionesSection() {
                         <p style={{
                           fontFamily: "var(--font-cinzel)",
                           fontSize: "0.82rem",
-                          color: isHH ? "#d4a017" : "var(--oasis-bright)",
+                          color: isHH ? "#d4a017" : "var(--color-label)",
                           fontWeight: 600,
                         }}>
                           {promo.local}
@@ -226,8 +233,8 @@ export default function PromocionesSection() {
                   {/* Título */}
                   <h3 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
-                    fontSize: "0.92rem",
-                    color: "var(--accent)",
+                    fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+                    color: "var(--color-title)",
                     marginBottom: "8px",
                     lineHeight: 1.3,
                   }}>
@@ -417,15 +424,15 @@ export default function PromocionesSection() {
                         ? "linear-gradient(135deg, #c8850a, #d4a017)"
                         : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
                       border: "none",
-                      borderRadius: "10px",
+                      borderRadius: "16px",
                       fontFamily: "var(--font-cinzel)",
-                      fontSize: "0.68rem",
-                      letterSpacing: "0.15em",
+                      fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+                      letterSpacing: "0.08em",
                       textTransform: "uppercase",
                       color: "#07040f",
                       fontWeight: 700,
                       cursor: "pointer",
-                      minHeight: "46px",
+                      minHeight: "52px",
                       transition: "opacity 0.2s",
                     }}
                     onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
@@ -446,7 +453,7 @@ export default function PromocionesSection() {
             fontSize: "0.8rem",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
-            color: "var(--accent)",
+            color: "var(--color-link)",
             textDecoration: "none",
             borderBottom: "1px solid var(--border-color)",
             paddingBottom: "4px",

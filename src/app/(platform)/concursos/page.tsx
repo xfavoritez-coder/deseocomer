@@ -79,7 +79,7 @@ export default function ConcursosPage() {
         }} />
         <div style={{ position: "relative", textAlign: "center" }}>
           <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+            fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.45em", textTransform: "uppercase",
             color: "var(--oasis-bright)", marginBottom: "16px",
           }}>
@@ -87,7 +87,7 @@ export default function ConcursosPage() {
           </p>
           <h1 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(2rem, 7vw, 4.5rem)",
+            fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
             color: "var(--accent)",
             textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)",
             marginBottom: "20px", lineHeight: 1.1,
@@ -95,7 +95,7 @@ export default function ConcursosPage() {
             Gana Comida Gratis 🎪
           </h1>
           <p style={{
-            fontFamily: "var(--font-lato)", fontSize: "clamp(0.95rem, 2vw, 1.15rem)",
+            fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
             color: "var(--text-primary)", fontWeight: 300,
             maxWidth: "520px", margin: "0 auto", lineHeight: 1.8,
           }}>
@@ -233,13 +233,13 @@ export default function ConcursosPage() {
           margin-bottom: 44px;
         }
         .dc-cp-filter-btn {
-          font-family: var(--font-cinzel); font-size: 0.7rem;
+          font-family: var(--font-cinzel); font-size: clamp(0.75rem, 2vw, 0.85rem);
           letter-spacing: 0.15em; text-transform: uppercase;
           padding: 10px 20px; border-radius: 30px; cursor: pointer;
           border: 1px solid var(--border-color);
           background: transparent; color: var(--text-muted);
           transition: all 0.2s ease; white-space: nowrap;
-          display: flex; align-items: center;
+          display: flex; align-items: center; min-height: 44px;
         }
         .dc-cp-filter-btn:hover {
           border-color: var(--accent); color: var(--accent);
@@ -341,14 +341,14 @@ function ConcursoCard({
           </span>
           <div style={{ minWidth: 0 }}>
             <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
               letterSpacing: "0.2em", color: "var(--oasis-bright)",
               textTransform: "uppercase", marginBottom: "4px",
             }}>
               {c.local}
             </p>
             <p style={{
-              fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.95rem",
+              fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
               color: "var(--accent)", lineHeight: 1.3,
             }}>
               {c.premio}
@@ -443,11 +443,11 @@ function ConcursoCard({
             background: soon
               ? "linear-gradient(135deg, #ff2244, #ff6644)"
               : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-            border: "none", borderRadius: "12px",
-            fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
-            letterSpacing: "0.15em", textTransform: "uppercase",
+            border: "none", borderRadius: "16px",
+            fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            letterSpacing: "0.08em", textTransform: "uppercase",
             color: soon ? "#fff" : "var(--bg-primary)",
-            fontWeight: 700, cursor: "pointer", minHeight: "52px",
+            fontWeight: 700, cursor: "pointer", minHeight: "56px", padding: "16px",
             boxShadow: soon
               ? "0 4px 24px rgba(255,34,68,0.35)"
               : "0 4px 24px rgba(42,122,111,0.25)",
@@ -521,14 +521,14 @@ function FinalizadoCard({ concurso: c }: { concurso: ConcursoFinalizado }) {
         <span style={{ fontSize: "2.4rem" }}>{c.imagen}</span>
         <div>
           <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+            fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.2em", color: "var(--text-muted)",
             textTransform: "uppercase", marginBottom: "4px",
           }}>
             {c.local}
           </p>
           <p style={{
-            fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
+            fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
             color: "var(--text-primary)",
           }}>
             {c.premio}

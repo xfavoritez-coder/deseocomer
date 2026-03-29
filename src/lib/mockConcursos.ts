@@ -10,6 +10,7 @@ export interface Concurso {
   local: string;
   localId: string;
   imagen: string;
+  imagenUrl: string;
   premio: string;
   descripcionPremio: string;
   participantes: number;
@@ -24,6 +25,7 @@ export interface ConcursoFinalizado {
   local: string;
   localId: string;
   imagen: string;
+  imagenUrl: string;
   premio: string;
   participantes: number;
   fechaFin: string;
@@ -42,6 +44,7 @@ export const CONCURSOS: Concurso[] = [
     local: "Pizza Napoli",
     localId: "pizza-napoli",
     imagen: "🍕",
+    imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
     premio: "Pizza familiar + bebidas para 4",
     descripcionPremio:
       "Una pizza familiar a elección del menú completo más 4 bebidas, válido para comer en el local o con delivery dentro de la Región Metropolitana. Incluye ingredientes importados de Italia.",
@@ -73,6 +76,7 @@ export const CONCURSOS: Concurso[] = [
     local: "Sushi Oasis",
     localId: "sushi-oasis",
     imagen: "🍣",
+    imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600",
     premio: "Menú omakase para 2 personas",
     descripcionPremio:
       "Experiencia omakase completa para 2: 14 piezas seleccionadas por el chef, entradas, dessert japonés y bebida incluida. Valor referencial $65.000.",
@@ -105,6 +109,7 @@ export const CONCURSOS: Concurso[] = [
     local: "El Menú de Don Carlos",
     localId: "menu-don-carlos",
     imagen: "🍲",
+    imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600",
     premio: "Almuerzo semanal gratis (5 días)",
     descripcionPremio:
       "Almuerzo completo de lunes a viernes durante 1 semana: sopa o entrada + plato de fondo + postre + jugo natural. La mejor comida casera de Barrio Italia.",
@@ -138,6 +143,7 @@ export const CONCURSOS: Concurso[] = [
     local: "Burger Bros",
     localId: "burger-bros",
     imagen: "🍔",
+    imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600",
     premio: "Ultimate Burger Experience",
     descripcionPremio:
       "La combo épica: 2 burgers dobles a elección, 2 papas fritas grandes, 2 bebidas medianas y 2 milkshakes de temporada. El sueño de todo foodie.",
@@ -168,6 +174,7 @@ export const CONCURSOS: Concurso[] = [
     local: "Café Buen Día",
     localId: "cafe-buen-dia",
     imagen: "☕",
+    imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600",
     premio: "Café premium ilimitado por un mes",
     descripcionPremio:
       "30 días de café de especialidad gratis: un americano, cortado o latte al día a tu elección. El ritual matutino perfecto para 1 mes completo.",
@@ -199,6 +206,7 @@ export const CONCURSOS: Concurso[] = [
     local: "La Trattoria",
     localId: "la-trattoria",
     imagen: "🍝",
+    imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600",
     premio: "Cena romántica para 2 + vino",
     descripcionPremio:
       "Menú de degustación para 2: entrada, pasta fresca a elección, secondo piatto, dessert de la casa y botella de vino tinto importado. Una noche perfecta.",
@@ -233,6 +241,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "Taco Fiesta",
     localId: "taco-fiesta",
     imagen: "🌮",
+    imagenUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=600",
     premio: "Pack de tacos para 4 amigos",
     participantes: 312,
     fechaFin: "23 Mar 2026",
@@ -248,6 +257,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "El Rincón Marino",
     localId: "rincon-marino",
     imagen: "🦞",
+    imagenUrl: "https://images.unsplash.com/photo-1559742811-822873691df8?w=600",
     premio: "Paila marina para 2 + vino",
     participantes: 445,
     fechaFin: "16 Mar 2026",
@@ -263,6 +273,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "Vegano Feliz",
     localId: "vegano-feliz",
     imagen: "🥗",
+    imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600",
     premio: "Plan alimentario vegano semanal",
     participantes: 267,
     fechaFin: "8 Mar 2026",
@@ -278,6 +289,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "Chilenito's BBQ",
     localId: "chilenitos-bbq",
     imagen: "🥩",
+    imagenUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600",
     premio: "Asado completo para 6 personas",
     participantes: 628,
     fechaFin: "28 Feb 2026",
@@ -293,6 +305,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "Ramen Tokio",
     localId: "ramen-tokio",
     imagen: "🍜",
+    imagenUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600",
     premio: "Ramen ilimitado para 2",
     participantes: 389,
     fechaFin: "19 Feb 2026",
@@ -308,6 +321,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
     local: "Crepería La Bohème",
     localId: "creperia-la-boheme",
     imagen: "🥞",
+    imagenUrl: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600",
     premio: "Brunch dominical para 4",
     participantes: 224,
     fechaFin: "10 Feb 2026",

@@ -11,6 +11,10 @@
 @property --theme-bg     { syntax: "<color>"; inherits: true; initial-value: #1a0e05; }
 @property --theme-text   { syntax: "<color>"; inherits: true; initial-value: #f5d080; }
 @property --theme-accent { syntax: "<color>"; inherits: true; initial-value: #e8a84c; }
+@property --color-title  { syntax: "<color>"; inherits: true; initial-value: #e8a84c; }
+@property --color-link   { syntax: "<color>"; inherits: true; initial-value: #3db89e; }
+@property --color-label  { syntax: "<color>"; inherits: true; initial-value: #5a4028; }
+@property --color-text   { syntax: "<color>"; inherits: true; initial-value: #c0a060; }
 
 :root {
   /* Transición suave de 2s entre todas las paletas */
@@ -23,7 +27,11 @@
     --border-color 2s ease,
     --theme-bg     2s ease,
     --theme-text   2s ease,
-    --theme-accent 2s ease;
+    --theme-accent 2s ease,
+    --color-title  2s ease,
+    --color-link   2s ease,
+    --color-label  2s ease,
+    --color-text   2s ease;
 
   /* Colores estáticos de diseño (no cambian con el tema) */
   --oasis-teal:    #2a7a6f;
