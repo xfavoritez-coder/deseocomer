@@ -199,7 +199,7 @@ export default function ConcursosSection() {
           grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
           gap: 28px;
         }
-        .dc-cst-card { padding: 0; overflow: hidden; }
+        .dc-cst-card { padding: 0; overflow: visible; }
         .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
         @keyframes dc-cst-pulse {
           0%, 100% { opacity: 1; }

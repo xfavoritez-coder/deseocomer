@@ -54,7 +54,7 @@ export default function HeroSection() {
       overflow: "hidden",
       background: heroGradient,
       transition: "background 2s ease",
-      marginBottom: "-2px",
+      marginBottom: "0",
     }}>
 
       {/* ── Estrellas ── */}
