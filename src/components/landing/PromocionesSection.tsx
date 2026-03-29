@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   PROMOCIONES,
   TIPO_ICONS,
@@ -26,7 +25,6 @@ function getTop3(): Promocion[] {
 interface TimerState { horas: number; minutos: number; segundos: number }
 
 export default function PromocionesSection() {
-  const router = useRouter();
   const [mounted, setMounted]   = useState(false);
   const [promos]                = useState<Promocion[]>(getTop3());
   const [timers, setTimers]     = useState<Record<number, TimerState>>({});
@@ -125,9 +123,10 @@ export default function PromocionesSection() {
               : null;
 
             return (
-              <div
+              <Link
                 key={promo.id}
-                className="dc-ps-card"
+                href={`/promociones/${promo.id}`}
+                className={`dc-ps-card${isHH ? " dc-ps-card--hh" : ""}${isUltimas ? " dc-ps-card--urgent" : ""}`}
                 style={{
                   backgroundColor: "var(--bg-secondary)",
                   border: isUltimas
@@ -138,19 +137,9 @@ export default function PromocionesSection() {
                   transition: "transform 0.2s ease, border-color 0.2s ease",
                   position: "relative",
                   overflow: "hidden",
-                }}
-                onClick={() => router.push(`/promociones/${promo.id}`)}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.transform = "translateY(-6px)";
-                  el.style.borderColor = isHH ? "#d4a017" : "var(--accent)";
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLDivElement;
-                  el.style.transform = "translateY(0)";
-                  el.style.borderColor = isUltimas
-                    ? "rgba(212,160,23,0.6)"
-                    : isHH ? "rgba(212,160,23,0.25)" : "var(--border-color)";
+                  textDecoration: "none",
+                  display: "block",
+                  color: "inherit",
                 }}
               >
                 {/* Happy hour gold stripe */}
@@ -161,11 +150,12 @@ export default function PromocionesSection() {
                     height: "3px",
                     background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)",
                     zIndex: 1,
+                    pointerEvents: "none",
                   }} />
                 )}
 
                 {promo.imagenUrl && (
-                  <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0 }}>
+                  <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0, pointerEvents: "none" }}>
                     <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     {badge && (
                       <div style={{
@@ -175,6 +165,7 @@ export default function PromocionesSection() {
                         letterSpacing: "0.08em", textTransform: "uppercase",
                         padding: "5px 12px", borderRadius: "8px",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                        pointerEvents: "none",
                       }}>
                         {badge.text}
                       </div>
@@ -186,6 +177,7 @@ export default function PromocionesSection() {
                 <div style={{
                   padding: "16px 24px 0",
                   display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                  pointerEvents: "none",
                 }}>
                   <div>
                     <p style={{
@@ -241,7 +233,7 @@ export default function PromocionesSection() {
                   </div>
                 </div>
 
-                <div className="dc-ps-card-inner">
+                <div className="dc-ps-card-inner" style={{ pointerEvents: "none" }}>
                   {/* Título */}
                   <h3 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
@@ -428,14 +420,13 @@ export default function PromocionesSection() {
                     </div>
                   )}
 
-                  {/* CTA */}
-                  <button
+                  {/* CTA (styled div, not a button — the whole card is a Link) */}
+                  <div
                     style={{
                       width: "100%",
                       background: isHH
                         ? "linear-gradient(135deg, #c8850a, #d4a017)"
                         : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-                      border: "none",
                       borderRadius: "16px",
                       fontFamily: "var(--font-cinzel)",
                       fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
@@ -443,17 +434,17 @@ export default function PromocionesSection() {
                       textTransform: "uppercase",
                       color: "#07040f",
                       fontWeight: 700,
-                      cursor: "pointer",
                       minHeight: "52px",
-                      transition: "opacity 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      pointerEvents: "none",
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
                   >
                     Ver promoción →
-                  </button>
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -487,6 +478,8 @@ export default function PromocionesSection() {
           gap: 28px;
         }
         .dc-ps-card-inner { padding: 16px 28px 28px; }
+        .dc-ps-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
+        .dc-ps-card--hh:hover { border-color: #d4a017 !important; }
 
         @keyframes dc-ps-blink {
           0%, 100% { opacity: 1; }

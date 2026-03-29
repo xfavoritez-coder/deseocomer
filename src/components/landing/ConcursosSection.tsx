@@ -66,30 +66,24 @@ export default function ConcursosSection() {
 
         <div className="dc-cst-grid">
           {concursosMock.map((c) => (
-            <div key={c.id}
+            <Link key={c.id}
+              href={`/concursos/${c.id}`}
               className="dc-cst-card"
               style={{
                 backgroundColor: "var(--bg-secondary)",
                 border: "1px solid var(--border-color)",
                 borderRadius: "20px",
                 cursor: "pointer",
-                transition: "transform 0.2s ease",
-              }}
-              onMouseEnter={e => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.transform = "translateY(-6px)";
-                el.style.setProperty("border-color", "var(--accent)");
-              }}
-              onMouseLeave={e => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.transform = "translateY(0)";
-                el.style.setProperty("border-color", "var(--border-color)");
+                transition: "transform 0.2s ease, border-color 0.2s ease",
+                textDecoration: "none",
+                display: "block",
+                color: "inherit",
               }}
             >
-              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0 }}>
+              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none" }}>
                 <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
-              <div style={{ padding: "24px 24px 0" }}>
+              <div style={{ padding: "24px 24px 0", pointerEvents: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
                   <div style={{ minWidth: 0 }}>
                     <p style={{
@@ -158,7 +152,7 @@ export default function ConcursosSection() {
                   ))}
                 </div>
 
-                <Link href={`/concursos/${c.id}`} style={{
+                <div style={{
                   display: "flex", alignItems: "center", justifyContent: "center",
                   width: "100%",
                   background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
@@ -167,14 +161,14 @@ export default function ConcursosSection() {
                   fontSize: "clamp(0.9rem, 2.5vw, 1rem)", letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: "var(--bg-primary)",
-                  fontWeight: 700, textDecoration: "none",
+                  fontWeight: 700,
                   minHeight: "56px",
                   marginBottom: "24px",
                 }}>
                   Ver concurso →
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -206,6 +200,7 @@ export default function ConcursosSection() {
           gap: 28px;
         }
         .dc-cst-card { padding: 0; overflow: hidden; }
+        .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
 
         @media (max-width: 767px) {
           .dc-cst-section { padding: 48px 20px 24px; }

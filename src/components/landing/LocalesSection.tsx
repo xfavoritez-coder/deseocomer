@@ -53,7 +53,7 @@ export default function LocalesSection() {
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
-            Descubre Dónde Comer 🗺️
+            Descubre Dónde Comer
           </h2>
           <p className="section-description">
             Los mejores locales gastronómicos de Santiago, curados y verificados.

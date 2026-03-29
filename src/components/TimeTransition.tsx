@@ -2,12 +2,12 @@
 import { useEffect } from "react";
 import type { TimeTheme } from "@/hooks/useTimeTheme";
 
-const GREETINGS: Record<string, string> = {
-  madrugada: "Los mejores antojos no tienen hora",
-  manana:    "Buenos días — ¿Qué vas a desayunar hoy?",
-  mediodia:  "Buenas tardes — ¿Ya pensaste dónde almorzar?",
-  tarde:     "Buenas tardes — La hora perfecta para una promoción",
-  noche:     "Buenas noches — La noche es perfecta para descubrir algo nuevo",
+const GREETINGS: Record<string, { title: string; subtitle?: string }> = {
+  madrugada: { title: "Los mejores antojos no tienen hora" },
+  manana:    { title: "Buenos días", subtitle: "¿Qué vas a desayunar hoy?" },
+  mediodia:  { title: "Buenas tardes", subtitle: "¿Ya pensaste dónde almorzar?" },
+  tarde:     { title: "Buenas tardes", subtitle: "La hora perfecta para una promoción" },
+  noche:     { title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
 };
 
 interface Props {
@@ -160,8 +160,25 @@ export default function TimeTransition({ from, to, onComplete }: Props) {
           padding: "0 20px",
           lineHeight: 1.4,
         }}>
-          {GREETINGS[to.period]}
+          {GREETINGS[to.period]?.title}
         </p>
+        {GREETINGS[to.period]?.subtitle && (
+          <p style={{
+            fontFamily: "var(--font-cinzel)",
+            fontSize: "clamp(0.85rem, 2.5vw, 1.1rem)",
+            color: `${to.text}b0`,
+            letterSpacing: "0.1em",
+            position: "relative",
+            zIndex: 1,
+            animation: "tt-text-in 600ms ease 820ms both",
+            textAlign: "center",
+            maxWidth: "600px",
+            padding: "0 20px",
+            lineHeight: 1.4,
+          }}>
+            {GREETINGS[to.period].subtitle}
+          </p>
+        )}
       </div>
     </>
   );

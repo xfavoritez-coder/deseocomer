@@ -22,6 +22,16 @@ const OVERLAY_BG: Record<TimePeriod, string> = {
   noche:     "rgba(6,4,16,0.95)",
 };
 
+const GREETING_DATA: Record<TimePeriod, { icon: string; title: string; subtitle?: string }> = {
+  madrugada: { icon: "✨", title: "Los mejores antojos no tienen hora" },
+  manana:    { icon: "🌅", title: "Buenos días", subtitle: "¿Qué vas a desayunar hoy?" },
+  mediodia:  { icon: "🌞", title: "Buenas tardes", subtitle: "¿Ya pensaste dónde almorzar?" },
+  tarde:     { icon: "🌇", title: "Buenas tardes", subtitle: "La hora perfecta para una promoción" },
+  noche:     { icon: "🌙", title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
+};
+
+const LS_KEY = "periodo_actual";
+
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hookTheme    = useTimeTheme();
   const [forcedPeriod, setForcedPeriod] = useState<TimePeriod | null>(null);
@@ -38,21 +48,46 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   const overlayVersionRef = useRef(0);
   const [overlayActive,  setOverlayActive]  = useState(false);
   const [overlayKey,     setOverlayKey]     = useState(0);
-  const [overlayContent, setOverlayContent] = useState({ icon: "", label: "", bg: "rgba(0,0,0,0.95)" });
+  const [overlayContent, setOverlayContent] = useState({ icon: "", title: "", subtitle: "", bg: "rgba(0,0,0,0.95)" });
 
-  // Detect period change → apply CSS vars + trigger overlay
+  // Track whether this is a dev-panel forced change (always animate)
+  const devForcedRef = useRef(false);
+
+  // On mount, seed localStorage with current period so first load never animates
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+      const stored = localStorage.getItem(LS_KEY);
+      if (!stored) {
+        // First ever visit — store period silently
+        localStorage.setItem(LS_KEY, activeTheme.period);
+      }
+    }
+  }, [activeTheme.period]);
+
+  // Detect period change → apply CSS vars + trigger overlay only on REAL change
   const prevPeriodRef = useRef<TimePeriod | null>(null);
   useEffect(() => {
-    const prev        = prevPeriodRef.current;
-    const needsOverlay = prev !== null && prev !== activeTheme.period;
+    const stored = localStorage.getItem(LS_KEY) as TimePeriod | null;
+    const isDevForced = devForcedRef.current;
+    devForcedRef.current = false; // reset flag
+
+    // Determine if we should show the overlay:
+    // - Dev panel forced change → always animate
+    // - Real period change detected by setInterval → animate only if stored !== current
+    // - Page load / refresh → stored === current, so NO animation
+    const needsOverlay = isDevForced || (stored !== null && stored !== activeTheme.period && prevPeriodRef.current !== null);
 
     if (needsOverlay) {
-      const { icon, label } = THEMES[activeTheme.period];
+      const greeting = GREETING_DATA[activeTheme.period];
       const bg  = OVERLAY_BG[activeTheme.period];
       const ver = ++overlayVersionRef.current;
-      setOverlayContent({ icon, label, bg });
+      setOverlayContent({ icon: greeting.icon, title: greeting.title, subtitle: greeting.subtitle ?? "", bg });
       setOverlayKey(ver);
       setOverlayActive(true);
+      // Update localStorage
+      localStorage.setItem(LS_KEY, activeTheme.period);
       // Apply CSS vars after overlay has faded in (~500ms)
       setTimeout(() => applyThemeVars(activeTheme), 500);
       // Remove overlay after 3s animation
@@ -60,13 +95,16 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         if (overlayVersionRef.current === ver) setOverlayActive(false);
       }, 3100);
     } else {
+      // Silently apply theme — no animation
       applyThemeVars(activeTheme);
+      localStorage.setItem(LS_KEY, activeTheme.period);
     }
     prevPeriodRef.current = activeTheme.period;
   }, [activeTheme]);
 
   function handleDevSelect(period: TimePeriod) {
     if (period === (forcedPeriod ?? hookTheme.period)) return;
+    devForcedRef.current = true; // mark as dev-forced so overlay always plays
     setForcedPeriod(period);
   }
 
@@ -81,7 +119,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           style={{
             position: "fixed", inset: 0, zIndex: 9998,
             display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center", gap: "24px",
+            alignItems: "center", justifyContent: "center", gap: "16px",
             background: overlayContent.bg,
             pointerEvents: "all",
             animation: "tpOverlayShow 3s ease forwards",
@@ -94,13 +132,25 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
             {overlayContent.icon}
           </span>
           <p style={{
-            fontFamily: "var(--font-cinzel, serif)", fontSize: "1rem",
-            letterSpacing: "0.35em", textTransform: "uppercase",
-            color: "rgba(255,255,255,0.9)", margin: 0,
+            fontFamily: "var(--font-cinzel-decorative, serif)", fontSize: "clamp(1.2rem, 4vw, 2rem)",
+            letterSpacing: "0.08em",
+            color: "rgba(255,255,255,0.95)", margin: 0,
             animation: "tpLabelFade 400ms ease 300ms both",
+            textAlign: "center", padding: "0 20px",
           }}>
-            {overlayContent.label}
+            {overlayContent.title}
           </p>
+          {overlayContent.subtitle && (
+            <p style={{
+              fontFamily: "var(--font-cinzel, serif)", fontSize: "clamp(0.85rem, 2.5vw, 1.1rem)",
+              letterSpacing: "0.15em",
+              color: "rgba(255,255,255,0.7)", margin: 0,
+              animation: "tpLabelFade 400ms ease 500ms both",
+              textAlign: "center", padding: "0 20px",
+            }}>
+              {overlayContent.subtitle}
+            </p>
+          )}
         </div>
       )}
 

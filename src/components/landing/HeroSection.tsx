@@ -2,14 +2,12 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useCiudad } from "@/hooks/useCiudad";
 
 const TEXT_SHADOW = "0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.6)";
 
 export default function HeroSection() {
   const theme     = useTheme();
   const { period, heroGradient, heroAtmosphere, starCount, accent } = theme;
-  const city = useCiudad();
 
   const starsRef    = useRef<HTMLDivElement>(null);
   const prevPeriod  = useRef<string>("");
@@ -172,7 +170,7 @@ export default function HeroSection() {
           margin: "0 auto 0",
           maxWidth: "800px",
         }}>
-          GANA COMIDA GRATIS.
+          Gana comida{" "}<span className="dc-hero-gratis">gratis</span>
         </h1>
 
         <p className="dc-hero-city" style={{
@@ -185,7 +183,7 @@ export default function HeroSection() {
           animation: "fadeUp 0.8s 0.55s both",
           margin: "16px auto 40px",
         }}>
-          Descubre los mejores locales de {city}
+          El genio que cumple tu deseo de comer 🧞
         </p>
 
         <div className="dc-hero-cta" style={{
@@ -261,8 +259,11 @@ export default function HeroSection() {
 
         .dc-hero-ghost:hover { border-color: rgba(255,255,255,1) !important; background: rgba(255,255,255,0.08) !important; }
 
+        .dc-hero-gratis { white-space: nowrap; }
+
         @media (max-width: 767px) {
           .dc-hero-h1       { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; }
+          .dc-hero-gratis   { display: block; }
           .dc-hero-subtitle { font-size: clamp(1rem, 4vw, 1.1rem) !important; line-height: 1.8 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-lamp          { font-size: 52px !important; bottom: 13% !important; }
