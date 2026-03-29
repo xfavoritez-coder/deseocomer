@@ -444,13 +444,13 @@ export default function ConcursoDetallePage() {
             <p style={{
               fontFamily: "var(--font-cinzel)", fontSize: "0.58rem",
               fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase",
-              color: "var(--oasis-bright)", marginBottom: "6px",
+              color: "var(--oasis-bright)", marginBottom: "6px", textAlign: "center",
             }}>
               Ranking en tiempo real
             </p>
             <h2 style={{
               fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.05rem",
-              fontWeight: 800, color: "var(--accent)", marginBottom: "28px",
+              fontWeight: 800, color: "var(--accent)", marginBottom: "28px", textAlign: "center",
             }}>
               🏆 Tabla de posiciones
             </h2>
@@ -706,69 +706,64 @@ export default function ConcursoDetallePage() {
       )}
 
       {/* Local info */}
-      {"descripcionLocal" in c && (
+      {"descripcionLocal" in c && (() => {
+        const localColors = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
+        const localColor = localColors[c.local.charCodeAt(0) % localColors.length];
+        const localInitials = c.local.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+        return (
         <div className="dc-cd-fullwidth" style={{ paddingBottom: "60px" }}>
           <div style={{
-            display: "flex", gap: "16px", alignItems: "flex-start",
+            display: "flex", flexDirection: "row", alignItems: "center", gap: "16px",
             background: "rgba(0,0,0,0.2)",
             border: "1px solid var(--border-color)",
-            borderRadius: "14px", padding: "24px 28px",
+            borderRadius: "14px", padding: "20px",
           }}>
             {LOCAL_IMAGES[c.localId] ? (
               <div style={{
-                width: "56px", height: "56px", borderRadius: "8px", overflow: "hidden",
+                width: "64px", height: "64px", borderRadius: "10px", overflow: "hidden",
                 flexShrink: 0, background: "rgba(45,26,8,0.8)",
               }}>
                 <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
-            ) : (() => {
-              const initials = c.local.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
-              let hash = 0;
-              for (let i = 0; i < c.local.length; i++) hash = c.local.charCodeAt(i) + ((hash << 5) - hash);
-              const hue = Math.abs(hash) % 360;
-              return (
-                <div style={{
-                  width: "56px", height: "56px", borderRadius: "50%", flexShrink: 0,
-                  background: `hsl(${hue}, 40%, 25%)`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "var(--font-cinzel)", fontSize: "1rem",
-                  fontWeight: 700, color: "#fff",
-                }}>
-                  {initials}
-                </div>
-              );
-            })()}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            ) : (
+              <div style={{
+                width: "64px", height: "64px", borderRadius: "50%", flexShrink: 0,
+                background: localColor,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                fontWeight: 700, color: "#fff",
+              }}>
+                {localInitials}
+              </div>
+            )}
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", overflow: "hidden", flex: 1, minWidth: 0 }}>
               <p style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.95rem",
-                color: "#e8a84c", fontWeight: 700, marginBottom: "6px",
+                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                color: "#e8a84c", fontWeight: 700,
+                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
               }}>
                 {c.local}
               </p>
               <p style={{
                 fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-                color: "rgba(253,240,200,0.7)", lineHeight: 1.7, marginBottom: "12px",
-                display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const,
+                color: "rgba(253,240,200,0.7)", lineHeight: 1.7,
+                display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const,
                 overflow: "hidden",
               }}>
                 {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
               </p>
               <Link href={`/locales/${c.localId}`} style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-                letterSpacing: "0.15em", textTransform: "uppercase",
+                fontFamily: "var(--font-lato)", fontSize: "0.8rem",
                 color: "var(--oasis-bright)", textDecoration: "none",
-                borderBottom: "1px solid transparent", paddingBottom: "2px",
-                transition: "border-color 0.2s",
-              }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderBottomColor = "rgba(61,184,158,0.5)"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderBottomColor = "transparent"; }}
-              >
+                marginTop: "4px",
+              }}>
                 Ver perfil del local →
               </Link>
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       <Footer />
 
@@ -780,10 +775,10 @@ export default function ConcursoDetallePage() {
         }
         .dc-cd-body {
           max-width: 1200px; margin: 0 auto;
-          padding: 60px 60px 80px;
+          padding: 32px 60px 80px;
           display: grid;
           grid-template-columns: 1fr 340px;
-          gap: 48px; align-items: start;
+          gap: 32px; align-items: start;
         }
         .dc-cd-main { min-width: 0; }
         .dc-cd-sidebar { min-width: 0; }
