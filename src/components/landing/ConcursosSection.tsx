@@ -128,7 +128,7 @@ export default function ConcursosSection() {
                     </p>
                   </div>
                   <div style={{ width: "1px", background: "var(--border-color)" }} />
-                  <div style={{ textAlign: "center", flex: 1 }}>
+                  <div style={{ textAlign: "center", flex: 1, paddingRight: "4px" }}>
                     <p style={{
                       fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
                       color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
@@ -137,8 +137,9 @@ export default function ConcursosSection() {
                       {c.horasRestantes}h
                     </p>
                     <p style={{
-                      fontFamily: "var(--font-lato)", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700,
+                      fontFamily: "var(--font-lato)", fontSize: "0.65rem", letterSpacing: "0.08em", fontWeight: 700,
                       color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--text-muted)",
+                      whiteSpace: "nowrap",
                     }}>
                       RESTANTES
                     </p>
