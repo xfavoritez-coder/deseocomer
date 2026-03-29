@@ -1,17 +1,39 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGenie } from "@/contexts/GenieContext";
 
 export default function GenieToast() {
   const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen } = useGenie();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-dismiss after 8 seconds
+  const [mostrandoFecha, setMostrandoFecha] = useState(false);
+  const [dia, setDia] = useState("");
+  const [mes, setMes] = useState("");
+  const [anio, setAnio] = useState("");
+  const [guardado, setGuardado] = useState(false);
+
+  // Reset state when toast changes
   useEffect(() => {
-    if (!toastActivo) return;
+    setMostrandoFecha(false);
+    setDia("");
+    setMes("");
+    setAnio("");
+    setGuardado(false);
+  }, [toastActivo?.id]);
+
+  // Auto-dismiss after 8 seconds (only if not showing birthday form)
+  useEffect(() => {
+    if (!toastActivo || mostrandoFecha) return;
     timerRef.current = setTimeout(() => setToastActivo(null), 8000);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [toastActivo, setToastActivo]);
+  }, [toastActivo, setToastActivo, mostrandoFecha]);
+
+  // Auto-close after save confirmation
+  useEffect(() => {
+    if (!guardado) return;
+    const t = setTimeout(() => setToastActivo(null), 2500);
+    return () => clearTimeout(t);
+  }, [guardado, setToastActivo]);
 
   if (!toastActivo) return null;
 
@@ -22,26 +44,58 @@ export default function GenieToast() {
       setIsOpen(true);
     } else if (opt === "Registrarme") {
       setToastActivo(null);
-      // Store that trigger5 was handled so it doesn't show again
-      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch { /* noop */ }
+      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
       window.location.href = "/registro";
     } else if (opt === "Seguir explorando") {
-      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch { /* noop */ }
+      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
       setToastActivo(null);
-    } else if (opt === "Decirle mi fecha") {
-      setToastActivo(null);
-      // Navigate to profile edit tab with birthday focus
-      window.location.href = "/perfil";
+    } else if (opt === "Cuéntale al Genio 🧞") {
+      // Don't close — show inline birthday form
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setMostrandoFecha(true);
     } else if (opt === "Después" && toastActivo.id === "cumpleanos") {
       try {
         const count = Number(localStorage.getItem("genio_cumple_postponed_count") ?? "0") + 1;
         localStorage.setItem("genio_cumple_postponed_count", String(count));
         if (count >= 2) localStorage.setItem("genio_cumple_solicitado", "true");
-      } catch { /* noop */ }
+      } catch {}
       setToastActivo(null);
     } else {
       setToastActivo(null);
     }
+  };
+
+  const handleGuardarCumple = () => {
+    const d = Number(dia), m = Number(mes), a = Number(anio);
+    if (d < 1 || d > 31 || m < 1 || m > 12 || a < 1900 || a > 2099) return;
+    try {
+      localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: d, mes: m, anio: a, guardadoEn: Date.now() }));
+      // Also save in profile
+      const profile = JSON.parse(localStorage.getItem("deseocomer_usuario_perfil") ?? "{}");
+      profile.cumpleanos = { dia: d, mes: m, ano: a };
+      localStorage.setItem("deseocomer_usuario_perfil", JSON.stringify(profile));
+      localStorage.setItem("genio_cumple_solicitado", "true");
+    } catch {}
+    addRespuestaGenio("cumpleaños", `${d}/${m}/${a}`);
+    setGuardado(true);
+  };
+
+  const isValidDate = (() => {
+    const d = Number(dia), m = Number(mes), a = Number(anio);
+    return d >= 1 && d <= 31 && m >= 1 && m <= 12 && a >= 1900 && a <= 2099;
+  })();
+
+  const inputStyle = {
+    background: "rgba(232,168,76,0.08)",
+    border: "1px solid rgba(232,168,76,0.25)",
+    borderRadius: "8px",
+    color: "var(--accent, #e8a84c)",
+    fontFamily: "var(--font-cinzel)",
+    fontSize: "0.9rem",
+    textAlign: "center" as const,
+    padding: "8px",
+    outline: "none",
+    boxSizing: "border-box" as const,
   };
 
   return (
@@ -65,29 +119,92 @@ export default function GenieToast() {
         fontSize: "0.9rem", cursor: "pointer",
       }}>✕</button>
 
-      <p style={{
-        fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-        color: "rgba(245,208,128,0.9)", lineHeight: 1.5,
-        marginBottom: "12px", paddingRight: "20px",
-      }}>
-        {toastActivo.mensaje}
-      </p>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-        {toastActivo.opciones.map(opt => (
-          <button key={opt} onClick={() => handleOption(opt)} style={{
-            background: "rgba(232,168,76,0.12)",
-            border: "1px solid rgba(232,168,76,0.25)",
-            borderRadius: "16px", padding: "6px 12px", cursor: "pointer",
-            fontFamily: "var(--font-lato)", fontSize: "0.75rem",
-            color: "rgba(245,208,128,0.85)",
+      {/* Birthday saved confirmation */}
+      {guardado ? (
+        <div style={{ textAlign: "center", padding: "8px 0" }}>
+          <div style={{ fontSize: "1.8rem", marginBottom: "8px" }}>🎂</div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent, #e8a84c)", marginBottom: "4px" }}>
+            ¡Guardado!
+          </p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.6)" }}>
+            Te avisaré cuando haya ofertas de cumpleaños
+          </p>
+        </div>
+      ) : mostrandoFecha ? (
+        /* Inline birthday form */
+        <div>
+          <p style={{
+            fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
+            color: "rgba(245,208,128,0.9)", marginBottom: "6px",
           }}>
-            {opt}
+            ¿Cuándo es tu cumpleaños?
+          </p>
+          <p style={{
+            fontFamily: "var(--font-lato)", fontSize: "0.75rem",
+            color: "rgba(245,208,128,0.5)", marginBottom: "14px", lineHeight: 1.4,
+          }}>
+            Así te aviso cuando hay ofertas especiales para celebrar 🎂
+          </p>
+          <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+            <input
+              type="text" inputMode="numeric" placeholder="DD" maxLength={2}
+              value={dia} onChange={e => setDia(e.target.value.replace(/\D/g, ""))}
+              style={{ ...inputStyle, width: "52px" }}
+            />
+            <input
+              type="text" inputMode="numeric" placeholder="MM" maxLength={2}
+              value={mes} onChange={e => setMes(e.target.value.replace(/\D/g, ""))}
+              style={{ ...inputStyle, width: "52px" }}
+            />
+            <input
+              type="text" inputMode="numeric" placeholder="AAAA" maxLength={4}
+              value={anio} onChange={e => setAnio(e.target.value.replace(/\D/g, ""))}
+              style={{ ...inputStyle, width: "72px" }}
+            />
+          </div>
+          <button
+            onClick={handleGuardarCumple}
+            disabled={!isValidDate}
+            style={{
+              width: "100%", padding: "10px",
+              background: isValidDate ? "var(--accent, #e8a84c)" : "rgba(232,168,76,0.2)",
+              border: "none", borderRadius: "10px",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
+              letterSpacing: "0.08em", textTransform: "uppercase",
+              color: isValidDate ? "#1a0e05" : "rgba(245,208,128,0.4)",
+              fontWeight: 700, cursor: isValidDate ? "pointer" : "default",
+            }}
+          >
+            Guardar 🧞
           </button>
-        ))}
-      </div>
+        </div>
+      ) : (
+        /* Normal toast content */
+        <>
+          <p style={{
+            fontFamily: "var(--font-lato)", fontSize: "0.85rem",
+            color: "rgba(245,208,128,0.9)", lineHeight: 1.5,
+            marginBottom: "12px", paddingRight: "20px",
+          }}>
+            {toastActivo.mensaje}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+            {toastActivo.opciones.map(opt => (
+              <button key={opt} onClick={() => handleOption(opt)} style={{
+                background: "rgba(232,168,76,0.12)",
+                border: "1px solid rgba(232,168,76,0.25)",
+                borderRadius: "16px", padding: "6px 12px", cursor: "pointer",
+                fontFamily: "var(--font-lato)", fontSize: "0.75rem",
+                color: "rgba(245,208,128,0.85)",
+              }}>
+                {opt}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* Lamp indicator */}
+      {/* Genie indicator */}
       <div style={{
         position: "absolute", bottom: "-6px", right: "28px",
         fontSize: "0.7rem",
