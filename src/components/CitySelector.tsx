@@ -31,11 +31,13 @@ function requestLocation() {
 }
 
 export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [city, setCity] = useState("Santiago");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem("ciudad_seleccionada");
     if (saved) setCity(saved);
     const handler = (e: Event) => setCity((e as CustomEvent<string>).detail);
@@ -58,43 +60,54 @@ export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
     setOpen(false);
   };
 
+  if (!mounted) return null;
+
   if (mobile) {
     return (
       <div style={{ padding: "12px 4px", borderBottom: "1px solid var(--border-color)" }}>
-        <p style={{
+        <label style={{
           fontFamily: "var(--font-cinzel)",
           fontSize: "0.65rem",
           letterSpacing: "0.2em",
           textTransform: "uppercase",
           color: "var(--text-muted)",
           marginBottom: "8px",
-        }}>Tu ciudad:</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-          {CITIES.map(c => (
-            <button key={c} onClick={() => handleSelect(c)} style={{
-              fontFamily: "var(--font-cinzel)",
-              fontSize: "0.7rem",
-              letterSpacing: "0.05em",
-              padding: "8px 14px",
-              borderRadius: "20px",
-              border: c === city ? "1px solid var(--accent)" : "1px solid var(--border-color)",
-              background: c === city ? "color-mix(in srgb, var(--accent) 15%, transparent)" : "transparent",
-              color: c === city ? "var(--accent)" : "var(--text-primary)",
-              cursor: "pointer",
-            }}>{c}</button>
-          ))}
-          <button onClick={() => { requestLocation(); setOpen(false); }} style={{
+          display: "block",
+        }}>Tu ciudad:</label>
+        <select
+          value={city}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "__location__") {
+              requestLocation();
+            } else {
+              handleSelect(val);
+            }
+          }}
+          style={{
+            width: "100%",
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem",
+            fontSize: "0.85rem",
             letterSpacing: "0.05em",
-            padding: "8px 14px",
-            borderRadius: "20px",
-            border: "1px solid var(--border-color)",
-            background: "transparent",
-            color: "var(--oasis-bright)",
+            padding: "8px 12px",
+            borderRadius: "8px",
+            border: "1px solid var(--accent)",
+            background: "var(--bg-secondary)",
+            color: "var(--accent)",
             cursor: "pointer",
-          }}>📡 Usar mi ubicación</button>
-        </div>
+            appearance: "none",
+            WebkitAppearance: "none",
+            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e8a84c' d='M2 4l4 4 4-4'/%3E%3C/svg%3E\")",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 12px center",
+            paddingRight: "32px",
+          }}
+        >
+          {CITIES.map(c => (
+            <option key={c} value={c} style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>{c}</option>
+          ))}
+          <option value="__location__" style={{ background: "var(--bg-primary)", color: "var(--oasis-bright)" }}>📡 Usar mi ubicación</option>
+        </select>
       </div>
     );
   }
