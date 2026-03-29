@@ -171,7 +171,7 @@ export default function ConcursosSection() {
                   minHeight: "56px",
                   marginBottom: "24px",
                 }}>
-                  Quiero Participar →
+                  Ver concurso →
                 </Link>
               </div>
             </div>

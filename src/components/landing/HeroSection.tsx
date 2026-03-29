@@ -159,46 +159,37 @@ export default function HeroSection() {
       }}>
         <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2.5rem, 4.5vw, 4rem)",
-          lineHeight: 1.1,
-          marginBottom: "24px",
-          animation: "fadeUp 0.8s 0.4s both",
-          textShadow: TEXT_SHADOW,
-          transition: "color 2s ease",
+          fontSize: "clamp(2.2rem, 5vw, 4.5rem)",
+          lineHeight: 1.05,
+          fontWeight: 900,
+          letterSpacing: "0.02em",
           textTransform: "uppercase",
+          color: "#e8a84c",
+          textShadow: TEXT_SHADOW,
+          animation: "fadeUp 0.8s 0.4s both",
+          margin: "0 auto 20px",
           maxWidth: "800px",
-          margin: "0 auto 24px",
         }}>
-          <span style={{
-            display: "block",
-            color: isDay ? "#ffe898" : "var(--accent)",
-          }}>
-            Gana comida gratis.
-          </span>
-          <span style={{
-            display: "block",
-            color: isDay ? "#80f0e0" : "var(--oasis-bright)",
-          }}>
-            Descubre los mejores locales.
-          </span>
+          Gana comida gratis.
         </h1>
 
         <p className="dc-hero-subtitle hero-subtitle" style={{
-          fontFamily: "var(--font-lato)",
-          fontWeight: 300,
+          fontFamily: "var(--font-cinzel)",
+          fontWeight: 400,
           color: "rgba(255,255,255,0.88)",
-          animation: "fadeUp 0.8s 0.65s both",
-          maxWidth: "560px",
+          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
+          lineHeight: 1.8,
+          animation: "fadeUp 0.8s 0.55s both",
+          maxWidth: "600px",
           margin: "0 auto 40px",
         }}>
-          El genio que cumple tu deseo de comer. Participa en concursos, accede a promociones,
-          {" "}y descubre qué comer hoy.
+          El genio que cumple tu deseo de comer. Participa en concursos, accede a promociones y descubre qué comer hoy.
         </p>
 
         <div className="dc-hero-cta" style={{
           display: "flex", flexDirection: "column", gap: "16px",
           alignItems: "center",
-          animation: "fadeUp 0.8s 0.9s both",
+          animation: "fadeUp 0.8s 0.7s both",
         }}>
           <Link href="/concursos" className="dc-hero-btn dc-hero-btn--primary" style={{
             fontFamily: "var(--font-cinzel)",
@@ -219,14 +210,20 @@ export default function HeroSection() {
           }}>
             🎪 Ver Concursos
           </Link>
-          <Link href="/promociones" className="dc-hero-link" style={{
+          <Link href="/promociones" className="dc-hero-ghost" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "clamp(0.85rem, 2vw, 0.95rem)",
-            letterSpacing: "0.08em",
+            fontSize: "0.85rem",
+            letterSpacing: "0.1em",
             textTransform: "uppercase",
-            color: "var(--color-link)",
+            color: "rgba(255,255,255,0.9)",
             textDecoration: "none",
-            opacity: 0.9,
+            padding: "12px 28px",
+            borderRadius: "10px",
+            border: "1.5px solid rgba(255,255,255,0.6)",
+            background: "transparent",
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            transition: "border-color 0.2s, background 0.2s",
+            whiteSpace: "nowrap",
           }}>
             Ver promociones →
           </Link>
@@ -260,7 +257,7 @@ export default function HeroSection() {
         .dc-hero-content { margin-top: -80px; }
         .dc-lamp { font-size: 80px; }
 
-        .dc-hero-link:hover { text-decoration: underline; opacity: 1; }
+        .dc-hero-ghost:hover { border-color: rgba(255,255,255,1) !important; background: rgba(255,255,255,0.08) !important; }
 
         @media (max-width: 767px) {
           .dc-hero-h1       { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; }
@@ -272,7 +269,7 @@ export default function HeroSection() {
           .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; bottom: 20% !important; }
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
           .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; max-width: 320px; justify-content: center; }
-          .dc-hero-subtitle br { display: none; }
+          .dc-hero-ghost    { width: 100%; max-width: 320px; justify-content: center; }
         }
 
         @media (min-width: 768px) and (max-width: 1023px) {

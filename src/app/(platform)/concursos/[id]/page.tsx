@@ -261,12 +261,23 @@ export default function ConcursoDetallePage() {
           position: "relative", display: "flex",
           alignItems: "center", gap: "28px", flexWrap: "wrap",
         }}>
-          <span style={{
-            fontSize: "clamp(3.5rem, 10vw, 6rem)",
-            filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
-          }}>
-            {c.imagen}
-          </span>
+          {c.imagenUrl ? (
+            <div style={{
+              width: "clamp(80px, 15vw, 120px)", height: "clamp(80px, 15vw, 120px)",
+              borderRadius: "16px", overflow: "hidden", flexShrink: 0,
+              boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+              border: "1px solid var(--border-color)",
+            }}>
+              <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            </div>
+          ) : (
+            <span style={{
+              fontSize: "clamp(3.5rem, 10vw, 6rem)",
+              filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
+            }}>
+              {c.imagen}
+            </span>
+          )}
           <div>
             <p style={{
               fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",

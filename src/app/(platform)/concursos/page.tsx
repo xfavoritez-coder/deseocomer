@@ -314,8 +314,29 @@ function ConcursoCard({
         el.style.boxShadow = "none";
       }}
     >
-      {/* Badge termina pronto */}
-      {soon && (
+      {/* Image */}
+      {c.imagenUrl && (
+        <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative" }}>
+          <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          {/* Badge termina pronto over image */}
+          {soon && (
+            <div style={{
+              position: "absolute", top: "12px", right: "12px",
+              background: "linear-gradient(135deg, #ff2244, #ff6644)",
+              color: "#fff", fontFamily: "var(--font-cinzel)",
+              fontSize: "0.55rem", letterSpacing: "0.15em",
+              textTransform: "uppercase", padding: "5px 12px",
+              borderRadius: "20px", fontWeight: 700,
+              boxShadow: "0 0 16px rgba(255,34,68,0.5)",
+              animation: "dc-pulse 1.5s ease-in-out infinite",
+            }}>
+              ¡Termina pronto!
+            </div>
+          )}
+        </div>
+      )}
+
+      {!c.imagenUrl && soon && (
         <div style={{
           position: "absolute", top: "16px", right: "16px",
           background: "linear-gradient(135deg, #ff2244, #ff6644)",
@@ -333,12 +354,6 @@ function ConcursoCard({
       <div style={{ padding: "28px 28px 0" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-          <span style={{
-            fontSize: "2.8rem", flexShrink: 0,
-            filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.4))",
-          }}>
-            {c.imagen}
-          </span>
           <div style={{ minWidth: 0 }}>
             <p style={{
               fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",

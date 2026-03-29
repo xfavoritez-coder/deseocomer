@@ -3,6 +3,7 @@ import { Cinzel_Decorative, Cinzel, Lato } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import DevPeriodSwitcher from "@/components/DevPeriodSwitcher";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <DevPeriodSwitcher />
           </AuthProvider>
         </ThemeProvider>
       </body>

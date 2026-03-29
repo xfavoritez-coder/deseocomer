@@ -76,21 +76,18 @@ section, div, nav, footer, button, a {
 /* ── Clases reutilizables para tipografía de sección ── */
 .section-description, .hero-subtitle, p.description {
   font-family: var(--font-body);
-  font-size: 1.2rem !important;
   font-weight: 300;
   color: var(--color-text);
-  line-height: 1.8 !important;
   max-width: 520px;
   margin: 0 auto;
 }
 
+/* ── Tipografía automática ── */
+main p, section p { font-size: 1.1rem; line-height: 1.8; color: var(--color-text); }
+main h2, section h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
+main h3, section h3 { font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 400; line-height: 1.8; }
+
 @media (max-width: 768px) {
-  .section-description, .hero-subtitle, p.description {
-    font-size: 1.1rem !important;
-    line-height: 1.8 !important;
-  }
-  p {
-    font-size: 1rem !important;
-    line-height: 1.7 !important;
-  }
+  main p, section p { font-size: 1rem; line-height: 1.7; }
+  main h2, section h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
 }
