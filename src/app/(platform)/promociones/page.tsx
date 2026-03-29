@@ -851,6 +851,16 @@ function PromoCard({
     ? "0 0 30px rgba(212,160,23,0.2), 0 4px 20px rgba(0,0,0,0.4)"
     : "0 4px 20px rgba(0,0,0,0.3)";
 
+  const badge = isHappyHour
+    ? { text: "HAPPY HOUR", bg: "linear-gradient(135deg, #c8850a, #d4a017)" }
+    : promo.tipo === "2x1"
+    ? { text: "2×1", bg: "linear-gradient(135deg, #2a7a6f, #3db89e)" }
+    : promo.porcentajeDescuento
+    ? { text: `-${promo.porcentajeDescuento}%`, bg: "linear-gradient(135deg, #b03000, #ff5020)" }
+    : promo.tipo === "cupon"
+    ? { text: "CUPÓN", bg: "linear-gradient(135deg, #5020a0, #8040d0)" }
+    : null;
+
   return (
     <div
       className="dc-promo-card"
@@ -880,34 +890,23 @@ function PromoCard({
       }}
     >
       {/* Image with discount badge overlay */}
-      {promo.imagenUrl && (() => {
-        const badge = isHappyHour
-          ? { text: "HAPPY HOUR", bg: "linear-gradient(135deg, #c8850a, #d4a017)" }
-          : promo.tipo === "2x1"
-          ? { text: "2×1", bg: "linear-gradient(135deg, #2a7a6f, #3db89e)" }
-          : promo.porcentajeDescuento
-          ? { text: `-${promo.porcentajeDescuento}%`, bg: "linear-gradient(135deg, #b03000, #ff5020)" }
-          : promo.tipo === "cupon"
-          ? { text: "CUPÓN", bg: "linear-gradient(135deg, #5020a0, #8040d0)" }
-          : null;
-        return (
-          <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0 }}>
-            <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-            {badge && (
-              <div style={{
-                position: "absolute", top: "12px", left: "12px", zIndex: 2,
-                background: badge.bg, color: "#fff", fontWeight: 700,
-                fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
-                letterSpacing: "0.08em", textTransform: "uppercase",
-                padding: "5px 12px", borderRadius: "8px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
-              }}>
-                {badge.text}
-              </div>
-            )}
-          </div>
-        );
-      })()}
+      {promo.imagenUrl && (
+        <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0 }}>
+          <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          {badge && (
+            <div style={{
+              position: "absolute", top: "12px", left: "12px", zIndex: 2,
+              background: badge.bg, color: "#fff", fontWeight: 700,
+              fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
+              letterSpacing: "0.08em", textTransform: "uppercase",
+              padding: "5px 12px", borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+            }}>
+              {badge.text}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Local info below image */}
       <div style={{
@@ -974,8 +973,9 @@ function PromoCard({
             </span>
           )}
         </div>
-        </div>
+      </div>
 
+      <div className="dc-promo-card-inner">
         {/* Título + descripción */}
         <h3 style={{
           fontFamily: "var(--font-cinzel-decorative)",

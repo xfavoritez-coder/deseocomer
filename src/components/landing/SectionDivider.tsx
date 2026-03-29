@@ -10,7 +10,7 @@ export default function SectionDivider() {
         width: "100%",
         maxWidth: "860px",
         height: "1px",
-        background: "linear-gradient(to right, transparent, rgba(232,168,76,0.28), transparent)",
+        background: "linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 55%, transparent), transparent)",
       }} />
     </div>
   );

@@ -131,6 +131,7 @@ export default function Navbar() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 20px 60px;
           display: flex; justify-content: space-between; align-items: center;
+          background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
           transition: background 0.3s ease, border-color 0.3s ease;
         }
         .dc-nav--scrolled {
@@ -140,8 +141,8 @@ export default function Navbar() {
         }
         .dc-nav-logo {
           font-family: var(--font-cinzel-decorative); font-size: 1.1rem;
-          color: var(--accent); text-decoration: none;
-          letter-spacing: 0.08em; text-shadow: 0 0 20px var(--accent);
+          color: #e8a84c; text-decoration: none;
+          letter-spacing: 0.08em;
           flex-shrink: 0;
         }
         .dc-nav-links {

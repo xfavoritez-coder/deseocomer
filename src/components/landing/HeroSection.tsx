@@ -183,12 +183,10 @@ export default function HeroSection() {
           </span>
         </h1>
 
-        <p className="dc-hero-subtitle" style={{
+        <p className="dc-hero-subtitle hero-subtitle" style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(1rem, 2vw, 1.2rem)",
           fontWeight: 300,
           color: "rgba(255,255,255,0.88)",
-          lineHeight: 1.8,
           animation: "fadeUp 0.8s 0.65s both",
           maxWidth: "560px",
           margin: "0 auto 40px",

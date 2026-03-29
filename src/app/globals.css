@@ -73,19 +73,24 @@ section, div, nav, footer, button, a {
   .font-body    { font-family: var(--font-body); }
 }
 
-/* ── Clase reutilizable para párrafos descriptivos de sección ── */
-.section-description {
+/* ── Clases reutilizables para tipografía de sección ── */
+.section-description, .hero-subtitle, p.description {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-size: 1.2rem !important;
   font-weight: 300;
   color: var(--color-text);
-  line-height: 1.8;
+  line-height: 1.8 !important;
   max-width: 520px;
   margin: 0 auto;
 }
 
-@media (max-width: 767px) {
-  .section-description {
-    font-size: clamp(1rem, 4vw, 1.1rem);
+@media (max-width: 768px) {
+  .section-description, .hero-subtitle, p.description {
+    font-size: 1.1rem !important;
+    line-height: 1.8 !important;
+  }
+  p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
   }
 }

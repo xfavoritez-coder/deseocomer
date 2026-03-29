@@ -227,9 +227,9 @@ export default function ConcursoDetallePage() {
               ? <><strong style={{ color: "var(--accent)" }}>{refBannerName}</strong> te invitó a participar.</>
               : "Alguien te invitó a participar."
             }
-            {" "}¡Regístrate para que cuente su punto!
+            {" "}¡Inicia sesión para que cuente su punto!
           </p>
-          <Link href="/registro" style={{
+          <Link href={`/login?next=/concursos/${concursoId}`} style={{
             flexShrink: 0,
             fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
             letterSpacing: "0.12em", textTransform: "uppercase",
@@ -237,7 +237,7 @@ export default function ConcursoDetallePage() {
             fontWeight: 700, padding: "10px 22px", borderRadius: "30px",
             textDecoration: "none", whiteSpace: "nowrap",
           }}>
-            Registrarme ahora
+            Inicia sesión para participar
           </Link>
         </div>
       )}

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 const concursosMock = [
   {
@@ -157,20 +158,21 @@ export default function ConcursosSection() {
                   ))}
                 </div>
 
-                <button style={{
+                <Link href={`/concursos/${c.id}`} style={{
+                  display: "flex", alignItems: "center", justifyContent: "center",
                   width: "100%",
                   background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-                  border: "none", borderRadius: "16px",
+                  borderRadius: "16px",
                   fontFamily: "var(--font-cinzel)",
                   fontSize: "clamp(0.9rem, 2.5vw, 1rem)", letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   color: "var(--bg-primary)",
-                  fontWeight: 700, cursor: "pointer",
+                  fontWeight: 700, textDecoration: "none",
                   minHeight: "56px",
                   marginBottom: "24px",
                 }}>
                   Quiero Participar →
-                </button>
+                </Link>
               </div>
             </div>
           ))}
