@@ -66,7 +66,7 @@ export default function Navbar() {
                 <button onClick={logout} className="dc-nav-logout">Salir</button>
               </div>
             ) : (
-              <Link href="/registro" className="dc-nav-cta">Entrar</Link>
+              <Link href="/login" className="dc-nav-cta">Entrar</Link>
             )
           )}
         </div>
