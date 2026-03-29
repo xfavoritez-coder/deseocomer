@@ -88,6 +88,7 @@ export default function ConcursosPage() {
           <h1 style={{
             fontFamily: "var(--font-cinzel-decorative)",
             fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
+            fontWeight: 800, letterSpacing: "0.02em",
             color: "var(--accent)",
             textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)",
             marginBottom: "20px", lineHeight: 1.1,
@@ -414,17 +415,17 @@ function ConcursoCard({
             Tiempo restante
           </p>
           {mounted && timer ? (
-            <div style={{ display: "flex", justifyContent: "center", gap: "8px", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "8px", flexWrap: "nowrap", width: "100%" }}>
               {timer.dias > 0 && (
                 <>
                   <TimerUnit value={timer.dias} label="días" urgent={soon} />
-                  <span style={{ color: "var(--text-muted)", paddingBottom: "18px", fontSize: "1.2rem" }}>:</span>
+                  <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
                 </>
               )}
               <TimerUnit value={timer.horas}    label="horas"    urgent={soon} />
-              <span style={{ color: "var(--text-muted)", paddingBottom: "18px", fontSize: "1.2rem" }}>:</span>
+              <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
               <TimerUnit value={timer.minutos}  label="min"      urgent={soon} />
-              <span style={{ color: "var(--text-muted)", paddingBottom: "18px", fontSize: "1.2rem" }}>:</span>
+              <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
               <TimerUnit value={timer.segundos} label="seg"      urgent={soon} />
             </div>
           ) : (
@@ -522,24 +523,25 @@ function ConcursoCard({
 
 function TimerUnit({ value, label, urgent }: { value: number; label: string; urgent: boolean }) {
   return (
-    <div style={{ textAlign: "center", width: "60px", flexShrink: 0, overflow: "hidden" }}>
-      <p style={{
+    <div style={{ flex: 1, minWidth: 0, textAlign: "center", padding: "16px 8px" }}>
+      <span style={{
         fontFamily: "var(--font-cinzel-decorative)",
-        fontSize: "clamp(1.4rem, 4vw, 2rem)", lineHeight: 1,
+        fontSize: "clamp(1.5rem, 5vw, 2.5rem)", fontWeight: 700,
+        lineHeight: 1, display: "block",
         color: urgent ? "#ff4444" : "var(--accent)",
         textShadow: urgent
           ? "0 0 20px rgba(255,68,68,0.6)"
           : "0 0 16px color-mix(in srgb, var(--accent) 50%, transparent)",
       }}>
         {pad2(value)}
-      </p>
-      <p style={{
-        fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
-        letterSpacing: "0.15em", textTransform: "uppercase",
-        color: "var(--text-muted)", marginTop: "4px",
+      </span>
+      <span style={{
+        fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
+        letterSpacing: "0.1em", textTransform: "uppercase",
+        color: "var(--text-muted)", marginTop: "4px", display: "block",
       }}>
         {label}
-      </p>
+      </span>
     </div>
   );
 }

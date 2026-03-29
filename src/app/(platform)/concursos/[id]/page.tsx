@@ -245,7 +245,7 @@ export default function ConcursoDetallePage() {
             }}>
               <p style={{
                 fontFamily: "var(--font-cinzel-decorative)",
-                fontSize: "1.1rem",
+                fontSize: "1.15rem",
                 fontWeight: 800,
                 color: "var(--sand-gold)",
                 marginBottom: "16px",
@@ -276,8 +276,8 @@ export default function ConcursoDetallePage() {
                 <button onClick={handleDismissRefBanner} style={{
                   fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
                   letterSpacing: "0.1em", textTransform: "uppercase",
-                  background: "none", border: "none", color: "rgba(255,255,255,0.6)",
-                  cursor: "pointer", padding: "8px 16px", fontWeight: 400,
+                  background: "none", border: "none", color: "rgba(255,255,255,0.5)",
+                  cursor: "pointer", padding: "8px 16px", fontWeight: 300,
                 }}>
                   Cerrar
                 </button>
@@ -328,12 +328,14 @@ export default function ConcursoDetallePage() {
               fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
               letterSpacing: "0.3em", textTransform: "uppercase",
               color: "var(--oasis-bright)", marginBottom: "10px",
+              fontWeight: 600,
             }}>
               {c.local}
             </p>
             <h1 style={{
               fontFamily: "var(--font-cinzel-decorative)",
               fontSize: "clamp(1.4rem, 4.5vw, 2.8rem)",
+              fontWeight: 800,
               color: "var(--accent)",
               textShadow: "0 0 40px color-mix(in srgb, var(--accent) 50%, transparent)",
               marginBottom: "12px", lineHeight: 1.2,
@@ -585,14 +587,14 @@ export default function ConcursoDetallePage() {
           }}>
             <p style={{
               fontFamily: "var(--font-cinzel)", fontSize: "0.58rem",
-              letterSpacing: "0.3em", textTransform: "uppercase",
+              fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase",
               color: "var(--oasis-bright)", marginBottom: "6px",
             }}>
               Ranking en tiempo real
             </p>
             <h2 style={{
               fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.05rem",
-              color: "var(--accent)", marginBottom: "28px",
+              fontWeight: 800, color: "var(--accent)", marginBottom: "28px",
             }}>
               🏆 Tabla de posiciones
             </h2>
@@ -748,7 +750,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <h2 style={{
       fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
-      letterSpacing: "0.25em", textTransform: "uppercase",
+      fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
       color: "var(--accent)", marginBottom: "22px",
       paddingBottom: "12px", borderBottom: "1px solid var(--border-color)",
     }}>
@@ -788,8 +790,8 @@ function BigTimer({
         </p>
       )}
       <div style={{
-        display: "flex", justifyContent: "center",
-        alignItems: "flex-start", gap: "6px", flexWrap: "wrap",
+        display: "flex", flexDirection: "row", justifyContent: "center",
+        alignItems: "center", gap: "8px", flexWrap: "nowrap", width: "100%",
       }}>
         {timer.dias > 0 && (
           <>
@@ -816,8 +818,8 @@ function BigTimer({
 function Colon() {
   return (
     <span style={{
-      color: "var(--text-muted)", fontSize: "2.5rem",
-      marginTop: "10px", lineHeight: 1,
+      color: "var(--text-muted)", fontSize: "1.5rem",
+      flexShrink: 0, alignSelf: "center", marginBottom: "16px",
     }}>
       :
     </span>
@@ -831,24 +833,24 @@ function BigUnit({ value, label, col, glow }: {
     <div style={{
       background: "rgba(0,0,0,0.3)",
       border: "1px solid var(--border-color)",
-      borderRadius: "14px", padding: "16px 18px",
-      minWidth: "72px",
+      borderRadius: "14px", padding: "16px 8px",
+      flex: 1, minWidth: 0, textAlign: "center",
     }}>
-      <p style={{
+      <span style={{
         fontFamily: "var(--font-cinzel-decorative)",
-        fontSize: "clamp(1.8rem, 5vw, 3.2rem)",
-        lineHeight: 1, color: col,
+        fontSize: "clamp(1.5rem, 5vw, 2.5rem)", fontWeight: 700,
+        lineHeight: 1, display: "block", color: col,
         textShadow: `0 0 30px ${glow}`,
       }}>
         {pad2(value)}
-      </p>
-      <p style={{
-        fontFamily: "var(--font-cinzel)", fontSize: "0.52rem",
-        letterSpacing: "0.18em", textTransform: "uppercase",
-        color: "var(--text-muted)", marginTop: "8px",
+      </span>
+      <span style={{
+        fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)",
+        letterSpacing: "0.1em", textTransform: "uppercase",
+        color: "var(--text-muted)", marginTop: "4px", display: "block",
       }}>
         {label}
-      </p>
+      </span>
     </div>
   );
 }

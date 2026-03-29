@@ -62,6 +62,7 @@ export default function GenieSection() {
         <h2 style={{
           fontFamily: "var(--font-cinzel-decorative)",
           fontSize: "clamp(2rem, 5vw, 3.5rem)",
+          fontWeight: 800, letterSpacing: "0.02em",
           color: "var(--accent)",
           textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
           marginBottom: "20px",

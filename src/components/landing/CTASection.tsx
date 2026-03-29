@@ -37,6 +37,7 @@ export default function CTASection() {
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
             fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+            fontWeight: 800, letterSpacing: "0.02em",
             color: "var(--accent)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "24px",
