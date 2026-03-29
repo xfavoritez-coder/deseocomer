@@ -3,6 +3,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  getPendingRef,
+  hasEmailCounted,
+  markEmailCounted,
+  incrementRef,
+  clearPendingRef,
+} from "@/lib/referrals";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -57,6 +64,7 @@ export default function RegistroPage() {
   const [error,    setError]    = useState("");
   const [loading,  setLoading]  = useState(false);
   const [success,  setSuccess]  = useState(false);
+  const [refMsg,   setRefMsg]   = useState("");
   const [googleMsg, setGoogleMsg] = useState("");
 
   // ── User form submit ──────────────────────────────────────────────────────
@@ -82,8 +90,25 @@ export default function RegistroPage() {
     setLoading(false);
 
     if (res.success) {
+      // Process pending referral if any
+      const pending = getPendingRef();
+      let msg = "";
+      let redirectTo = "/concursos";
+
+      if (pending && res.userId && pending.refCode !== res.userId) {
+        const email = userForm.email.trim().toLowerCase();
+        if (!hasEmailCounted(pending.concursoId, pending.refCode, email)) {
+          markEmailCounted(pending.concursoId, pending.refCode, email);
+          incrementRef(pending.concursoId, pending.refCode);
+          msg = "¡Listo! Le diste un punto a tu amigo en el concurso.";
+          redirectTo = `/concursos/${pending.concursoId}`;
+        }
+        clearPendingRef();
+      }
+
+      setRefMsg(msg);
       setSuccess(true);
-      setTimeout(() => router.push("/concursos"), 1600);
+      setTimeout(() => router.push(redirectTo), msg ? 2200 : 1600);
     } else {
       setError(res.error ?? "Error al crear la cuenta.");
     }
@@ -147,7 +172,9 @@ export default function RegistroPage() {
             <h2 className="dc-auth-success-title">
               {tab === "user" ? "¡Bienvenido!" : "¡Local registrado!"}
             </h2>
-            <p className="dc-auth-success-sub">El Genio te está esperando...</p>
+            <p className="dc-auth-success-sub">
+              {refMsg || "El Genio te está esperando..."}
+            </p>
           </div>
         ) : (
           <>

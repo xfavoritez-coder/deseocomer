@@ -45,6 +45,7 @@ export type RegisterData = RegisterUserData | RegisterLocalData;
 interface AuthResult {
   success: boolean;
   error?: string;
+  userId?: string;
 }
 
 interface AuthContextType {
@@ -164,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(authUser);
     sessionStorage.setItem(SESSION_KEY, newUser.id);
 
-    return { success: true };
+    return { success: true, userId: newUser.id };
   }, []);
 
   const logout = useCallback(() => {

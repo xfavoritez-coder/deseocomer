@@ -14,49 +14,22 @@ import {
   pad2,
   type RankingEntry,
 } from "@/lib/mockConcursos";
-
-// ─── LocalStorage helpers ─────────────────────────────────────────────────────
-
-const REFS_KEY    = "dc_refs";
-const VISITED_KEY = "dc_ref_visited";
-
-function getRefCount(concursoId: number, userId: string): number {
-  try {
-    const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
-    return store[`${concursoId}_${userId}`] ?? 0;
-  } catch { return 0; }
-}
-
-function incrementRef(concursoId: number, userId: string): void {
-  try {
-    const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
-    const key = `${concursoId}_${userId}`;
-    store[key] = (store[key] ?? 0) + 1;
-    localStorage.setItem(REFS_KEY, JSON.stringify(store));
-  } catch { /* noop */ }
-}
-
-function hasVisited(concursoId: number, refUserId: string): boolean {
-  try {
-    const list: string[] = JSON.parse(localStorage.getItem(VISITED_KEY) ?? "[]");
-    return list.includes(`${concursoId}_${refUserId}`);
-  } catch { return false; }
-}
-
-function markVisited(concursoId: number, refUserId: string): void {
-  try {
-    const list: string[] = JSON.parse(localStorage.getItem(VISITED_KEY) ?? "[]");
-    list.push(`${concursoId}_${refUserId}`);
-    localStorage.setItem(VISITED_KEY, JSON.stringify(list));
-  } catch { /* noop */ }
-}
+import {
+  REFS_KEY,
+  savePendingRef,
+  getRefCount,
+  incrementRef,
+  hasVisited,
+  markVisited,
+  getRefUserName,
+} from "@/lib/referrals";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ConcursoDetallePage() {
   const { id }         = useParams<{ id: string }>();
   const searchParams   = useSearchParams();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const concursoId = Number(id);
   const refUserId  = searchParams.get("ref");
@@ -70,9 +43,12 @@ export default function ConcursoDetallePage() {
   const [ranking, setRanking] = useState<RankingEntry[]>(() =>
     concurso ? concurso.ranking : (finalizado?.ranking ?? [])
   );
-  const [copied,   setCopied]   = useState(false);
-  const [refToast, setRefToast] = useState(false);
-  const [myRefs,   setMyRefs]   = useState(0);
+  const [copied,       setCopied]       = useState(false);
+  const [refToast,     setRefToast]     = useState(false);
+  const [newRefToast,  setNewRefToast]  = useState(false);
+  const [newRefCount,  setNewRefCount]  = useState(0);
+  const [myRefs,       setMyRefs]       = useState(0);
+  const [refBannerName, setRefBannerName] = useState<string | null | undefined>(undefined);
   const refProcessed = useRef(false);
 
   // Tick countdown every second
@@ -87,15 +63,24 @@ export default function ConcursoDetallePage() {
   // Process incoming referral param
   useEffect(() => {
     if (!refUserId || refProcessed.current) return;
-    if (!isAuthenticated || !user) return;
-    if (user.id === refUserId) return;
+    if (authLoading) return; // Wait for session to resolve
+
+    if (!isAuthenticated || !user) {
+      // Unauthenticated: save pending ref so registration can process it
+      savePendingRef(refUserId, concursoId);
+      const name = getRefUserName(refUserId);
+      setRefBannerName(name); // null = unknown name, string = known name
+      return;
+    }
+
+    if (user.id === refUserId) return; // No self-referral
     if (hasVisited(concursoId, refUserId)) return;
     refProcessed.current = true;
     incrementRef(concursoId, refUserId);
     markVisited(concursoId, refUserId);
     setRefToast(true);
     setTimeout(() => setRefToast(false), 4000);
-  }, [isAuthenticated, user, concursoId, refUserId]);
+  }, [authLoading, isAuthenticated, user, concursoId, refUserId]);
 
   // Refresh ranking every 30s, merging localStorage referrals
   const refreshRanking = useCallback(() => {
@@ -120,6 +105,29 @@ export default function ConcursoDetallePage() {
   useEffect(() => {
     if (user) setMyRefs(getRefCount(concursoId, user.id));
   }, [user, concursoId]);
+
+  // Cross-tab: notify referrer when someone registers via their link
+  useEffect(() => {
+    if (!user) return;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key !== REFS_KEY || !e.newValue) return;
+      try {
+        const newStore = JSON.parse(e.newValue) as Record<string, number>;
+        const oldStore = e.oldValue ? (JSON.parse(e.oldValue) as Record<string, number>) : {};
+        const myKey    = `${concursoId}_${user.id}`;
+        const oldCount = oldStore[myKey] ?? 0;
+        const newCount = newStore[myKey] ?? 0;
+        if (newCount > oldCount) {
+          setNewRefCount(newCount);
+          setNewRefToast(true);
+          setTimeout(() => setNewRefToast(false), 5000);
+          refreshRanking();
+        }
+      } catch { /* noop */ }
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [user, concursoId, refreshRanking]);
 
   // 404
   if (!concurso && !finalizado) {
@@ -167,7 +175,7 @@ export default function ConcursoDetallePage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Ref toast */}
+      {/* Ref credited toast (shown to the visitor who registered via a link) */}
       {refToast && (
         <div style={{
           position: "fixed", bottom: "32px", left: "50%",
@@ -181,6 +189,56 @@ export default function ConcursoDetallePage() {
           whiteSpace: "nowrap",
         }}>
           ✓ ¡Referido contabilizado! Alguien llegó por tu link.
+        </div>
+      )}
+
+      {/* New ref cross-tab toast (shown to the referrer in another tab) */}
+      {newRefToast && (
+        <div style={{
+          position: "fixed", bottom: "32px", left: "50%",
+          transform: "translateX(-50%)", zIndex: 200,
+          background: "linear-gradient(135deg, #e8a84c, #f5c97a)",
+          color: "#1a1008", fontFamily: "var(--font-cinzel)",
+          fontSize: "0.75rem", letterSpacing: "0.1em",
+          padding: "14px 28px", borderRadius: "30px",
+          boxShadow: "0 8px 32px rgba(232,168,76,0.45)",
+          animation: "dc-slideUp 0.3s ease",
+          whiteSpace: "nowrap",
+        }}>
+          🎉 ¡Nuevo referido! Ya tienes {newRefCount} referido{newRefCount !== 1 ? "s" : ""} en este concurso.
+        </div>
+      )}
+
+      {/* Referral banner for unauthenticated visitors arriving via a ref link */}
+      {refUserId && refBannerName !== undefined && !isAuthenticated && (
+        <div style={{
+          background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(61,184,158,0.08))",
+          borderBottom: "1px solid rgba(232,168,76,0.3)",
+          padding: "14px 24px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          gap: "16px", flexWrap: "wrap",
+        }}>
+          <p style={{
+            fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+            color: "var(--text-primary)", textAlign: "center",
+          }}>
+            🏮{" "}
+            {refBannerName
+              ? <><strong style={{ color: "var(--accent)" }}>{refBannerName}</strong> te invitó a participar.</>
+              : "Alguien te invitó a participar."
+            }
+            {" "}¡Regístrate para que cuente su punto!
+          </p>
+          <Link href="/registro" style={{
+            flexShrink: 0,
+            fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            background: "var(--accent)", color: "var(--bg-primary)",
+            fontWeight: 700, padding: "10px 22px", borderRadius: "30px",
+            textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            Registrarme ahora
+          </Link>
         </div>
       )}
 
