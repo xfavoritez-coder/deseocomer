@@ -24,7 +24,7 @@ export default function LocalesSection() {
     <section className="dc-loc-section" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "0.7rem",
@@ -87,9 +87,11 @@ export default function LocalesSection() {
         {/* Grid */}
         <div className="dc-loc-grid">
           {localesFiltrados.map(local => (
-            <div key={local.id} className="dc-loc-card" style={{
+            <Link key={local.id} href={`/locales/${local.id}`} className="dc-loc-card" style={{
               backgroundColor: "var(--bg-secondary)",
               borderRadius: "20px",
+              textDecoration: "none",
+              display: "block",
             }}>
               {/* Línea 1: emoji + nombre */}
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
@@ -165,19 +167,20 @@ export default function LocalesSection() {
                   fontFamily: "var(--font-cinzel)",
                   fontSize: "0.75rem",
                   color: "var(--accent)",
-                }}>⭐ {local.rating}</span>
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}>
+                  ⭐ {local.rating}
+                  <span className="dc-loc-arrow">→</span>
+                </span>
               </div>
-
-              {/* Hover: Ver local */}
-              <Link href={`/locales/${local.id}`} className="dc-loc-hover-btn">
-                Ver local →
-              </Link>
-            </div>
+            </Link>
           ))}
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "60px" }}>
-          <a href="/locales" style={{
+        <div style={{ textAlign: "center", marginTop: "48px" }}>
+          <Link href="/locales" style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "0.8rem",
             letterSpacing: "0.15em",
@@ -188,19 +191,19 @@ export default function LocalesSection() {
             paddingBottom: "4px",
           }}>
             Explorar todos los locales →
-          </a>
+          </Link>
         </div>
       </div>
 
       <style>{`
-        .dc-loc-section { padding: 72px 60px; }
+        .dc-loc-section { padding: 64px 60px 32px; }
 
         .dc-filters {
           display: flex;
           gap: 12px;
           justify-content: center;
           flex-wrap: wrap;
-          margin-bottom: 48px;
+          margin-bottom: 40px;
         }
         .dc-filter-btn {
           padding: 12px 22px;
@@ -215,50 +218,35 @@ export default function LocalesSection() {
 
         .dc-loc-card {
           border: 1px solid var(--border-color);
-          padding: 24px 24px 20px;
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.2s ease, border-color 0.2s ease;
+          padding: 24px;
           cursor: pointer;
+          transition: transform 0.2s ease, border-color 0.2s ease;
         }
         .dc-loc-card:hover {
           transform: translateY(-4px);
           border-color: var(--accent);
         }
 
-        .dc-loc-hover-btn {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          transform: translateY(100%);
-          transition: transform 0.25s ease;
-          padding: 14px 24px;
-          text-align: center;
-          background: linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright));
-          color: var(--bg-primary);
-          font-family: var(--font-cinzel);
-          font-size: 0.7rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          font-weight: 700;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 44px;
+        .dc-loc-arrow {
+          color: var(--accent);
+          font-size: 1rem;
+          display: inline-block;
+          transition: transform 0.2s ease;
+          opacity: 0.7;
         }
-        .dc-loc-card:hover .dc-loc-hover-btn {
-          transform: translateY(0);
+        .dc-loc-card:hover .dc-loc-arrow {
+          transform: translateX(5px);
+          opacity: 1;
         }
 
         @media (max-width: 767px) {
-          .dc-loc-section { padding: 72px 20px; }
-          .dc-filters     { justify-content: flex-start; flex-wrap: wrap; margin-bottom: 32px; }
+          .dc-loc-section { padding: 48px 20px 24px; }
+          .dc-filters     { justify-content: flex-start; margin-bottom: 28px; }
           .dc-filter-btn  { padding: 10px 18px; font-size: 0.65rem !important; }
           .dc-loc-grid    { grid-template-columns: 1fr; gap: 14px; }
-          .dc-loc-hover-btn { position: static; transform: none !important; margin-top: 16px; border-radius: 10px; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
-          .dc-loc-section { padding: 60px 40px; }
+          .dc-loc-section { padding: 56px 40px 28px; }
           .dc-loc-grid    { grid-template-columns: repeat(2, 1fr); }
         }
       `}</style>

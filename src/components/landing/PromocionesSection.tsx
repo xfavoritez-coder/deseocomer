@@ -461,7 +461,7 @@ export default function PromocionesSection() {
       </div>
 
       <style>{`
-        .dc-ps-section { padding: 72px 60px; }
+        .dc-ps-section { padding: 64px 60px 32px; }
         .dc-ps-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -479,7 +479,7 @@ export default function PromocionesSection() {
         }
 
         @media (max-width: 767px) {
-          .dc-ps-section   { padding: 72px 20px; }
+          .dc-ps-section   { padding: 48px 20px 24px; }
           .dc-ps-grid      { grid-template-columns: 1fr; gap: 16px; }
           .dc-ps-card-inner { padding: 20px; }
         }

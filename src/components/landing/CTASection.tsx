@@ -140,7 +140,7 @@ export default function CTASection() {
       </div>
 
       <style>{`
-        .dc-cta-section    { padding: 72px 60px; }
+        .dc-cta-section    { padding: 64px 60px 72px; }
         .dc-cta-card       { padding: 48px 60px; }
         .dc-benefits-grid  {
           display: grid;
@@ -154,7 +154,7 @@ export default function CTASection() {
         }
 
         @media (max-width: 767px) {
-          .dc-cta-section   { padding: 72px 20px; }
+          .dc-cta-section   { padding: 48px 20px 60px; }
           .dc-cta-card      { padding: 36px 24px; border-radius: 24px; }
           .dc-benefits-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 36px; }
           .dc-cta-btns      { flex-direction: column; align-items: center; }

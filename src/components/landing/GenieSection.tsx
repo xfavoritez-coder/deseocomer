@@ -214,7 +214,7 @@ export default function GenieSection() {
             50%       { opacity: 1; }
           }
 
-          .dc-genie-section { padding: 72px 60px; }
+          .dc-genie-section { padding: 64px 60px 32px; }
           .dc-genie-lamp    { font-size: 6rem; }
           .dc-genie-grid {
             display: grid;
@@ -228,7 +228,7 @@ export default function GenieSection() {
           }
 
           @media (max-width: 767px) {
-            .dc-genie-section  { padding: 72px 20px; }
+            .dc-genie-section  { padding: 48px 20px 24px; }
             .dc-genie-lamp     { font-size: 4.5rem !important; margin-bottom: 32px !important; }
             .dc-genie-grid     { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .dc-genie-actions  { flex-direction: column; align-items: center; }

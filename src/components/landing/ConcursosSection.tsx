@@ -193,7 +193,7 @@ export default function ConcursosSection() {
       </div>
 
       <style>{`
-        .dc-cst-section { padding: 72px 60px; }
+        .dc-cst-section { padding: 64px 60px 32px; }
         .dc-cst-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -202,7 +202,7 @@ export default function ConcursosSection() {
         .dc-cst-card { padding: 32px; }
 
         @media (max-width: 767px) {
-          .dc-cst-section { padding: 72px 20px; }
+          .dc-cst-section { padding: 48px 20px 24px; }
           .dc-cst-grid    { grid-template-columns: 1fr; gap: 16px; }
           .dc-cst-card    { padding: 22px; }
         }

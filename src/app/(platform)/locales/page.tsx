@@ -15,7 +15,7 @@ const localesMock = [
   { id: 8,  nombre: "Taquería del Desierto", categoria: "Mexicano", barrio: "Ñuñoa",           emoji: "🌮", rating: 4.4, precio: "$$",   isOpen: true,  descripcion: "Tacos al pastor auténticos, mezcal artesanal y ambiente festivo." },
   { id: 9,  nombre: "Ramen Noche",           categoria: "Sushi",    barrio: "Providencia",     emoji: "🍜", rating: 4.8, precio: "$$",   isOpen: false, descripcion: "Ramen tonkotsu cocido 18 horas, gyozas caseras y sake importado." },
   { id: 10, nombre: "Parrilla del Sur",      categoria: "Almuerzo", barrio: "Maipú",           emoji: "🥩", rating: 4.5, precio: "$$",   isOpen: true,  descripcion: "Cortes premium a las brasas, chimichurri secreto de la casa." },
-  { id: 11, nombre: "Vegan Garden",          categoria: "Vegano",   barrio: "Providencia",     emoji: "🌱", rating: 4.3, precio: "$",    isOpen: true,  descripcion: "Bowl therapy, wraps energéticos y jugos cold press. Cocina saludable sin sacrificar sabor." },
+  { id: 11, nombre: "Vegan Garden",          categoria: "Vegano",   barrio: "Providencia",     emoji: "🌱", rating: 4.3, precio: "$",    isOpen: true,  descripcion: "Bowl therapy, wraps energéticos y jugos cold press." },
   { id: 12, nombre: "Espresso Duna",         categoria: "Café",     barrio: "Las Condes",      emoji: "☕", rating: 4.6, precio: "$",    isOpen: false, descripcion: "Café de especialidad de origen único, té de autor y cheesecake de temporada." },
 ];
 
@@ -33,10 +33,10 @@ export default function LocalesPage() {
 
   return (
     <main style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh", paddingTop: "80px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "60px 60px 80px" }}>
+      <div className="dc-lp-wrap">
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "0.7rem",
@@ -70,7 +70,7 @@ export default function LocalesPage() {
         </div>
 
         {/* Buscador */}
-        <div style={{ maxWidth: "480px", margin: "0 auto 32px" }}>
+        <div style={{ maxWidth: "480px", margin: "0 auto 28px" }}>
           <input
             type="text"
             placeholder="Buscar local o barrio..."
@@ -91,7 +91,7 @@ export default function LocalesPage() {
           />
         </div>
 
-        {/* Filtros por categoría */}
+        {/* Filtros */}
         <div className="dc-lp-filters">
           {categorias.map(cat => {
             const isActive = categoriaActiva === cat;
@@ -126,7 +126,7 @@ export default function LocalesPage() {
           letterSpacing: "0.15em",
           textTransform: "uppercase",
           color: "var(--text-muted)",
-          marginBottom: "32px",
+          marginBottom: "28px",
         }}>
           {localesFiltrados.length} local{localesFiltrados.length !== 1 ? "es" : ""} encontrado{localesFiltrados.length !== 1 ? "s" : ""}
         </p>
@@ -135,9 +135,11 @@ export default function LocalesPage() {
         {localesFiltrados.length > 0 ? (
           <div className="dc-lp-grid">
             {localesFiltrados.map(local => (
-              <div key={local.id} className="dc-lp-card" style={{
+              <Link key={local.id} href={`/locales/${local.id}`} className="dc-lp-card" style={{
                 backgroundColor: "var(--bg-secondary)",
                 borderRadius: "20px",
+                textDecoration: "none",
+                display: "block",
               }}>
                 {/* Línea 1: emoji + nombre */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
@@ -213,14 +215,15 @@ export default function LocalesPage() {
                     fontFamily: "var(--font-cinzel)",
                     fontSize: "0.75rem",
                     color: "var(--accent)",
-                  }}>⭐ {local.rating}</span>
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}>
+                    ⭐ {local.rating}
+                    <span className="dc-lp-arrow">→</span>
+                  </span>
                 </div>
-
-                {/* Hover: Ver local */}
-                <Link href={`/locales/${local.id}`} className="dc-lp-hover-btn">
-                  Ver local →
-                </Link>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
@@ -242,11 +245,16 @@ export default function LocalesPage() {
       </div>
 
       <style>{`
+        .dc-lp-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 60px 60px 80px;
+        }
         .dc-lp-filters {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
         .dc-lp-grid {
           display: grid;
@@ -255,48 +263,33 @@ export default function LocalesPage() {
         }
         .dc-lp-card {
           border: 1px solid var(--border-color);
-          padding: 24px 24px 20px;
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.2s ease, border-color 0.2s ease;
+          padding: 24px;
           cursor: pointer;
+          transition: transform 0.2s ease, border-color 0.2s ease;
         }
         .dc-lp-card:hover {
           transform: translateY(-4px);
           border-color: var(--accent);
         }
-        .dc-lp-hover-btn {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          transform: translateY(100%);
-          transition: transform 0.25s ease;
-          padding: 14px 24px;
-          text-align: center;
-          background: linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright));
-          color: var(--bg-primary);
-          font-family: var(--font-cinzel);
-          font-size: 0.7rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          font-weight: 700;
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 44px;
+        .dc-lp-arrow {
+          color: var(--accent);
+          font-size: 1rem;
+          display: inline-block;
+          transition: transform 0.2s ease;
+          opacity: 0.7;
         }
-        .dc-lp-card:hover .dc-lp-hover-btn {
-          transform: translateY(0);
+        .dc-lp-card:hover .dc-lp-arrow {
+          transform: translateX(5px);
+          opacity: 1;
         }
 
         @media (max-width: 767px) {
-          main > div { padding: 40px 20px 60px !important; }
+          .dc-lp-wrap   { padding: 40px 20px 60px; }
           .dc-lp-filters { gap: 8px; }
-          .dc-lp-grid { grid-template-columns: 1fr; gap: 14px; }
-          .dc-lp-hover-btn { position: static; transform: none !important; margin-top: 16px; border-radius: 10px; }
+          .dc-lp-grid   { grid-template-columns: 1fr; gap: 14px; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
-          main > div { padding: 48px 40px 60px !important; }
+          .dc-lp-wrap { padding: 48px 40px 60px; }
           .dc-lp-grid { grid-template-columns: repeat(2, 1fr); }
         }
       `}</style>
