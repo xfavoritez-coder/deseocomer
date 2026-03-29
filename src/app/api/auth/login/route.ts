@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+
+export async function POST(req: NextRequest) {
+  try {
+    const { email, password, tipo } = await req.json();
+
+    if (tipo === "local") {
+      const local = await prisma.local.findUnique({ where: { email } });
+      if (!local) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
+      const ok = await bcrypt.compare(password, local.password);
+      if (!ok) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
+      const { password: _, ...localSinPassword } = local;
+      return NextResponse.json({ tipo: "local", data: localSinPassword });
+    } else {
+      const usuario = await prisma.usuario.findUnique({ where: { email } });
+      if (!usuario) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
+      const ok = await bcrypt.compare(password, usuario.password);
+      if (!ok) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
+      const { password: _, ...usuarioSinPassword } = usuario;
+      return NextResponse.json({ tipo: "usuario", data: usuarioSinPassword });
+    }
+  } catch {
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}

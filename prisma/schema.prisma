@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Usuario {
+  id          String   @id @default(cuid())
+  nombre      String
+  email       String   @unique
+  password    String
+  telefono    String?
+  ciudad      String?  @default("santiago")
+  cumpleDia   Int?
+  cumpleMes   Int?
+  cumpleAnio  Int?
+  tipo        String   @default("usuario")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  favoritos       Favorito[]
+  resenas         Resena[]
+  participaciones ParticipanteConcurso[]
+}
+
+model Local {
+  id            String   @id @default(cuid())
+  nombre        String
+  email         String   @unique
+  password      String
+  telefono      String?
+  ciudad        String   @default("santiago")
+  categoria     String?
+  descripcion   String?
+  historia      String?
+  direccion     String?
+  comuna        String?
+  lat           Float?
+  lng           Float?
+  instagram     String?
+  horarios      Json?
+  logoUrl       String?
+  portadaUrl    String?
+  galeria       Json?
+  tieneMenu     Boolean  @default(false)
+  verificado    Boolean  @default(false)
+  activo        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  menuItems   MenuItem[]
+  concursos   Concurso[]
+  promociones Promocion[]
+  favoritos   Favorito[]
+  resenas     Resena[]
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  localId     String
+  categoria   String
+  nombre      String
+  descripcion String?
+  precio      Float
+  imagenUrl   String?
+  destacado   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  local       Local    @relation(fields: [localId], references: [id])
+}
+
+model Concurso {
+  id           String   @id @default(cuid())
+  localId      String
+  premio       String
+  descripcion  String?
+  imagenUrl    String?
+  fechaInicio  DateTime @default(now())
+  fechaFin     DateTime
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  local         Local    @relation(fields: [localId], references: [id])
+  participantes ParticipanteConcurso[]
+}
+
+model ParticipanteConcurso {
+  id          String   @id @default(cuid())
+  concursoId  String
+  usuarioId   String
+  referidoPor String?
+  puntos      Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  concurso    Concurso @relation(fields: [concursoId], references: [id])
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@unique([concursoId, usuarioId])
+}
+
+model Promocion {
+  id                  String   @id @default(cuid())
+  localId             String
+  tipo                String
+  titulo              String
+  descripcion         String?
+  porcentajeDescuento Int?
+  precioOriginal      Float?
+  precioDescuento     Float?
+  horaInicio          String
+  horaFin             String
+  diasSemana          Json
+  activa              Boolean  @default(true)
+  esCumpleanos        Boolean  @default(false)
+  imagenUrl           String?
+  createdAt           DateTime @default(now())
+
+  local               Local    @relation(fields: [localId], references: [id])
+}
+
+model Favorito {
+  id        String   @id @default(cuid())
+  usuarioId String
+  localId   String
+  createdAt DateTime @default(now())
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  local     Local    @relation(fields: [localId], references: [id])
+
+  @@unique([usuarioId, localId])
+}
+
+model Resena {
+  id              String    @id @default(cuid())
+  usuarioId       String
+  localId         String
+  rating          Int
+  comentario      String
+  respuestaLocal  String?
+  fechaRespuesta  DateTime?
+  likes           Int       @default(0)
+  createdAt       DateTime  @default(now())
+
+  usuario         Usuario   @relation(fields: [usuarioId], references: [id])
+  local           Local     @relation(fields: [localId], references: [id])
+}
+
+model ListaEsperaLocal {
+  id        String   @id @default(cuid())
+  email     String
+  ciudad    String
+  createdAt DateTime @default(now())
+}
