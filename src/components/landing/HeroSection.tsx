@@ -37,12 +37,11 @@ export default function HeroSection() {
     }
   });
 
-  const isDay  = period === "manana" || period === "mediodia";
+  const isDay  = period === "dia";
   const hasSky = period === "madrugada" || period === "noche";
 
-  // Botón "Ver Concursos" — dorado intenso en tarde para contraste
-  const btnBg    = period === "tarde" ? "#e8a84c" : "var(--accent)";
-  const btnColor = period === "tarde" ? "#1a0e05" : "var(--bg-primary)";
+  const btnBg    = "var(--accent)";
+  const btnColor = "var(--bg-primary)";
 
   return (
     <section style={{
@@ -80,17 +79,8 @@ export default function HeroSection() {
         }} />
       )}
 
-      {/* ── Oscurecimiento superior para legibilidad en tarde ── */}
-      {period === "tarde" && (
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 65%)",
-          pointerEvents: "none", zIndex: 3,
-        }} />
-      )}
-
       {/* ── Objetos del cielo ── */}
-      {period === "mediodia" && (
+      {period === "dia" && (
         <div className="dc-sky dc-sky--sun" style={{
           position: "absolute", top: "7%", left: "50%",
           transform: "translateX(-50%)",
@@ -100,7 +90,6 @@ export default function HeroSection() {
           pointerEvents: "none", zIndex: 4,
         }}>☀️</div>
       )}
-      {/* Sunrise and sunset icons removed for cleaner hero */}
       {hasSky && (
         <div className="dc-sky dc-sky--moon" style={{
           position: "absolute", top: "8%", right: "14%",
@@ -111,7 +100,7 @@ export default function HeroSection() {
           animation: "skyFloat 9s ease-in-out infinite",
           pointerEvents: "none", zIndex: 4,
         }}>
-          {period === "madrugada" ? "🌙" : "🌕"}
+          {period === "madrugada" ? "✨" : "🌙"}
         </div>
       )}
 

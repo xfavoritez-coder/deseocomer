@@ -4,30 +4,24 @@ import { useTimeTheme, getThemeByPeriod, applyThemeVars, THEMES } from "@/hooks/
 import type { TimePeriod } from "@/hooks/useTimeTheme";
 import { ThemeContext } from "@/contexts/ThemeContext";
 
-const PERIOD_ORDER: TimePeriod[] = ["madrugada", "manana", "mediodia", "tarde", "noche"];
+const PERIOD_ORDER: TimePeriod[] = ["dia", "noche", "madrugada"];
 
 const DEV_LABELS: Record<TimePeriod, string> = {
-  madrugada: "Madrugada",
-  manana:    "Amanecer",
-  mediodia:  "Mediodía",
-  tarde:     "Tarde",
+  dia:       "Día",
   noche:     "Noche",
+  madrugada: "Madrugada",
 };
 
 const OVERLAY_BG: Record<TimePeriod, string> = {
   madrugada: "rgba(7,4,15,0.95)",
-  manana:    "rgba(28,12,0,0.95)",
-  mediodia:  "rgba(30,20,0,0.95)",
-  tarde:     "rgba(20,6,8,0.95)",
+  dia:       "rgba(30,20,0,0.95)",
   noche:     "rgba(6,4,16,0.95)",
 };
 
 const GREETING_DATA: Record<TimePeriod, { icon: string; title: string; subtitle?: string }> = {
-  madrugada: { icon: "✨", title: "Los mejores antojos no tienen hora" },
-  manana:    { icon: "🌅", title: "Buenos días", subtitle: "¿Qué vas a desayunar hoy?" },
-  mediodia:  { icon: "🌞", title: "Buenas tardes", subtitle: "¿Ya pensaste dónde almorzar?" },
-  tarde:     { icon: "🌇", title: "Buenas tardes", subtitle: "La hora perfecta para una promoción" },
+  dia:       { icon: "☀️", title: "¡Buen día!", subtitle: "¿Qué vas a comer hoy?" },
   noche:     { icon: "🌙", title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
+  madrugada: { icon: "✨", title: "Buenas madrugadas", subtitle: "Los mejores antojos no tienen hora" },
 };
 
 const SS_KEY = "dc_periodo";

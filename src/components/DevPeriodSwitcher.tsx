@@ -7,7 +7,7 @@ import {
   type TimePeriod,
 } from "@/hooks/useTimeTheme";
 
-const PERIODS: TimePeriod[] = ["madrugada", "manana", "mediodia", "tarde", "noche"];
+const PERIODS: TimePeriod[] = ["dia", "noche", "madrugada"];
 
 interface OverlayState {
   active: boolean;

@@ -3,11 +3,9 @@ import { useEffect } from "react";
 import type { TimeTheme } from "@/hooks/useTimeTheme";
 
 const GREETINGS: Record<string, { title: string; subtitle?: string }> = {
-  madrugada: { title: "Los mejores antojos no tienen hora" },
-  manana:    { title: "Buenos días", subtitle: "¿Qué vas a desayunar hoy?" },
-  mediodia:  { title: "Buenas tardes", subtitle: "¿Ya pensaste dónde almorzar?" },
-  tarde:     { title: "Buenas tardes", subtitle: "La hora perfecta para una promoción" },
+  dia:       { title: "¡Buen día!", subtitle: "¿Qué vas a comer hoy?" },
   noche:     { title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
+  madrugada: { title: "Buenas madrugadas", subtitle: "Los mejores antojos no tienen hora" },
 };
 
 interface Props {
