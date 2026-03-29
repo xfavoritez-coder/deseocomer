@@ -114,6 +114,21 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [toastActivo, setToastActivo] = useState<GenieContextType["toastActivo"]>(null);
   const [sessionCount, setSessionCount] = useState(0);
+  const [localesDB, setLocalesDB] = useState<LocalRecomendado[]>(LOCALES_DB);
+
+  // Fetch real locales from API
+  useEffect(() => {
+    fetch("/api/locales").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        setLocalesDB(data.map((l: Record<string, unknown>) => ({
+          id: String(l.id), nombre: l.nombre as string,
+          categoria: ((l.categoria as string) ?? "general").toLowerCase(),
+          comuna: (l.comuna as string) ?? "Santiago", rating: 4.5, descuento: 0,
+          foto: (l.portadaUrl as string) ?? null,
+        })));
+      }
+    }).catch(() => {});
+  }, []);
 
   // Load from localStorage on mount + track sessions for non-logged users
   useEffect(() => {
@@ -223,7 +238,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [updatePerfil]);
 
   const getRecomendacion = useCallback((categoria?: string, comuna?: string): LocalRecomendado => {
-    let candidates = [...LOCALES_DB];
+    let candidates = [...localesDB];
 
     // Filter by category if specified
     if (categoria && categoria !== "sorprendeme") {
@@ -253,7 +268,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
 
     scored.sort((a, b) => b.score - a.score);
     return scored[0] ?? LOCALES_DB[0];
-  }, [perfil.gustos]);
+  }, [perfil.gustos, localesDB]);
 
   const showFavoritoToast = useCallback(() => {
     if (isLoggedIn) return;

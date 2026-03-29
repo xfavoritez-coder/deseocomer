@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
@@ -26,10 +26,26 @@ const localesMock = [
 
 export default function LocalesSection() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
+  const [locales, setLocales] = useState(localesMock);
+
+  useEffect(() => {
+    fetch("/api/locales").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setLocales(data.slice(0, 6).map((l: any) => ({
+          id: l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
+          barrio: l.comuna ?? "Santiago", emoji: "🍽️",
+          rating: 4.5, precio: "$$", isOpen: true,
+          descripcion: l.descripcion ?? "",
+          imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+        })));
+      }
+    }).catch(() => {});
+  }, []);
 
   const localesFiltrados = categoriaActiva === "Todos"
-    ? localesMock
-    : localesMock.filter(l => l.categoria === categoriaActiva);
+    ? locales
+    : locales.filter(l => l.categoria === categoriaActiva);
 
   return (
     <section className="dc-loc-section" style={{ backgroundColor: "var(--bg-primary)" }}>

@@ -35,12 +35,29 @@ const concursosMock = [
 ];
 
 export default function ConcursosSection() {
+  const [concursos, setConcursos] = useState(concursosMock);
   const [tiempos, setTiempos] = useState<Record<number, {h:number,m:number,s:number}>>({});
+
+  // Try fetching from API, fallback to mock
+  useEffect(() => {
+    fetch("/api/concursos").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setConcursos(data.slice(0, 3).map((c: any) => ({
+          id: c.id as number, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
+          participantes: c._count?.participantes ?? 0,
+          horasRestantes: Math.max(1, Math.floor((new Date(c.fechaFin).getTime() - Date.now()) / 3600000)),
+          imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
+          topRanking: [],
+        })));
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const calcular = () => {
       const next: Record<number, {h:number,m:number,s:number}> = {};
-      concursosMock.forEach(c => {
+      concursos.forEach(c => {
         const totalSeg = c.horasRestantes * 3600;
         const ahora = Math.floor(Date.now() / 1000);
         const restaSeg = totalSeg - (ahora % totalSeg);
@@ -90,7 +107,7 @@ export default function ConcursosSection() {
         </div>
 
         <div className="dc-cst-grid">
-          {concursosMock.map((c) => (
+          {concursos.map((c) => (
             <a key={c.id}
               href={`/concursos/${c.id}`}
               className="dc-cst-card"

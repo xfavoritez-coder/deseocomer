@@ -29,7 +29,17 @@ interface TimerState { horas: number; minutos: number; segundos: number }
 
 export default function PromocionesSection() {
   const [mounted, setMounted]   = useState(false);
-  const [promos]                = useState<Promocion[]>(getTop3());
+  const [promos, setPromos]     = useState<Promocion[]>(getTop3());
+
+  // Try fetching from API (supplement mock data)
+  useEffect(() => {
+    fetch("/api/promociones").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // BD promos found — for now just log, full integration later
+        console.log("[Promos] BD tiene", data.length, "promociones");
+      }
+    }).catch(() => {});
+  }, []);
   const [timers, setTimers]     = useState<Record<number, TimerState>>({});
   const [activasAhora, setActivasAhora] = useState(0);
 
