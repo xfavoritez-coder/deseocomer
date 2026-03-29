@@ -2,12 +2,29 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useGenie } from "@/contexts/GenieContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalById, LOCALES, type Local, type Resena } from "@/lib/mockLocales";
 import { CONCURSOS } from "@/lib/mockConcursos";
+
+const MapaLocal = dynamic(() => import("@/components/MapaLocal"), {
+  ssr: false,
+  loading: () => (
+    <div style={{
+      width: "100%", height: "220px", borderRadius: "12px",
+      background: "rgba(45,26,8,0.85)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      border: "1px solid rgba(232,168,76,0.2)",
+    }}>
+      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>
+        Cargando mapa...
+      </span>
+    </div>
+  ),
+});
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -197,8 +214,8 @@ export default function LocalDetailPage() {
                     <p style={bodyStyle}>📞 {local.telefono}</p>
                     <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>
                   </div>
-                  <div style={{ marginTop: "16px", height: "200px", background: "rgba(45,26,8,0.85)", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-muted)" }}>🗺️ Mapa próximamente</p>
+                  <div style={{ marginTop: "16px" }}>
+                    <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
                   </div>
                 </Section>
               </div>
