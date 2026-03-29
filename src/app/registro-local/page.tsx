@@ -52,21 +52,20 @@ export default function RegistroLocalPage() {
     if (!form.telefono.trim()) return setError("El teléfono es obligatorio.");
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
 
     try {
-      localStorage.setItem("deseocomer_local_auth", JSON.stringify({
-        id: Date.now(),
-        tipo: "local",
-        nombreLocal: form.nombre.trim(),
-        email: form.email.trim().toLowerCase(),
-        password: form.password,
-        telefono: form.telefono.trim(),
-        creadoEn: Date.now(),
-        perfilCompleto: 0,
-      }));
-      sessionStorage.setItem("deseocomer_local_session", JSON.stringify({ loggedIn: true, email: form.email.trim().toLowerCase() }));
-    } catch {}
+      const res = await fetch("/api/locales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre: form.nombre.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.telefono.trim(), ciudad: form.ciudad }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) { setLoading(false); return setError(data.error || "Error al registrarse"); }
+
+      localStorage.setItem("deseocomer_local_session", JSON.stringify({ id: data.id, nombre: data.nombre, email: data.email, tipo: "local", loggedIn: true }));
+      sessionStorage.setItem("deseocomer_local_session", JSON.stringify({ loggedIn: true, email: data.email }));
+    } catch { setLoading(false); return setError("Error de conexión"); }
 
     setLoading(false);
     router.push("/panel?bienvenido=1");
@@ -149,9 +148,9 @@ export default function RegistroLocalPage() {
               ) : (
                 <div style={{ display: "flex", gap: "8px" }}>
                   <input style={{ ...inputStyle, flex: 1 }} type="email" placeholder="tu@email.com" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} />
-                  <button type="button" onClick={() => {
+                  <button type="button" onClick={async () => {
                     if (!waitlistEmail.includes("@")) return;
-                    try { const list = JSON.parse(localStorage.getItem("deseocomer_lista_espera_locales") ?? "[]"); list.push({ email: waitlistEmail.trim(), ciudad: ciudadLabel, fecha: Date.now() }); localStorage.setItem("deseocomer_lista_espera_locales", JSON.stringify(list)); } catch {}
+                    try { await fetch("/api/lista-espera", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: waitlistEmail.trim(), ciudad: ciudadLabel }) }); } catch {}
                     setWaitlistSaved(true);
                   }} style={{ ...inputStyle, width: "auto", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", whiteSpace: "nowrap" }}>
                     Avisarme →

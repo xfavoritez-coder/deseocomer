@@ -42,18 +42,22 @@ export default function LoginLocalPage() {
     if (!password) return setError("Ingresa tu contraseña.");
 
     setLoading(true);
-    await new Promise(r => setTimeout(r, 500));
 
     try {
-      const raw = localStorage.getItem("deseocomer_local_auth");
-      if (!raw) { setLoading(false); return setError("No existe una cuenta con ese email."); }
-      const data = JSON.parse(raw);
-      if (data.email !== email.trim().toLowerCase()) { setLoading(false); return setError("No existe una cuenta con ese email."); }
-      if (data.password !== password) { setLoading(false); return setError("Contraseña incorrecta."); }
-      sessionStorage.setItem("deseocomer_local_session", JSON.stringify({ loggedIn: true, email: data.email }));
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password, tipo: "local" }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) { setLoading(false); return setError(data.error || "Email o contraseña incorrectos"); }
+
+      localStorage.setItem("deseocomer_local_session", JSON.stringify({ id: data.data.id, nombre: data.data.nombre, email: data.data.email, tipo: "local", loggedIn: true }));
+      sessionStorage.setItem("deseocomer_local_session", JSON.stringify({ loggedIn: true, email: data.data.email }));
     } catch {
       setLoading(false);
-      return setError("Error al iniciar sesión.");
+      return setError("Error de conexión.");
     }
 
     setLoading(false);
