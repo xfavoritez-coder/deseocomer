@@ -431,189 +431,6 @@ export default function ConcursoDetallePage() {
             </div>
           </div>
 
-          {/* Referral link */}
-          {!isEnded && (
-            <div className="dc-cd-block">
-              <div style={{
-                width: "100%",
-                background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))",
-                border: "1px solid rgba(232,168,76,0.4)",
-                borderRadius: "20px",
-                padding: "48px 40px",
-                textAlign: "center",
-                boxShadow: "0 0 40px rgba(232,168,76,0.08)",
-              }}>
-                <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🔗</p>
-                <p style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "1.1rem",
-                  letterSpacing: "0.2em", textTransform: "uppercase",
-                  color: "#e8a84c", marginBottom: "20px", fontWeight: 700,
-                }}>
-                  Tu link de participación
-                </p>
-
-                {isAuthenticated && refLink ? (
-                  <>
-                    {myRefs > 0 && (
-                      <p style={{
-                        fontFamily: "var(--font-lato)", fontSize: "0.9rem",
-                        color: "var(--oasis-bright)", marginBottom: "20px",
-                      }}>
-                        🎉 Ya tienes <strong>{myRefs} referido{myRefs !== 1 ? "s" : ""}</strong> en este concurso. ¡Sigue compartiendo!
-                      </p>
-                    )}
-                    <div style={{
-                      background: "rgba(0,0,0,0.4)",
-                      border: "1px solid rgba(232,168,76,0.3)",
-                      borderRadius: "10px", padding: "14px 20px",
-                      width: "100%", maxWidth: "500px", margin: "0 auto 16px",
-                      wordBreak: "break-all",
-                    }}>
-                      <p style={{
-                        fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-                        color: "#e8a84c",
-                      }}>
-                        {refLink}
-                      </p>
-                    </div>
-                    <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px" }}>
-                      <button
-                        onClick={copyLink}
-                        style={{
-                          background: copied
-                            ? "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))"
-                            : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-                          border: "none", borderRadius: "12px",
-                          fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                          letterSpacing: "0.1em", textTransform: "uppercase",
-                          color: copied ? "#fff" : "var(--bg-primary)",
-                          padding: "14px 28px", cursor: "pointer",
-                          fontWeight: 700, minHeight: "44px",
-                          opacity: copied ? 0.8 : 1,
-                        }}
-                      >
-                        {copied ? "✓ Copiado" : "📋 Copiar link"}
-                      </button>
-                      <a
-                        href={`https://wa.me/?text=${encodeURIComponent(`¡Participa en este concurso y gana comida gratis! ${refLink}`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          background: "#25D366", border: "none", borderRadius: "12px",
-                          fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                          letterSpacing: "0.1em", textTransform: "uppercase",
-                          color: "#fff", padding: "14px 28px",
-                          fontWeight: 700, minHeight: "44px",
-                          textDecoration: "none", display: "inline-flex", alignItems: "center",
-                        }}
-                      >
-                        WhatsApp
-                      </a>
-                    </div>
-                    <p style={{
-                      fontFamily: "var(--font-lato)", fontSize: "0.78rem",
-                      color: "rgba(253,240,200,0.5)", lineHeight: 1.6,
-                    }}>
-                      Comparte este link por WhatsApp, Instagram o donde quieras
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p style={{
-                      fontFamily: "var(--font-lato)", fontSize: "0.95rem",
-                      color: "rgba(253,240,200,0.6)", marginBottom: "28px", lineHeight: 1.7,
-                    }}>
-                      Inicia sesión para obtener tu link único y empezar a sumar referidos
-                    </p>
-                    <Link
-                      href={`/login?next=/concursos/${concursoId}`}
-                      style={{
-                        display: "inline-block",
-                        background: "linear-gradient(135deg, #f5d080, #e8a84c)",
-                        fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
-                        letterSpacing: "0.12em", textTransform: "uppercase",
-                        color: "#1a0e05", fontWeight: 700,
-                        padding: "16px 48px", borderRadius: "12px",
-                        textDecoration: "none",
-                      }}
-                    >
-                      Inicia sesión para participar
-                    </Link>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Rules */}
-          {"reglas" in c && (
-            <div className="dc-cd-block">
-              <div style={{
-                width: "60px", height: "1px", margin: "0 auto 24px",
-                background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)",
-              }} />
-              <p style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                letterSpacing: "0.3em", textTransform: "uppercase",
-                color: "rgba(232,168,76,0.6)", marginBottom: "20px",
-                textAlign: "center",
-              }}>
-                Reglas del concurso
-              </p>
-              <ol style={{ margin: 0, paddingLeft: "20px" }}>
-                {(c as typeof c & { reglas: string[] }).reglas.map((r, i, arr) => (
-                  <li key={i} style={{
-                    fontFamily: "var(--font-lato)", fontSize: "0.875rem",
-                    color: "rgba(253,240,200,0.5)", lineHeight: 1.7,
-                    marginBottom: i < arr.length - 1 ? "10px" : 0,
-                  }}>
-                    {r}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Local info */}
-          {"descripcionLocal" in c && (
-            <div className="dc-cd-block">
-              <SectionTitle>🏪 Sobre {c.local}</SectionTitle>
-              <div style={{
-                display: "flex", gap: "20px", alignItems: "flex-start",
-                background: "rgba(0,0,0,0.2)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "14px", padding: "24px",
-              }}>
-                {LOCAL_IMAGES[c.localId] ? (
-                  <div style={{
-                    width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden",
-                    flexShrink: 0, border: "1px solid var(--border-color)",
-                    background: "rgba(45,26,8,0.8)",
-                  }}>
-                    <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  </div>
-                ) : (
-                  <span style={{ fontSize: "2.5rem", flexShrink: 0 }}>{c.imagen}</span>
-                )}
-                <div>
-                  <p style={{
-                    fontFamily: "var(--font-lato)", fontSize: "0.9rem",
-                    color: "var(--text-muted)", lineHeight: 1.7, marginBottom: "16px",
-                  }}>
-                    {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
-                  </p>
-                  <Link href={`/locales/${c.localId}`} style={{
-                    fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-                    letterSpacing: "0.15em", textTransform: "uppercase",
-                    color: "var(--oasis-bright)", textDecoration: "none",
-                    borderBottom: "1px solid rgba(61,184,158,0.3)", paddingBottom: "2px",
-                  }}>
-                    Ver perfil del local →
-                  </Link>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Sidebar: ranking */}
@@ -744,6 +561,207 @@ export default function ConcursoDetallePage() {
           </div>
         </div>
       </div>
+
+      {/* ── Full-width sections below the grid ─────────────────────────── */}
+
+      {/* Referral link */}
+      {!isEnded && (
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 48px" }}>
+          <div style={{
+            width: "100%",
+            background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))",
+            border: "1px solid rgba(232,168,76,0.4)",
+            borderRadius: "20px",
+            padding: "48px 40px",
+            textAlign: "center",
+            boxShadow: "0 0 40px rgba(232,168,76,0.08)",
+          }}>
+            <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🔗</p>
+            <p style={{
+              fontFamily: "var(--font-cinzel)", fontSize: "1.1rem",
+              letterSpacing: "0.2em", textTransform: "uppercase",
+              color: "#e8a84c", marginBottom: "20px", fontWeight: 700,
+            }}>
+              Tu link de participación
+            </p>
+
+            {isAuthenticated && refLink ? (
+              <>
+                {myRefs > 0 && (
+                  <p style={{
+                    fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+                    color: "var(--oasis-bright)", marginBottom: "20px",
+                  }}>
+                    🎉 Ya tienes <strong>{myRefs} referido{myRefs !== 1 ? "s" : ""}</strong> en este concurso. ¡Sigue compartiendo!
+                  </p>
+                )}
+                <div style={{
+                  background: "rgba(0,0,0,0.4)",
+                  border: "1px solid rgba(232,168,76,0.3)",
+                  borderRadius: "10px", padding: "14px 20px",
+                  width: "100%", maxWidth: "500px", margin: "0 auto 16px",
+                  wordBreak: "break-all",
+                }}>
+                  <p style={{
+                    fontFamily: "var(--font-lato)", fontSize: "0.85rem",
+                    color: "#e8a84c",
+                  }}>
+                    {refLink}
+                  </p>
+                </div>
+                <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap", marginBottom: "16px" }}>
+                  <button
+                    onClick={copyLink}
+                    style={{
+                      background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
+                      border: "none", borderRadius: "12px",
+                      fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+                      letterSpacing: "0.1em", textTransform: "uppercase",
+                      color: copied ? "#fff" : "var(--bg-primary)",
+                      padding: "14px 28px", cursor: "pointer",
+                      fontWeight: 700, minHeight: "44px",
+                      opacity: copied ? 0.8 : 1,
+                    }}
+                  >
+                    {copied ? "✓ Copiado" : "📋 Copiar link"}
+                  </button>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`¡Participa en este concurso y gana comida gratis! ${refLink}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: "#25D366", border: "none", borderRadius: "12px",
+                      fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+                      letterSpacing: "0.1em", textTransform: "uppercase",
+                      color: "#fff", padding: "14px 28px",
+                      fontWeight: 700, minHeight: "44px",
+                      textDecoration: "none", display: "inline-flex", alignItems: "center",
+                    }}
+                  >
+                    WhatsApp
+                  </a>
+                </div>
+                <p style={{
+                  fontFamily: "var(--font-lato)", fontSize: "0.78rem",
+                  color: "rgba(253,240,200,0.5)", lineHeight: 1.6,
+                }}>
+                  Comparte este link por WhatsApp, Instagram o donde quieras
+                </p>
+              </>
+            ) : (
+              <>
+                <p style={{
+                  fontFamily: "var(--font-lato)", fontSize: "0.95rem",
+                  color: "rgba(253,240,200,0.6)", marginBottom: "28px", lineHeight: 1.7,
+                }}>
+                  Inicia sesión para obtener tu link único y empezar a sumar referidos
+                </p>
+                <Link
+                  href={`/login?next=/concursos/${concursoId}`}
+                  style={{
+                    display: "inline-block",
+                    background: "linear-gradient(135deg, #f5d080, #e8a84c)",
+                    fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
+                    letterSpacing: "0.12em", textTransform: "uppercase",
+                    color: "#1a0e05", fontWeight: 700,
+                    padding: "16px 48px", borderRadius: "12px",
+                    textDecoration: "none",
+                  }}
+                >
+                  Inicia sesión para participar
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Rules */}
+      {"reglas" in c && (
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 48px" }}>
+          <div style={{
+            width: "60px", height: "1px", margin: "0 auto 24px",
+            background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)",
+          }} />
+          <p style={{
+            fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+            letterSpacing: "0.3em", textTransform: "uppercase",
+            color: "rgba(232,168,76,0.6)", marginBottom: "20px",
+            textAlign: "center",
+          }}>
+            Reglas del concurso
+          </p>
+          <ol style={{ margin: 0, paddingLeft: "20px" }}>
+            {(c as typeof c & { reglas: string[] }).reglas.map((r, i, arr) => (
+              <li key={i} style={{
+                fontFamily: "var(--font-lato)", fontSize: "0.875rem",
+                color: "rgba(253,240,200,0.5)", lineHeight: 1.7,
+                marginBottom: i < arr.length - 1 ? "10px" : 0,
+              }}>
+                {r}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {/* Local info */}
+      {"descripcionLocal" in c && (
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 60px" }}>
+          <div style={{
+            display: "flex", gap: "20px", alignItems: "center",
+            background: "rgba(0,0,0,0.2)",
+            border: "1px solid var(--border-color)",
+            borderRadius: "14px", padding: "24px 28px",
+          }}>
+            {LOCAL_IMAGES[c.localId] ? (
+              <div style={{
+                width: "80px", height: "60px", borderRadius: "8px", overflow: "hidden",
+                flexShrink: 0, background: "rgba(45,26,8,0.8)",
+              }}>
+                <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              </div>
+            ) : (
+              <div style={{
+                width: "60px", height: "60px", borderRadius: "50%", flexShrink: 0,
+                background: "color-mix(in srgb, var(--accent) 15%, var(--bg-primary))",
+                border: "1px solid var(--border-color)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                fontWeight: 700, color: "var(--accent)",
+              }}>
+                {c.local.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{
+                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                color: "#e8a84c", fontWeight: 700, marginBottom: "6px",
+              }}>
+                {c.local}
+              </p>
+              <p style={{
+                fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+                color: "rgba(253,240,200,0.7)", lineHeight: 1.7, marginBottom: "12px",
+              }}>
+                {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
+              </p>
+              <Link href={`/locales/${c.localId}`} style={{
+                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+                letterSpacing: "0.15em", textTransform: "uppercase",
+                color: "var(--oasis-bright)", textDecoration: "none",
+                borderBottom: "1px solid transparent", paddingBottom: "2px",
+                transition: "border-color 0.2s",
+              }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderBottomColor = "rgba(61,184,158,0.5)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderBottomColor = "transparent"; }}
+              >
+                Ver perfil del local →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
 
