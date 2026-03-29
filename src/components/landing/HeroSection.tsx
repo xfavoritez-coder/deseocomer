@@ -157,58 +157,45 @@ export default function HeroSection() {
         padding: "0 24px",
         maxWidth: "820px",
       }}>
-        <p style={{
-          fontFamily: "var(--font-cinzel)",
-          fontSize: "0.75rem",
-          letterSpacing: "0.4em",
-          textTransform: "uppercase",
-          color: isDay ? "#a0f8e8" : "var(--oasis-bright)",
-          marginBottom: "24px",
-          animation: "fadeUp 0.8s 0.3s both",
-          textShadow: TEXT_SHADOW,
-        }}>
-          Santiago de Chile · Plataforma Gastronómica
-        </p>
-
         <h1 style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2.8rem, 8vw, 6.5rem)",
-          lineHeight: 1,
-          color: isDay ? "#ffe898" : "var(--accent)",
-          marginBottom: "8px",
-          animation: "fadeUp 0.8s 0.5s both",
+          fontSize: "clamp(2rem, 5.5vw, 4.8rem)",
+          lineHeight: 1.15,
+          marginBottom: "28px",
+          animation: "fadeUp 0.8s 0.4s both",
           textShadow: TEXT_SHADOW,
           transition: "color 2s ease",
         }}>
-          Deseo
-        </h1>
-        <h1 style={{
-          fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2.8rem, 8vw, 6.5rem)",
-          lineHeight: 1,
-          color: isDay ? "#80f0e0" : "var(--oasis-bright)",
-          marginBottom: "32px",
-          animation: "fadeUp 0.8s 0.6s both",
-          textShadow: TEXT_SHADOW,
-        }}>
-          Comer
+          <span style={{
+            display: "block",
+            color: isDay ? "#ffe898" : "var(--accent)",
+          }}>
+            Gana. Descubre.
+          </span>
+          <span style={{
+            display: "block",
+            color: isDay ? "#80f0e0" : "var(--oasis-bright)",
+          }}>
+            Cumple tu deseo.
+          </span>
         </h1>
 
         <p className="dc-hero-subtitle" style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
+          fontSize: "clamp(0.95rem, 2vw, 1.2rem)",
           fontWeight: 300,
-          color: "rgba(255,255,255,0.95)",
+          color: "rgba(255,255,255,0.9)",
           lineHeight: 1.8,
           marginBottom: "48px",
-          animation: "fadeUp 0.8s 0.7s both",
+          animation: "fadeUp 0.8s 0.65s both",
           textShadow: TEXT_SHADOW,
+          maxWidth: "560px",
+          margin: "0 auto 48px",
         }}>
-          El genio que cumple tu deseo de comer.<br />
-          Descubre locales, gana comida gratis y deja
-          {" "}que la magia te diga{" "}
+          Concursos de comida gratis, los mejores locales de Santiago
+          {" "}y un Genio que sabe exactamente{" "}
           <strong style={{ color: isDay ? "#ffe060" : "var(--accent)", fontWeight: 700 }}>
-            qué comer hoy.
+            qué deberías comer hoy.
           </strong>
         </p>
 

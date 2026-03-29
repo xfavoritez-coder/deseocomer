@@ -1,21 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useTimeTheme, getThemeByPeriod, applyThemeVars, THEMES } from "@/hooks/useTimeTheme";
-import type { TimePeriod, TimeTheme } from "@/hooks/useTimeTheme";
-import TimeTransition from "@/components/TimeTransition";
+import type { TimePeriod } from "@/hooks/useTimeTheme";
 import { ThemeContext } from "@/contexts/ThemeContext";
-
-type TransitionState = { from: TimeTheme; to: TimeTheme } | null;
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hookTheme = useTimeTheme();
 
   const [forcedPeriod, setForcedPeriod] = useState<TimePeriod | null>(null);
   const activeTheme = forcedPeriod ? getThemeByPeriod(forcedPeriod) : hookTheme;
-
-  const [transition, setTransition] = useState<TransitionState>(null);
-  const prevPeriodRef = useRef<TimePeriod | null>(null);
-  const isMountedRef  = useRef(false);
 
   const [devVisible, setDevVisible] = useState(false);
   useEffect(() => {
@@ -24,21 +17,10 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
-  // Aplica las variables y detecta cambios de período
+  // Aplica las variables CSS — el cambio gradual lo maneja la transición de 2s en globals.css
+  const prevPeriodRef = useRef<TimePeriod | null>(null);
   useEffect(() => {
     applyThemeVars(activeTheme);
-
-    if (!isMountedRef.current) {
-      isMountedRef.current = true;
-      prevPeriodRef.current = activeTheme.period;
-      return;
-    }
-
-    if (prevPeriodRef.current && prevPeriodRef.current !== activeTheme.period) {
-      const from = getThemeByPeriod(prevPeriodRef.current);
-      setTransition({ from, to: activeTheme });
-    }
-
     prevPeriodRef.current = activeTheme.period;
   }, [activeTheme]);
 
@@ -50,14 +32,6 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   return (
     <ThemeContext.Provider value={activeTheme}>
       {children}
-
-      {transition && (
-        <TimeTransition
-          from={transition.from}
-          to={transition.to}
-          onComplete={() => setTransition(null)}
-        />
-      )}
 
       {devVisible && (
         <DevPanel activePeriod={activeTheme.period} onSelect={handleDevSelect} />

@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const NAV_LINKS = [
@@ -15,7 +14,6 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
-  const theme = useTheme();
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -52,13 +50,6 @@ export default function Navbar() {
           {NAV_LINKS.map(({ label, href }) => (
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
-
-          {mounted && (
-            <div className="dc-nav-period">
-              <span style={{ fontSize: "0.9rem" }}>{theme.icon}</span>
-              <span className="dc-nav-period-label">{theme.label}</span>
-            </div>
-          )}
 
           {/* Auth: show user or "Entrar" */}
           {mounted && (
@@ -103,13 +94,6 @@ export default function Navbar() {
             {label}
           </Link>
         ))}
-
-        {mounted && (
-          <div className="dc-mobile-period">
-            <span style={{ fontSize: "1rem" }}>{theme.icon}</span>
-            <span>{theme.label}</span>
-          </div>
-        )}
 
         {/* Mobile auth section */}
         {mounted && (
@@ -167,16 +151,6 @@ export default function Navbar() {
           font-family: var(--font-cinzel); font-size: 0.75rem;
           letter-spacing: 0.15em; text-transform: uppercase;
           color: var(--text-primary); text-decoration: none; white-space: nowrap;
-        }
-        .dc-nav-period {
-          display: flex; align-items: center; gap: 6px;
-          padding: 6px 14px; border-radius: 20px;
-          background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
-          white-space: nowrap;
-        }
-        .dc-nav-period-label {
-          font-family: var(--font-cinzel); font-size: 0.6rem;
-          letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent);
         }
         .dc-nav-cta {
           font-family: var(--font-cinzel); font-size: 0.75rem;
@@ -262,12 +236,6 @@ export default function Navbar() {
           color: var(--text-primary); text-decoration: none;
           padding: 16px 4px; border-bottom: 1px solid var(--border-color);
           display: flex; align-items: center; min-height: 52px;
-        }
-        .dc-mobile-period {
-          display: flex; align-items: center; gap: 10px;
-          padding: 14px 4px; border-bottom: 1px solid var(--border-color);
-          font-family: var(--font-cinzel); font-size: 0.7rem;
-          letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
         }
         .dc-mobile-cta {
           font-family: var(--font-cinzel); font-size: 0.85rem;
