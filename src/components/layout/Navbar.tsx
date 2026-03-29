@@ -48,11 +48,11 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="dc-nav-links">
+          <CitySelector />
+
           {NAV_LINKS.map(({ label, href }) => (
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
-
-          <CitySelector />
 
           <Link href="/registro?tipo=local" className="dc-nav-local-link">¿Tienes un local?</Link>
 
@@ -94,13 +94,13 @@ export default function Navbar() {
         className={`dc-mobile-menu${menuOpen ? " dc-mobile-menu--open" : ""}`}
         aria-hidden={!menuOpen}
       >
+        <CitySelector mobile />
+
         {NAV_LINKS.map(({ label, href }) => (
           <Link key={label} href={href} className="dc-mobile-link" onClick={() => setMenuOpen(false)}>
             {label}
           </Link>
         ))}
-
-        <CitySelector mobile />
 
         <div style={{ borderTop: "1px solid rgba(232,168,76,0.15)", marginTop: "4px" }}>
           <Link href="/registro?tipo=local" className="dc-mobile-link" onClick={() => setMenuOpen(false)}

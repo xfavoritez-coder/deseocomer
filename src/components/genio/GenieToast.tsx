@@ -73,7 +73,7 @@ export default function GenieToast() {
       <div style={{
         position: "absolute", bottom: "-6px", right: "28px",
         fontSize: "0.7rem",
-      }}>🪔</div>
+      }}>🧞</div>
 
       <style>{`
         @keyframes genieToastIn {

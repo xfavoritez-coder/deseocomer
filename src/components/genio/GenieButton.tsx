@@ -130,7 +130,7 @@ export default function GenieLampara() {
               : "geniePulse 2s ease-in-out infinite",
         }}
       >
-        {isOpen ? "✕" : "🪔"}
+        {isOpen ? "✕" : "🧞"}
       </button>
 
       <style>{`

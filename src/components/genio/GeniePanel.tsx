@@ -91,7 +91,7 @@ export default function GeniePanel() {
           fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem",
           color: "var(--sand-gold, #e8a84c)",
         }}>
-          🪔 El Genio
+          🧞 El Genio
         </p>
         <button onClick={() => setIsOpen(false)} style={{
           background: "none", border: "none", color: "rgba(245,208,128,0.5)",
@@ -219,25 +219,28 @@ export default function GeniePanel() {
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
             <a href={`/locales/${resultado.id}`} style={{
-              flex: 1, textAlign: "center", padding: "10px",
+              width: "100%", textAlign: "center", padding: "10px 16px",
+              minHeight: "44px", boxSizing: "border-box" as const, whiteSpace: "nowrap",
               background: "var(--oasis-teal, #2a7a6f)", borderRadius: "10px",
               fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
               letterSpacing: "0.08em", textTransform: "uppercase",
               color: "#fff", textDecoration: "none", fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center",
             }}>
               Ver local
             </a>
             <button onClick={handleOtra} style={{
-              flex: 1, padding: "10px",
+              width: "100%", padding: "10px 16px",
+              minHeight: "44px", boxSizing: "border-box" as const, whiteSpace: "nowrap",
               background: "transparent", border: "1px solid rgba(232,168,76,0.3)",
               borderRadius: "10px", cursor: "pointer",
               fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
               letterSpacing: "0.08em", textTransform: "uppercase",
               color: "rgba(245,208,128,0.7)",
             }}>
-              Otra opción
+              Dame otra opción
             </button>
           </div>
         </div>
