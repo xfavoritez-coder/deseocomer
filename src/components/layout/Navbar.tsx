@@ -95,36 +95,44 @@ export default function Navbar() {
       >
         {/* 1. Navigation links */}
         {NAV_LINKS.map(({ label, href }) => (
-          <Link key={label} href={href} className="dc-mobile-link" onClick={() => setMenuOpen(false)}>
+          <Link key={label} href={href} className="dc-mobile-link" onClick={() => setMenuOpen(false)}
+            style={{ padding: "20px 28px", fontSize: "1.05rem" }}>
             {label}
           </Link>
         ))}
 
         {/* 3. Auth */}
-        {mounted && (
-          isAuthenticated && user ? (
-            <div style={{ padding: "8px 20px 4px" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", marginBottom: "8px" }}>{user.nombre}</p>
-              <Link href="/perfil" onClick={() => setMenuOpen(false)} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", padding: "8px 0" }}>Mi perfil</Link>
-              <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer", padding: "8px 0", width: "100%", textAlign: "left" }}>Cerrar sesión</button>
-            </div>
-          ) : (
-            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-              display: "block", margin: "8px 20px 4px", padding: "14px 20px",
-              background: "var(--accent)", borderRadius: "12px",
-              fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              color: "var(--bg-primary)", textDecoration: "none",
-              textAlign: "center", fontWeight: 700,
-            }}>
-              Entrar
-            </Link>
-          )
-        )}
+        <div style={{ marginTop: "24px" }}>
+          {mounted && (
+            isAuthenticated && user ? (
+              <div style={{ padding: "8px 28px 4px" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", marginBottom: "8px" }}>{user.nombre}</p>
+                <Link href="/perfil" onClick={() => setMenuOpen(false)} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", padding: "8px 0" }}>Mi perfil</Link>
+                <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer", padding: "8px 0", width: "100%", textAlign: "left" }}>Cerrar sesión</button>
+              </div>
+            ) : (
+              <>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "10px", letterSpacing: "0.03em" }}>
+                  Únete gratis o inicia sesión
+                </p>
+                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                  display: "block", margin: "0 20px", padding: "16px 20px",
+                  background: "var(--accent)", borderRadius: "12px",
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
+                  letterSpacing: "0.12em", textTransform: "uppercase",
+                  color: "var(--bg-primary)", textDecoration: "none",
+                  textAlign: "center", fontWeight: 700,
+                }}>
+                  Entrar
+                </Link>
+              </>
+            )
+          )}
+        </div>
 
         {/* 4. Local link */}
         <Link href="/solo-locales" onClick={() => setMenuOpen(false)} style={{
-          display: "block", padding: "12px 24px 20px",
+          display: "block", padding: "20px 24px 24px",
           fontFamily: "var(--font-lato)", fontSize: "0.8rem",
           color: "var(--text-muted)", textDecoration: "none", textAlign: "center",
         }}>
