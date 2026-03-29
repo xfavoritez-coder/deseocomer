@@ -111,11 +111,14 @@ function RegistroContent() {
         const email = userForm.email.trim().toLowerCase();
         if (!hasEmailCounted(pending.concursoId, pending.refCode, email)) {
           markEmailCounted(pending.concursoId, pending.refCode, email);
-          incrementRef(pending.concursoId, pending.refCode);
+          // +2 puntos para el referidor
+          incrementRef(pending.concursoId, pending.refCode, 2);
+          // +1 punto de bienvenida para el nuevo usuario
+          incrementRef(pending.concursoId, res.userId, 1);
           const friendName = getRefUserName(pending.refCode);
           msg = friendName
-            ? `✅ ¡Listo! Le sumaste un punto a ${friendName}. Ahora tú también puedes participar en el concurso.`
-            : "✅ ¡Listo! Le sumaste un punto a tu amigo. Ahora tú también puedes participar en el concurso.";
+            ? `✅ ¡Listo! Le sumaste 2 puntos a ${friendName} y tú ganaste 1 punto de bienvenida.`
+            : "✅ ¡Listo! Le sumaste 2 puntos a tu amigo y tú ganaste 1 punto de bienvenida.";
           redirectTo = `/concursos/${pending.concursoId}`;
         }
         clearPendingRef();

@@ -38,11 +38,11 @@ export function getRefCount(concursoId: number, userId: string): number {
   } catch { return 0; }
 }
 
-export function incrementRef(concursoId: number, userId: string): void {
+export function incrementRef(concursoId: number, userId: string, amount = 1): void {
   try {
     const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
     const key = `${concursoId}_${userId}`;
-    store[key] = (store[key] ?? 0) + 1;
+    store[key] = (store[key] ?? 0) + amount;
     localStorage.setItem(REFS_KEY, JSON.stringify(store));
   } catch { /* noop */ }
 }
@@ -121,4 +121,33 @@ export function findUserByRefCode(code: string): StoredUser | null {
     const upper = code.toUpperCase();
     return users.find(u => u.id.slice(-6).toUpperCase() === upper) ?? null;
   } catch { return null; }
+}
+
+// ─── Support / Apoyo system ──────────────────────────────────────────────────
+
+const SUPPORT_KEY = "dc_support"; // Record<`${cid}_${supporterId}_${targetId}_${date}`, true>
+
+function todayStr(): string {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+/** Check if user already supported this target today in this concurso */
+export function hasSupportedToday(concursoId: number, supporterId: string, targetId: string): boolean {
+  try {
+    const store = JSON.parse(localStorage.getItem(SUPPORT_KEY) ?? "{}") as Record<string, boolean>;
+    return !!store[`${concursoId}_${supporterId}_${targetId}_${todayStr()}`];
+  } catch { return false; }
+}
+
+/** Record a support action and give +1 point to the target */
+export function supportUser(concursoId: number, supporterId: string, targetId: string): boolean {
+  if (supporterId === targetId) return false;
+  if (hasSupportedToday(concursoId, supporterId, targetId)) return false;
+  try {
+    const store = JSON.parse(localStorage.getItem(SUPPORT_KEY) ?? "{}") as Record<string, boolean>;
+    store[`${concursoId}_${supporterId}_${targetId}_${todayStr()}`] = true;
+    localStorage.setItem(SUPPORT_KEY, JSON.stringify(store));
+    incrementRef(concursoId, targetId, 1);
+    return true;
+  } catch { return false; }
 }

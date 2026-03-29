@@ -26,6 +26,8 @@ import {
   markVisited,
   getRefUserName,
   findUserByRefCode,
+  hasSupportedToday,
+  supportUser,
 } from "@/lib/referrals";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -76,6 +78,8 @@ export default function ConcursoDetallePage() {
   const [myRefs,       setMyRefs]       = useState(0);
   const [refBannerName, setRefBannerName] = useState<string | null | undefined>(undefined);
   const [refBannerDismissed, setRefBannerDismissed] = useState(false);
+  const [supportToast, setSupportToast] = useState<string | null>(null);
+  const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const refProcessed = useRef(false);
 
   const handleDismissRefBanner = () => {
@@ -205,6 +209,29 @@ export default function ConcursoDetallePage() {
     } catch { /* noop */ }
   };
 
+  const handleSupport = (targetName: string, targetId: string) => {
+    if (!user) return;
+    const ok = supportUser(concursoId, user.id, targetId);
+    if (ok) {
+      setSupportedMap(m => ({ ...m, [targetId]: true }));
+      setSupportToast(`🤝 ¡Le diste 1 punto a ${targetName.split(" ")[0]}!`);
+      setTimeout(() => setSupportToast(null), 4000);
+      refreshRanking();
+    }
+  };
+
+  // Check which users were already supported today
+  useEffect(() => {
+    if (!user) return;
+    const map: Record<string, boolean> = {};
+    for (const r of ranking) {
+      // Use nombre as a proxy key since we don't have real user IDs in mock ranking
+      const key = `mock_${r.nombre}`;
+      map[key] = hasSupportedToday(concursoId, user.id, key);
+    }
+    setSupportedMap(map);
+  }, [user, concursoId, ranking]);
+
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
@@ -240,6 +267,21 @@ export default function ConcursoDetallePage() {
           whiteSpace: "nowrap",
         }}>
           🎉 ¡Nuevo referido! Ya tienes {newRefCount} referido{newRefCount !== 1 ? "s" : ""} en este concurso.
+        </div>
+      )}
+
+      {/* Support toast */}
+      {supportToast && (
+        <div style={{
+          position: "fixed", top: "24px", right: "24px", zIndex: 200,
+          background: "linear-gradient(135deg, #f5d080, #e8a84c)",
+          color: "#1a0e05", fontFamily: "var(--font-cinzel)",
+          fontSize: "0.75rem", letterSpacing: "0.08em",
+          padding: "12px 16px", borderRadius: "10px",
+          boxShadow: "0 8px 32px rgba(232,168,76,0.45)",
+          animation: "dc-slideUp 0.3s ease",
+        }}>
+          {supportToast}
         </div>
       )}
 
@@ -570,6 +612,25 @@ export default function ConcursoDetallePage() {
                   }}>
                     {r.referidos}
                   </span>
+                  {isAuthenticated && !isMe && !isEnded && (() => {
+                    const targetKey = `mock_${r.nombre}`;
+                    const already = supportedMap[targetKey];
+                    return (
+                      <button
+                        onClick={() => handleSupport(r.nombre, targetKey)}
+                        disabled={!!already}
+                        style={{
+                          border: already ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(61,184,158,0.4)",
+                          color: already ? "var(--text-muted)" : "var(--oasis-bright)",
+                          fontSize: "0.65rem", padding: "3px 8px", borderRadius: "20px",
+                          background: "transparent", cursor: already ? "default" : "pointer",
+                          fontFamily: "var(--font-cinzel)", flexShrink: 0, whiteSpace: "nowrap",
+                        }}
+                      >
+                        {already ? "✓" : "+1"}
+                      </button>
+                    );
+                  })()}
                 </div>
               );
             })}
@@ -729,6 +790,46 @@ export default function ConcursoDetallePage() {
         </div>
       )}
 
+      {/* Así se gana */}
+      {!isEnded && (
+        <div className="dc-cd-fullwidth">
+          <p style={{
+            fontFamily: "var(--font-cinzel)", fontSize: "0.9rem",
+            fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "#e8a84c", textAlign: "center", marginBottom: "20px",
+          }}>
+            ⚡ Así se gana
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }} className="dc-asi-grid">
+            {[
+              { icon: "🎉", action: "Te registras por invitación", points: "+1 punto de bienvenida", color: "#3db89e" },
+              { icon: "👥", action: "Un amigo se registra con tu link", points: "+2 puntos para ti", color: "#e8a84c" },
+              { icon: "🤝", action: "Apoyas a un participante", points: "+1 punto para él", color: "#2a7a6f" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: "rgba(45,26,8,0.6)",
+                border: "1px solid rgba(232,168,76,0.2)",
+                borderRadius: "12px", padding: "16px", textAlign: "center",
+              }}>
+                <span style={{ fontSize: "1.5rem", display: "block", marginBottom: "8px" }}>{item.icon}</span>
+                <p style={{
+                  fontFamily: "var(--font-lato)", fontSize: "0.8rem",
+                  color: "rgba(253,240,200,0.7)", margin: "8px 0", lineHeight: 1.4,
+                }}>
+                  {item.action}
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem",
+                  fontWeight: 900, color: item.color,
+                }}>
+                  {item.points}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Local info */}
       {"descripcionLocal" in c && (() => {
         const localColors = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
@@ -826,6 +927,7 @@ export default function ConcursoDetallePage() {
           .dc-cd-body { padding: 28px 20px 60px; }
           .dc-cd-fullwidth { padding: 0 20px 36px; max-width: 100%; }
           .dc-cd-fullwidth > div { border-radius: 12px; }
+          .dc-asi-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </main>
