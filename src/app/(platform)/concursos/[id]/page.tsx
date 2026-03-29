@@ -566,7 +566,7 @@ export default function ConcursoDetallePage() {
 
       {/* Referral link */}
       {!isEnded && (
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 48px" }}>
+        <div className="dc-cd-fullwidth">
           <div style={{
             width: "100%",
             background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))",
@@ -626,7 +626,7 @@ export default function ConcursoDetallePage() {
                     {copied ? "✓ Copiado" : "📋 Copiar link"}
                   </button>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`¡Participa en este concurso y gana comida gratis! ${refLink}`)}`}
+                    href={`https://wa.me/?text=${encodeURIComponent(`¡Hola! Ayúdame a ganar en el concurso ${c.premio} de ${c.local} en DeseoComer 🙏 Regístrate con mi link y ambos podemos ganar: ${refLink}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -661,10 +661,10 @@ export default function ConcursoDetallePage() {
                   style={{
                     display: "inline-block",
                     background: "linear-gradient(135deg, #f5d080, #e8a84c)",
-                    fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
+                    fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.7rem, 2vw, 0.75rem)",
                     letterSpacing: "0.12em", textTransform: "uppercase",
                     color: "#1a0e05", fontWeight: 700,
-                    padding: "16px 48px", borderRadius: "12px",
+                    padding: "14px 20px", borderRadius: "12px",
                     textDecoration: "none",
                   }}
                 >
@@ -678,7 +678,7 @@ export default function ConcursoDetallePage() {
 
       {/* Rules */}
       {"reglas" in c && (
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 48px" }}>
+        <div className="dc-cd-fullwidth">
           <div style={{
             width: "60px", height: "1px", margin: "0 auto 24px",
             background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)",
@@ -707,42 +707,49 @@ export default function ConcursoDetallePage() {
 
       {/* Local info */}
       {"descripcionLocal" in c && (
-        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 60px 60px" }}>
+        <div className="dc-cd-fullwidth" style={{ paddingBottom: "60px" }}>
           <div style={{
-            display: "flex", gap: "20px", alignItems: "center",
+            display: "flex", gap: "16px", alignItems: "flex-start",
             background: "rgba(0,0,0,0.2)",
             border: "1px solid var(--border-color)",
             borderRadius: "14px", padding: "24px 28px",
           }}>
             {LOCAL_IMAGES[c.localId] ? (
               <div style={{
-                width: "80px", height: "60px", borderRadius: "8px", overflow: "hidden",
+                width: "56px", height: "56px", borderRadius: "8px", overflow: "hidden",
                 flexShrink: 0, background: "rgba(45,26,8,0.8)",
               }}>
                 <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
-            ) : (
-              <div style={{
-                width: "60px", height: "60px", borderRadius: "50%", flexShrink: 0,
-                background: "color-mix(in srgb, var(--accent) 15%, var(--bg-primary))",
-                border: "1px solid var(--border-color)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
-                fontWeight: 700, color: "var(--accent)",
-              }}>
-                {c.local.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-              </div>
-            )}
+            ) : (() => {
+              const initials = c.local.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+              let hash = 0;
+              for (let i = 0; i < c.local.length; i++) hash = c.local.charCodeAt(i) + ((hash << 5) - hash);
+              const hue = Math.abs(hash) % 360;
+              return (
+                <div style={{
+                  width: "56px", height: "56px", borderRadius: "50%", flexShrink: 0,
+                  background: `hsl(${hue}, 40%, 25%)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                  fontWeight: 700, color: "#fff",
+                }}>
+                  {initials}
+                </div>
+              );
+            })()}
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
+                fontFamily: "var(--font-cinzel)", fontSize: "0.95rem",
                 color: "#e8a84c", fontWeight: 700, marginBottom: "6px",
               }}>
                 {c.local}
               </p>
               <p style={{
-                fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+                fontFamily: "var(--font-lato)", fontSize: "0.85rem",
                 color: "rgba(253,240,200,0.7)", lineHeight: 1.7, marginBottom: "12px",
+                display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const,
+                overflow: "hidden",
               }}>
                 {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
               </p>
@@ -781,6 +788,9 @@ export default function ConcursoDetallePage() {
         .dc-cd-main { min-width: 0; }
         .dc-cd-sidebar { min-width: 0; }
         .dc-cd-block { margin-bottom: 48px; }
+        .dc-cd-fullwidth {
+          max-width: 800px; margin: 0 auto; padding: 0 60px 48px;
+        }
 
         @keyframes dc-slideUp {
           from { opacity: 0; transform: translateX(-50%) translateY(16px); }
@@ -795,6 +805,8 @@ export default function ConcursoDetallePage() {
         @media (max-width: 767px) {
           .dc-cd-banner { padding: 96px 20px 40px; }
           .dc-cd-body { padding: 28px 20px 60px; }
+          .dc-cd-fullwidth { padding: 0 20px 36px; max-width: 100%; }
+          .dc-cd-fullwidth > div { border-radius: 12px; }
         }
       `}</style>
     </main>

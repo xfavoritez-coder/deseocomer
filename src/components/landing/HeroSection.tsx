@@ -62,20 +62,13 @@ export default function HeroSection() {
         style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}
       />
 
-      {/* ── Glow atmosférico ── */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: heroAtmosphere,
-        pointerEvents: "none", zIndex: 2,
-        transition: "background 2s ease",
-      }} />
-
-      {/* ── Vignette diurna ── */}
-      {isDay && (
+      {/* ── Glow atmosférico (solo noche/madrugada) ── */}
+      {!isDay && (
         <div style={{
           position: "absolute", inset: 0,
-          background: "radial-gradient(ellipse at 50% 58%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 40%, transparent 72%)",
-          pointerEvents: "none", zIndex: 3,
+          background: heroAtmosphere,
+          pointerEvents: "none", zIndex: 2,
+          transition: "background 2s ease",
         }} />
       )}
 

@@ -83,7 +83,7 @@ export default function ConcursosPage() {
             letterSpacing: "0.45em", textTransform: "uppercase",
             color: "var(--oasis-bright)", marginBottom: "16px",
           }}>
-            DeseoComer · Concursos
+            Concursos
           </p>
           <h1 style={{
             fontFamily: "var(--font-cinzel-decorative)",
