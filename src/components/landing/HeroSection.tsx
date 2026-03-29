@@ -40,6 +40,10 @@ export default function HeroSection() {
   const isDay  = period === "manana" || period === "mediodia";
   const hasSky = period === "madrugada" || period === "noche";
 
+  // Botón "Ver Concursos" — dorado intenso en tarde para contraste
+  const btnBg    = period === "tarde" ? "#e8a84c" : "var(--accent)";
+  const btnColor = period === "tarde" ? "#1a0e05" : "var(--bg-primary)";
+
   return (
     <section style={{
       minHeight: "100vh",
@@ -76,6 +80,15 @@ export default function HeroSection() {
         }} />
       )}
 
+      {/* ── Oscurecimiento superior para legibilidad en tarde ── */}
+      {period === "tarde" && (
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 40%, transparent 65%)",
+          pointerEvents: "none", zIndex: 3,
+        }} />
+      )}
+
       {/* ── Objetos del cielo ── */}
       {period === "mediodia" && (
         <div className="dc-sky dc-sky--sun" style={{
@@ -89,17 +102,16 @@ export default function HeroSection() {
       )}
       {period === "manana" && (
         <div className="dc-sky dc-sky--sunrise" style={{
-          position: "absolute", bottom: "22%", left: "50%",
-          transform: "translateX(-50%)",
+          position: "absolute", top: "8%", right: "14%",
           fontSize: "72px",
           filter: "drop-shadow(0 0 50px rgba(255,160,40,0.9))",
           animation: "skyFloat 6s ease-in-out infinite",
           pointerEvents: "none", zIndex: 4,
-        }}>🌅</div>
+        }}>🌄</div>
       )}
       {period === "tarde" && (
         <div className="dc-sky dc-sky--sunset" style={{
-          position: "absolute", bottom: "18%", right: "12%",
+          position: "absolute", top: "8%", right: "14%",
           fontSize: "60px",
           filter: "drop-shadow(0 0 40px rgba(255,80,20,0.8))",
           animation: "skyFloat 7s ease-in-out infinite",
@@ -129,26 +141,6 @@ export default function HeroSection() {
             fill="var(--bg-primary)" />
         </svg>
       </div>
-
-      {/* ── Lámpara flotante ── */}
-      <div className="dc-lamp" style={{
-        position: "absolute", bottom: "16%", left: "50%",
-        transform: "translateX(-50%)",
-        animation: "lampFloat 4s ease-in-out infinite",
-        filter: `drop-shadow(0 0 35px ${accent})`,
-        zIndex: 6,
-      }}>🏮</div>
-
-      {/* ── Humo ── */}
-      <div style={{
-        position: "absolute", bottom: "30%", left: "50%",
-        transform: "translateX(-50%)",
-        width: "4px", height: "80px",
-        background: "linear-gradient(to top, rgba(95,240,208,0.4), transparent)",
-        borderRadius: "4px",
-        animation: "smokeRise 2s ease-out infinite",
-        zIndex: 6,
-      }} />
 
       {/* ── Contenido ── */}
       <div className="dc-hero-content" style={{
@@ -196,8 +188,8 @@ export default function HeroSection() {
             fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            background: "var(--accent)",
-            color: "var(--bg-primary)",
+            background: btnBg,
+            color: btnColor,
             padding: "16px 40px",
             borderRadius: "12px",
             textDecoration: "none",
@@ -208,7 +200,7 @@ export default function HeroSection() {
             whiteSpace: "nowrap",
             minHeight: "56px",
           }}>
-            🎪 Ver Concursos
+            Ver Concursos
           </Link>
           <Link href="/promociones" className="dc-hero-ghost" style={{
             fontFamily: "var(--font-cinzel)",
@@ -231,15 +223,6 @@ export default function HeroSection() {
       </div>
 
       <style>{`
-        @keyframes lampFloat {
-          0%, 100% { transform: translateX(-50%) translateY(0) rotate(-3deg); }
-          50%       { transform: translateX(-50%) translateY(-16px) rotate(3deg); }
-        }
-        @keyframes smokeRise {
-          0%   { opacity: 0; transform: translateX(-50%) scaleX(1); }
-          50%  { opacity: 0.6; }
-          100% { opacity: 0; transform: translateX(-50%) scaleX(3) translateY(-40px); }
-        }
         @keyframes twinkle {
           0%, 100% { opacity: 0.1; }
           50%       { opacity: 1; }
@@ -255,7 +238,6 @@ export default function HeroSection() {
 
         /* ── Responsive base ── */
         .dc-hero-content { margin-top: -80px; }
-        .dc-lamp { font-size: 80px; }
 
         .dc-hero-ghost:hover { border-color: rgba(255,255,255,1) !important; background: rgba(255,255,255,0.08) !important; }
 
@@ -266,10 +248,9 @@ export default function HeroSection() {
           .dc-hero-gratis   { display: block; }
           .dc-hero-subtitle { font-size: clamp(1rem, 4vw, 1.1rem) !important; line-height: 1.8 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
-          .dc-lamp          { font-size: 52px !important; bottom: 13% !important; }
           .dc-sky--sun      { font-size: 56px !important; }
-          .dc-sky--sunrise  { font-size: 50px !important; bottom: 25% !important; }
-          .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; bottom: 20% !important; }
+          .dc-sky--sunrise  { font-size: 50px !important; right: 8% !important; top: 5% !important; }
+          .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; top: 5% !important; }
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
           .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; max-width: 320px; justify-content: center; }
           .dc-hero-ghost    { width: 100%; max-width: 320px; justify-content: center; }
@@ -277,7 +258,6 @@ export default function HeroSection() {
 
         @media (min-width: 768px) and (max-width: 1023px) {
           .dc-hero-content { margin-top: -56px !important; }
-          .dc-lamp         { font-size: 64px !important; }
         }
       `}</style>
     </section>

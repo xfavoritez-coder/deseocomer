@@ -30,7 +30,7 @@ const GREETING_DATA: Record<TimePeriod, { icon: string; title: string; subtitle?
   noche:     { icon: "🌙", title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
 };
 
-const LS_KEY = "periodo_actual";
+const SS_KEY = "periodo_mostrado";
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hookTheme    = useTimeTheme();
@@ -53,31 +53,20 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   // Track whether this is a dev-panel forced change (always animate)
   const devForcedRef = useRef(false);
 
-  // On mount, seed localStorage with current period so first load never animates
-  const initializedRef = useRef(false);
-  useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
-      const stored = localStorage.getItem(LS_KEY);
-      if (!stored) {
-        // First ever visit — store period silently
-        localStorage.setItem(LS_KEY, activeTheme.period);
-      }
-    }
-  }, [activeTheme.period]);
-
-  // Detect period change → apply CSS vars + trigger overlay only on REAL change
+  // Detect period change → apply CSS vars + trigger overlay
   const prevPeriodRef = useRef<TimePeriod | null>(null);
   useEffect(() => {
-    const stored = localStorage.getItem(LS_KEY) as TimePeriod | null;
+    const stored = sessionStorage.getItem(SS_KEY) as TimePeriod | null;
     const isDevForced = devForcedRef.current;
-    devForcedRef.current = false; // reset flag
+    devForcedRef.current = false;
 
-    // Determine if we should show the overlay:
-    // - Dev panel forced change → always animate
-    // - Real period change detected by setInterval → animate only if stored !== current
-    // - Page load / refresh → stored === current, so NO animation
-    const needsOverlay = isDevForced || (stored !== null && stored !== activeTheme.period && prevPeriodRef.current !== null);
+    // Show overlay ONLY when:
+    // 1. Dev panel forced a change, OR
+    // 2. setInterval detected a real period change (prevPeriodRef !== null means not first render,
+    //    and stored differs from current period)
+    // NEVER on page load/refresh/navigation (stored === current or first render)
+    const isRealTimeChange = prevPeriodRef.current !== null && stored !== null && stored !== activeTheme.period;
+    const needsOverlay = isDevForced || isRealTimeChange;
 
     if (needsOverlay) {
       const greeting = GREETING_DATA[activeTheme.period];
@@ -86,18 +75,15 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       setOverlayContent({ icon: greeting.icon, title: greeting.title, subtitle: greeting.subtitle ?? "", bg });
       setOverlayKey(ver);
       setOverlayActive(true);
-      // Update localStorage
-      localStorage.setItem(LS_KEY, activeTheme.period);
-      // Apply CSS vars after overlay has faded in (~500ms)
+      sessionStorage.setItem(SS_KEY, activeTheme.period);
       setTimeout(() => applyThemeVars(activeTheme), 500);
-      // Remove overlay after 3s animation
       setTimeout(() => {
         if (overlayVersionRef.current === ver) setOverlayActive(false);
       }, 3100);
     } else {
       // Silently apply theme — no animation
       applyThemeVars(activeTheme);
-      localStorage.setItem(LS_KEY, activeTheme.period);
+      sessionStorage.setItem(SS_KEY, activeTheme.period);
     }
     prevPeriodRef.current = activeTheme.period;
   }, [activeTheme]);

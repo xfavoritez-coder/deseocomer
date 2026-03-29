@@ -104,7 +104,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#3db8a8",
     colorLabel: "#701818",
     colorText:  "#cc8860",
-    colorHeroSubtitle: "rgba(61,184,158,0.9)",
+    colorHeroSubtitle: "rgba(255,255,255,0.9)",
   },
 
   noche: {
