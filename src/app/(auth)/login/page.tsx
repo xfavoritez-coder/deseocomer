@@ -141,6 +141,30 @@ export default function LoginPage() {
               ¿No tienes cuenta?{" "}
               <Link href="/registro" className="dc-link">Registrarse gratis</Link>
             </p>
+
+            {/* Demo accounts hint */}
+            <div style={{
+              marginTop: "20px", padding: "16px",
+              background: "rgba(232,168,76,0.08)",
+              border: "1px solid rgba(232,168,76,0.2)",
+              borderRadius: "12px", textAlign: "left",
+            }}>
+              <p style={{
+                fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+                letterSpacing: "0.2em", textTransform: "uppercase",
+                color: "rgba(232,168,76,0.6)", marginBottom: "10px",
+              }}>
+                Cuentas de prueba
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(253,240,200,0.6)", lineHeight: 1.5 }}>
+                  <strong style={{ color: "rgba(253,240,200,0.8)" }}>Usuario:</strong> demo@deseocomer.com / demo1234
+                </p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(253,240,200,0.6)", lineHeight: 1.5 }}>
+                  <strong style={{ color: "rgba(253,240,200,0.8)" }}>Local:</strong> local@deseocomer.com / local1234
+                </p>
+              </div>
+            </div>
           </>
         )}
       </div>

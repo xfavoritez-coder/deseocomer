@@ -73,10 +73,36 @@ const AuthContext = createContext<AuthContextType>({
 const USERS_KEY   = "dc_users";
 const SESSION_KEY = "dc_session";
 
+// ─── Demo accounts (always available on every device) ────────────────────────
+
+const DEMO_USERS: StoredUser[] = [
+  {
+    id: "demo-user-1", email: "demo@deseocomer.com", password: "demo1234",
+    type: "user", nombre: "Jaime Demo", comuna: "Providencia",
+    createdAt: "2026-01-01T00:00:00.000Z",
+  },
+  {
+    id: "demo-local-1", email: "local@deseocomer.com", password: "local1234",
+    type: "local", nombre: "Carlos Encargado", nombreLocal: "Pizza Napoli",
+    comuna: "Providencia", telefono: "+56912345678", tipoCocina: "Pizza",
+    createdAt: "2026-01-01T00:00:00.000Z",
+  },
+];
+
 function getStoredUsers(): StoredUser[] {
   if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]"); }
-  catch { return []; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]") as StoredUser[];
+    // Merge demo users (avoid duplicates by email)
+    const emails = new Set(saved.map(u => u.email.toLowerCase()));
+    const missing = DEMO_USERS.filter(d => !emails.has(d.email.toLowerCase()));
+    if (missing.length > 0) {
+      const merged = [...missing, ...saved];
+      localStorage.setItem(USERS_KEY, JSON.stringify(merged));
+      return merged;
+    }
+    return saved;
+  } catch { return [...DEMO_USERS]; }
 }
 
 function saveUsers(users: StoredUser[]) {
