@@ -92,7 +92,7 @@ export default function SoloLocalesPage() {
             </div>
           </Reveal>
           <Reveal delay={0.4}>
-            <Link href="/registro?tipo=local" style={{
+            <Link href="/registro-local" style={{
               display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
               letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700,
               background: "var(--accent)", color: "var(--bg-primary)",
@@ -204,7 +204,7 @@ export default function SoloLocalesPage() {
           </p>
         </Reveal>
         <Reveal delay={0.3}>
-          <Link href="/registro?tipo=local" style={{
+          <Link href="/registro-local" style={{
             display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
             letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700,
             background: "var(--accent)", color: "var(--bg-primary)",
