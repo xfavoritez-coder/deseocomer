@@ -109,6 +109,28 @@ export default function GenieLampara() {
     return () => clearTimeout(timer);
   }, [isLoggedIn, sessionCount, setToastActivo]);
 
+  // ── Trigger 6: Birthday request (logged in, no birthday, 2nd+ visit) ──
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    try {
+      if (localStorage.getItem("genio_cumple_solicitado")) return;
+      const profile = JSON.parse(localStorage.getItem("deseocomer_usuario_perfil") ?? "{}");
+      if (profile.cumpleanos?.mes) return; // already has birthday
+      const visitCount = Number(localStorage.getItem("deseocomer_visita_count") ?? "0") + 1;
+      localStorage.setItem("deseocomer_visita_count", String(visitCount));
+      if (visitCount < 2) return;
+    } catch { return; }
+    const timer = setTimeout(() => {
+      setToastActivo({
+        id: "cumpleanos",
+        mensaje: "🎂 ¿Cuándo es tu cumpleaños? Así te aviso cuando haya ofertas especiales para celebrar",
+        opciones: ["Decirle mi fecha", "Después"],
+      });
+    }, 45000);
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, setToastActivo]);
+
   return (
     <>
       {/* Toast */}

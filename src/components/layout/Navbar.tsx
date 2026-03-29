@@ -60,8 +60,8 @@ export default function Navbar() {
           {mounted && (
             isAuthenticated && user ? (
               <div className="dc-nav-user">
-                <div className="dc-nav-avatar" title={user.nombre}>{initials}</div>
-                <span className="dc-nav-username">{displayName}</span>
+                <Link href="/perfil" className="dc-nav-avatar" title={user.nombre} style={{ textDecoration: "none" }}>{initials}</Link>
+                <Link href="/perfil" className="dc-nav-username" style={{ textDecoration: "none" }}>{displayName}</Link>
                 {user.type === "local" && (
                   <Link href="/panel/dashboard" className="dc-nav-panel">Panel</Link>
                 )}

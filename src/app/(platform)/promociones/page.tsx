@@ -37,11 +37,12 @@ export default function PromocionesPage() {
 
   // Filters
   const [busqueda, setBusqueda]               = useState("");
-  const [tipoFiltro, setTipoFiltro]           = useState<TipoPromocion | "todos">("todos");
+  const [tipoFiltro, setTipoFiltro]           = useState<TipoPromocion | "todos" | "cumpleanos">("todos");
   const [categoriaFiltro, setCategoriaFiltro] = useState<CategoriaPromocion | "todos">("todos");
   const [comunaFiltro, setComunaFiltro]       = useState<string>("todas");
   const [precioFiltro, setPrecioFiltro]       = useState<RangoPrecio>("todos");
   const [soloActivasAhora, setSoloActivasAhora] = useState(false);
+  const [filtroCumple, setFiltroCumple]         = useState(false);
   const [panelAbierto, setPanelAbierto]       = useState(false);
   const panelRef                              = useRef<HTMLDivElement>(null);
 
@@ -101,6 +102,7 @@ export default function PromocionesPage() {
   const filtered = PROMOCIONES.filter((p) => {
     if (!p.activa) return false;
     if (q && !p.titulo.toLowerCase().includes(q) && !p.local.toLowerCase().includes(q) && !p.descripcion.toLowerCase().includes(q)) return false;
+    if (tipoFiltro === "cumpleanos") return false; // birthday promos shown separately
     if (tipoFiltro !== "todos" && p.tipo !== tipoFiltro) return false;
     if (categoriaFiltro !== "todos" && p.categoria !== categoriaFiltro) return false;
     if (comunaFiltro !== "todas" && p.comuna !== comunaFiltro) return false;
@@ -114,13 +116,14 @@ export default function PromocionesPage() {
     return true;
   });
 
-  const tiposPromocion: Array<{ key: TipoPromocion | "todos"; label: string; icon?: string }> = [
+  const tiposPromocion: Array<{ key: TipoPromocion | "todos" | "cumpleanos"; label: string; icon?: string }> = [
     { key: "todos",          label: "Todos los tipos" },
     { key: "happy_hour",     label: "Happy Hour",      icon: "⚡" },
     { key: "descuento",      label: "Descuento %",     icon: "🏷️" },
     { key: "2x1",            label: "2x1",             icon: "🔁" },
     { key: "cupon",          label: "Cupón",           icon: "🎟️" },
     { key: "precio_especial", label: "Precio Especial", icon: "⭐" },
+    { key: "cumpleanos",      label: "Cumpleaños",      icon: "🎂" },
   ];
 
   const categorias: Array<{ key: CategoriaPromocion | "todos"; label: string }> = [
@@ -363,7 +366,7 @@ export default function PromocionesPage() {
                       {tiposPromocion.map((t) => (
                         <button
                           key={t.key}
-                          onClick={() => setTipoFiltro(t.key as TipoPromocion | "todos")}
+                          onClick={() => setTipoFiltro(t.key as TipoPromocion | "todos" | "cumpleanos")}
                           className={`dc-promo-pill${tipoFiltro === t.key ? " dc-promo-pill--active" : ""}`}
                           style={tipoFiltro === t.key && t.key === "happy_hour" ? {
                             background: "linear-gradient(135deg, #c8850a, #d4a017)",
@@ -465,7 +468,50 @@ export default function PromocionesPage() {
         </div>
       </section>
 
+      {/* ── Birthday promos ──────────────────────────────────────────── */}
+      {tipoFiltro === "cumpleanos" && (
+        <section className="dc-promo-grid-section">
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            {/* Banner */}
+            <div style={{
+              background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)",
+              borderRadius: "16px", padding: "20px 24px", marginBottom: "28px", textAlign: "center",
+            }}>
+              <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--sand-gold, #e8a84c)", marginBottom: "6px" }}>
+                🎂 Promociones de Cumpleaños
+              </p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                Estos locales tienen algo especial para celebrar tu día
+              </p>
+            </div>
+            <div className="dc-promo-grid">
+              {[
+                { id: "cumple-1", local: "El Rincón del Sushi", titulo: "Rol gratis en tu cumpleaños", desc: "Ven con tu cédula el día de tu cumpleaños y te regalamos un rol de tu elección.", comuna: "Providencia", emoji: "🍣" },
+                { id: "cumple-2", local: "BurgerCraft", titulo: "Burger gratis el mes de tu cumpleaños", desc: "Durante todo tu mes de cumpleaños, tu burger clásica va por nuestra cuenta.", comuna: "Las Condes", emoji: "🍔" },
+                { id: "cumple-3", local: "Verde Natural", titulo: "20% off en tu semana de cumpleaños", desc: "La semana de tu cumpleaños comes con 20% de descuento en toda la carta.", comuna: "Providencia", emoji: "🥗" },
+              ].map(p => (
+                <div key={p.id} style={{
+                  background: "var(--bg-secondary)", border: "1px solid rgba(232,168,76,0.3)",
+                  borderRadius: "20px", overflow: "hidden",
+                }}>
+                  <div style={{ height: "120px", background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.6))", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: "3rem" }}>{p.emoji}</span>
+                  </div>
+                  <div style={{ padding: "20px" }}>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "var(--sand-gold, #e8a84c)", background: "rgba(232,168,76,0.12)", borderRadius: "20px", padding: "3px 10px" }}>🎂 Cumpleaños</span>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.95rem", color: "var(--accent)", marginTop: "10px", marginBottom: "4px" }}>{p.titulo}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: "4px" }}>{p.local} · {p.comuna}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-primary)", lineHeight: 1.5 }}>{p.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ── Grid ───────────────────────────────────────────────────────── */}
+      {tipoFiltro !== "cumpleanos" && (
       <section className="dc-promo-grid-section">
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           {filtered.length === 0 ? (
@@ -503,6 +549,7 @@ export default function PromocionesPage() {
           )}
         </div>
       </section>
+      )}
 
       <Footer />
 

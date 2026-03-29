@@ -28,6 +28,17 @@ export default function GenieToast() {
     } else if (opt === "Seguir explorando") {
       try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch { /* noop */ }
       setToastActivo(null);
+    } else if (opt === "Decirle mi fecha") {
+      setToastActivo(null);
+      // Navigate to profile edit tab with birthday focus
+      window.location.href = "/perfil";
+    } else if (opt === "Después" && toastActivo.id === "cumpleanos") {
+      try {
+        const count = Number(localStorage.getItem("genio_cumple_postponed_count") ?? "0") + 1;
+        localStorage.setItem("genio_cumple_postponed_count", String(count));
+        if (count >= 2) localStorage.setItem("genio_cumple_solicitado", "true");
+      } catch { /* noop */ }
+      setToastActivo(null);
     } else {
       setToastActivo(null);
     }
