@@ -879,84 +879,101 @@ function PromoCard({
         el.style.boxShadow = cardGlow;
       }}
     >
-      {/* Happy hour golden top stripe */}
-      {isHappyHour && (
-        <div style={{
-          position: "absolute",
-          top: 0, left: 0, right: 0,
-          height: "3px",
-          background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)",
-        }} />
-      )}
-
-      <div className="dc-promo-card-inner">
-        {/* Top row: image + local info + badges */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "14px", alignItems: "flex-start", minWidth: 0 }}>
-            <span style={{ fontSize: "2.8rem", flexShrink: 0, lineHeight: 1 }}>{promo.imagen}</span>
-            <div style={{ minWidth: 0 }}>
-              <p style={{
-                fontFamily: "var(--font-cinzel)",
-                fontSize: "0.65rem",
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                color: "var(--text-muted)",
-                marginBottom: "3px",
+      {/* Image with discount badge overlay */}
+      {promo.imagenUrl && (() => {
+        const badge = isHappyHour
+          ? { text: "HAPPY HOUR", bg: "linear-gradient(135deg, #c8850a, #d4a017)" }
+          : promo.tipo === "2x1"
+          ? { text: "2×1", bg: "linear-gradient(135deg, #2a7a6f, #3db89e)" }
+          : promo.porcentajeDescuento
+          ? { text: `-${promo.porcentajeDescuento}%`, bg: "linear-gradient(135deg, #b03000, #ff5020)" }
+          : promo.tipo === "cupon"
+          ? { text: "CUPÓN", bg: "linear-gradient(135deg, #5020a0, #8040d0)" }
+          : null;
+        return (
+          <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0 }}>
+            <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            {badge && (
+              <div style={{
+                position: "absolute", top: "12px", left: "12px", zIndex: 2,
+                background: badge.bg, color: "#fff", fontWeight: 700,
+                fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
+                letterSpacing: "0.08em", textTransform: "uppercase",
+                padding: "5px 12px", borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
               }}>
-                {promo.comuna}
-              </p>
-              <p style={{
-                fontFamily: "var(--font-cinzel)",
-                fontSize: "0.85rem",
-                color: isHappyHour ? "#d4a017" : "var(--oasis-bright)",
-                fontWeight: 600,
-                letterSpacing: "0.05em",
-              }}>
-                {promo.local}
-              </p>
-            </div>
-          </div>
-
-          {/* Tipo badge */}
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            gap: "6px",
-            flexShrink: 0,
-          }}>
-            <span style={{
-              fontFamily: "var(--font-cinzel)",
-              fontSize: "0.55rem",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              padding: "5px 10px",
-              borderRadius: "30px",
-              border: isHappyHour ? "1px solid rgba(212,160,23,0.5)" : "1px solid var(--border-color)",
-              color: isHappyHour ? "#d4a017" : "var(--accent)",
-              background: isHappyHour ? "rgba(212,160,23,0.08)" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}>
-              {TIPO_ICONS[promo.tipo]} {TIPO_LABELS[promo.tipo]}
-            </span>
-            {isActiva && (
-              <span style={{
-                fontFamily: "var(--font-cinzel)",
-                fontSize: "0.5rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                padding: "4px 8px",
-                borderRadius: "30px",
-                background: "rgba(61,184,158,0.15)",
-                border: "1px solid rgba(61,184,158,0.4)",
-                color: "var(--oasis-bright)",
-              }}>
-                ● Activa ahora
-              </span>
+                {badge.text}
+              </div>
             )}
           </div>
+        );
+      })()}
+
+      {/* Local info below image */}
+      <div style={{
+        padding: "16px 24px 0",
+        display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+      }}>
+        <div>
+          <p style={{
+            fontFamily: "var(--font-cinzel)",
+            fontSize: "0.6rem",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+            marginBottom: "3px",
+          }}>
+            {promo.comuna}
+          </p>
+          <p style={{
+            fontFamily: "var(--font-cinzel)",
+            fontSize: "0.85rem",
+            color: isHappyHour ? "#d4a017" : "var(--oasis-bright)",
+            fontWeight: 600,
+          }}>
+            {promo.local}
+          </p>
+        </div>
+        {/* Tipo badge */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: "6px",
+          flexShrink: 0,
+        }}>
+          <span style={{
+            fontFamily: "var(--font-cinzel)",
+            fontSize: "0.55rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            padding: "5px 10px",
+            borderRadius: "30px",
+            border: isHappyHour ? "1px solid rgba(212,160,23,0.5)" : "1px solid var(--border-color)",
+            color: isHappyHour ? "#d4a017" : "var(--accent)",
+            background: isHappyHour ? "rgba(212,160,23,0.08)" : "transparent",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}>
+            {TIPO_ICONS[promo.tipo]} {TIPO_LABELS[promo.tipo]}
+          </span>
+          {isActiva && (
+            <span style={{
+              fontFamily: "var(--font-cinzel)",
+              fontSize: "0.5rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              padding: "4px 8px",
+              borderRadius: "30px",
+              background: "rgba(61,184,158,0.15)",
+              border: "1px solid rgba(61,184,158,0.4)",
+              color: "var(--oasis-bright)",
+            }}>
+              ● Activa ahora
+            </span>
+          )}
+        </div>
         </div>
 
         {/* Título + descripción */}

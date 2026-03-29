@@ -159,13 +159,15 @@ export default function HeroSection() {
       }}>
         <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2.2rem, 7vw, 6rem)",
+          fontSize: "clamp(2.5rem, 4.5vw, 4rem)",
           lineHeight: 1.1,
           marginBottom: "24px",
           animation: "fadeUp 0.8s 0.4s both",
           textShadow: TEXT_SHADOW,
           transition: "color 2s ease",
           textTransform: "uppercase",
+          maxWidth: "800px",
+          margin: "0 auto 24px",
         }}>
           <span style={{
             display: "block",
@@ -183,12 +185,11 @@ export default function HeroSection() {
 
         <p className="dc-hero-subtitle" style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(1.1rem, 3vw, 1.4rem)",
+          fontSize: "clamp(1rem, 2vw, 1.2rem)",
           fontWeight: 300,
-          color: "rgba(255,255,255,0.9)",
+          color: "rgba(255,255,255,0.88)",
           lineHeight: 1.8,
           animation: "fadeUp 0.8s 0.65s both",
-          textShadow: TEXT_SHADOW,
           maxWidth: "560px",
           margin: "0 auto 40px",
         }}>
@@ -197,8 +198,8 @@ export default function HeroSection() {
         </p>
 
         <div className="dc-hero-cta" style={{
-          display: "flex", gap: "12px",
-          justifyContent: "center", flexWrap: "wrap",
+          display: "flex", flexDirection: "column", gap: "16px",
+          alignItems: "center",
           animation: "fadeUp 0.8s 0.9s both",
         }}>
           <Link href="/concursos" className="dc-hero-btn dc-hero-btn--primary" style={{
@@ -208,8 +209,8 @@ export default function HeroSection() {
             textTransform: "uppercase",
             background: "var(--accent)",
             color: "var(--bg-primary)",
-            padding: "16px 32px",
-            borderRadius: "16px",
+            padding: "16px 40px",
+            borderRadius: "12px",
             textDecoration: "none",
             fontWeight: 700,
             boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
@@ -220,25 +221,16 @@ export default function HeroSection() {
           }}>
             🎪 Ver Concursos
           </Link>
-          <Link href="/locales" className="dc-hero-btn dc-hero-btn--secondary" style={{
+          <Link href="/promociones" className="dc-hero-link" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            fontSize: "clamp(0.85rem, 2vw, 0.95rem)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
-            border: "2px solid rgba(255,255,255,0.75)",
-            color: "white",
-            padding: "16px 32px",
-            borderRadius: "16px",
+            color: "var(--color-link)",
             textDecoration: "none",
-            fontWeight: 600,
-            background: "rgba(0,0,0,0.3)",
-            backdropFilter: "blur(4px)",
-            textShadow: "0 1px 4px rgba(0,0,0,0.8)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            whiteSpace: "nowrap",
-            minHeight: "56px",
+            opacity: 0.9,
           }}>
-            🗺️ Explorar Locales
+            Ver promociones →
           </Link>
         </div>
       </div>
@@ -270,16 +262,18 @@ export default function HeroSection() {
         .dc-hero-content { margin-top: -80px; }
         .dc-lamp { font-size: 80px; }
 
+        .dc-hero-link:hover { text-decoration: underline; opacity: 1; }
+
         @media (max-width: 767px) {
-          .dc-hero-subtitle { font-size: 0.95rem !important; line-height: 1.7 !important; }
+          .dc-hero-h1       { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; }
+          .dc-hero-subtitle { font-size: clamp(1rem, 4vw, 1.1rem) !important; line-height: 1.8 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-lamp          { font-size: 52px !important; bottom: 13% !important; }
           .dc-sky--sun      { font-size: 56px !important; }
           .dc-sky--sunrise  { font-size: 50px !important; bottom: 25% !important; }
           .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; bottom: 20% !important; }
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
-          .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; justify-content: center; }
-          .dc-hero-cta      { flex-direction: column; align-items: stretch; gap: 12px !important; }
+          .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; max-width: 320px; justify-content: center; }
           .dc-hero-subtitle br { display: none; }
         }
 

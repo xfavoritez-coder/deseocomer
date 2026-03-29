@@ -47,15 +47,7 @@ export default function CTASection() {
             Suma tu Local al Oasis
           </h2>
 
-          <p style={{
-            fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "var(--text-primary)",
-            fontWeight: 300,
-            lineHeight: 1.8,
-            maxWidth: "560px",
-            margin: "0 auto 48px",
-          }}>
+          <p className="section-description" style={{ marginBottom: "48px" }}>
             Crea concursos virales, haz que tus clientes traigan nuevos clientes
             y aparece en el mapa gastronómico de Santiago. Sin comisiones por reserva.
           </p>

@@ -2,12 +2,12 @@
 import { useState } from "react";
 
 const opciones = [
-  { emoji: "🍕", label: "Antojo de pizza" },
-  { emoji: "🌮", label: "Algo diferente" },
-  { emoji: "🥗", label: "Algo liviano" },
-  { emoji: "🍣", label: "Japonés" },
-  { emoji: "🍔", label: "Contundente" },
-  { emoji: "☕", label: "Café y algo rico" },
+  { imgUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=120", label: "Antojo de pizza" },
+  { imgUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=120", label: "Algo diferente" },
+  { imgUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=120", label: "Algo liviano" },
+  { imgUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=120", label: "Japonés" },
+  { imgUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120", label: "Contundente" },
+  { imgUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=120", label: "Café y algo rico" },
 ];
 
 const respuestasGenio = [
@@ -68,14 +68,7 @@ export default function GenieSection() {
         }}>
           Consulta al Genio 🧞
         </h2>
-        <p style={{
-          fontFamily: "var(--font-lato)",
-          fontSize: "clamp(1rem, 2vw, 1.1rem)",
-          color: "var(--text-primary)",
-          fontWeight: 300,
-          lineHeight: 1.7,
-          marginBottom: "48px",
-        }}>
+        <p className="section-description" style={{ marginBottom: "48px" }}>
           No sabes qué comer. El Genio sí.<br />
           Cuéntale tu antojo y él te revela tu destino gastronómico de hoy.
         </p>
@@ -94,13 +87,16 @@ export default function GenieSection() {
 
         {/* Opciones */}
         {!respuesta && (
-          <div className="dc-genie-grid">
+          <div className="dc-genie-list">
             {opciones.map(op => (
               <button key={op.label}
                 onClick={() => consultarGenio(op.label)}
                 disabled={cargando}
                 style={{
-                  padding: "20px 12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "16px",
+                  padding: "12px 20px",
                   backgroundColor: seleccion === op.label
                     ? "color-mix(in srgb, var(--accent) 20%, transparent)"
                     : "var(--bg-secondary)",
@@ -110,15 +106,24 @@ export default function GenieSection() {
                   borderRadius: "16px",
                   cursor: cargando ? "not-allowed" : "pointer",
                   opacity: cargando && seleccion !== op.label ? 0.4 : 1,
-                  minHeight: "96px",
+                  width: "100%",
+                  textAlign: "left",
+                  transition: "border-color 0.2s, background-color 0.2s",
                 }}>
-                <div style={{ fontSize: "2rem", marginBottom: "8px" }}>{op.emoji}</div>
+                <img
+                  src={op.imgUrl}
+                  alt={op.label}
+                  style={{
+                    width: "60px", height: "60px", borderRadius: "50%",
+                    objectFit: "cover", flexShrink: 0,
+                  }}
+                />
                 <p style={{
                   fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.6rem",
+                  fontSize: "clamp(0.85rem, 2.5vw, 0.95rem)",
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "var(--text-primary)",
+                  color: seleccion === op.label ? "var(--accent)" : "var(--text-primary)",
                   lineHeight: 1.3,
                 }}>{op.label}</p>
               </button>
@@ -216,11 +221,14 @@ export default function GenieSection() {
 
           .dc-genie-section { padding: 64px 60px 32px; }
           .dc-genie-lamp    { font-size: 6rem; }
-          .dc-genie-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+          .dc-genie-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             margin-bottom: 40px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
           }
           .dc-genie-actions {
             display: flex; gap: 16px;
@@ -230,7 +238,7 @@ export default function GenieSection() {
           @media (max-width: 767px) {
             .dc-genie-section  { padding: 48px 20px 24px; }
             .dc-genie-lamp     { font-size: 4.5rem !important; margin-bottom: 32px !important; }
-            .dc-genie-grid     { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .dc-genie-list     { gap: 10px; }
             .dc-genie-actions  { flex-direction: column; align-items: center; }
             .dc-genie-actions a,
             .dc-genie-actions button { width: 100%; max-width: 320px; justify-content: center; }

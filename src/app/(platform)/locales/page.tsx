@@ -4,6 +4,17 @@ import Link from "next/link";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café", "Italiano", "Mexicano"];
 
+function nameToHue(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % 360;
+}
+function getInitials(nombre: string): string {
+  return nombre.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+}
+
 const localesMock = [
   { id: 1,  nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia." },
   { id: 2,  nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", descripcion: "Omakase y rolls creativos con ingredientes del Pacífico." },
@@ -140,10 +151,26 @@ export default function LocalesPage() {
                 borderRadius: "20px",
                 textDecoration: "none",
                 display: "block",
+                overflow: "hidden",
               }}>
-                {/* Línea 1: emoji + nombre */}
+                {local.imagenUrl && (
+                  <div style={{ height: "120px", overflow: "hidden", flexShrink: 0 }}>
+                    <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                )}
+                <div style={{ padding: "20px 24px 24px" }}>
+                {/* Línea 1: initials + nombre */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "2rem", flexShrink: 0, lineHeight: 1 }}>{local.emoji}</span>
+                  <div style={{
+                    width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0,
+                    background: `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
+                    border: `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
+                    color: `hsl(${nameToHue(local.nombre)}, 65%, 72%)`,
+                  }}>
+                    {getInitials(local.nombre)}
+                  </div>
                   <h2 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
                     fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
@@ -223,6 +250,7 @@ export default function LocalesPage() {
                     <span className="dc-lp-arrow">→</span>
                   </span>
                 </div>
+                </div>
               </Link>
             ))}
           </div>
@@ -263,7 +291,7 @@ export default function LocalesPage() {
         }
         .dc-lp-card {
           border: 1px solid var(--border-color);
-          padding: 24px;
+          padding: 0;
           cursor: pointer;
           transition: transform 0.2s ease, border-color 0.2s ease;
         }

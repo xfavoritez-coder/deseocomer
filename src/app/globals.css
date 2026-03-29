@@ -72,3 +72,20 @@ section, div, nav, footer, button, a {
   .font-heading { font-family: var(--font-heading); }
   .font-body    { font-family: var(--font-body); }
 }
+
+/* ── Clase reutilizable para párrafos descriptivos de sección ── */
+.section-description {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2.8vw, 1.15rem);
+  font-weight: 300;
+  color: var(--color-text);
+  line-height: 1.8;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .section-description {
+    font-size: clamp(1rem, 4vw, 1.1rem);
+  }
+}

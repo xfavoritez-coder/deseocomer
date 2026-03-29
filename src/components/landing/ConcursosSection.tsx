@@ -58,15 +58,7 @@ export default function ConcursosSection() {
           }}>
             Gana Comida Gratis 🎪
           </h2>
-          <p style={{
-            fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "var(--color-text)",
-            fontWeight: 300,
-            maxWidth: "500px",
-            margin: "0 auto",
-            lineHeight: 1.8,
-          }}>
+          <p className="section-description">
             Comparte tu link con amigos y sube en el ranking. Los mejores ganan premios reales cada semana.
           </p>
         </div>

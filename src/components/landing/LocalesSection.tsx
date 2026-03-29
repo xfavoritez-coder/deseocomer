@@ -4,6 +4,17 @@ import Link from "next/link";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
 
+function nameToHue(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash) % 360;
+}
+function getInitials(nombre: string): string {
+  return nombre.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
+}
+
 const localesMock = [
   { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" },
   { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600" },
@@ -44,15 +55,7 @@ export default function LocalesSection() {
           }}>
             Descubre Dónde Comer 🗺️
           </h2>
-          <p style={{
-            fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "var(--color-text)",
-            fontWeight: 300,
-            maxWidth: "500px",
-            margin: "0 auto",
-            lineHeight: 1.8,
-          }}>
+          <p className="section-description">
             Los mejores locales gastronómicos de Santiago, curados y verificados.
           </p>
         </div>
@@ -93,13 +96,22 @@ export default function LocalesSection() {
               textDecoration: "none",
               display: "block",
             }}>
-              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0 }}>
+              <div style={{ height: "120px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0 }}>
                 <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
               </div>
               <div style={{ padding: "20px 24px 24px" }}>
                 {/* Línea 1: emoji + nombre */}
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                  <span style={{ fontSize: "2rem", flexShrink: 0, lineHeight: 1 }}>{local.emoji}</span>
+                  <div style={{
+                    width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0,
+                    background: `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
+                    border: `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
+                    color: `hsl(${nameToHue(local.nombre)}, 65%, 72%)`,
+                  }}>
+                    {getInitials(local.nombre)}
+                  </div>
                   <h3 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
                     fontSize: "clamp(0.9rem, 2.5vw, 1rem)",

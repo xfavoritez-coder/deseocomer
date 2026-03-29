@@ -77,15 +77,7 @@ export default function PromocionesSection() {
           }}>
             Promociones Activas 🏷️
           </h2>
-          <p style={{
-            fontFamily: "var(--font-lato)",
-            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "var(--color-text)",
-            fontWeight: 300,
-            maxWidth: "500px",
-            margin: "0 auto 24px",
-            lineHeight: 1.8,
-          }}>
+          <p className="section-description" style={{ marginBottom: "24px" }}>
             Descuentos, happy hours y cupones exclusivos en los mejores locales de Santiago. Algunos terminan hoy.
           </p>
 
@@ -122,6 +114,15 @@ export default function PromocionesSection() {
             const timer        = timers[promo.id];
             const isHH         = promo.tipo === "happy_hour";
             const accentColor  = isHH ? "#d4a017" : "var(--accent)";
+            const badge        = isHH
+              ? { text: "HAPPY HOUR", bg: "linear-gradient(135deg, #c8850a, #d4a017)" }
+              : promo.tipo === "2x1"
+              ? { text: "2×1", bg: "linear-gradient(135deg, #2a7a6f, #3db89e)" }
+              : promo.porcentajeDescuento
+              ? { text: `-${promo.porcentajeDescuento}%`, bg: "linear-gradient(135deg, #b03000, #ff5020)" }
+              : promo.tipo === "cupon"
+              ? { text: "CUPÓN", bg: "linear-gradient(135deg, #5020a0, #8040d0)" }
+              : null;
 
             return (
               <div
@@ -164,72 +165,83 @@ export default function PromocionesSection() {
                 )}
 
                 {promo.imagenUrl && (
-                  <div style={{ height: "160px", overflow: "hidden", flexShrink: 0 }}>
+                  <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0 }}>
                     <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    {badge && (
+                      <div style={{
+                        position: "absolute", top: "12px", left: "12px", zIndex: 2,
+                        background: badge.bg, color: "#fff", fontWeight: 700,
+                        fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
+                        letterSpacing: "0.08em", textTransform: "uppercase",
+                        padding: "5px 12px", borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.5)",
+                      }}>
+                        {badge.text}
+                      </div>
+                    )}
                   </div>
                 )}
 
-                <div className="dc-ps-card-inner">
-                  {/* Top */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
-                    <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
-                      <span style={{ fontSize: "2.6rem", lineHeight: 1 }}>{promo.imagen}</span>
-                      <div>
-                        <p style={{
-                          fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.6rem",
-                          letterSpacing: "0.2em",
-                          textTransform: "uppercase",
-                          color: "var(--text-muted)",
-                          marginBottom: "3px",
-                        }}>
-                          {promo.comuna}
-                        </p>
-                        <p style={{
-                          fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.82rem",
-                          color: isHH ? "#d4a017" : "var(--color-label)",
-                          fontWeight: 600,
-                        }}>
-                          {promo.local}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "flex-end" }}>
+                {/* Local info below image */}
+                <div style={{
+                  padding: "16px 24px 0",
+                  display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                }}>
+                  <div>
+                    <p style={{
+                      fontFamily: "var(--font-cinzel)",
+                      fontSize: "0.6rem",
+                      letterSpacing: "0.2em",
+                      textTransform: "uppercase",
+                      color: "var(--text-muted)",
+                      marginBottom: "3px",
+                    }}>
+                      {promo.comuna}
+                    </p>
+                    <p style={{
+                      fontFamily: "var(--font-cinzel)",
+                      fontSize: "0.85rem",
+                      color: isHH ? "#d4a017" : "var(--color-link)",
+                      fontWeight: 600,
+                    }}>
+                      {promo.local}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "flex-end" }}>
+                    <span style={{
+                      fontFamily: "var(--font-cinzel)",
+                      fontSize: "0.52rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      padding: "5px 10px",
+                      borderRadius: "30px",
+                      border: isHH ? "1px solid rgba(212,160,23,0.5)" : "1px solid var(--border-color)",
+                      color: accentColor,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}>
+                      {TIPO_ICONS[promo.tipo]} {TIPO_LABELS[promo.tipo]}
+                    </span>
+                    {isActiva && (
                       <span style={{
                         fontFamily: "var(--font-cinzel)",
-                        fontSize: "0.52rem",
+                        fontSize: "0.48rem",
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
-                        padding: "5px 10px",
+                        padding: "4px 8px",
                         borderRadius: "30px",
-                        border: isHH ? "1px solid rgba(212,160,23,0.5)" : "1px solid var(--border-color)",
-                        color: accentColor,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
+                        background: "rgba(61,184,158,0.15)",
+                        border: "1px solid rgba(61,184,158,0.4)",
+                        color: "var(--oasis-bright)",
                       }}>
-                        {TIPO_ICONS[promo.tipo]} {TIPO_LABELS[promo.tipo]}
+                        ● Activa
                       </span>
-                      {isActiva && (
-                        <span style={{
-                          fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.48rem",
-                          letterSpacing: "0.12em",
-                          textTransform: "uppercase",
-                          padding: "4px 8px",
-                          borderRadius: "30px",
-                          background: "rgba(61,184,158,0.15)",
-                          border: "1px solid rgba(61,184,158,0.4)",
-                          color: "var(--oasis-bright)",
-                        }}>
-                          ● Activa
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
+                </div>
 
+                <div className="dc-ps-card-inner">
                   {/* Título */}
                   <h3 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
@@ -474,7 +486,7 @@ export default function PromocionesSection() {
           grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 28px;
         }
-        .dc-ps-card-inner { padding: 28px; }
+        .dc-ps-card-inner { padding: 16px 28px 28px; }
 
         @keyframes dc-ps-blink {
           0%, 100% { opacity: 1; }
