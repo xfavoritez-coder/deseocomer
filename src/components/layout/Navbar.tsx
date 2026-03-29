@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import CitySelector from "@/components/CitySelector";
 
 const NAV_LINKS = [
   { label: "Concursos",   href: "/concursos"   },
@@ -51,6 +52,8 @@ export default function Navbar() {
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
 
+          <CitySelector />
+
           {/* Auth: show user or "Entrar" */}
           {mounted && (
             isAuthenticated && user ? (
@@ -94,6 +97,8 @@ export default function Navbar() {
             {label}
           </Link>
         ))}
+
+        <CitySelector mobile />
 
         {/* Mobile auth section */}
         {mounted && (

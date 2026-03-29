@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import type { TimeTheme } from "@/hooks/useTimeTheme";
 
 const GREETINGS: Record<string, string> = {
-  madrugada: "La madrugada es tuya",
-  manana:    "Buenos días",
-  mediodia:  "El sol está en su cenit",
-  tarde:     "Buenas tardes",
-  noche:     "Buenas noches",
+  madrugada: "Los mejores antojos no tienen hora",
+  manana:    "Buenos días — ¿Qué vas a desayunar hoy?",
+  mediodia:  "Buenas tardes — ¿Ya pensaste dónde almorzar?",
+  tarde:     "Buenas tardes — La hora perfecta para una promoción",
+  noche:     "Buenas noches — La noche es perfecta para descubrir algo nuevo",
 };
 
 interface Props {
@@ -145,32 +145,20 @@ export default function TimeTransition({ from, to, onComplete }: Props) {
           {to.icon}
         </div>
 
-        {/* Nombre del período */}
+        {/* Saludo principal */}
         <p style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(1.6rem, 5vw, 2.8rem)",
+          fontSize: "clamp(1.2rem, 4vw, 2.2rem)",
           color: to.text,
           textShadow: `0 0 50px ${to.accent}aa, 0 2px 8px rgba(0,0,0,0.5)`,
-          letterSpacing: "0.08em",
+          letterSpacing: "0.06em",
           position: "relative",
           zIndex: 1,
           animation: "tt-text-in 600ms ease 620ms both",
-        }}>
-          {to.label}
-        </p>
-
-        {/* Saludo */}
-        <p style={{
-          fontFamily: "var(--font-cinzel)",
-          fontSize: "clamp(0.7rem, 2vw, 0.9rem)",
-          color: to.text,
-          opacity: 0.65,
-          letterSpacing: "0.35em",
-          textTransform: "uppercase",
-          position: "relative",
-          zIndex: 1,
-          marginTop: "14px",
-          animation: "tt-text-in 600ms ease 840ms both",
+          textAlign: "center",
+          maxWidth: "600px",
+          padding: "0 20px",
+          lineHeight: 1.4,
         }}>
           {GREETINGS[to.period]}
         </p>

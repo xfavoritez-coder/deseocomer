@@ -2,12 +2,14 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCiudad } from "@/hooks/useCiudad";
 
 const TEXT_SHADOW = "0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.6)";
 
 export default function HeroSection() {
   const theme     = useTheme();
   const { period, heroGradient, heroAtmosphere, starCount, accent } = theme;
+  const city = useCiudad();
 
   const starsRef    = useRef<HTMLDivElement>(null);
   const prevPeriod  = useRef<string>("");
@@ -159,31 +161,31 @@ export default function HeroSection() {
       }}>
         <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2.2rem, 5vw, 4.5rem)",
+          fontSize: "clamp(2rem, 4.5vw, 3.8rem)",
           lineHeight: 1.05,
-          fontWeight: 900,
-          letterSpacing: "0.02em",
+          fontWeight: 700,
+          letterSpacing: "0.03em",
           textTransform: "uppercase",
-          color: "#e8a84c",
+          color: "var(--sand-gold)",
           textShadow: TEXT_SHADOW,
           animation: "fadeUp 0.8s 0.4s both",
-          margin: "0 auto 20px",
+          margin: "0 auto 0",
           maxWidth: "800px",
         }}>
-          Gana comida gratis.
+          GANA COMIDA GRATIS.
         </h1>
 
-        <p className="dc-hero-subtitle hero-subtitle" style={{
+        <p className="dc-hero-city" style={{
           fontFamily: "var(--font-cinzel)",
           fontWeight: 400,
-          color: "rgba(255,255,255,0.88)",
-          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
-          lineHeight: 1.8,
+          color: "var(--color-hero-subtitle, rgba(61,184,158,0.9))",
+          fontSize: "clamp(1rem, 2.5vw, 1.6rem)",
+          lineHeight: 1.5,
+          letterSpacing: "0.05em",
           animation: "fadeUp 0.8s 0.55s both",
-          maxWidth: "600px",
-          margin: "0 auto 40px",
+          margin: "16px auto 40px",
         }}>
-          El genio que cumple tu deseo de comer. Participa en concursos, accede a promociones y descubre qué comer hoy.
+          Descubre los mejores locales de {city}
         </p>
 
         <div className="dc-hero-cta" style={{

@@ -3,7 +3,6 @@ import { Cinzel_Decorative, Cinzel, Lato } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
-import DevPeriodSwitcher from "@/components/DevPeriodSwitcher";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -24,8 +23,13 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: "DeseoComer.com — Tu deseo gastronómico hecho realidad",
-  description: "Descubre los mejores restaurantes de Santiago, participa en concursos virales y deja que el Genio te diga qué comer hoy.",
+  title: "DeseoComer.com — El genio que cumple tu deseo de comer",
+  description: "Gana comida gratis, descubre los mejores locales y promociones de tu ciudad.",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -39,7 +43,6 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             {children}
-            <DevPeriodSwitcher />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -22,6 +22,7 @@ export interface TimeTheme {
   colorLink:  string;
   colorLabel: string;
   colorText:  string;
+  colorHeroSubtitle: string;
 }
 
 export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
@@ -43,6 +44,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#3db89e",
     colorLabel: "#5a3c18",
     colorText:  "#c0a060",
+    colorHeroSubtitle: "rgba(61,184,158,0.9)",
   },
 
   manana: {
@@ -62,6 +64,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#2aac9a",
     colorLabel: "#804818",
     colorText:  "#d4a870",
+    colorHeroSubtitle: "rgba(255,255,255,0.9)",
   },
 
   mediodia: {
@@ -81,6 +84,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#1aa098",
     colorLabel: "#706018",
     colorText:  "#cca858",
+    colorHeroSubtitle: "rgba(255,255,255,0.9)",
   },
 
   tarde: {
@@ -100,6 +104,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#3db8a8",
     colorLabel: "#701818",
     colorText:  "#cc8860",
+    colorHeroSubtitle: "rgba(61,184,158,0.9)",
   },
 
   noche: {
@@ -119,6 +124,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorLink:  "#3db89e",
     colorLabel: "#282e48",
     colorText:  "#b0a8c8",
+    colorHeroSubtitle: "rgba(61,184,158,0.9)",
   },
 };
 
@@ -141,6 +147,7 @@ export function applyThemeVars(theme: TimeTheme) {
   root.style.setProperty("--color-link",   theme.colorLink);
   root.style.setProperty("--color-label",  theme.colorLabel);
   root.style.setProperty("--color-text",   theme.colorText);
+  root.style.setProperty("--color-hero-subtitle", theme.colorHeroSubtitle);
 }
 
 function getPeriod(hour: number): TimePeriod {

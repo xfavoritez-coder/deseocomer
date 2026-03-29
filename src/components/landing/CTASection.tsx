@@ -23,8 +23,6 @@ export default function CTASection() {
           borderRadius: "32px",
           textAlign: "center",
         }}>
-          <div style={{ fontSize: "4rem", marginBottom: "32px" }}>🏪</div>
-
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
