@@ -159,24 +159,25 @@ export default function HeroSection() {
       }}>
         <h1 style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2rem, 5.5vw, 4.8rem)",
-          lineHeight: 1.15,
+          fontSize: "clamp(1.4rem, 3.5vw, 3.2rem)",
+          lineHeight: 1.2,
           marginBottom: "28px",
           animation: "fadeUp 0.8s 0.4s both",
           textShadow: TEXT_SHADOW,
           transition: "color 2s ease",
+          textTransform: "uppercase",
         }}>
           <span style={{
             display: "block",
             color: isDay ? "#ffe898" : "var(--accent)",
           }}>
-            Gana. Descubre.
+            Gana comida gratis.
           </span>
           <span style={{
             display: "block",
             color: isDay ? "#80f0e0" : "var(--oasis-bright)",
           }}>
-            Cumple tu deseo.
+            Descubre los mejores locales.
           </span>
         </h1>
 
@@ -189,14 +190,11 @@ export default function HeroSection() {
           marginBottom: "48px",
           animation: "fadeUp 0.8s 0.65s both",
           textShadow: TEXT_SHADOW,
-          maxWidth: "560px",
+          maxWidth: "580px",
           margin: "0 auto 48px",
         }}>
-          Concursos de comida gratis, los mejores locales de Santiago
-          {" "}y un Genio que sabe exactamente{" "}
-          <strong style={{ color: isDay ? "#ffe060" : "var(--accent)", fontWeight: 700 }}>
-            qué deberías comer hoy.
-          </strong>
+          Un genio que sabe exactamente qué quieres comer hoy. Participa en concursos, accede a promociones
+          {" "}y vive nuevas experiencias gastronómicas.
         </p>
 
         <div className="dc-hero-cta" style={{

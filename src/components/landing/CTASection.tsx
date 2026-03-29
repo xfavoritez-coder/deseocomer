@@ -140,8 +140,8 @@ export default function CTASection() {
       </div>
 
       <style>{`
-        .dc-cta-section    { padding: 120px 60px; }
-        .dc-cta-card       { padding: 80px 60px; }
+        .dc-cta-section    { padding: 72px 60px; }
+        .dc-cta-card       { padding: 48px 60px; }
         .dc-benefits-grid  {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

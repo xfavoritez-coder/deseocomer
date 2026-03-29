@@ -57,7 +57,7 @@ export default function PromocionesSection() {
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "80px" }}>
+        <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "0.7rem",
@@ -461,7 +461,7 @@ export default function PromocionesSection() {
       </div>
 
       <style>{`
-        .dc-ps-section { padding: 120px 60px; }
+        .dc-ps-section { padding: 72px 60px; }
         .dc-ps-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

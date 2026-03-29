@@ -35,7 +35,7 @@ export default function ConcursosSection() {
     <section className="dc-cst-section" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
-        <div style={{ textAlign: "center", marginBottom: "80px" }}>
+        <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "0.7rem",
@@ -193,7 +193,7 @@ export default function ConcursosSection() {
       </div>
 
       <style>{`
-        .dc-cst-section { padding: 120px 60px; }
+        .dc-cst-section { padding: 72px 60px; }
         .dc-cst-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));

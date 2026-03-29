@@ -214,7 +214,7 @@ export default function GenieSection() {
             50%       { opacity: 1; }
           }
 
-          .dc-genie-section { padding: 120px 60px; }
+          .dc-genie-section { padding: 72px 60px; }
           .dc-genie-lamp    { font-size: 6rem; }
           .dc-genie-grid {
             display: grid;
