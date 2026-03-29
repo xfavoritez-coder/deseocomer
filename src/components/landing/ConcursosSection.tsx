@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 
 const concursosMock = [
   {
@@ -34,6 +35,30 @@ const concursosMock = [
 ];
 
 export default function ConcursosSection() {
+  const [tiempos, setTiempos] = useState<Record<number, {h:number,m:number,s:number}>>({});
+
+  useEffect(() => {
+    const calcular = () => {
+      const next: Record<number, {h:number,m:number,s:number}> = {};
+      concursosMock.forEach(c => {
+        const totalSeg = c.horasRestantes * 3600;
+        const ahora = Math.floor(Date.now() / 1000);
+        const restaSeg = totalSeg - (ahora % totalSeg);
+        next[c.id] = {
+          h: Math.floor(restaSeg / 3600),
+          m: Math.floor((restaSeg % 3600) / 60),
+          s: restaSeg % 60,
+        };
+      });
+      setTiempos(next);
+    };
+    calcular();
+    const id = setInterval(calcular, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   return (
     <section className="dc-cst-section" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -112,37 +137,69 @@ export default function ConcursosSection() {
                   </div>
                 </div>
 
-                {/* Stats */}
+                {/* Countdown */}
                 <div style={{
-                  display: "flex", gap: "20px",
-                  marginBottom: "24px", padding: "16px",
-                  background: "rgba(0,0,0,0.25)",
-                  borderRadius: "12px",
+                  marginBottom: "20px", borderRadius: "14px", overflow: "hidden",
+                  border: c.horasRestantes <= 6 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
+                  background: c.horasRestantes <= 6 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
                 }}>
-                  <div style={{ textAlign: "center", flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>
-                      {c.participantes}
-                    </p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>
-                      PARTICIPANTES
-                    </p>
+                  <div style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  }}>
+                    <span style={{
+                      fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
+                      letterSpacing: "0.2em", textTransform: "uppercase",
+                      color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
+                      display: "flex", alignItems: "center", gap: "6px",
+                    }}>
+                      <span style={{
+                        width: "6px", height: "6px", borderRadius: "50%",
+                        background: c.horasRestantes <= 6 ? "#ff4444" : "var(--oasis-bright)",
+                        display: "inline-block",
+                        animation: "dc-cst-pulse 1.5s ease-in-out infinite",
+                      }}/>
+                      Termina en
+                    </span>
+                    <span style={{
+                      fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
+                      letterSpacing: "0.15em", color: "var(--text-muted)", textTransform: "uppercase",
+                    }}>
+                      👥 {c.participantes}
+                    </span>
                   </div>
-                  <div style={{ width: "1px", background: "var(--border-color)" }} />
-                  <div style={{ textAlign: "center", flex: 1, paddingRight: "16px", overflow: "visible", minWidth: "fit-content" }}>
-                    <p style={{
-                      fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
-                      color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
-                      animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1.5s ease-in-out infinite" : "none",
-                    }}>
-                      {c.horasRestantes}h
-                    </p>
-                    <p style={{
-                      fontFamily: "var(--font-lato)", fontSize: "0.65rem", letterSpacing: "0.08em", fontWeight: 700,
-                      color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--text-muted)",
-                      whiteSpace: "nowrap", overflow: "visible",
-                    }}>
-                      RESTANTES
-                    </p>
+                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "4px", padding: "12px 16px" }}>
+                    {[
+                      { val: tiempos[c.id]?.h ?? 0, label: "hrs" },
+                      { val: tiempos[c.id]?.m ?? 0, label: "min" },
+                      { val: tiempos[c.id]?.s ?? 0, label: "seg" },
+                    ].map(({ val, label }, idx) => (
+                      <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{
+                            fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", lineHeight: 1,
+                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
+                            textShadow: c.horasRestantes <= 6 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
+                            minWidth: "42px", textAlign: "center",
+                            animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1s ease-in-out infinite" : "none",
+                          }}>
+                            {pad(val)}
+                          </div>
+                          <div style={{
+                            fontFamily: "var(--font-cinzel)", fontSize: "0.45rem",
+                            letterSpacing: "0.15em", textTransform: "uppercase",
+                            color: "var(--text-muted)", marginTop: "4px",
+                          }}>{label}</div>
+                        </div>
+                        {idx < 2 && (
+                          <span style={{
+                            fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
+                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
+                            opacity: 0.6, marginBottom: "16px", alignSelf: "flex-start", paddingTop: "2px",
+                          }}>:</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
