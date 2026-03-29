@@ -136,7 +136,7 @@ export default function Navbar() {
           fontFamily: "var(--font-lato)", fontSize: "0.8rem",
           color: "var(--text-muted)", textDecoration: "none", textAlign: "center",
         }}>
-          ¿Tienes un local? →
+          <span style={{ textDecoration: "underline" }}>¿Tienes un local?</span>{" →"}
         </Link>
       </div>
 
