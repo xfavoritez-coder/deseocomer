@@ -75,7 +75,14 @@ export default function ConcursoDetallePage() {
     if (!isAuthenticated || !user) {
       // Unauthenticated: save pending ref so registration can process it
       savePendingRef(refUserId, concursoId);
+      // Debug: log localStorage users to see structure
+      try {
+        const raw = localStorage.getItem("dc_users");
+        console.log("[Referral] dc_users in localStorage:", raw ? JSON.parse(raw) : "empty");
+        console.log("[Referral] Looking for userId:", refUserId);
+      } catch { /* noop */ }
       const name = getRefUserName(refUserId);
+      console.log("[Referral] Resolved name:", name);
       setRefBannerName(name); // null = unknown name, string = known name
       return;
     }
@@ -243,7 +250,8 @@ export default function ConcursoDetallePage() {
             }}>
               <p style={{
                 fontFamily: "var(--font-cinzel-decorative)",
-                fontSize: "clamp(1rem, 3vw, 1.25rem)",
+                fontSize: "1.1rem",
+                fontWeight: 800,
                 color: "var(--sand-gold)",
                 marginBottom: "16px",
                 lineHeight: 1.4,
@@ -251,7 +259,7 @@ export default function ConcursoDetallePage() {
                 🏮 ¡{displayName} te invitó a ganar comida gratis!
               </p>
               <p style={{
-                fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+                fontFamily: "var(--font-lato)", fontSize: "1rem",
                 color: "var(--text-primary)", lineHeight: 1.7,
                 marginBottom: "24px", fontWeight: 400,
               }}>
@@ -271,10 +279,10 @@ export default function ConcursoDetallePage() {
                   🎉 Registrarme y sumarle un punto a {displayName}
                 </Link>
                 <button onClick={handleDismissRefBanner} style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
                   letterSpacing: "0.1em", textTransform: "uppercase",
-                  background: "none", border: "none", color: "var(--text-muted)",
-                  cursor: "pointer", padding: "8px 16px",
+                  background: "none", border: "none", color: "rgba(255,255,255,0.6)",
+                  cursor: "pointer", padding: "8px 16px", fontWeight: 400,
                 }}>
                   Cerrar
                 </button>
