@@ -51,20 +51,12 @@ export default function GenieLampara() {
     }, 300);
   };
 
-  // ── Intro balloon (first visit only) ──
+  // ── Intro balloon (first visit only, stays until user clicks lamp) ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     try { if (localStorage.getItem("deseocomer_genio_presentado")) return; } catch { return; }
     const showTimer = setTimeout(() => setShowBalloon(true), 3000);
-    const hideTimer = setTimeout(() => {
-      setBalloonExiting(true);
-      setTimeout(() => {
-        setShowBalloon(false);
-        setBalloonExiting(false);
-        try { localStorage.setItem("deseocomer_genio_presentado", "true"); } catch {}
-      }, 300);
-    }, 9000); // 3s delay + 6s visible
-    return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
+    return () => clearTimeout(showTimer);
   }, []);
 
   // ── Trigger 3: Lunchtime toast ──

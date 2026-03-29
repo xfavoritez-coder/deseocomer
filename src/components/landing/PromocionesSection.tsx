@@ -205,38 +205,7 @@ export default function PromocionesSection() {
                       {promo.local}
                     </p>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "flex-end" }}>
-                    <span style={{
-                      fontFamily: "var(--font-cinzel)",
-                      fontSize: "0.52rem",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      padding: "5px 10px",
-                      borderRadius: "30px",
-                      border: isHH ? "1px solid rgba(212,160,23,0.5)" : "1px solid var(--border-color)",
-                      color: accentColor,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}>
-                      {TIPO_ICONS[promo.tipo]} {TIPO_LABELS[promo.tipo]}
-                    </span>
-                    {isActiva && (
-                      <span style={{
-                        fontFamily: "var(--font-cinzel)",
-                        fontSize: "0.48rem",
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        padding: "4px 8px",
-                        borderRadius: "30px",
-                        background: "rgba(61,184,158,0.15)",
-                        border: "1px solid rgba(61,184,158,0.4)",
-                        color: "var(--oasis-bright)",
-                      }}>
-                        ● Activa
-                      </span>
-                    )}
-                  </div>
+                  <div />
                 </div>
 
                 <div className="dc-ps-card-inner" style={{ pointerEvents: "none" }}>
@@ -373,58 +342,6 @@ export default function PromocionesSection() {
                     ))}
                   </div>
 
-                  {/* Timer últimas horas */}
-                  {isUltimas && timer && (
-                    <div style={{
-                      background: "rgba(212,160,23,0.08)",
-                      border: "1px solid rgba(212,160,23,0.3)",
-                      borderRadius: "10px",
-                      padding: "12px 16px",
-                      marginBottom: "16px",
-                      animation: "dc-ps-glow 2s ease-in-out infinite",
-                    }}>
-                      <p style={{
-                        fontFamily: "var(--font-cinzel)",
-                        fontSize: "0.55rem",
-                        letterSpacing: "0.18em",
-                        textTransform: "uppercase",
-                        color: "#d4a017",
-                        fontWeight: 700,
-                        marginBottom: "10px",
-                      }}>
-                        ⚡ ¡Últimas horas!
-                      </p>
-                      <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-                        {[
-                          { val: timer.horas,    lbl: "Hr" },
-                          { val: timer.minutos,  lbl: "Min" },
-                          { val: timer.segundos, lbl: "Seg" },
-                        ].map(({ val, lbl }) => (
-                          <div key={lbl} style={{ textAlign: "center" }}>
-                            <p style={{
-                              fontFamily: "var(--font-cinzel-decorative)",
-                              fontSize: "1.5rem",
-                              color: "#d4a017",
-                              lineHeight: 1,
-                              textShadow: "0 0 16px rgba(212,160,23,0.6)",
-                            }}>
-                              {pad2(val)}
-                            </p>
-                            <p style={{
-                              fontFamily: "var(--font-cinzel)",
-                              fontSize: "0.45rem",
-                              letterSpacing: "0.2em",
-                              textTransform: "uppercase",
-                              color: "var(--text-muted)",
-                              marginTop: "3px",
-                            }}>
-                              {lbl}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* CTA (styled div, not a button — the whole card is a Link) */}
                   <div

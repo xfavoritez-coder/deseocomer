@@ -8,7 +8,6 @@ const NAV_LINKS = [
   { label: "Concursos",   href: "/concursos"   },
   { label: "Promociones", href: "/promociones" },
   { label: "Locales",     href: "/locales"     },
-  { label: "El Genio",    href: "/genio"       },
 ];
 
 export default function Navbar() {
@@ -215,10 +214,17 @@ export default function Navbar() {
         .dc-nav-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
         .dc-nav-local-link {
           font-family: var(--font-cinzel); font-size: 0.7rem;
-          color: rgba(232,168,76,0.6); text-decoration: none;
-          white-space: nowrap; transition: color 0.2s;
+          color: var(--accent); text-decoration: none;
+          white-space: nowrap; transition: all 0.2s;
+          background: rgba(232,168,76,0.12);
+          border: 1px solid rgba(232,168,76,0.35);
+          border-radius: 20px; padding: 8px 16px;
+          font-weight: 600;
         }
-        .dc-nav-local-link:hover { color: #e8a84c; }
+        .dc-nav-local-link:hover {
+          background: rgba(232,168,76,0.22);
+          border-color: rgba(232,168,76,0.6);
+        }
 
         /* Hamburger button */
         .dc-hamburger {
