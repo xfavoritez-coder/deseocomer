@@ -488,13 +488,15 @@ function BirthdayBanner() {
           <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>¿Cuándo es tu cumpleaños?</p>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", marginBottom: "16px" }}>Regístrate y te avisamos cuando haya ofertas especiales para celebrar</p>
-          <button onClick={() => setPaso("form")} style={btnP}>Quiero mis ofertas de cumpleaños</button>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button onClick={() => setPaso("form")} style={{ ...btnP, width: "auto", display: "inline-block", padding: "14px 40px" }}>¡Lo quiero!</button>
+          </div>
         </div>
       )}
 
       {paso === "form" && (
         <div style={{ textAlign: "left", maxWidth: "340px", margin: "0 auto" }}>
-          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: "4px", textAlign: "center" }}>Cuéntanos sobre ti 🎂</p>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1rem, 3vw, 1.3rem)", color: "var(--color-title)", marginBottom: "8px", textAlign: "center" }}>🎂 Recibe ofertas exclusivas en tu cumpleaños</p>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "16px", textAlign: "center" }}>Solo tarda 30 segundos</p>
           {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff8080", marginBottom: "10px", textAlign: "center" }}>⚠️ {error}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
