@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getPendingRef,
@@ -9,6 +9,8 @@ import {
   markEmailCounted,
   incrementRef,
   clearPendingRef,
+  savePendingRef,
+  getRefUserName,
 } from "@/lib/referrals";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -53,8 +55,20 @@ const initLocal = { nombreLocal: "", nombreEncargado: "", email: "", telefono: "
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function RegistroPage() {
+  return (
+    <Suspense>
+      <RegistroContent />
+    </Suspense>
+  );
+}
+
+function RegistroContent() {
   const { register } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const refCode     = searchParams.get("ref");
+  const concursoId  = searchParams.get("concurso");
 
   const [tab,      setTab]      = useState<"user" | "local">("user");
   const [userForm, setUserForm] = useState(initUser);
@@ -66,6 +80,22 @@ export default function RegistroPage() {
   const [success,  setSuccess]  = useState(false);
   const [refMsg,   setRefMsg]   = useState("");
   const [googleMsg, setGoogleMsg] = useState("");
+  const [refName,  setRefName]  = useState<string | null>(null);
+  const [refPremio, setRefPremio] = useState<string | null>(null);
+
+  // Save pending ref from URL params and resolve names
+  useEffect(() => {
+    if (refCode && concursoId) {
+      savePendingRef(refCode, Number(concursoId));
+      const name = getRefUserName(refCode);
+      setRefName(name);
+      // Try to get concurso name from mockConcursos
+      try {
+        // Dynamic import not needed - use localStorage or just show generic text
+        setRefPremio(null); // Will show generic text
+      } catch { /* noop */ }
+    }
+  }, [refCode, concursoId]);
 
   // ── User form submit ──────────────────────────────────────────────────────
   const handleUser = async (e: React.FormEvent) => {
@@ -100,7 +130,10 @@ export default function RegistroPage() {
         if (!hasEmailCounted(pending.concursoId, pending.refCode, email)) {
           markEmailCounted(pending.concursoId, pending.refCode, email);
           incrementRef(pending.concursoId, pending.refCode);
-          msg = "¡Listo! Le diste un punto a tu amigo en el concurso.";
+          const friendName = getRefUserName(pending.refCode);
+          msg = friendName
+            ? `✅ ¡Listo! Le sumaste un punto a ${friendName}. Ahora tú también puedes participar en el concurso.`
+            : "✅ ¡Listo! Le sumaste un punto a tu amigo. Ahora tú también puedes participar en el concurso.";
           redirectTo = `/concursos/${pending.concursoId}`;
         }
         clearPendingRef();
@@ -178,6 +211,43 @@ export default function RegistroPage() {
           </div>
         ) : (
           <>
+            {/* Referral banner */}
+            {refCode && concursoId && (
+              <div style={{
+                background: "rgba(232,168,76,0.15)",
+                border: "1px solid rgba(232,168,76,0.4)",
+                borderRadius: "12px",
+                padding: "16px 20px",
+                marginBottom: "20px",
+                textAlign: "center",
+              }}>
+                <p style={{
+                  fontFamily: "var(--font-cinzel)",
+                  fontSize: "clamp(0.85rem, 2.5vw, 0.95rem)",
+                  color: "var(--accent)",
+                  marginBottom: "6px",
+                  fontWeight: 600,
+                }}>
+                  🏮 {refName
+                    ? `¡Estás a un paso de sumarle un punto a ${refName}!`
+                    : "¡Te invitaron a ganar comida gratis!"
+                  }
+                </p>
+                <p style={{
+                  fontFamily: "var(--font-lato)",
+                  fontSize: "0.85rem",
+                  color: "var(--text-primary)",
+                  lineHeight: 1.6,
+                  fontWeight: 400,
+                }}>
+                  {refName
+                    ? `Completa tu registro y automáticamente le darás un punto a ${refName} en el concurso. Tú también podrás participar y ganar comida gratis.`
+                    : "Completa tu registro para participar en el concurso y ganar comida gratis."
+                  }
+                </p>
+              </div>
+            )}
+
             {/* Logo */}
             <div className="dc-auth-logo">
               <span className="dc-auth-lamp-icon">🏮</span>
@@ -461,7 +531,7 @@ export function AuthStyles() {
       }
       .dc-auth-subtitle {
         font-family: var(--font-lato); font-size: 0.9rem;
-        color: var(--text-muted); font-weight: 300; margin-bottom: 28px;
+        color: var(--text-muted); font-weight: 400; margin-bottom: 28px;
       }
 
       /* Tabs */
@@ -680,7 +750,7 @@ export function AuthStyles() {
       }
       .dc-auth-success-sub {
         font-family: var(--font-lato); font-size: 0.95rem;
-        color: var(--text-muted); font-weight: 300;
+        color: var(--text-muted); font-weight: 400;
       }
       @keyframes dc-lamp-bounce {
         0%   { transform: scale(0) rotate(-15deg); opacity: 0; }

@@ -100,24 +100,7 @@ export default function HeroSection() {
           pointerEvents: "none", zIndex: 4,
         }}>☀️</div>
       )}
-      {period === "manana" && (
-        <div className="dc-sky dc-sky--sunrise" style={{
-          position: "absolute", top: "8%", right: "14%",
-          fontSize: "72px",
-          filter: "drop-shadow(0 0 50px rgba(255,160,40,0.9))",
-          animation: "skyFloat 6s ease-in-out infinite",
-          pointerEvents: "none", zIndex: 4,
-        }}>🌄</div>
-      )}
-      {period === "tarde" && (
-        <div className="dc-sky dc-sky--sunset" style={{
-          position: "absolute", top: "8%", right: "14%",
-          fontSize: "60px",
-          filter: "drop-shadow(0 0 40px rgba(255,80,20,0.8))",
-          animation: "skyFloat 7s ease-in-out infinite",
-          pointerEvents: "none", zIndex: 4,
-        }}>🌇</div>
-      )}
+      {/* Sunrise and sunset icons removed for cleaner hero */}
       {hasSky && (
         <div className="dc-sky dc-sky--moon" style={{
           position: "absolute", top: "8%", right: "14%",
@@ -249,8 +232,7 @@ export default function HeroSection() {
           .dc-hero-subtitle { font-size: clamp(1rem, 4vw, 1.1rem) !important; line-height: 1.8 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-sky--sun      { font-size: 56px !important; }
-          .dc-sky--sunrise  { font-size: 50px !important; right: 8% !important; top: 5% !important; }
-          .dc-sky--sunset   { font-size: 42px !important; right: 5% !important; top: 5% !important; }
+          /* sunrise/sunset icons removed */
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
           .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; max-width: 320px; justify-content: center; }
           .dc-hero-ghost    { width: 100%; max-width: 320px; justify-content: center; }

@@ -76,7 +76,7 @@ export default function CTASection() {
                   fontSize: "0.85rem",
                   color: "var(--text-muted)",
                   lineHeight: 1.6,
-                  fontWeight: 300,
+                  fontWeight: 400,
                 }}>{b.desc}</p>
               </div>
             ))}

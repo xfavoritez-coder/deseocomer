@@ -96,7 +96,7 @@ export default function ConcursosPage() {
           </h1>
           <p style={{
             fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "var(--text-primary)", fontWeight: 300,
+            color: "var(--text-primary)", fontWeight: 400,
             maxWidth: "520px", margin: "0 auto", lineHeight: 1.8,
           }}>
             Comparte tu link con amigos, sube en el ranking y gana premios reales
@@ -109,19 +109,13 @@ export default function ConcursosPage() {
               { val: CONCURSOS.length, label: "concursos activos" },
               { val: CONCURSOS.reduce((s, c) => s + c.participantes, 0).toLocaleString("es-CL"), label: "participantes" },
               { val: CONCURSOS_FINALIZADOS.length, label: "premios entregados" },
-            ].map(({ val, label }) => (
-              <div key={label} style={{ textAlign: "center" }}>
-                <p style={{
-                  fontFamily: "var(--font-cinzel-decorative)",
-                  fontSize: "clamp(1.4rem, 4vw, 2rem)",
-                  color: "var(--accent)",
-                  textShadow: "0 0 20px color-mix(in srgb, var(--accent) 40%, transparent)",
-                }}>{val}</p>
-                <p style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
-                  letterSpacing: "0.2em", textTransform: "uppercase",
-                  color: "var(--text-muted)", marginTop: "4px",
-                }}>{label}</p>
+            ].map(({ val, label }, i) => (
+              <div key={label} className="dc-cp-stat-item">
+                {i > 0 && <div className="dc-cp-stat-sep" />}
+                <div style={{ textAlign: "center", flex: 1 }}>
+                  <p className="dc-cp-stat-val">{val}</p>
+                  <p className="dc-cp-stat-label">{label}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -225,8 +219,36 @@ export default function ConcursosPage() {
           text-align: center;
         }
         .dc-cp-stats {
-          display: flex; justify-content: center; gap: 56px;
-          margin-top: 48px; flex-wrap: wrap;
+          display: flex; justify-content: space-around; align-items: stretch;
+          margin-top: 48px;
+          padding: 20px 16px;
+          background: rgba(0,0,0,0.2);
+          border-radius: 16px;
+          border: 1px solid var(--border-color);
+          max-width: 600px;
+          margin-left: auto; margin-right: auto;
+        }
+        .dc-cp-stat-item {
+          display: flex; align-items: center; flex: 1;
+        }
+        .dc-cp-stat-sep {
+          width: 1px; height: 40px;
+          background: rgba(255,255,255,0.15);
+          flex-shrink: 0;
+        }
+        .dc-cp-stat-val {
+          font-family: var(--font-cinzel-decorative);
+          font-size: 2rem !important; font-weight: 700 !important;
+          color: var(--sand-gold) !important;
+          text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 40%, transparent);
+          line-height: 1.2 !important;
+        }
+        .dc-cp-stat-label {
+          font-family: var(--font-cinzel);
+          font-size: 0.75rem !important; font-weight: 500 !important;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(255,255,255,0.8) !important;
+          margin-top: 4px;
         }
         .dc-cp-filters {
           display: flex; gap: 10px; flex-wrap: wrap;
@@ -261,7 +283,8 @@ export default function ConcursosPage() {
 
         @media (max-width: 767px) {
           .dc-cp-hero    { padding: 100px 20px 60px; }
-          .dc-cp-stats   { gap: 28px; }
+          .dc-cp-stats   { padding: 16px 12px; }
+          .dc-cp-stat-val { font-size: 1.6rem !important; }
           .dc-cp-content { padding: 0 20px 60px; }
           .dc-cp-grid    { grid-template-columns: 1fr; gap: 16px; }
         }

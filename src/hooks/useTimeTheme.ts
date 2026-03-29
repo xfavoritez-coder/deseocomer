@@ -162,13 +162,24 @@ export function useTimeTheme(): TimeTheme {
   const [theme, setTheme] = useState<TimeTheme | null>(null);
 
   useEffect(() => {
-    const update = () => {
-      const t = getThemeByPeriod(getPeriod(new Date().getHours()));
-      setTheme(t);
-      applyThemeVars(t);
-    };
-    update();
-    const interval = setInterval(update, 30_000);
+    // Initial load: apply colors silently, store period
+    const periodoActual = getPeriod(new Date().getHours());
+    const t = getThemeByPeriod(periodoActual);
+    setTheme(t);
+    applyThemeVars(t);
+    sessionStorage.setItem("dc_periodo", periodoActual);
+
+    // Interval: only update state when period actually changes
+    const interval = setInterval(() => {
+      const periodoNuevo = getPeriod(new Date().getHours());
+      const periodoGuardado = sessionStorage.getItem("dc_periodo");
+      if (periodoNuevo !== periodoGuardado) {
+        const newTheme = getThemeByPeriod(periodoNuevo);
+        setTheme(newTheme);
+        applyThemeVars(newTheme);
+        sessionStorage.setItem("dc_periodo", periodoNuevo);
+      }
+    }, 30_000);
     return () => clearInterval(interval);
   }, []);
 

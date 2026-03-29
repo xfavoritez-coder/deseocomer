@@ -124,7 +124,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <Link href="/registro" className="dc-mobile-cta" onClick={() => setMenuOpen(false)}>
+            <Link href="/login" className="dc-mobile-cta" onClick={() => setMenuOpen(false)}>
               Entrar
             </Link>
           )
@@ -157,6 +157,7 @@ export default function Navbar() {
           font-family: var(--font-cinzel); font-size: 0.75rem;
           letter-spacing: 0.15em; text-transform: uppercase;
           color: var(--text-primary); text-decoration: none; white-space: nowrap;
+          font-weight: 500;
         }
         .dc-nav-cta {
           font-family: var(--font-cinzel); font-size: 0.75rem;
@@ -244,6 +245,7 @@ export default function Navbar() {
           color: var(--text-primary); text-decoration: none;
           padding: 16px 4px; border-bottom: 1px solid var(--border-color);
           display: flex; align-items: center; min-height: 52px;
+          font-weight: 500;
         }
         .dc-mobile-cta {
           font-family: var(--font-cinzel); font-size: 0.85rem;

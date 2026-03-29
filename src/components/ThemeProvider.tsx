@@ -30,7 +30,7 @@ const GREETING_DATA: Record<TimePeriod, { icon: string; title: string; subtitle?
   noche:     { icon: "🌙", title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
 };
 
-const SS_KEY = "periodo_mostrado";
+const SS_KEY = "dc_periodo";
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hookTheme    = useTimeTheme();

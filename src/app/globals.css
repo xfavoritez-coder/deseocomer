@@ -46,6 +46,12 @@
   --font-body:    var(--font-lato);
 }
 
+/* ── BASE GLOBAL DE TIPOGRAFÍA ── */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -56,9 +62,24 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   transition: background-color 2s ease, color 2s ease;
 }
+
+/* ── Párrafos globales ── */
+p {
+  font-size: 1rem;
+  line-height: 1.75;
+  font-weight: 400;
+}
+
+/* ── Títulos globales ── */
+h1 { font-size: clamp(1.8rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.2; }
+h2 { font-size: clamp(1.5rem, 4vw, 2.8rem); font-weight: 700; line-height: 1.3; }
+h3 { font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 600; line-height: 1.4; }
 
 /* Transición en todos los elementos que usen las variables de tema */
 section, div, nav, footer, button, a {
@@ -77,18 +98,43 @@ section, div, nav, footer, button, a {
 /* ── Clases reutilizables para tipografía de sección ── */
 .section-description, .hero-subtitle, p.description {
   font-family: var(--font-body);
-  font-weight: 300;
+  font-weight: 400;
   color: var(--color-text);
   max-width: 520px;
   margin: 0 auto;
 }
 
 /* ── Tipografía automática ── */
-main p, section p { font-size: 1.1rem; line-height: 1.8; color: var(--color-text); }
-main h2, section h2 { font-size: clamp(1.8rem, 4vw, 3rem); }
-main h3, section h3 { font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 400; line-height: 1.8; }
+main p, section p { font-size: 1.1rem; line-height: 1.8; color: var(--color-text); font-weight: 400; }
+main h2, section h2 { font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 700; }
+main h3, section h3 { font-size: clamp(1.1rem, 2.5vw, 1.4rem); font-weight: 600; line-height: 1.8; }
 
 @media (max-width: 768px) {
   main p, section p { font-size: 1rem; line-height: 1.7; }
   main h2, section h2 { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+
+  /* Textos generales en móvil */
+  p {
+    font-size: 1rem !important;
+    line-height: 1.75 !important;
+    font-weight: 400 !important;
+  }
+
+  /* Textos de cards */
+  .card p, .card span, .card div {
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+  }
+
+  /* Labels y etiquetas pequeñas */
+  small, .label, .badge {
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+  }
+
+  /* Botones */
+  button, a[role="button"] {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+  }
 }

@@ -142,7 +142,7 @@ export default function LocalesSection() {
                   fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
                   color: "var(--text-muted)",
                   lineHeight: 1.7,
-                  fontWeight: 300,
+                  fontWeight: 400,
                   marginBottom: "18px",
                 }}>{local.descripcion}</p>
 

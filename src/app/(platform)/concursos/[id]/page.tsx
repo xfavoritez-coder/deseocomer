@@ -49,7 +49,14 @@ export default function ConcursoDetallePage() {
   const [newRefCount,  setNewRefCount]  = useState(0);
   const [myRefs,       setMyRefs]       = useState(0);
   const [refBannerName, setRefBannerName] = useState<string | null | undefined>(undefined);
+  const [refBannerDismissed, setRefBannerDismissed] = useState(false);
   const refProcessed = useRef(false);
+
+  const handleDismissRefBanner = () => {
+    setRefBannerDismissed(true);
+    // Keep the ref in localStorage so registration can still process it
+    if (refUserId) savePendingRef(refUserId, concursoId);
+  };
 
   // Tick countdown every second
   useEffect(() => {
@@ -209,36 +216,57 @@ export default function ConcursoDetallePage() {
         </div>
       )}
 
-      {/* Referral banner for unauthenticated visitors arriving via a ref link */}
-      {refUserId && refBannerName !== undefined && !isAuthenticated && (
+      {/* Referral banner — fixed bottom for unauthenticated visitors via ref link */}
+      {refUserId && refBannerName !== undefined && !isAuthenticated && !refBannerDismissed && (
         <div style={{
-          background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(61,184,158,0.08))",
-          borderBottom: "1px solid rgba(232,168,76,0.3)",
-          padding: "14px 24px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          gap: "16px", flexWrap: "wrap",
+          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 500,
+          background: "rgba(13,7,3,0.97)",
+          borderTop: "1px solid var(--sand-gold)",
+          borderRadius: "16px 16px 0 0",
+          padding: "20px 24px",
+          textAlign: "center",
+          backdropFilter: "blur(12px)",
         }}>
+          <div style={{ fontSize: "2.2rem", marginBottom: "10px" }}>🏮</div>
+          <p style={{
+            fontFamily: "var(--font-cinzel-decorative)",
+            fontSize: "clamp(1rem, 3vw, 1.2rem)",
+            color: "var(--sand-gold)",
+            marginBottom: "8px",
+          }}>
+            ¡Te invitaron a ganar comida gratis!
+          </p>
           <p style={{
             fontFamily: "var(--font-lato)", fontSize: "0.9rem",
-            color: "var(--text-primary)", textAlign: "center",
+            color: "var(--text-primary)", lineHeight: 1.7,
+            maxWidth: "480px", margin: "0 auto 16px",
+            fontWeight: 400,
           }}>
-            🏮{" "}
             {refBannerName
-              ? <><strong style={{ color: "var(--accent)" }}>{refBannerName}</strong> te invitó a participar.</>
-              : "Alguien te invitó a participar."
+              ? <><strong style={{ color: "var(--accent)" }}>{refBannerName}</strong> quiere que participes en el concurso <strong style={{ color: "var(--accent)" }}>{c.premio}</strong>. Regístrate gratis y le sumas un punto. ¡Tú también puedes ganar!</>
+              : <>Alguien quiere que participes en el concurso <strong style={{ color: "var(--accent)" }}>{c.premio}</strong>. Regístrate gratis y le sumas un punto. ¡Tú también puedes ganar!</>
             }
-            {" "}¡Inicia sesión para que cuente su punto!
           </p>
-          <Link href={`/login?next=/concursos/${concursoId}`} style={{
-            flexShrink: 0,
-            fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            background: "var(--accent)", color: "var(--bg-primary)",
-            fontWeight: 700, padding: "10px 22px", borderRadius: "30px",
-            textDecoration: "none", whiteSpace: "nowrap",
-          }}>
-            Inicia sesión para participar
-          </Link>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center" }}>
+            <Link href={`/registro?ref=${refUserId}&concurso=${concursoId}`} style={{
+              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.8rem, 2.5vw, 0.9rem)",
+              letterSpacing: "0.08em", textTransform: "uppercase",
+              background: "var(--accent)", color: "var(--bg-primary)",
+              fontWeight: 700, padding: "14px 28px", borderRadius: "14px",
+              textDecoration: "none", display: "inline-flex", alignItems: "center",
+              justifyContent: "center", minHeight: "48px", width: "100%", maxWidth: "380px",
+            }}>
+              🎉 Registrarme{refBannerName ? ` y sumar punto a ${refBannerName}` : ""}
+            </Link>
+            <button onClick={handleDismissRefBanner} style={{
+              fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+              letterSpacing: "0.1em", textTransform: "uppercase",
+              background: "none", border: "none", color: "var(--text-muted)",
+              cursor: "pointer", padding: "8px 16px",
+            }}>
+              Cerrar
+            </button>
+          </div>
         </div>
       )}
 
@@ -298,7 +326,7 @@ export default function ConcursoDetallePage() {
             {"descripcionPremio" in c && (
               <p style={{
                 fontFamily: "var(--font-lato)", fontSize: "0.95rem",
-                color: "var(--text-primary)", fontWeight: 300,
+                color: "var(--text-primary)", fontWeight: 400,
                 maxWidth: "520px", lineHeight: 1.7,
               }}>
                 {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
