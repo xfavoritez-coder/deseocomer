@@ -3,173 +3,83 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { AuthStyles } from "@/app/(auth)/registro/page";
-
-function EyeIcon({ open }: { open: boolean }) {
-  return open ? (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ) : (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-      <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  );
-}
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const router    = useRouter();
-
-  const [email,     setEmail]     = useState("");
-  const [password,  setPassword]  = useState("");
-  const [remember,  setRemember]  = useState(false);
-  const [showPw,    setShowPw]    = useState(false);
-  const [error,     setError]     = useState("");
-  const [loading,   setLoading]   = useState(false);
-  const [success,   setSuccess]   = useState(false);
-  const [googleMsg, setGoogleMsg] = useState("");
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (!email.trim())    return setError("El email es obligatorio.");
-    if (!password)        return setError("La contraseña es obligatoria.");
-
+    if (!email.trim()) return setError("Ingresa tu email.");
+    if (!password) return setError("Ingresa tu contraseña.");
     setLoading(true);
     const res = await login(email.trim(), password, remember);
     setLoading(false);
-
-    if (res.success) {
-      setSuccess(true);
-      // Redirect based on user type — AuthContext has user updated synchronously
-      setTimeout(() => {
-        // We can't access user here easily; just go to a smart landing
-        router.push("/panel/dashboard");
-      }, 1400);
-    } else {
-      setError(res.error ?? "Error al iniciar sesión.");
-    }
+    if (res.success) router.push("/");
+    else setError(res.error ?? "Error al iniciar sesión.");
   };
 
   return (
-    <main className="dc-auth-page">
-      <div className="dc-auth-glow" aria-hidden="true" />
-      <Link href="/" className="dc-auth-back">← Volver al inicio</Link>
+    <main style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <div style={{ maxWidth: "420px", width: "100%", background: "rgba(45,26,8,0.9)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "24px", padding: "40px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
 
-      <div className="dc-auth-card">
-        {success ? (
-          <div className="dc-auth-success">
-            <div className="dc-auth-success-lamp">🏮</div>
-            <h2 className="dc-auth-success-title">¡Bienvenido!</h2>
-            <p className="dc-auth-success-sub">El Genio te abre las puertas...</p>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)" }}>DeseoComer</p>
+        </div>
+
+        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.6rem, 5vw, 2rem)", color: "var(--color-title, var(--accent))", marginBottom: "8px" }}>Entrar</h1>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "32px" }}>
+          ¿No tienes cuenta? <Link href="/registro" style={{ color: "var(--accent)", textDecoration: "none" }}>Regístrate gratis</Link>
+        </p>
+
+        {error && (
+          <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "8px", padding: "12px", marginBottom: "16px" }}>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p>
           </div>
-        ) : (
-          <>
-            <div className="dc-auth-logo">
-              <span className="dc-auth-lamp-icon">🏮</span>
-              <span className="dc-auth-logo-text">DeseoComer</span>
-            </div>
-
-            <h1 className="dc-auth-title">Iniciar sesión</h1>
-            <p className="dc-auth-subtitle">Accede a tu cuenta en la plataforma gastronómica</p>
-
-            {error && (
-              <div className="dc-auth-error" role="alert">
-                <span>⚠️ {error}</span>
-                <button type="button" onClick={() => setError("")} className="dc-auth-error-close">✕</button>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="dc-auth-form" noValidate>
-              <div className="dc-field">
-                <label className="dc-label">Correo electrónico</label>
-                <input
-                  type="email" className="dc-input"
-                  placeholder="tu@email.com"
-                  value={email} onChange={e => setEmail(e.target.value)}
-                  autoComplete="email" required
-                />
-              </div>
-
-              <div className="dc-field">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <label className="dc-label">Contraseña</label>
-                  <a href="#" className="dc-label dc-link" style={{ marginBottom: 0 }}>
-                    ¿Olvidé mi contraseña?
-                  </a>
-                </div>
-                <div className="dc-pw-wrap">
-                  <input
-                    type={showPw ? "text" : "password"}
-                    className="dc-input dc-input--pw"
-                    placeholder="Tu contraseña"
-                    value={password} onChange={e => setPassword(e.target.value)}
-                    autoComplete="current-password" required
-                  />
-                  <button type="button" className="dc-pw-btn" onClick={() => setShowPw(s => !s)}
-                    aria-label={showPw ? "Ocultar contraseña" : "Mostrar contraseña"}>
-                    <EyeIcon open={showPw} />
-                  </button>
-                </div>
-              </div>
-
-              <label className="dc-check-label">
-                <input type="checkbox" className="dc-checkbox"
-                  checked={remember} onChange={e => setRemember(e.target.checked)} />
-                <span>Recordarme en este dispositivo</span>
-              </label>
-
-              <button type="submit" className="dc-btn-primary" disabled={loading}>
-                {loading ? <span className="dc-spinner" /> : "✨ Iniciar sesión"}
-              </button>
-            </form>
-
-            <div className="dc-divider"><span>o</span></div>
-
-            <button type="button" className="dc-btn-google"
-              onClick={() => setGoogleMsg("Autenticación con Google próximamente 🧞")}>
-              <span className="dc-google-g">G</span>
-              Continuar con Google
-            </button>
-            {googleMsg && <p className="dc-google-msg">{googleMsg}</p>}
-
-            <p className="dc-auth-foot">
-              ¿No tienes cuenta?{" "}
-              <Link href="/registro" className="dc-link">Registrarse gratis</Link>
-            </p>
-
-            {/* Demo accounts hint */}
-            <div style={{
-              marginTop: "20px", padding: "16px",
-              background: "rgba(232,168,76,0.08)",
-              border: "1px solid rgba(232,168,76,0.2)",
-              borderRadius: "12px", textAlign: "left",
-            }}>
-              <p style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
-                letterSpacing: "0.2em", textTransform: "uppercase",
-                color: "rgba(232,168,76,0.6)", marginBottom: "10px",
-              }}>
-                Cuentas de prueba
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(253,240,200,0.6)", lineHeight: 1.5 }}>
-                  <strong style={{ color: "rgba(253,240,200,0.8)" }}>Usuario:</strong> demo@deseocomer.com / demo1234
-                </p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(253,240,200,0.6)", lineHeight: 1.5 }}>
-                  <strong style={{ color: "rgba(253,240,200,0.8)" }}>Local:</strong> local@deseocomer.com / local1234
-                </p>
-              </div>
-            </div>
-          </>
         )}
-      </div>
 
-      <AuthStyles />
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div>
+            <label style={labelS}>Email</label>
+            <input style={inputS} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+          </div>
+          <div>
+            <label style={labelS}>Contraseña</label>
+            <div style={{ position: "relative" }}>
+              <input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Tu contraseña" value={password} onChange={e => setPassword(e.target.value)} />
+              <button type="button" onClick={() => setShowPw(s => !s)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "1rem" }}>
+                {showPw ? "🙈" : "👁"}
+              </button>
+            </div>
+          </div>
+
+          <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+            <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} />
+            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>Recordarme</span>
+          </label>
+
+          <button type="submit" disabled={loading} style={btnS}>
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
+
+        <button onClick={() => alert("Escríbenos a hola@deseocomer.com")} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "16px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+          ¿Olvidaste tu contraseña?
+        </button>
+      </div>
     </main>
   );
 }
+
+const labelS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "8px", display: "block" };
+const inputS: React.CSSProperties = { width: "100%", padding: "14px 16px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" };
+const btnS: React.CSSProperties = { width: "100%", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: "1rem", letterSpacing: "0.1em", padding: "16px", borderRadius: "12px", border: "none", cursor: "pointer" };
