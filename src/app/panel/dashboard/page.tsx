@@ -1,1 +1,9 @@
-export default function Page() { return <div style={{padding:'120px 60px',color:'var(--sand-gold)',fontFamily:'var(--font-cinzel-decorative)'}}>dashboard — próximamente</div>; }
+"use client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function DashboardRedirect() {
+  const router = useRouter();
+  useEffect(() => { router.replace("/panel"); }, [router]);
+  return null;
+}
