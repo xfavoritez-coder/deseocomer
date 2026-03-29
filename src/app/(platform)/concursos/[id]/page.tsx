@@ -303,60 +303,68 @@ export default function ConcursoDetallePage() {
           ← Todos los concursos
         </Link>
 
+        {/* Premio card */}
         <div style={{
-          position: "relative", display: "flex",
-          alignItems: "center", gap: "28px", flexWrap: "nowrap",
+          position: "relative", overflow: "hidden", borderRadius: "24px",
+          border: "1px solid rgba(232,168,76,0.3)",
+          background: "linear-gradient(160deg, #2d1a08, #1a0e05)",
+          boxShadow: "0 0 60px rgba(0,0,0,0.6), 0 0 30px rgba(232,168,76,0.08)",
         }}>
-          {c.imagenUrl ? (
-            <div style={{
-              width: "clamp(80px, 15vw, 120px)", height: "clamp(80px, 15vw, 120px)",
-              borderRadius: "16px", overflow: "hidden", flexShrink: 0,
-              boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-              border: "1px solid var(--border-color)",
-              background: "rgba(45,26,8,0.8)",
-            }}>
+          {/* Foto full width */}
+          {c.imagenUrl && (
+            <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
               <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              {/* Ribbon */}
+              <div style={{
+                position: "absolute", top: "18px", right: "-32px",
+                background: "linear-gradient(135deg, #f5d080, #e8a84c, #c4853a)",
+                color: "#1a0e05",
+                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+                fontWeight: 900, letterSpacing: "0.12em",
+                padding: "8px 48px",
+                transform: "rotate(35deg)",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                whiteSpace: "nowrap",
+              }}>
+                🏆 Premio Gratis
+              </div>
             </div>
-          ) : (
-            <span style={{
-              fontSize: "clamp(3.5rem, 10vw, 6rem)",
-              filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
-              flexShrink: 0,
-            }}>
-              {c.imagen}
-            </span>
           )}
-          <div>
+
+          {/* Contenido */}
+          <div style={{ padding: "28px 28px 32px", textAlign: "center" }}>
             <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
               letterSpacing: "0.3em", textTransform: "uppercase",
-              color: "var(--oasis-bright)", marginBottom: "10px",
-              fontWeight: 600,
+              color: "#3db89e", marginBottom: "12px",
             }}>
               {c.local}
             </p>
             <h1 style={{
               fontFamily: "var(--font-cinzel-decorative)",
-              fontSize: "clamp(1.4rem, 4.5vw, 2.8rem)",
-              fontWeight: 800,
-              color: "var(--accent)",
-              textShadow: "0 0 40px color-mix(in srgb, var(--accent) 50%, transparent)",
-              marginBottom: "12px", lineHeight: 1.2,
+              fontSize: "1.4rem", fontWeight: 900,
+              color: "#e8a84c", lineHeight: 1.3,
+              marginBottom: "16px",
             }}>
               {c.premio}
             </h1>
+            {/* Separador */}
+            <div style={{
+              width: "60px", height: "1px", margin: "0 auto 16px",
+              background: "linear-gradient(90deg, transparent, #e8a84c, transparent)",
+            }} />
             {"descripcionPremio" in c && (
               <p style={{
                 fontFamily: "var(--font-lato)", fontSize: "0.95rem",
-                color: "var(--text-primary)", fontWeight: 400,
-                maxWidth: "520px", lineHeight: 1.7,
+                color: "rgba(253,240,200,0.75)", fontWeight: 400,
+                lineHeight: 1.65, maxWidth: "520px", margin: "0 auto",
               }}>
                 {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
               </p>
             )}
             {isEnded && "fechaFin" in c && (
               <div style={{
-                display: "inline-block", marginTop: "12px",
+                display: "inline-block", marginTop: "16px",
                 background: "rgba(255,255,255,0.06)",
                 border: "1px solid var(--border-color)",
                 borderRadius: "20px", padding: "6px 16px",
