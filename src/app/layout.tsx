@@ -46,9 +46,9 @@ export default function RootLayout({
           var h=new Date().getHours(),p;
           if(h<7)p="madrugada";else if(h<20)p="dia";else p="noche";
           var T={
-            madrugada:{bg:"#07040f",bg2:"#12080a",text:"#f0d080",muted:"#7a6040",accent:"#c4853a",border:"rgba(196,133,58,0.22)",title:"#c4853a",link:"#3db89e",label:"#5a3c18",ctext:"#c0a060"},
-            dia:{bg:"#1e1400",bg2:"#0a1f18",text:"#fff8e0",muted:"#b09040",accent:"#e8a020",border:"rgba(232,160,32,0.25)",title:"#e8a020",link:"#1aa098",label:"#706018",ctext:"#cca858"},
-            noche:{bg:"#060410",bg2:"#0d1a0a",text:"#e0d8f0",muted:"#586090",accent:"#b8860b",border:"rgba(184,134,11,0.22)",title:"#b8860b",link:"#3db89e",label:"#282e48",ctext:"#b0a8c8"}
+            madrugada:{bg:"#07040f",bg2:"#0c0818",text:"#f0d080",muted:"#7a6040",accent:"#c4853a",border:"rgba(196,133,58,0.22)",title:"#c4853a",link:"#3db89e",label:"#5a3c18",ctext:"#c0a060"},
+            dia:{bg:"#1e1400",bg2:"#080d18",text:"#fff8e0",muted:"#b09040",accent:"#e8a020",border:"rgba(232,160,32,0.25)",title:"#e8a020",link:"#1aa098",label:"#706018",ctext:"#cca858"},
+            noche:{bg:"#060410",bg2:"#08101a",text:"#e0d8f0",muted:"#586090",accent:"#b8860b",border:"rgba(184,134,11,0.22)",title:"#b8860b",link:"#3db89e",label:"#282e48",ctext:"#b0a8c8"}
           };
           var t=T[p],r=document.documentElement,s=r.style;
           s.setProperty("transition","none");

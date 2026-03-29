@@ -70,7 +70,7 @@ export default function ConcursosSection() {
               href={`/concursos/${c.id}`}
               className="dc-cst-card"
               style={{
-                backgroundColor: "var(--bg-secondary)",
+                backgroundColor: "rgba(45,26,8,0.85)",
                 border: "1px solid var(--border-color)",
                 borderRadius: "20px",
                 cursor: "pointer",
@@ -128,7 +128,7 @@ export default function ConcursosSection() {
                     </p>
                   </div>
                   <div style={{ width: "1px", background: "var(--border-color)" }} />
-                  <div style={{ textAlign: "center", flex: 1, paddingRight: "4px" }}>
+                  <div style={{ textAlign: "center", flex: 1, paddingRight: "16px", overflow: "visible", minWidth: "fit-content" }}>
                     <p style={{
                       fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
                       color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
@@ -139,7 +139,7 @@ export default function ConcursosSection() {
                     <p style={{
                       fontFamily: "var(--font-lato)", fontSize: "0.65rem", letterSpacing: "0.08em", fontWeight: 700,
                       color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--text-muted)",
-                      whiteSpace: "nowrap",
+                      whiteSpace: "nowrap", overflow: "visible",
                     }}>
                       RESTANTES
                     </p>
