@@ -93,50 +93,48 @@ export default function Navbar() {
         className={`dc-mobile-menu${menuOpen ? " dc-mobile-menu--open" : ""}`}
         aria-hidden={!menuOpen}
       >
-        <CitySelector mobile />
-
+        {/* 1. Navigation links */}
         {NAV_LINKS.map(({ label, href }) => (
           <Link key={label} href={href} className="dc-mobile-link" onClick={() => setMenuOpen(false)}>
             {label}
           </Link>
         ))}
 
-        <div style={{ borderTop: "1px solid rgba(232,168,76,0.15)", marginTop: "4px" }}>
-          <Link href="/solo-locales" className="dc-mobile-link" onClick={() => setMenuOpen(false)}
-            style={{ color: "rgba(232,168,76,0.6)", fontSize: "0.8rem" }}>
-            ¿Tienes un local?
-          </Link>
+        {/* 2. City */}
+        <div style={{ padding: "14px 24px", borderTop: "1px solid rgba(232,168,76,0.1)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em" }}>
+          📍 Santiago
         </div>
 
-        {/* Mobile auth section */}
+        {/* 3. Auth */}
         {mounted && (
           isAuthenticated && user ? (
-            <>
-              <div className="dc-mobile-user-info">
-                <div className="dc-nav-avatar dc-nav-avatar--lg">{initials}</div>
-                <div>
-                  <div className="dc-mobile-user-name">{user.nombre}</div>
-                  <div className="dc-mobile-user-email">{user.email}</div>
-                </div>
-              </div>
-              {user.type === "local" && (
-                <Link href="/panel/dashboard" className="dc-mobile-link" onClick={() => setMenuOpen(false)}>
-                  📊 Panel de control
-                </Link>
-              )}
-              <button
-                className="dc-mobile-logout"
-                onClick={() => { logout(); setMenuOpen(false); }}
-              >
-                Cerrar sesión
-              </button>
-            </>
+            <div style={{ padding: "8px 20px 4px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", marginBottom: "8px" }}>{user.nombre}</p>
+              <Link href="/perfil" onClick={() => setMenuOpen(false)} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", padding: "8px 0" }}>Mi perfil</Link>
+              <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer", padding: "8px 0", width: "100%", textAlign: "left" }}>Cerrar sesión</button>
+            </div>
           ) : (
-            <Link href="/login" className="dc-mobile-cta" onClick={() => setMenuOpen(false)}>
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+              display: "block", margin: "8px 20px 4px", padding: "14px 20px",
+              background: "var(--accent)", borderRadius: "12px",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
+              letterSpacing: "0.12em", textTransform: "uppercase",
+              color: "var(--bg-primary)", textDecoration: "none",
+              textAlign: "center", fontWeight: 700,
+            }}>
               Entrar
             </Link>
           )
         )}
+
+        {/* 4. Local link */}
+        <Link href="/solo-locales" onClick={() => setMenuOpen(false)} style={{
+          display: "block", padding: "12px 24px 20px",
+          fontFamily: "var(--font-lato)", fontSize: "0.8rem",
+          color: "var(--text-muted)", textDecoration: "none", textAlign: "center",
+        }}>
+          ¿Tienes un local? →
+        </Link>
       </div>
 
       <style>{`

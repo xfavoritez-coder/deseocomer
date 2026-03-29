@@ -29,7 +29,9 @@ const inputStyle: React.CSSProperties = {
 
 export default function RegistroLocalPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ nombre: "", email: "", password: "", telefono: "" });
+  const [form, setForm] = useState({ nombre: "", email: "", password: "", telefono: "", ciudad: "santiago" });
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistSaved, setWaitlistSaved] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -107,14 +109,45 @@ export default function RegistroLocalPage() {
             <input style={inputStyle} type="tel" placeholder="+56 9 1234 5678" value={form.telefono} onChange={e => set("telefono", e.target.value)} />
           </div>
 
-          <button type="submit" disabled={loading} style={{
-            width: "100%", padding: "16px", background: "var(--accent)", color: "var(--bg-primary)",
-            fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700,
-            border: "none", borderRadius: "12px", cursor: loading ? "wait" : "pointer",
-            opacity: loading ? 0.7 : 1, marginTop: "4px",
-          }}>
-            {loading ? "Creando cuenta..." : "Crear cuenta gratis →"}
-          </button>
+          <div>
+            <label style={labelStyle}>Ciudad</label>
+            <select style={inputStyle} value={form.ciudad} onChange={e => set("ciudad", e.target.value)}>
+              <option value="santiago">Santiago ✓ Disponible</option>
+              <option value="otra">Otra ciudad</option>
+            </select>
+          </div>
+
+          {form.ciudad === "otra" ? (
+            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "20px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no estamos en tu ciudad 🌎</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "14px" }}>
+                Por ahora solo operamos en Santiago, pero estamos creciendo. Déjanos tu email y te avisamos cuando lleguemos.
+              </p>
+              {waitlistSaved ? (
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>✓ Te avisaremos pronto. ¡Gracias por tu interés!</p>
+              ) : (
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input style={{ ...inputStyle, flex: 1 }} type="email" placeholder="tu@email.com" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} />
+                  <button type="button" onClick={() => {
+                    if (!waitlistEmail.includes("@")) return;
+                    try { const list = JSON.parse(localStorage.getItem("deseocomer_lista_espera_locales") ?? "[]"); list.push(waitlistEmail.trim()); localStorage.setItem("deseocomer_lista_espera_locales", JSON.stringify(list)); } catch {}
+                    setWaitlistSaved(true);
+                  }} style={{ ...inputStyle, width: "auto", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", whiteSpace: "nowrap" }}>
+                    Avisarme →
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button type="submit" disabled={loading} style={{
+              width: "100%", padding: "16px", background: "var(--accent)", color: "var(--bg-primary)",
+              fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700,
+              border: "none", borderRadius: "12px", cursor: loading ? "wait" : "pointer",
+              opacity: loading ? 0.7 : 1, marginTop: "4px",
+            }}>
+              {loading ? "Creando cuenta..." : "Crear cuenta gratis →"}
+            </button>
+          )}
         </form>
 
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", marginTop: "16px" }}>
