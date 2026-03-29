@@ -282,11 +282,6 @@ export default function LocalDetailPage() {
 
           {/* Sidebar */}
           <div className="dc-ld-sidebar">
-            {/* Genie card */}
-            <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px", marginBottom: "16px" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "8px" }}>🧞 El Genio recomienda</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{genieText}</p>
-            </div>
             {/* Stats */}
             <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "20px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
