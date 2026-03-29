@@ -38,7 +38,7 @@ export default function PerfilPage() {
   }
 
   const copyLink = async (concursoId: number) => {
-    const url = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}`;
+    const url = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(concursoId);
@@ -197,7 +197,7 @@ export default function PerfilPage() {
               {refCounts.map(({ concursoId, count }) => {
                 const info = getConcursoName(concursoId);
                 const isActive = CONCURSOS.some(c => c.id === concursoId);
-                const refLink = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}`;
+                const refLink = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`;
 
                 return (
                   <div key={concursoId} style={{

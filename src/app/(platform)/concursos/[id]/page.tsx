@@ -33,6 +33,7 @@ export default function ConcursoDetallePage() {
 
   const concursoId = Number(id);
   const refUserId  = searchParams.get("ref");
+  const refNameFromUrl = searchParams.get("refName");
 
   const concurso   = CONCURSOS.find((c) => c.id === concursoId);
   const finalizado = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
@@ -75,15 +76,9 @@ export default function ConcursoDetallePage() {
     if (!isAuthenticated || !user) {
       // Unauthenticated: save pending ref so registration can process it
       savePendingRef(refUserId, concursoId);
-      // Debug: log localStorage users to see structure
-      try {
-        const raw = localStorage.getItem("dc_users");
-        console.log("[Referral] dc_users in localStorage:", raw ? JSON.parse(raw) : "empty");
-        console.log("[Referral] Looking for userId:", refUserId);
-      } catch { /* noop */ }
-      const name = getRefUserName(refUserId);
-      console.log("[Referral] Resolved name:", name);
-      setRefBannerName(name); // null = unknown name, string = known name
+      // Priority: URL param > localStorage > null (fallback to "tu amigo")
+      const name = refNameFromUrl || getRefUserName(refUserId);
+      setRefBannerName(name);
       return;
     }
 
@@ -173,7 +168,7 @@ export default function ConcursoDetallePage() {
   const isEnded = !!finalizado || !!timer?.ended;
   const soon    = concurso ? isSoonEnding(concurso.endsAt) : false;
   const refLink = isAuthenticated && user
-    ? `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}`
+    ? `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`
     : null;
 
   const copyLink = async () => {
