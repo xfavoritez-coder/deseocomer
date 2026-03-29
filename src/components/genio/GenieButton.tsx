@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useGenie } from "@/contexts/GenieContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import GeniePanel from "./GeniePanel";
 import GenieToast from "./GenieToast";
 
@@ -27,6 +28,7 @@ function markToastShown(id: string) {
 export default function GenieLampara() {
   const pathname = usePathname();
   const { isOpen, setIsOpen, toastActivo, setToastActivo, isLoggedIn, sessionCount } = useGenie();
+  const { period } = useTheme();
   const [rubbing, setRubbing] = useState(false);
   const [showBalloon, setShowBalloon] = useState(false);
   const [balloonExiting, setBalloonExiting] = useState(false);
@@ -133,35 +135,28 @@ export default function GenieLampara() {
       {isOpen && <GeniePanel />}
 
       {/* Intro balloon */}
-      {showBalloon && (
-        <div style={{
-          position: "fixed",
-          bottom: "calc(80px + 56px + 12px)",
-          right: "16px",
-          zIndex: 951,
-          background: "rgba(13,7,3,0.95)",
-          border: "1px solid var(--accent, #e8a84c)",
-          borderRadius: "12px",
-          padding: "10px 16px",
-          whiteSpace: "nowrap",
-          animation: balloonExiting ? "genieBalloonOut 0.3s ease forwards" : "genieBalloonIn 0.4s ease both",
-        }}>
-          <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
-            color: "var(--accent, #e8a84c)", margin: 0,
-          }}>
-            ✨ Pregúntame qué comer
-          </p>
-          {/* Arrow pointing down */}
+      {showBalloon && (() => {
+        const gs = {
+          dia: { bg: "rgba(10,30,50,0.95)", border: "rgba(232,168,76,0.7)", shadow: "0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(232,168,76,0.2)", color: "#f5d080" },
+          noche: { bg: "rgba(13,7,3,0.97)", border: "rgba(232,168,76,0.6)", shadow: "0 4px 30px rgba(0,0,0,0.8), 0 0 25px rgba(232,168,76,0.25)", color: "#e8a84c" },
+          madrugada: { bg: "rgba(18,5,30,0.97)", border: "rgba(180,140,255,0.5)", shadow: "0 4px 30px rgba(0,0,0,0.8), 0 0 25px rgba(180,140,255,0.2)", color: "#c8a8ff" },
+        };
+        const s = gs[period as keyof typeof gs] ?? gs.noche;
+        return (
           <div style={{
-            position: "absolute", bottom: "-7px", right: "20px",
-            width: 0, height: 0,
-            borderLeft: "7px solid transparent",
-            borderRight: "7px solid transparent",
-            borderTop: "7px solid var(--accent, #e8a84c)",
-          }} />
-        </div>
-      )}
+            position: "fixed", bottom: "calc(80px + 56px + 12px)", right: "16px", zIndex: 951,
+            background: s.bg, border: `2px solid ${s.border}`,
+            boxShadow: s.shadow, backdropFilter: "blur(8px)",
+            borderRadius: "12px", padding: "10px 18px", whiteSpace: "nowrap",
+            animation: balloonExiting ? "genieBalloonOut 0.3s ease forwards" : "genieBalloonIn 0.4s ease both",
+          }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", fontWeight: 700, letterSpacing: "0.03em", color: s.color, margin: 0 }}>
+              ✨ Pregúntame qué comer
+            </p>
+            <div style={{ position: "absolute", bottom: "-8px", right: "20px", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `8px solid ${s.border}` }} />
+          </div>
+        );
+      })()}
 
       {/* Lamp button */}
       <button
