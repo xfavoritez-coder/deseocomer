@@ -10,6 +10,8 @@ import {
   CONCURSOS,
   CONCURSOS_FINALIZADOS,
   LOCAL_IMAGES,
+  findConcurso,
+  getRefCode,
   getTimeLeft,
   isSoonEnding,
   pad2,
@@ -23,18 +25,40 @@ import {
   hasVisited,
   markVisited,
   getRefUserName,
+  findUserByRefCode,
 } from "@/lib/referrals";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ConcursoDetallePage() {
-  const { id }         = useParams<{ id: string }>();
-  const searchParams   = useSearchParams();
+  const rawParams    = useParams<{ params: string[] }>();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const concursoId = Number(id);
-  const refUserId  = searchParams.get("ref");
-  const refNameFromUrl = searchParams.get("refName");
+  const segments = rawParams.params ?? [];
+
+  // Parse URL: /concursos/[slug-or-id] OR /concursos/[slug]/[nombre]/[codigo]
+  let concursoId: number;
+  let refUserId: string | null = null;
+  let refNameFromUrl: string | null = null;
+
+  if (segments.length >= 3) {
+    // Pretty URL: /concursos/pizza-napoli/jaime/ABC123
+    const [slugOrId, refName, refCode] = segments;
+    const found = findConcurso(slugOrId);
+    concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
+    refNameFromUrl = decodeURIComponent(refName);
+    // Resolve userId from refCode via localStorage
+    const resolvedUser = findUserByRefCode(refCode.toUpperCase());
+    refUserId = resolvedUser?.id ?? null;
+  } else {
+    // Classic URL: /concursos/1?ref=xxx or /concursos/pizza-napoli
+    const param = segments[0] ?? "";
+    const found = findConcurso(param);
+    concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
+    refUserId = searchParams.get("ref");
+    refNameFromUrl = searchParams.get("refName");
+  }
 
   const concurso   = CONCURSOS.find((c) => c.id === concursoId);
   const finalizado = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
@@ -168,8 +192,8 @@ export default function ConcursoDetallePage() {
   const c       = concurso ?? finalizado!;
   const isEnded = !!finalizado || !!timer?.ended;
   const soon    = concurso ? isSoonEnding(concurso.endsAt) : false;
-  const refLink = isAuthenticated && user
-    ? `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`
+  const refLink = isAuthenticated && user && c
+    ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
     : null;
 
   const copyLink = async () => {

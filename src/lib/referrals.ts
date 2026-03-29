@@ -113,3 +113,12 @@ export function getRefUserName(userId: string): string | null {
     return found ? found.nombre.split(" ")[0] : null;
   } catch { return null; }
 }
+
+/** Find a user by their short ref code (last 6 chars of userId, case-insensitive). */
+export function findUserByRefCode(code: string): StoredUser | null {
+  try {
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) ?? "[]") as StoredUser[];
+    const upper = code.toUpperCase();
+    return users.find(u => u.id.slice(-6).toUpperCase() === upper) ?? null;
+  } catch { return null; }
+}

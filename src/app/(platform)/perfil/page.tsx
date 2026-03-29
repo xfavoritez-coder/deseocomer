@@ -7,7 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { getAllRefCounts } from "@/lib/referrals";
-import { CONCURSOS, CONCURSOS_FINALIZADOS } from "@/lib/mockConcursos";
+import { CONCURSOS, CONCURSOS_FINALIZADOS, getRefCode } from "@/lib/mockConcursos";
 
 export default function PerfilPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -38,7 +38,11 @@ export default function PerfilPage() {
   }
 
   const copyLink = async (concursoId: number) => {
-    const url = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`;
+    const concurso = CONCURSOS.find(c => c.id === concursoId);
+    const slug = concurso?.slug ?? String(concursoId);
+    const nombre = encodeURIComponent(user.nombre.split(" ")[0].toLowerCase());
+    const code = getRefCode(user.id);
+    const url = `https://deseocomer.com/concursos/${slug}/${nombre}/${code}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopied(concursoId);
@@ -197,7 +201,8 @@ export default function PerfilPage() {
               {refCounts.map(({ concursoId, count }) => {
                 const info = getConcursoName(concursoId);
                 const isActive = CONCURSOS.some(c => c.id === concursoId);
-                const refLink = `https://deseocomer.com/concursos/${concursoId}?ref=${user.id}&refName=${encodeURIComponent(user.nombre.split(" ")[0])}`;
+                const cSlug = CONCURSOS.find(cc => cc.id === concursoId)?.slug ?? String(concursoId);
+                const refLink = `https://deseocomer.com/concursos/${cSlug}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`;
 
                 return (
                   <div key={concursoId} style={{

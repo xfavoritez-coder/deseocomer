@@ -7,6 +7,7 @@ export interface RankingEntry {
 
 export interface Concurso {
   id: number;
+  slug: string;
   local: string;
   localId: string;
   imagen: string;
@@ -22,6 +23,7 @@ export interface Concurso {
 
 export interface ConcursoFinalizado {
   id: number;
+  slug: string;
   local: string;
   localId: string;
   imagen: string;
@@ -33,6 +35,25 @@ export interface ConcursoFinalizado {
   ranking: RankingEntry[];
 }
 
+/** Get short ref code from userId (last 6 chars, uppercase) */
+export function getRefCode(userId: string): string {
+  return userId.slice(-6).toUpperCase();
+}
+
+/** Find concurso by slug or numeric id */
+export function findConcurso(param: string): { concurso?: Concurso; finalizado?: ConcursoFinalizado } {
+  const numId = Number(param);
+  const concurso = !isNaN(numId)
+    ? CONCURSOS.find(c => c.id === numId)
+    : CONCURSOS.find(c => c.slug === param);
+  const finalizado = !concurso
+    ? (!isNaN(numId)
+      ? CONCURSOS_FINALIZADOS.find(c => c.id === numId)
+      : CONCURSOS_FINALIZADOS.find(c => c.slug === param))
+    : undefined;
+  return { concurso, finalizado };
+}
+
 // Helper: hours from the moment the module is first loaded (client-side)
 const h = (hours: number) => Date.now() + hours * 3_600_000;
 
@@ -41,6 +62,7 @@ const h = (hours: number) => Date.now() + hours * 3_600_000;
 export const CONCURSOS: Concurso[] = [
   {
     id: 1,
+    slug: "pizza-napoli",
     local: "Pizza Napoli",
     localId: "pizza-napoli",
     imagen: "🍕",
@@ -73,6 +95,7 @@ export const CONCURSOS: Concurso[] = [
   },
   {
     id: 2,
+    slug: "sushi-oasis",
     local: "Sushi Oasis",
     localId: "sushi-oasis",
     imagen: "🍣",
@@ -106,6 +129,7 @@ export const CONCURSOS: Concurso[] = [
   },
   {
     id: 3,
+    slug: "menu-don-carlos",
     local: "El Menú de Don Carlos",
     localId: "menu-don-carlos",
     imagen: "🍲",
@@ -140,6 +164,7 @@ export const CONCURSOS: Concurso[] = [
   },
   {
     id: 4,
+    slug: "burger-bros",
     local: "Burger Bros",
     localId: "burger-bros",
     imagen: "🍔",
@@ -171,6 +196,7 @@ export const CONCURSOS: Concurso[] = [
   },
   {
     id: 5,
+    slug: "cafe-buen-dia",
     local: "Café Buen Día",
     localId: "cafe-buen-dia",
     imagen: "☕",
@@ -203,6 +229,7 @@ export const CONCURSOS: Concurso[] = [
   },
   {
     id: 6,
+    slug: "la-trattoria",
     local: "La Trattoria",
     localId: "la-trattoria",
     imagen: "🍝",
@@ -255,6 +282,7 @@ export const LOCAL_IMAGES: Record<string, string> = {
 export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   {
     id: 101,
+    slug: "taco-fiesta",
     local: "Taco Fiesta",
     localId: "taco-fiesta",
     imagen: "🌮",
@@ -271,6 +299,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   },
   {
     id: 102,
+    slug: "rincon-marino",
     local: "El Rincón Marino",
     localId: "rincon-marino",
     imagen: "🦞",
@@ -287,6 +316,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   },
   {
     id: 103,
+    slug: "vegano-feliz",
     local: "Vegano Feliz",
     localId: "vegano-feliz",
     imagen: "🥗",
@@ -303,6 +333,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   },
   {
     id: 104,
+    slug: "chilenitos-bbq",
     local: "Chilenito's BBQ",
     localId: "chilenitos-bbq",
     imagen: "🥩",
@@ -319,6 +350,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   },
   {
     id: 105,
+    slug: "ramen-tokio",
     local: "Ramen Tokio",
     localId: "ramen-tokio",
     imagen: "🍜",
@@ -335,6 +367,7 @@ export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [
   },
   {
     id: 106,
+    slug: "creperia-la-boheme",
     local: "Crepería La Bohème",
     localId: "creperia-la-boheme",
     imagen: "🥞",
