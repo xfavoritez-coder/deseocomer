@@ -37,7 +37,7 @@ export default function LocalesSection() {
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+            fontSize: "clamp(2rem, 5vw, 3.5rem)",
             color: "var(--accent)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
@@ -46,7 +46,7 @@ export default function LocalesSection() {
           </h2>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+            fontSize: "clamp(1rem, 2vw, 1.1rem)",
             color: "var(--text-primary)",
             fontWeight: 300,
             maxWidth: "500px",
@@ -123,9 +123,9 @@ export default function LocalesSection() {
               {/* Línea 3: descripción */}
               <p style={{
                 fontFamily: "var(--font-lato)",
-                fontSize: "0.82rem",
+                fontSize: "0.95rem",
                 color: "var(--text-muted)",
-                lineHeight: 1.55,
+                lineHeight: 1.6,
                 fontWeight: 300,
                 marginBottom: "18px",
               }}>{local.descripcion}</p>
@@ -244,6 +244,7 @@ export default function LocalesSection() {
           .dc-filters     { justify-content: flex-start; margin-bottom: 28px; }
           .dc-filter-btn  { padding: 10px 18px; font-size: 0.65rem !important; }
           .dc-loc-grid    { grid-template-columns: 1fr; gap: 14px; }
+          .dc-loc-card p  { font-size: 0.95rem !important; line-height: 1.7 !important; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
           .dc-loc-section { padding: 56px 40px 28px; }

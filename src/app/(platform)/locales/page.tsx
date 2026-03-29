@@ -171,9 +171,9 @@ export default function LocalesPage() {
                 {/* Línea 3: descripción */}
                 <p style={{
                   fontFamily: "var(--font-lato)",
-                  fontSize: "0.82rem",
+                  fontSize: "0.95rem",
                   color: "var(--text-muted)",
-                  lineHeight: 1.55,
+                  lineHeight: 1.6,
                   fontWeight: 300,
                   marginBottom: "18px",
                 }}>{local.descripcion}</p>
@@ -284,9 +284,10 @@ export default function LocalesPage() {
         }
 
         @media (max-width: 767px) {
-          .dc-lp-wrap   { padding: 40px 20px 60px; }
+          .dc-lp-wrap    { padding: 40px 20px 60px; }
           .dc-lp-filters { gap: 8px; }
-          .dc-lp-grid   { grid-template-columns: 1fr; gap: 14px; }
+          .dc-lp-grid    { grid-template-columns: 1fr; gap: 14px; }
+          .dc-lp-card p  { font-size: 0.95rem !important; line-height: 1.7 !important; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
           .dc-lp-wrap { padding: 48px 40px 60px; }

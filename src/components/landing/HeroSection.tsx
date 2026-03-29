@@ -157,9 +157,9 @@ export default function HeroSection() {
         padding: "0 24px",
         maxWidth: "820px",
       }}>
-        <h1 style={{
+        <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(1.4rem, 3.5vw, 3.2rem)",
+          fontSize: "clamp(2.8rem, 5.5vw, 3.4rem)",
           lineHeight: 1.2,
           marginBottom: "28px",
           animation: "fadeUp 0.8s 0.4s both",
@@ -177,13 +177,13 @@ export default function HeroSection() {
             display: "block",
             color: isDay ? "#80f0e0" : "var(--oasis-bright)",
           }}>
-            Descubre los mejores locales.
+            Descubre nuevos locales.
           </span>
         </h1>
 
         <p className="dc-hero-subtitle" style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(0.95rem, 2vw, 1.2rem)",
+          fontSize: "clamp(1.1rem, 2vw, 1.2rem)",
           fontWeight: 300,
           color: "rgba(255,255,255,0.9)",
           lineHeight: 1.8,
@@ -193,8 +193,8 @@ export default function HeroSection() {
           maxWidth: "580px",
           margin: "0 auto 48px",
         }}>
-          Un genio que sabe exactamente qué quieres comer hoy. Participa en concursos, accede a promociones
-          {" "}y vive nuevas experiencias gastronómicas.
+          El genio que cumple tu deseo de comer. Participa en concursos, accede a promociones,
+          {" "}y descubre qué comer hoy.
         </p>
 
         <div className="dc-hero-cta" style={{
@@ -268,7 +268,9 @@ export default function HeroSection() {
         .dc-lamp { font-size: 80px; }
 
         @media (max-width: 767px) {
-          .dc-hero-content  { margin-top: -24px !important; padding: 0 20px !important; }
+          .dc-hero-h1       { font-size: 2.8rem !important; }
+          .dc-hero-subtitle { font-size: 1.1rem !important; line-height: 1.7 !important; }
+          .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-lamp          { font-size: 52px !important; bottom: 13% !important; }
           .dc-sky--sun      { font-size: 56px !important; }
           .dc-sky--sunrise  { font-size: 50px !important; bottom: 25% !important; }

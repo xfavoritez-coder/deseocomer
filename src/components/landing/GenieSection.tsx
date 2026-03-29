@@ -61,7 +61,7 @@ export default function GenieSection() {
         </p>
         <h2 style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+          fontSize: "clamp(2rem, 5vw, 3.5rem)",
           color: "var(--accent)",
           textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
           marginBottom: "20px",
@@ -70,7 +70,7 @@ export default function GenieSection() {
         </h2>
         <p style={{
           fontFamily: "var(--font-lato)",
-          fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+          fontSize: "clamp(1rem, 2vw, 1.1rem)",
           color: "var(--text-primary)",
           fontWeight: 300,
           lineHeight: 1.7,
@@ -130,7 +130,7 @@ export default function GenieSection() {
           <div style={{ padding: "40px", textAlign: "center" }}>
             <p style={{
               fontFamily: "var(--font-cinzel-decorative)",
-              fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+              fontSize: "clamp(1rem, 2vw, 1.1rem)",
               color: "var(--accent)",
               animation: "pulse 1s ease-in-out infinite",
             }}>
@@ -150,7 +150,7 @@ export default function GenieSection() {
           }}>
             <p style={{
               fontFamily: "var(--font-lato)",
-              fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+              fontSize: "clamp(1rem, 2vw, 1.1rem)",
               color: "var(--text-primary)",
               lineHeight: 1.8,
               fontStyle: "italic",

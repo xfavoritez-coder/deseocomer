@@ -70,7 +70,7 @@ export default function PromocionesSection() {
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+            fontSize: "clamp(2rem, 5vw, 3.5rem)",
             color: "var(--accent)",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
@@ -79,7 +79,7 @@ export default function PromocionesSection() {
           </h2>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "clamp(0.95rem, 2vw, 1.1rem)",
+            fontSize: "clamp(1rem, 2vw, 1.1rem)",
             color: "var(--text-primary)",
             fontWeight: 300,
             maxWidth: "500px",
