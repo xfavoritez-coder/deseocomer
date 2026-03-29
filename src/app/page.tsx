@@ -12,9 +12,9 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <ConcursosSection />
-      <SectionDivider fromBg="primary" toBg="secondary" />
+      <SectionDivider />
       <PromocionesSection />
-      <SectionDivider fromBg="secondary" toBg="primary" />
+      <SectionDivider />
       <LocalesSection />
       <Footer />
     </main>
