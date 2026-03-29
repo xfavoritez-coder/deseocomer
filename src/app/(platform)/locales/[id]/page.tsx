@@ -174,8 +174,7 @@ export default function LocalDetailPage() {
             {/* TAB: Información */}
             {tab === "Información" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                <Section title="Sobre nosotros"><p style={bodyStyle}>{local.descripcion}</p></Section>
-                {local.historia && <Section title="Nuestra historia"><p style={bodyStyle}>{local.historia}</p></Section>}
+                <p style={bodyStyle}>{local.descripcion}</p>
                 <Section title="Horarios">
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                     {local.horarios.map(h => (
