@@ -233,6 +233,23 @@ export const CONCURSOS: Concurso[] = [
   },
 ];
 
+// ─── Local profile images (foto del local, no del premio) ─────────────────────
+
+export const LOCAL_IMAGES: Record<string, string> = {
+  "pizza-napoli":      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
+  "sushi-oasis":       "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400",
+  "menu-don-carlos":   "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400",
+  "burger-bros":       "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400",
+  "cafe-buen-dia":     "https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=400",
+  "la-trattoria":      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400",
+  "taco-fiesta":       "https://images.unsplash.com/photo-1653748440266-18e4ffd3fc5e?w=400",
+  "rincon-marino":     "https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=400",
+  "vegano-feliz":      "https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=400",
+  "chilenitos-bbq":    "https://images.unsplash.com/photo-1558030006-450675393462?w=400",
+  "ramen-tokio":       "https://images.unsplash.com/photo-1554679665-f5537f187268?w=400",
+  "creperia-la-boheme":"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=400",
+};
+
 // ─── Finished contests ────────────────────────────────────────────────────────
 
 export const CONCURSOS_FINALIZADOS: ConcursoFinalizado[] = [

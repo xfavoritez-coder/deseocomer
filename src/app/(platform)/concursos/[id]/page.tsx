@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   CONCURSOS,
   CONCURSOS_FINALIZADOS,
+  LOCAL_IMAGES,
   getTimeLeft,
   isSoonEnding,
   pad2,
@@ -557,13 +558,13 @@ export default function ConcursoDetallePage() {
                 border: "1px solid var(--border-color)",
                 borderRadius: "14px", padding: "24px",
               }}>
-                {c.imagenUrl ? (
+                {LOCAL_IMAGES[c.localId] ? (
                   <div style={{
                     width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden",
                     flexShrink: 0, border: "1px solid var(--border-color)",
                     background: "rgba(45,26,8,0.8)",
                   }}>
-                    <img src={c.imagenUrl} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 ) : (
                   <span style={{ fontSize: "2.5rem", flexShrink: 0 }}>{c.imagen}</span>
