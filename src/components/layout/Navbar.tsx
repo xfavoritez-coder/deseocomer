@@ -53,7 +53,7 @@ export default function Navbar() {
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
 
-          <Link href="/registro?tipo=local" className="dc-nav-local-link">¿Tienes un local?</Link>
+          <Link href="/solo-locales" className="dc-nav-local-link">¿Tienes un local?</Link>
 
           {/* Auth: show user or "Entrar" */}
           {mounted && (
@@ -102,7 +102,7 @@ export default function Navbar() {
         ))}
 
         <div style={{ borderTop: "1px solid rgba(232,168,76,0.15)", marginTop: "4px" }}>
-          <Link href="/registro?tipo=local" className="dc-mobile-link" onClick={() => setMenuOpen(false)}
+          <Link href="/solo-locales" className="dc-mobile-link" onClick={() => setMenuOpen(false)}
             style={{ color: "rgba(232,168,76,0.6)", fontSize: "0.8rem" }}>
             ¿Tienes un local?
           </Link>
