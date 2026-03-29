@@ -2,22 +2,17 @@
 
 export default function SectionDivider({
   fromBg = "var(--bg-primary)",
-  toBg = "var(--bg-primary)"
+  toBg = "var(--bg-primary)",
 }: {
   fromBg?: string;
   toBg?: string;
 }) {
   return (
-    <div style={{
-      background: fromBg,
-      lineHeight: 0,
-      marginTop: "-1px",
-      marginBottom: "-2px",
-    }}>
+    <div style={{ background: fromBg, lineHeight: 0, display: "block", marginTop: "-1px" }}>
       <svg
         viewBox="0 0 1440 80"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ display: "block", width: "100%" }}
+        style={{ display: "block", width: "100%", height: "80px" }}
         preserveAspectRatio="none"
       >
         <path

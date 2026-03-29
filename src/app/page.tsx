@@ -11,7 +11,7 @@ export default function Home() {
     <main style={{ background: "var(--bg-primary)" }}>
       <Navbar />
       <HeroSection />
-      <SectionDivider fromBg="transparent" toBg="var(--bg-primary)" />
+      <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-primary)" />
       <ConcursosSection />
       <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-secondary)" />
       <PromocionesSection />
