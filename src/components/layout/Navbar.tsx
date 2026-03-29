@@ -100,11 +100,6 @@ export default function Navbar() {
           </Link>
         ))}
 
-        {/* 2. City */}
-        <div style={{ padding: "14px 24px", borderTop: "1px solid rgba(232,168,76,0.1)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em" }}>
-          📍 Santiago
-        </div>
-
         {/* 3. Auth */}
         {mounted && (
           isAuthenticated && user ? (

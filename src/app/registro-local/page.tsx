@@ -30,8 +30,13 @@ const inputStyle: React.CSSProperties = {
 export default function RegistroLocalPage() {
   const router = useRouter();
   const [form, setForm] = useState({ nombre: "", email: "", password: "", telefono: "", ciudad: "santiago" });
+  const [otraCiudad, setOtraCiudad] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSaved, setWaitlistSaved] = useState(false);
+
+  const CIUDADES: Record<string, string> = { santiago: "Santiago", valparaiso: "Valparaíso", concepcion: "Concepción", antofagasta: "Antofagasta", la_serena: "La Serena", temuco: "Temuco", rancagua: "Rancagua", talca: "Talca", iquique: "Iquique", puerto_montt: "Puerto Montt", otra: "Otra ciudad" };
+  const ciudadLabel = form.ciudad === "otra" ? (otraCiudad || "tu ciudad") : (CIUDADES[form.ciudad] ?? form.ciudad);
+  const noEsSantiago = form.ciudad !== "santiago";
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -111,26 +116,42 @@ export default function RegistroLocalPage() {
 
           <div>
             <label style={labelStyle}>Ciudad</label>
-            <select style={inputStyle} value={form.ciudad} onChange={e => set("ciudad", e.target.value)}>
-              <option value="santiago">Santiago ✓ Disponible</option>
+            <select style={inputStyle} value={form.ciudad} onChange={e => { set("ciudad", e.target.value); setWaitlistSaved(false); }}>
+              <option value="santiago">Santiago</option>
+              <option value="valparaiso">Valparaíso</option>
+              <option value="concepcion">Concepción</option>
+              <option value="antofagasta">Antofagasta</option>
+              <option value="la_serena">La Serena</option>
+              <option value="temuco">Temuco</option>
+              <option value="rancagua">Rancagua</option>
+              <option value="talca">Talca</option>
+              <option value="iquique">Iquique</option>
+              <option value="puerto_montt">Puerto Montt</option>
               <option value="otra">Otra ciudad</option>
             </select>
           </div>
 
-          {form.ciudad === "otra" ? (
+          {form.ciudad === "otra" && (
+            <div>
+              <label style={labelStyle}>¿Cuál es tu ciudad?</label>
+              <input style={inputStyle} value={otraCiudad} onChange={e => setOtraCiudad(e.target.value)} placeholder="Escribe tu ciudad..." />
+            </div>
+          )}
+
+          {noEsSantiago ? (
             <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "20px", textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no estamos en tu ciudad 🌎</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no estamos en {ciudadLabel} 🌎</p>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "14px" }}>
-                Por ahora solo operamos en Santiago, pero estamos creciendo. Déjanos tu email y te avisamos cuando lleguemos.
+                Por ahora solo operamos en Santiago, pero estamos creciendo. Déjanos tu email y te avisamos cuando lleguemos a {ciudadLabel}.
               </p>
               {waitlistSaved ? (
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>✓ Te avisaremos pronto. ¡Gracias por tu interés!</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>✓ Te avisaremos cuando lleguemos a {ciudadLabel}. ¡Gracias!</p>
               ) : (
                 <div style={{ display: "flex", gap: "8px" }}>
                   <input style={{ ...inputStyle, flex: 1 }} type="email" placeholder="tu@email.com" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} />
                   <button type="button" onClick={() => {
                     if (!waitlistEmail.includes("@")) return;
-                    try { const list = JSON.parse(localStorage.getItem("deseocomer_lista_espera_locales") ?? "[]"); list.push(waitlistEmail.trim()); localStorage.setItem("deseocomer_lista_espera_locales", JSON.stringify(list)); } catch {}
+                    try { const list = JSON.parse(localStorage.getItem("deseocomer_lista_espera_locales") ?? "[]"); list.push({ email: waitlistEmail.trim(), ciudad: ciudadLabel, fecha: Date.now() }); localStorage.setItem("deseocomer_lista_espera_locales", JSON.stringify(list)); } catch {}
                     setWaitlistSaved(true);
                   }} style={{ ...inputStyle, width: "auto", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", whiteSpace: "nowrap" }}>
                     Avisarme →
