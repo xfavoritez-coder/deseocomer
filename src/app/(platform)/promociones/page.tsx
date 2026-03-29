@@ -603,7 +603,7 @@ export default function PromocionesPage() {
           font-family: var(--font-lato);
           font-size: 0.88rem;
           color: var(--text-primary);
-          background: color-mix(in srgb, var(--bg-secondary) 80%, transparent);
+          background: #1a1008;
           border: 1px solid var(--border-color);
           border-radius: 12px;
           padding: 11px 36px 11px 40px;

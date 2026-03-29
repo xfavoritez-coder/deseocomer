@@ -465,7 +465,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     ? Math.floor((Date.now() - new Date(form.cumpleAno, form.cumpleMes - 1, form.cumpleDia).getTime()) / 31557600000)
     : null;
 
-  const S = { fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", background: "rgba(0,0,0,0.3)", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "10px 14px", width: "100%", boxSizing: "border-box" as const, outline: "none" };
+  const S = { fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", background: "#1a1008", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "10px 14px", width: "100%", boxSizing: "border-box" as const, outline: "none" };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "480px" }}>

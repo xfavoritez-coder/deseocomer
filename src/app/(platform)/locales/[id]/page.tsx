@@ -441,7 +441,7 @@ function ResenasTab({ local, isAuth }: { local: Local; isAuth: boolean }) {
             ))}
           </div>
           <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Escribe tu experiencia (mínimo 20 caracteres)..." rows={3}
-            style={{ width: "100%", background: "rgba(0,0,0,0.3)", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "12px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", resize: "vertical", outline: "none", boxSizing: "border-box" }} />
+            style={{ width: "100%", background: "#1a1008", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "12px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", resize: "vertical", outline: "none", boxSizing: "border-box" }} />
           <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
             <button onClick={handlePublish} disabled={stars === 0 || comment.length < 20} style={{
               fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", background: stars > 0 && comment.length >= 20 ? "var(--accent)" : "rgba(232,168,76,0.2)",

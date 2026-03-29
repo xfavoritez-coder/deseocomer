@@ -418,7 +418,7 @@ export function AuthStyles() {
       /* Input */
       .dc-input {
         width: 100%; padding: 13px 16px;
-        background: rgba(0,0,0,0.35);
+        background: #1a1008;
         border: 1px solid var(--border-color);
         border-radius: 12px;
         font-family: var(--font-lato); font-size: 0.92rem;

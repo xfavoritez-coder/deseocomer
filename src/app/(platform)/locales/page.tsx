@@ -92,7 +92,7 @@ export default function LocalesPage() {
               fontFamily: "var(--font-lato)",
               fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
               color: "var(--text-primary)",
-              background: "var(--bg-secondary)",
+              background: "#1a1008",
               border: "1px solid var(--border-color)",
               borderRadius: "12px",
               padding: "14px 20px",
