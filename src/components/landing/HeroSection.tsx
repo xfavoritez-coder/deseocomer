@@ -54,6 +54,7 @@ export default function HeroSection() {
       overflow: "hidden",
       background: heroGradient,
       transition: "background 2s ease",
+      marginBottom: "-2px",
     }}>
 
       {/* ── Estrellas ── */}
@@ -127,7 +128,7 @@ export default function HeroSection() {
           margin: "0 auto 0",
           maxWidth: "800px",
         }}>
-          Gana comida{" "}<span className="dc-hero-gratis">gratis</span>
+          Gana comida gratis{" "}<span className="dc-hero-gratis">y promociones</span>
         </h1>
 
         <p className="dc-hero-city" style={{
@@ -165,7 +166,7 @@ export default function HeroSection() {
             minHeight: "56px",
             textAlign: "center",
           }}>
-            Gana Comida Gratis y Promociones
+            Ver Concursos
           </Link>
         </div>
       </div>

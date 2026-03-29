@@ -131,12 +131,16 @@ export default function ConcursosSection() {
                   <div style={{ textAlign: "center", flex: 1 }}>
                     <p style={{
                       fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
-                      color: c.horasRestantes <= 12 ? "#ff6b6b" : "var(--oasis-bright)",
+                      color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
+                      animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1.5s ease-in-out infinite" : "none",
                     }}>
                       {c.horasRestantes}h
                     </p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "#ff6b6b", letterSpacing: "0.1em", fontWeight: 700 }}>
-                      🔥 CIERRA EN
+                    <p style={{
+                      fontFamily: "var(--font-lato)", fontSize: "0.7rem", letterSpacing: "0.1em", fontWeight: 700,
+                      color: c.horasRestantes <= 2 ? "#ff4444" : c.horasRestantes <= 6 ? "#ff6b6b" : "var(--text-muted)",
+                    }}>
+                      RESTANTES
                     </p>
                   </div>
                 </div>
@@ -196,6 +200,10 @@ export default function ConcursosSection() {
         }
         .dc-cst-card { padding: 0; overflow: hidden; }
         .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
+        @keyframes dc-cst-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
 
         @media (max-width: 767px) {
           .dc-cst-section { padding: 48px 20px 24px; }

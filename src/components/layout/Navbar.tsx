@@ -257,8 +257,8 @@ export default function Navbar() {
         .dc-mobile-link {
           font-family: var(--font-cinzel); font-size: 0.9rem;
           letter-spacing: 0.15em; text-transform: uppercase;
-          color: rgba(255,255,255,0.9) !important; text-decoration: none;
-          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.1);
+          color: rgba(245,208,128,0.9) !important; text-decoration: none;
+          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.15) !important;
           display: flex; align-items: center; min-height: 52px;
           font-weight: 500;
         }
@@ -275,15 +275,15 @@ export default function Navbar() {
         /* Mobile user info */
         .dc-mobile-user-info {
           display: flex; align-items: center; gap: 14px;
-          padding: 16px 4px; border-bottom: 1px solid var(--border-color);
+          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.15) !important;
         }
         .dc-mobile-user-name {
           font-family: var(--font-cinzel); font-size: 0.8rem;
-          letter-spacing: 0.08em; color: var(--text-primary); font-weight: 600;
+          letter-spacing: 0.08em; color: rgba(245,208,128,0.9) !important; font-weight: 600;
         }
         .dc-mobile-user-email {
           font-family: var(--font-lato); font-size: 0.75rem;
-          color: var(--text-muted); margin-top: 2px;
+          color: rgba(245,208,128,0.5) !important; margin-top: 2px;
         }
         .dc-mobile-logout {
           font-family: var(--font-cinzel); font-size: 0.8rem;
