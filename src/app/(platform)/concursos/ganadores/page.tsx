@@ -207,6 +207,16 @@ function WinnerCard({
         el.style.boxShadow = "none";
       }}
     >
+      {/* Card image */}
+      {c.imagenUrl && (
+        <div style={{
+          height: "160px", overflow: "hidden",
+          background: "rgba(45,26,8,0.8)",
+        }}>
+          <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+      )}
+
       {/* Card header */}
       <div style={{
         background: "rgba(0,0,0,0.3)",
@@ -214,12 +224,14 @@ function WinnerCard({
         display: "flex", alignItems: "center", gap: "16px",
         borderBottom: "1px solid var(--border-color)",
       }}>
-        <span style={{
-          fontSize: "2.8rem",
-          filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))",
-        }}>
-          {c.imagen}
-        </span>
+        {!c.imagenUrl && (
+          <span style={{
+            fontSize: "2.8rem",
+            filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))",
+          }}>
+            {c.imagen}
+          </span>
+        )}
         <div style={{ minWidth: 0 }}>
           <p style={{
             fontFamily: "var(--font-cinzel)", fontSize: "0.58rem",

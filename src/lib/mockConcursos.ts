@@ -206,7 +206,7 @@ export const CONCURSOS: Concurso[] = [
     local: "La Trattoria",
     localId: "la-trattoria",
     imagen: "🍝",
-    imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600",
+    imagenUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400",
     premio: "Cena romántica para 2 + vino",
     descripcionPremio:
       "Menú de degustación para 2: entrada, pasta fresca a elección, secondo piatto, dessert de la casa y botella de vino tinto importado. Una noche perfecta.",

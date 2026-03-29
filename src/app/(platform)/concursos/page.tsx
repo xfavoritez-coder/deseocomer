@@ -251,9 +251,14 @@ export default function ConcursosPage() {
           margin-top: 4px;
         }
         .dc-cp-filters {
-          display: flex; gap: 10px; flex-wrap: wrap;
+          display: flex; gap: 10px; flex-wrap: nowrap;
           margin-bottom: 44px;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
         }
+        .dc-cp-filters::-webkit-scrollbar { display: none; }
         .dc-cp-filter-btn {
           font-family: var(--font-cinzel); font-size: clamp(0.75rem, 2vw, 0.85rem);
           letter-spacing: 0.15em; text-transform: uppercase;
@@ -339,7 +344,7 @@ function ConcursoCard({
     >
       {/* Image */}
       {c.imagenUrl && (
-        <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative" }}>
+        <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative", background: "rgba(45,26,8,0.8)" }}>
           <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           {/* Badge termina pronto over image */}
           {soon && (
@@ -517,21 +522,20 @@ function ConcursoCard({
 
 function TimerUnit({ value, label, urgent }: { value: number; label: string; urgent: boolean }) {
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: "center", width: "60px", flexShrink: 0, overflow: "hidden" }}>
       <p style={{
         fontFamily: "var(--font-cinzel-decorative)",
-        fontSize: "1.6rem", lineHeight: 1,
+        fontSize: "clamp(1.4rem, 4vw, 2rem)", lineHeight: 1,
         color: urgent ? "#ff4444" : "var(--accent)",
         textShadow: urgent
           ? "0 0 20px rgba(255,68,68,0.6)"
           : "0 0 16px color-mix(in srgb, var(--accent) 50%, transparent)",
-        minWidth: "44px",
       }}>
         {pad2(value)}
       </p>
       <p style={{
-        fontFamily: "var(--font-cinzel)", fontSize: "0.5rem",
-        letterSpacing: "0.2em", textTransform: "uppercase",
+        fontFamily: "var(--font-cinzel)", fontSize: "0.6rem",
+        letterSpacing: "0.15em", textTransform: "uppercase",
         color: "var(--text-muted)", marginTop: "4px",
       }}>
         {label}
@@ -548,15 +552,24 @@ function FinalizadoCard({ concurso: c }: { concurso: ConcursoFinalizado }) {
       style={{
         backgroundColor: "var(--bg-secondary)",
         border: "1px solid var(--border-color)",
-        borderRadius: "20px", padding: "28px",
+        borderRadius: "20px", overflow: "hidden",
         opacity: 0.75,
         transition: "opacity 0.2s ease",
       }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "1"; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.opacity = "0.75"; }}
     >
+      {c.imagenUrl && (
+        <div style={{
+          height: "140px", overflow: "hidden",
+          background: "rgba(45,26,8,0.8)",
+        }}>
+          <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+      )}
+      <div style={{ padding: "28px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
-        <span style={{ fontSize: "2.4rem" }}>{c.imagen}</span>
+        {!c.imagenUrl && <span style={{ fontSize: "2.4rem" }}>{c.imagen}</span>}
         <div>
           <p style={{
             fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
@@ -627,6 +640,7 @@ function FinalizadoCard({ concurso: c }: { concurso: ConcursoFinalizado }) {
           {c.fechaFin}
         </span>
       </div>
+      </div>{/* close padding wrapper */}
     </div>
   );
 }
