@@ -322,6 +322,7 @@ function ConcursoCard({
   return (
     <div
       className="dc-cc-card"
+      onClick={onParticipate}
       style={{
         backgroundColor: "var(--bg-secondary)",
         border: "1px solid var(--border-color)",
