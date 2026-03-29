@@ -54,19 +54,24 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
   const devForcedRef = useRef(false);
 
   // Detect period change → apply CSS vars + trigger overlay
-  const prevPeriodRef = useRef<TimePeriod | null>(null);
+  const mountedRef = useRef(false);
+  const prevPeriodRef = useRef<TimePeriod>(activeTheme.period);
+
   useEffect(() => {
-    const stored = sessionStorage.getItem(SS_KEY) as TimePeriod | null;
     const isDevForced = devForcedRef.current;
     devForcedRef.current = false;
 
-    // Show overlay ONLY when:
-    // 1. Dev panel forced a change, OR
-    // 2. setInterval detected a real period change (prevPeriodRef !== null means not first render,
-    //    and stored differs from current period)
-    // NEVER on page load/refresh/navigation (stored === current or first render)
-    const isRealTimeChange = prevPeriodRef.current !== null && stored !== null && stored !== activeTheme.period;
-    const needsOverlay = isDevForced || isRealTimeChange;
+    let needsOverlay = false;
+
+    if (!mountedRef.current) {
+      // Primer render: solo animar si el período cambió desde la última vez que se vio
+      mountedRef.current = true;
+      const periodoGuardado = sessionStorage.getItem(SS_KEY);
+      needsOverlay = periodoGuardado !== null && periodoGuardado !== activeTheme.period;
+    } else {
+      // Renders posteriores: cambio real de período (setInterval) o dev panel
+      needsOverlay = isDevForced || prevPeriodRef.current !== activeTheme.period;
+    }
 
     if (needsOverlay) {
       const greeting = GREETING_DATA[activeTheme.period];
@@ -75,17 +80,17 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       setOverlayContent({ icon: greeting.icon, title: greeting.title, subtitle: greeting.subtitle ?? "", bg });
       setOverlayKey(ver);
       setOverlayActive(true);
-      sessionStorage.setItem(SS_KEY, activeTheme.period);
       setTimeout(() => applyThemeVars(activeTheme), 500);
       setTimeout(() => {
         if (overlayVersionRef.current === ver) setOverlayActive(false);
       }, 3100);
     } else {
-      // Silently apply theme — no animation
+      // Aplicar tema silenciosamente — sin animación
       applyThemeVars(activeTheme);
-      sessionStorage.setItem(SS_KEY, activeTheme.period);
     }
+
     prevPeriodRef.current = activeTheme.period;
+    sessionStorage.setItem(SS_KEY, activeTheme.period);
   }, [activeTheme]);
 
   function handleDevSelect(period: TimePeriod) {

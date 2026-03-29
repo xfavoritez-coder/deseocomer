@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export type TimePeriod = "madrugada" | "manana" | "mediodia" | "tarde" | "noche";
 
@@ -159,29 +159,27 @@ function getPeriod(hour: number): TimePeriod {
 }
 
 export function useTimeTheme(): TimeTheme {
-  const [theme, setTheme] = useState<TimeTheme | null>(null);
+  // Inicializar sincrónicamente con el período correcto — nunca null
+  const [theme, setTheme] = useState<TimeTheme>(() =>
+    getThemeByPeriod(getPeriod(new Date().getHours()))
+  );
+  const periodRef = useRef(theme.period);
 
   useEffect(() => {
-    // Initial load: apply colors silently, store period
-    const periodoActual = getPeriod(new Date().getHours());
-    const t = getThemeByPeriod(periodoActual);
-    setTheme(t);
-    applyThemeVars(t);
-    sessionStorage.setItem("dc_periodo", periodoActual);
+    applyThemeVars(theme);
 
-    // Interval: only update state when period actually changes
+    // Interval: solo actualizar cuando el período cambia realmente
     const interval = setInterval(() => {
       const periodoNuevo = getPeriod(new Date().getHours());
-      const periodoGuardado = sessionStorage.getItem("dc_periodo");
-      if (periodoNuevo !== periodoGuardado) {
+      if (periodoNuevo !== periodRef.current) {
+        periodRef.current = periodoNuevo;
         const newTheme = getThemeByPeriod(periodoNuevo);
         setTheme(newTheme);
         applyThemeVars(newTheme);
-        sessionStorage.setItem("dc_periodo", periodoNuevo);
       }
     }, 30_000);
     return () => clearInterval(interval);
   }, []);
 
-  return theme ?? getThemeByPeriod("mediodia");
+  return theme;
 }
