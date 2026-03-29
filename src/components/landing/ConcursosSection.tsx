@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 
 const concursosMock = [
   {
@@ -66,7 +65,7 @@ export default function ConcursosSection() {
 
         <div className="dc-cst-grid">
           {concursosMock.map((c) => (
-            <Link key={c.id}
+            <a key={c.id}
               href={`/concursos/${c.id}`}
               className="dc-cst-card"
               style={{
@@ -168,7 +167,7 @@ export default function ConcursosSection() {
                   Ver concurso →
                 </div>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
 

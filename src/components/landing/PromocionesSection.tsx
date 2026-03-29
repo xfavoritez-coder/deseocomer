@@ -123,7 +123,7 @@ export default function PromocionesSection() {
               : null;
 
             return (
-              <Link
+              <a
                 key={promo.id}
                 href={`/promociones/${promo.id}`}
                 className={`dc-ps-card${isHH ? " dc-ps-card--hh" : ""}${isUltimas ? " dc-ps-card--urgent" : ""}`}
@@ -444,7 +444,7 @@ export default function PromocionesSection() {
                     Ver promoción →
                   </div>
                 </div>
-              </Link>
+              </a>
             );
           })}
         </div>

@@ -231,10 +231,12 @@ export default function Navbar() {
           padding: 8px 24px 28px;
           flex-direction: column;
           opacity: 0; transform: translateY(-8px);
+          pointer-events: none;
           transition: opacity 200ms ease, transform 200ms ease;
         }
         .dc-mobile-menu--open {
           opacity: 1; transform: translateY(0);
+          pointer-events: auto;
         }
         .dc-mobile-link {
           font-family: var(--font-cinzel); font-size: 0.9rem;
