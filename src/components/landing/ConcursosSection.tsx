@@ -38,7 +38,7 @@ export default function ConcursosSection() {
     <section className="dc-cst-section" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
@@ -193,7 +193,7 @@ export default function ConcursosSection() {
       </div>
 
       <style>{`
-        .dc-cst-section { padding: 64px 60px 32px; }
+        .dc-cst-section { padding: 100px 60px 80px; }
         .dc-cst-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -207,7 +207,7 @@ export default function ConcursosSection() {
         }
 
         @media (max-width: 767px) {
-          .dc-cst-section { padding: 48px 20px 24px; }
+          .dc-cst-section { padding: 72px 20px 48px; }
           .dc-cst-grid    { display: flex !important; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
           .dc-cst-grid::-webkit-scrollbar { display: none; }
           .dc-cst-card    { flex-shrink: 0 !important; width: 300px !important; }

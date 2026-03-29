@@ -3,7 +3,6 @@ import HeroSection from "@/components/landing/HeroSection";
 import ConcursosSection from "@/components/landing/ConcursosSection";
 import PromocionesSection from "@/components/landing/PromocionesSection";
 import LocalesSection from "@/components/landing/LocalesSection";
-import GenieSection from "@/components/landing/GenieSection";
 import SectionDivider from "@/components/landing/SectionDivider";
 import Footer from "@/components/layout/Footer";
 
@@ -13,12 +12,10 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <ConcursosSection />
-      <SectionDivider />
+      <SectionDivider fromBg="primary" toBg="secondary" />
       <PromocionesSection />
-      <SectionDivider />
+      <SectionDivider fromBg="secondary" toBg="primary" />
       <LocalesSection />
-      <SectionDivider />
-      <GenieSection />
       <Footer />
     </main>
   );

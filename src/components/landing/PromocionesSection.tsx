@@ -51,11 +51,11 @@ export default function PromocionesSection() {
   }, [updateTimers]);
 
   return (
-    <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-primary)" }}>
+    <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-secondary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
@@ -472,7 +472,7 @@ export default function PromocionesSection() {
       </div>
 
       <style>{`
-        .dc-ps-section { padding: 64px 60px 32px; }
+        .dc-ps-section { padding: 100px 60px 80px; }
         .dc-ps-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -492,7 +492,7 @@ export default function PromocionesSection() {
         }
 
         @media (max-width: 767px) {
-          .dc-ps-section   { padding: 48px 20px 24px; }
+          .dc-ps-section   { padding: 72px 20px 48px; }
           .dc-ps-grid      { grid-template-columns: 1fr; gap: 16px; }
           .dc-ps-card-inner { padding: 20px; }
         }

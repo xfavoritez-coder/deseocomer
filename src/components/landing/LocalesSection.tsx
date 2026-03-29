@@ -35,7 +35,7 @@ export default function LocalesSection() {
     <section className="dc-loc-section" style={{ backgroundColor: "var(--bg-primary)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+        <div style={{ textAlign: "center", marginBottom: "64px" }}>
           <p style={{
             fontFamily: "var(--font-cinzel)",
             fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
@@ -214,7 +214,7 @@ export default function LocalesSection() {
       </div>
 
       <style>{`
-        .dc-loc-section { padding: 64px 60px 32px; }
+        .dc-loc-section { padding: 100px 60px 80px; }
 
         .dc-filters {
           display: flex;
@@ -259,7 +259,7 @@ export default function LocalesSection() {
         }
 
         @media (max-width: 767px) {
-          .dc-loc-section { padding: 48px 20px 24px; }
+          .dc-loc-section { padding: 72px 20px 48px; }
           .dc-filters     { justify-content: flex-start; margin-bottom: 28px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none; }
           .dc-filters::-webkit-scrollbar { display: none; }
           .dc-filter-btn  { padding: 10px 18px; font-size: 0.65rem !important; flex-shrink: 0; }
