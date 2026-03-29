@@ -113,11 +113,13 @@ export default function HeroSection() {
         position: "relative", zIndex: 10,
         textAlign: "center",
         padding: "0 24px",
-        maxWidth: "820px",
+        maxWidth: "100%",
+        boxSizing: "border-box" as const,
+        width: "100%",
       }}>
         <h1 className="dc-hero-h1" style={{
           fontFamily: "var(--font-cinzel-decorative)",
-          fontSize: "clamp(2rem, 4.5vw, 3.8rem)",
+          fontSize: "clamp(1.6rem, 8vw, 2.2rem)",
           lineHeight: 1.05,
           fontWeight: 800,
           letterSpacing: "0.03em",
@@ -128,7 +130,7 @@ export default function HeroSection() {
           margin: "0 auto 0",
           maxWidth: "800px",
         }}>
-          Gana comida gratis{" "}<span className="dc-hero-gratis">y promociones</span>
+          Comida gratis{" "}<span className="dc-hero-gratis">y promociones</span>
         </h1>
 
         <p className="dc-hero-city" style={{
@@ -191,8 +193,15 @@ export default function HeroSection() {
         .dc-hero-gratis { white-space: nowrap; }
 
         @media (max-width: 767px) {
-          .dc-hero-h1       { font-size: 2.8rem !important; }
-          .dc-hero-gratis   { display: block; }
+          .dc-hero-h1 {
+            font-size: clamp(1.6rem, 8vw, 2.2rem) !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .dc-hero-gratis   { display: inline !important; white-space: normal !important; }
           .dc-hero-city     { font-size: 1.1rem !important; line-height: 1.6 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-sky--sun      { font-size: 56px !important; }
