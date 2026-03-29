@@ -3,6 +3,8 @@ import { Cinzel_Decorative, Cinzel, Lato } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { GenieProvider } from "@/contexts/GenieContext";
+import GenieLampara from "@/components/genio/GenieButton";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -62,7 +64,10 @@ export default function RootLayout({
       <body className={`${cinzelDecorative.variable} ${cinzel.variable} ${lato.variable}`}>
         <ThemeProvider>
           <AuthProvider>
-            {children}
+            <GenieProvider>
+              {children}
+              <GenieLampara />
+            </GenieProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
