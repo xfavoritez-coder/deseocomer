@@ -26,7 +26,7 @@ function markToastShown(id: string) {
 
 export default function GenieLampara() {
   const pathname = usePathname();
-  const { isOpen, setIsOpen, toastActivo, setToastActivo } = useGenie();
+  const { isOpen, setIsOpen, toastActivo, setToastActivo, isLoggedIn, sessionCount } = useGenie();
   const [rubbing, setRubbing] = useState(false);
   const mountTimeRef = useRef(Date.now());
   const triggerCheckedRef = useRef(false);
@@ -91,6 +91,23 @@ export default function GenieLampara() {
       return () => clearTimeout(timer);
     }
   }, [setToastActivo]);
+
+  // ── Trigger 5: 3rd session without registration ──
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (isLoggedIn || sessionCount < 3) return;
+    try {
+      if (localStorage.getItem("genio_trigger5_mostrado")) return;
+    } catch { return; }
+    const timer = setTimeout(() => {
+      setToastActivo({
+        id: "session3",
+        mensaje: "Ya nos conocemos un poco 🧞 Regístrate y recuerdo todo lo que te gusta",
+        opciones: ["Registrarme", "Seguir explorando"],
+      });
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, sessionCount, setToastActivo]);
 
   return (
     <>

@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -43,6 +44,10 @@ interface GenieContextType {
   addInteraccion: (tipo: string, datos: Record<string, string | number>) => void;
   addRespuestaGenio: (pregunta: string, respuesta: string) => void;
   getRecomendacion: (categoria?: string, comuna?: string) => LocalRecomendado;
+  isLoggedIn: boolean;
+  userName: string | null;
+  sessionCount: number;
+  showFavoritoToast: () => void;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -89,15 +94,40 @@ function savePerfil(p: GeniePerfil) {
 
 const GenieContext = createContext<GenieContextType | null>(null);
 
+const SESSIONS_KEY = "deseocomer_genio_sessions";
+const SESSION_COUNTED_KEY = "deseocomer_genio_session_counted";
+const FAV_TOAST_COUNT_KEY = "genio_favoritos_toast_count";
+
+function getSessionCount(): number {
+  try { return Number(localStorage.getItem(SESSIONS_KEY) ?? "0"); }
+  catch { return 0; }
+}
+
 export function GenieProvider({ children }: { children: ReactNode }) {
+  const { user, isAuthenticated } = useAuth();
+  const isLoggedIn = isAuthenticated && !!user;
+  const userName = user?.nombre?.split(" ")[0] ?? null;
+
   const [perfil, setPerfil] = useState<GeniePerfil>(createEmptyPerfil);
   const [isOpen, setIsOpen] = useState(false);
   const [toastActivo, setToastActivo] = useState<GenieContextType["toastActivo"]>(null);
+  const [sessionCount, setSessionCount] = useState(0);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount + track sessions for non-logged users
   useEffect(() => {
     setPerfil(loadPerfil());
-  }, []);
+    const count = getSessionCount();
+    setSessionCount(count);
+    if (!isLoggedIn) {
+      const alreadyCounted = sessionStorage.getItem(SESSION_COUNTED_KEY);
+      if (!alreadyCounted) {
+        const newCount = count + 1;
+        localStorage.setItem(SESSIONS_KEY, String(newCount));
+        sessionStorage.setItem(SESSION_COUNTED_KEY, "1");
+        setSessionCount(newCount);
+      }
+    }
+  }, [isLoggedIn]);
 
   const updatePerfil = useCallback((updater: (p: GeniePerfil) => GeniePerfil) => {
     setPerfil(prev => {
@@ -202,8 +232,22 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     return scored[0] ?? LOCALES_DB[0];
   }, [perfil.gustos]);
 
+  const showFavoritoToast = useCallback(() => {
+    if (isLoggedIn) return;
+    try {
+      const count = Number(localStorage.getItem(FAV_TOAST_COUNT_KEY) ?? "0");
+      if (count >= 3) return;
+      localStorage.setItem(FAV_TOAST_COUNT_KEY, String(count + 1));
+      setToastActivo({
+        id: "favorito_guardado",
+        mensaje: "Guardado 🧞 Regístrate para no perder tus favoritos si cambias de dispositivo",
+        opciones: ["Entendido"],
+      });
+    } catch { /* noop */ }
+  }, [isLoggedIn, setToastActivo]);
+
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast }}>
       {children}
     </GenieContext.Provider>
   );

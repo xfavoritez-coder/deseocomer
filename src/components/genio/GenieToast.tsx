@@ -17,10 +17,17 @@ export default function GenieToast() {
 
   const handleOption = (opt: string) => {
     addRespuestaGenio(toastActivo.mensaje, opt);
-    // If user wants help, open the panel
     if (opt === "Sí, ayúdame" || opt === "Buscar restaurante") {
       setToastActivo(null);
       setIsOpen(true);
+    } else if (opt === "Registrarme") {
+      setToastActivo(null);
+      // Store that trigger5 was handled so it doesn't show again
+      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch { /* noop */ }
+      window.location.href = "/registro";
+    } else if (opt === "Seguir explorando") {
+      try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch { /* noop */ }
+      setToastActivo(null);
     } else {
       setToastActivo(null);
     }

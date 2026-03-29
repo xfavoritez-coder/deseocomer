@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useGenie, type LocalRecomendado } from "@/contexts/GenieContext";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -36,13 +37,24 @@ function getRazon(local: LocalRecomendado, categoria?: string, comuna?: string):
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function GeniePanel() {
-  const { setIsOpen, addInteraccion, getRecomendacion } = useGenie();
+  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount } = useGenie();
 
   const [step, setStep] = useState(1);
   const [ocasion, setOcasion] = useState("");
   const [comuna, setComuna] = useState("");
   const [categoria, setCategoria] = useState("");
   const [resultado, setResultado] = useState<LocalRecomendado | null>(null);
+  const [showRegCta, setShowRegCta] = useState(false);
+  const [regDismissed, setRegDismissed] = useState(false);
+
+  // Show registration CTA 2s after reaching step 4 (non-logged only)
+  useEffect(() => {
+    if (step !== 4 || isLoggedIn || regDismissed) return;
+    const dismissed = sessionStorage.getItem("genio_registro_descartado");
+    if (dismissed) { setRegDismissed(true); return; }
+    const t = setTimeout(() => setShowRegCta(true), 2000);
+    return () => clearTimeout(t);
+  }, [step, isLoggedIn, regDismissed]);
 
   const handleOcasion = (o: string) => {
     setOcasion(o);
@@ -106,7 +118,7 @@ export default function GeniePanel() {
             fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
             color: "rgba(245,208,128,0.9)", marginBottom: "14px", lineHeight: 1.5,
           }}>
-            {getSaludo()}
+            {isLoggedIn && userName ? `Hola ${userName} ✨ ¿Qué deseas hoy?` : getSaludo()}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {OCASIONES.map(o => (
@@ -243,6 +255,60 @@ export default function GeniePanel() {
               Dame otra opción
             </button>
           </div>
+
+          {/* Registration CTA for non-logged users */}
+          {showRegCta && !isLoggedIn && (
+            <div style={{
+              marginTop: "16px", paddingTop: "16px",
+              borderTop: "1px solid rgba(232,168,76,0.15)",
+              textAlign: "center",
+              animation: "genieSlideUp 0.4s ease both",
+            }}>
+              <p style={{ fontSize: "1.5rem", marginBottom: "8px" }}>🧞</p>
+              <p style={{
+                fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
+                color: "rgba(245,208,128,0.9)", marginBottom: "6px",
+              }}>
+                Quiero recordarte para la próxima vez
+              </p>
+              <p style={{
+                fontFamily: "var(--font-lato)", fontSize: "0.78rem",
+                color: "rgba(245,208,128,0.5)", marginBottom: "12px", lineHeight: 1.5,
+              }}>
+                {sessionCount >= 3
+                  ? `Llevas ${sessionCount} visitas explorando. ¿Te quedas? 🧞`
+                  : "Si te registras, aprendo más de ti y mis recomendaciones mejoran con el tiempo"}
+              </p>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Link href="/registro" onClick={() => setIsOpen(false)} style={{
+                  flex: 1, textAlign: "center", padding: "10px 12px",
+                  minHeight: "40px", boxSizing: "border-box" as const,
+                  background: "var(--sand-gold, #e8a84c)", borderRadius: "10px",
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
+                  letterSpacing: "0.08em", textTransform: "uppercase",
+                  color: "#1a0e05", textDecoration: "none", fontWeight: 700,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  Registrarme gratis
+                </Link>
+                <button onClick={() => {
+                  setShowRegCta(false);
+                  setRegDismissed(true);
+                  sessionStorage.setItem("genio_registro_descartado", "true");
+                }} style={{
+                  flex: 1, padding: "10px 12px",
+                  minHeight: "40px", boxSizing: "border-box" as const,
+                  background: "transparent", border: "1px solid rgba(232,168,76,0.25)",
+                  borderRadius: "10px", cursor: "pointer",
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
+                  letterSpacing: "0.08em", textTransform: "uppercase",
+                  color: "rgba(245,208,128,0.5)",
+                }}>
+                  Ahora no
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
