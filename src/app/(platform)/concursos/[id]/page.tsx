@@ -304,7 +304,7 @@ export default function ConcursoDetallePage() {
 
         <div style={{
           position: "relative", display: "flex",
-          alignItems: "center", gap: "28px", flexWrap: "wrap",
+          alignItems: "center", gap: "28px", flexWrap: "nowrap",
         }}>
           {c.imagenUrl ? (
             <div style={{
@@ -312,6 +312,7 @@ export default function ConcursoDetallePage() {
               borderRadius: "16px", overflow: "hidden", flexShrink: 0,
               boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
               border: "1px solid var(--border-color)",
+              background: "rgba(45,26,8,0.8)",
             }}>
               <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
@@ -319,6 +320,7 @@ export default function ConcursoDetallePage() {
             <span style={{
               fontSize: "clamp(3.5rem, 10vw, 6rem)",
               filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.5))",
+              flexShrink: 0,
             }}>
               {c.imagen}
             </span>
@@ -555,7 +557,17 @@ export default function ConcursoDetallePage() {
                 border: "1px solid var(--border-color)",
                 borderRadius: "14px", padding: "24px",
               }}>
-                <span style={{ fontSize: "2.5rem", flexShrink: 0 }}>{c.imagen}</span>
+                {c.imagenUrl ? (
+                  <div style={{
+                    width: "56px", height: "56px", borderRadius: "50%", overflow: "hidden",
+                    flexShrink: 0, border: "1px solid var(--border-color)",
+                    background: "rgba(45,26,8,0.8)",
+                  }}>
+                    <img src={c.imagenUrl} alt={c.local} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                ) : (
+                  <span style={{ fontSize: "2.5rem", flexShrink: 0 }}>{c.imagen}</span>
+                )}
                 <div>
                   <p style={{
                     fontFamily: "var(--font-lato)", fontSize: "0.9rem",
