@@ -28,6 +28,8 @@ export default function GenieLampara() {
   const pathname = usePathname();
   const { isOpen, setIsOpen, toastActivo, setToastActivo, isLoggedIn, sessionCount } = useGenie();
   const [rubbing, setRubbing] = useState(false);
+  const [showBalloon, setShowBalloon] = useState(false);
+  const [balloonExiting, setBalloonExiting] = useState(false);
   const mountTimeRef = useRef(Date.now());
   const triggerCheckedRef = useRef(false);
 
@@ -35,8 +37,11 @@ export default function GenieLampara() {
   if (pathname.startsWith("/panel")) return null;
 
   const handleClick = () => {
+    if (showBalloon) {
+      setShowBalloon(false);
+      try { localStorage.setItem("deseocomer_genio_presentado", "true"); } catch {}
+    }
     if (toastActivo) {
-      // Dismiss toast and open panel
       setToastActivo(null);
     }
     setRubbing(true);
@@ -45,6 +50,22 @@ export default function GenieLampara() {
       setIsOpen(!isOpen);
     }, 300);
   };
+
+  // ── Intro balloon (first visit only) ──
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    try { if (localStorage.getItem("deseocomer_genio_presentado")) return; } catch { return; }
+    const showTimer = setTimeout(() => setShowBalloon(true), 3000);
+    const hideTimer = setTimeout(() => {
+      setBalloonExiting(true);
+      setTimeout(() => {
+        setShowBalloon(false);
+        setBalloonExiting(false);
+        try { localStorage.setItem("deseocomer_genio_presentado", "true"); } catch {}
+      }, 300);
+    }, 9000); // 3s delay + 6s visible
+    return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
+  }, []);
 
   // ── Trigger 3: Lunchtime toast ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -139,6 +160,37 @@ export default function GenieLampara() {
       {/* Panel */}
       {isOpen && <GeniePanel />}
 
+      {/* Intro balloon */}
+      {showBalloon && (
+        <div style={{
+          position: "fixed",
+          bottom: "calc(80px + 56px + 12px)",
+          right: "16px",
+          zIndex: 951,
+          background: "rgba(13,7,3,0.95)",
+          border: "1px solid var(--accent, #e8a84c)",
+          borderRadius: "12px",
+          padding: "10px 16px",
+          whiteSpace: "nowrap",
+          animation: balloonExiting ? "genieBalloonOut 0.3s ease forwards" : "genieBalloonIn 0.4s ease both",
+        }}>
+          <p style={{
+            fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
+            color: "var(--accent, #e8a84c)", margin: 0,
+          }}>
+            ✨ Pregúntame qué comer
+          </p>
+          {/* Arrow pointing down */}
+          <div style={{
+            position: "absolute", bottom: "-7px", right: "20px",
+            width: 0, height: 0,
+            borderLeft: "7px solid transparent",
+            borderRight: "7px solid transparent",
+            borderTop: "7px solid var(--accent, #e8a84c)",
+          }} />
+        </div>
+      )}
+
       {/* Lamp button */}
       <button
         onClick={handleClick}
@@ -187,6 +239,14 @@ export default function GenieLampara() {
           50%  { transform: rotate(10deg); }
           75%  { transform: rotate(-5deg); }
           100% { transform: rotate(0deg); }
+        }
+        @keyframes genieBalloonIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes genieBalloonOut {
+          from { opacity: 1; transform: translateY(0); }
+          to   { opacity: 0; transform: translateY(-10px); }
         }
         @media (min-width: 768px) {
           button[aria-label="Abrir El Genio"] {
