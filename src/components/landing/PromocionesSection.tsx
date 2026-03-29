@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useGenie } from "@/contexts/GenieContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   PROMOCIONES,
   TIPO_ICONS,
@@ -431,84 +432,130 @@ export default function PromocionesSection() {
 
 function BirthdayBanner() {
   const { setToastActivo } = useGenie();
-  const [hasBirthday, setHasBirthday] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const [tieneFecha, setTieneFecha] = useState(false);
+  const [paso, setPaso] = useState<"banner"|"form"|"contrasena"|"fin">("banner");
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [dia, setDia] = useState("");
+  const [mes, setMes] = useState("");
+  const [anio, setAnio] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    try { setHasBirthday(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
+    try { setTieneFecha(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
   }, []);
 
-  const cumplePromos = PROMOCIONES.filter(p => p.esCumpleanos);
-
-  const triggerCumpleToast = () => {
-    setToastActivo({
-      id: "cumpleanos",
-      mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
-      opciones: ["Cuéntale al Genio 🧞", "Después"],
-    });
+  const box: React.CSSProperties = {
+    background: "rgba(180,30,100,0.06)", border: "1px solid rgba(220,50,120,0.2)",
+    borderRadius: "16px", padding: "32px", textAlign: "center", marginBottom: "48px",
+    animation: "bdFadeIn 0.3s ease",
+  };
+  const inp: React.CSSProperties = {
+    background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)",
+    borderRadius: "8px", padding: "10px 12px", color: "var(--text-primary)",
+    fontFamily: "var(--font-lato)", fontSize: "1rem", textAlign: "center", outline: "none", boxSizing: "border-box",
+  };
+  const btnP: React.CSSProperties = {
+    background: "var(--accent)", color: "var(--bg-primary)", border: "none",
+    borderRadius: "10px", padding: "12px 24px", fontFamily: "var(--font-cinzel)",
+    fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase",
+    fontWeight: 700, cursor: "pointer", width: "100%",
   };
 
-  return (
-    <div style={{ marginBottom: "48px" }}>
-      <div style={{
-        background: hasBirthday ? "rgba(180,30,100,0.08)" : "rgba(180,30,100,0.06)",
-        border: `1px solid ${hasBirthday ? "rgba(220,50,120,0.3)" : "rgba(220,50,120,0.2)"}`,
-        borderRadius: "16px", padding: "24px", textAlign: "center",
-        marginBottom: cumplePromos.length > 0 && hasBirthday ? "20px" : "0",
-      }}>
-        <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🎂</div>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>
-          {hasBirthday ? "Ofertas para Cumpleañeros" : "¿Es tu cumpleaños pronto?"}
-        </p>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: hasBirthday ? "0" : "16px" }}>
-          {hasBirthday
-            ? "Estos locales tienen beneficios especiales para celebrar tu cumpleaños"
-            : "Registra tu fecha y te avisamos cuando haya ofertas especiales para celebrar"}
-        </p>
-        {!hasBirthday && (
-          <button onClick={triggerCumpleToast} style={{
-            background: "var(--accent)", color: "var(--bg-primary)",
-            border: "none", borderRadius: "10px", padding: "10px 24px",
-            fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
-            letterSpacing: "0.1em", textTransform: "uppercase",
-            fontWeight: 700, cursor: "pointer",
-          }}>
-            Registrar mi cumpleaños
-          </button>
-        )}
-      </div>
+  // State 3: logged in with birthday
+  if (isAuthenticated && tieneFecha) return null;
 
-      {hasBirthday && cumplePromos.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
-          {cumplePromos.map(p => (
-            <a key={p.id} href={`/promociones/${p.id}`} style={{
-              backgroundColor: "rgba(45,26,8,0.85)", border: "1px solid rgba(220,50,120,0.25)",
-              borderRadius: "16px", overflow: "hidden", textDecoration: "none", display: "block",
-            }}>
-              <div style={{ height: "120px", overflow: "hidden" }}>
-                <img src={p.imagenUrl} alt={p.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              </div>
-              <div style={{ padding: "16px" }}>
-                <span style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.12em",
-                  background: "rgba(220,50,120,0.15)", color: "#e8a84c",
-                  borderRadius: "20px", padding: "3px 10px",
-                }}>
-                  🎂 CUMPLEAÑOS
-                </span>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginTop: "8px", marginBottom: "4px" }}>
-                  {p.titulo}
-                </p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                  {p.local} · {p.comuna}
-                </p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-primary)", lineHeight: 1.5, marginTop: "6px" }}>
-                  {p.descripcion}
-                </p>
-              </div>
-            </a>
-          ))}
+  // State 2: logged in without birthday
+  if (isAuthenticated && !tieneFecha) return (
+    <div style={box}>
+      <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
+      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>¿Cuándo es tu cumpleaños?</p>
+      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", marginBottom: "16px" }}>Cuéntale al Genio y te avisamos cuando haya ofertas especiales para ti</p>
+      <button onClick={() => setToastActivo({ id: "cumpleanos", mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar", opciones: ["Cuéntale al Genio 🧞", "Después"] })} style={btnP}>
+        🧞 Cuéntale al Genio
+      </button>
+      <style>{`@keyframes bdFadeIn { from { opacity:0 } to { opacity:1 } }`}</style>
+    </div>
+  );
+
+  // State 1: not logged in — multi-step flow
+  return (
+    <div style={box}>
+      {paso === "banner" && (
+        <div>
+          <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>¿Cuándo es tu cumpleaños?</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", marginBottom: "16px" }}>Regístrate y te avisamos cuando haya ofertas especiales para celebrar</p>
+          <button onClick={() => setPaso("form")} style={btnP}>Quiero mis ofertas de cumpleaños</button>
         </div>
       )}
+
+      {paso === "form" && (
+        <div style={{ textAlign: "left", maxWidth: "340px", margin: "0 auto" }}>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: "4px", textAlign: "center" }}>Cuéntanos sobre ti 🎂</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "16px", textAlign: "center" }}>Solo tarda 30 segundos</p>
+          {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff8080", marginBottom: "10px", textAlign: "center" }}>⚠️ {error}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <input style={{ ...inp, textAlign: "left", width: "100%" }} placeholder="Tu nombre" value={nombre} onChange={e => setNombre(e.target.value)} />
+            <input style={{ ...inp, textAlign: "left", width: "100%" }} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
+            <div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Fecha de cumpleaños</p>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <input style={{ ...inp, width: "60px" }} placeholder="DD" maxLength={2} value={dia} onChange={e => setDia(e.target.value.replace(/\D/g, ""))} />
+                <input style={{ ...inp, width: "60px" }} placeholder="MM" maxLength={2} value={mes} onChange={e => setMes(e.target.value.replace(/\D/g, ""))} />
+                <input style={{ ...inp, width: "80px" }} placeholder="AAAA" maxLength={4} value={anio} onChange={e => setAnio(e.target.value.replace(/\D/g, ""))} />
+              </div>
+            </div>
+            <button onClick={() => {
+              setError("");
+              if (!nombre.trim()) return setError("Ingresa tu nombre");
+              if (!email.includes("@")) return setError("Email inválido");
+              const d = Number(dia), m = Number(mes), a = Number(anio);
+              if (d < 1 || d > 31 || m < 1 || m > 12 || a < 1900 || a > 2099) return setError("Fecha inválida");
+              try {
+                localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: d, mes: m, anio: a, nombre: nombre.trim(), email: email.trim(), guardadoEn: Date.now() }));
+                localStorage.setItem("deseocomer_user_temp", JSON.stringify({ nombre: nombre.trim(), email: email.trim() }));
+              } catch {}
+              setPaso("contrasena");
+            }} style={btnP}>Guardar 🎂</button>
+          </div>
+        </div>
+      )}
+
+      {paso === "contrasena" && (
+        <div style={{ maxWidth: "340px", margin: "0 auto" }}>
+          <div style={{ fontSize: "1.8rem", marginBottom: "8px", color: "var(--oasis-bright)" }}>✓</div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "8px", fontWeight: 700 }}>¡Listo! Guardamos tu cumpleaños 🎂</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "16px", lineHeight: 1.6 }}>Para acceder a otras promociones y concursos en DeseoComer, crea una contraseña:</p>
+          {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff8080", marginBottom: "10px" }}>⚠️ {error}</p>}
+          <input style={{ ...inp, textAlign: "left", width: "100%", marginBottom: "12px" }} type="password" placeholder="Mínimo 8 caracteres" value={contrasena} onChange={e => setContrasena(e.target.value)} />
+          <button onClick={() => {
+            setError("");
+            if (contrasena.length < 8) return setError("Mínimo 8 caracteres");
+            try {
+              const users = JSON.parse(localStorage.getItem("dc_users") ?? "[]");
+              users.push({ id: `${Date.now()}-${Math.random().toString(36).slice(2,8)}`, nombre: nombre.trim(), email: email.trim().toLowerCase(), password: contrasena, type: "user", comuna: "", createdAt: new Date().toISOString() });
+              localStorage.setItem("dc_users", JSON.stringify(users));
+              localStorage.removeItem("deseocomer_user_temp");
+            } catch {}
+            setPaso("fin");
+          }} style={{ ...btnP, marginBottom: "10px" }}>Crear mi cuenta →</button>
+          <button onClick={() => setPaso("fin")} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", cursor: "pointer", padding: "8px", width: "100%" }}>Ahora no, ya lo haré después</button>
+        </div>
+      )}
+
+      {paso === "fin" && (
+        <div>
+          <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: "8px" }}>¡Bienvenido/a a DeseoComer!</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "16px", lineHeight: 1.6 }}>Ya eres parte de la comunidad. Ahora puedes participar en concursos y ver todas las promociones.</p>
+          <button onClick={() => window.location.reload()} style={btnP}>Ver promociones</button>
+        </div>
+      )}
+
+      <style>{`@keyframes bdFadeIn { from { opacity:0 } to { opacity:1 } }`}</style>
     </div>
   );
 }
