@@ -216,59 +216,73 @@ export default function ConcursoDetallePage() {
         </div>
       )}
 
-      {/* Referral banner — fixed bottom for unauthenticated visitors via ref link */}
-      {refUserId && refBannerName !== undefined && !isAuthenticated && !refBannerDismissed && (
-        <div style={{
-          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 500,
-          background: "rgba(13,7,3,0.97)",
-          borderTop: "1px solid var(--sand-gold)",
-          borderRadius: "16px 16px 0 0",
-          padding: "20px 24px",
-          textAlign: "center",
-          backdropFilter: "blur(12px)",
-        }}>
-          <div style={{ fontSize: "2.2rem", marginBottom: "10px" }}>🏮</div>
-          <p style={{
-            fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(1rem, 3vw, 1.2rem)",
-            color: "var(--sand-gold)",
-            marginBottom: "8px",
-          }}>
-            ¡Te invitaron a ganar comida gratis!
-          </p>
-          <p style={{
-            fontFamily: "var(--font-lato)", fontSize: "0.9rem",
-            color: "var(--text-primary)", lineHeight: 1.7,
-            maxWidth: "480px", margin: "0 auto 16px",
-            fontWeight: 400,
-          }}>
-            {refBannerName
-              ? <><strong style={{ color: "var(--accent)" }}>{refBannerName}</strong> quiere que participes en el concurso <strong style={{ color: "var(--accent)" }}>{c.premio}</strong>. Regístrate gratis y le sumas un punto. ¡Tú también puedes ganar!</>
-              : <>Alguien quiere que participes en el concurso <strong style={{ color: "var(--accent)" }}>{c.premio}</strong>. Regístrate gratis y le sumas un punto. ¡Tú también puedes ganar!</>
-            }
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center" }}>
-            <Link href={`/registro?ref=${refUserId}&concurso=${concursoId}`} style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.8rem, 2.5vw, 0.9rem)",
-              letterSpacing: "0.08em", textTransform: "uppercase",
-              background: "var(--accent)", color: "var(--bg-primary)",
-              fontWeight: 700, padding: "14px 28px", borderRadius: "14px",
-              textDecoration: "none", display: "inline-flex", alignItems: "center",
-              justifyContent: "center", minHeight: "48px", width: "100%", maxWidth: "380px",
+      {/* Referral modal — centered shadow box for unauthenticated visitors via ref link */}
+      {refUserId && refBannerName !== undefined && !isAuthenticated && !refBannerDismissed && (() => {
+        const displayName = refBannerName ?? "tu amigo";
+        return (
+          <>
+            {/* Overlay oscuro */}
+            <div
+              onClick={handleDismissRefBanner}
+              style={{
+                position: "fixed", inset: 0, zIndex: 999,
+                background: "rgba(0,0,0,0.7)",
+              }}
+            />
+            {/* Modal centrado */}
+            <div style={{
+              position: "fixed", top: "50%", left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "90%", maxWidth: "480px", zIndex: 1000,
+              background: "rgba(13,7,3,0.98)",
+              border: "1px solid rgba(232,168,76,0.5)",
+              borderRadius: "20px",
+              boxShadow: "0 0 60px rgba(0,0,0,0.8), 0 0 30px rgba(232,168,76,0.15)",
+              padding: "36px 28px",
+              textAlign: "center",
             }}>
-              🎉 Registrarme{refBannerName ? ` y sumar punto a ${refBannerName}` : ""}
-            </Link>
-            <button onClick={handleDismissRefBanner} style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-              letterSpacing: "0.1em", textTransform: "uppercase",
-              background: "none", border: "none", color: "var(--text-muted)",
-              cursor: "pointer", padding: "8px 16px",
-            }}>
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
+              <p style={{
+                fontFamily: "var(--font-cinzel-decorative)",
+                fontSize: "clamp(1rem, 3vw, 1.25rem)",
+                color: "var(--sand-gold)",
+                marginBottom: "16px",
+                lineHeight: 1.4,
+              }}>
+                🏮 ¡{displayName} te invitó a ganar comida gratis!
+              </p>
+              <p style={{
+                fontFamily: "var(--font-lato)", fontSize: "0.9rem",
+                color: "var(--text-primary)", lineHeight: 1.7,
+                marginBottom: "24px", fontWeight: 400,
+              }}>
+                <strong style={{ color: "var(--accent)" }}>{displayName}</strong> está participando en el concurso{" "}
+                <strong style={{ color: "var(--accent)" }}>{c.premio}</strong> y necesita tu ayuda para sumar puntos.
+                Regístrate gratis, súmale 1 punto y tú también entras a ganar.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
+                <Link href={`/registro?ref=${refUserId}&concurso=${concursoId}`} style={{
+                  fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.78rem, 2.5vw, 0.88rem)",
+                  letterSpacing: "0.08em", textTransform: "uppercase",
+                  background: "var(--accent)", color: "var(--bg-primary)",
+                  fontWeight: 700, padding: "14px 28px", borderRadius: "14px",
+                  textDecoration: "none", display: "inline-flex", alignItems: "center",
+                  justifyContent: "center", minHeight: "48px", width: "100%", maxWidth: "380px",
+                }}>
+                  🎉 Registrarme y sumarle un punto a {displayName}
+                </Link>
+                <button onClick={handleDismissRefBanner} style={{
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+                  letterSpacing: "0.1em", textTransform: "uppercase",
+                  background: "none", border: "none", color: "var(--text-muted)",
+                  cursor: "pointer", padding: "8px 16px",
+                }}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </>
+        );
+      })()}
 
       {/* Banner */}
       <section className="dc-cd-banner">
