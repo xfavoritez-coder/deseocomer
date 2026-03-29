@@ -25,6 +25,7 @@ export interface Promocion {
   limiteUsos?: number;
   usosActuales?: number;
   activa: boolean;
+  esCumpleanos?: boolean;
   // Info del local para la página de detalle
   direccion?: string;
   telefono?: string;
@@ -225,6 +226,31 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2789 3456",
     horarioLocal: "Mar-Vie 18:00-02:00 | Sáb-Dom 15:00-02:00",
     descripcionLocal: "La terraza con mejor vista de Bellavista. Cócteles de autor, tapas gourmet y música en vivo los fines de semana. El lugar favorito del barrio.",
+  },
+  // ── Birthday promotions ──
+  {
+    id: 101, localId: "pizza-napoli", local: "Pizza Napoli", comuna: "Providencia",
+    tipo: "descuento" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
+    titulo: "Cena de Cumpleaños Especial", descripcion: "30% de descuento en tu cumpleaños presentando tu cédula",
+    porcentajeDescuento: 30, diasSemana: [0,1,2,3,4,5,6], horaInicio: "19:00", horaFin: "23:00",
+    fechaVencimiento: "2027-12-31", activa: true, esCumpleanos: true,
+  },
+  {
+    id: 102, localId: "cafe-buen-dia", local: "Café Arenas", comuna: "Bellavista",
+    tipo: "descuento" as TipoPromocion, categoria: "desayuno" as CategoriaPromocion,
+    imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600",
+    titulo: "Postre Gratis en tu Día", descripcion: "Postre de la casa gratis el día de tu cumpleaños",
+    diasSemana: [0,1,2,3,4,5,6], horaInicio: "08:00", horaFin: "22:00",
+    fechaVencimiento: "2027-12-31", activa: true, esCumpleanos: true,
+  },
+  {
+    id: 103, localId: "sushi-oasis", local: "Sushi Oasis", comuna: "Las Condes",
+    tipo: "descuento" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600",
+    titulo: "Cumpleaños Omakase", descripcion: "20% off en menú omakase para cumpleañeros",
+    porcentajeDescuento: 20, diasSemana: [0,1,2,3,4,5,6], horaInicio: "13:00", horaFin: "23:00",
+    fechaVencimiento: "2027-12-31", activa: true, esCumpleanos: true,
   },
 ];
 

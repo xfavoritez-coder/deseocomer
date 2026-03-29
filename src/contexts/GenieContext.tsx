@@ -97,6 +97,8 @@ const GenieContext = createContext<GenieContextType | null>(null);
 const SESSIONS_KEY = "deseocomer_genio_sessions";
 const SESSION_COUNTED_KEY = "deseocomer_genio_session_counted";
 const FAV_TOAST_COUNT_KEY = "genio_favoritos_toast_count";
+const VISITAS_LOGUEADO_KEY = "genio_visitas_logueado";
+const CUMPLE_SOLICITADO_KEY = "genio_cumple_solicitado";
 
 function getSessionCount(): number {
   try { return Number(localStorage.getItem(SESSIONS_KEY) ?? "0"); }
@@ -127,7 +129,28 @@ export function GenieProvider({ children }: { children: ReactNode }) {
         setSessionCount(newCount);
       }
     }
-  }, [isLoggedIn]);
+
+    if (isLoggedIn) {
+      const yaContada = sessionStorage.getItem("genio_visita_logueado_contada");
+      if (!yaContada) {
+        const visitas = Number(localStorage.getItem(VISITAS_LOGUEADO_KEY) ?? "0") + 1;
+        localStorage.setItem(VISITAS_LOGUEADO_KEY, String(visitas));
+        sessionStorage.setItem("genio_visita_logueado_contada", "1");
+
+        const yaSolicitado = localStorage.getItem(CUMPLE_SOLICITADO_KEY);
+        const yaTieneFecha = localStorage.getItem("deseocomer_user_birthday");
+        if (visitas >= 2 && !yaSolicitado && !yaTieneFecha) {
+          setTimeout(() => {
+            setToastActivo({
+              id: "cumpleanos",
+              mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
+              opciones: ["Cuéntale al Genio 🧞", "Después"],
+            });
+          }, 5000);
+        }
+      }
+    }
+  }, [isLoggedIn, setToastActivo]);
 
   const updatePerfil = useCallback((updater: (p: GeniePerfil) => GeniePerfil) => {
     setPerfil(prev => {

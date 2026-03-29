@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useGenie } from "@/contexts/GenieContext";
 import {
   PROMOCIONES,
   TIPO_ICONS,
@@ -16,9 +17,10 @@ import {
 
 // Top 3: prioritize active now, then happy_hour, then any
 function getTop3(): Promocion[] {
-  const activas   = PROMOCIONES.filter((p) => p.activa && isPromocionActivaAhora(p));
-  const happyHour = PROMOCIONES.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo === "happy_hour");
-  const resto     = PROMOCIONES.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo !== "happy_hour");
+  const noB = PROMOCIONES.filter(p => !p.esCumpleanos);
+  const activas   = noB.filter((p) => p.activa && isPromocionActivaAhora(p));
+  const happyHour = noB.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo === "happy_hour");
+  const resto     = noB.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo !== "happy_hour");
   return [...activas, ...happyHour, ...resto].slice(0, 3);
 }
 
@@ -106,6 +108,9 @@ export default function PromocionesSection() {
         </div>
 
         {/* Cards grid */}
+        {/* Birthday section */}
+        <BirthdayBanner />
+
         <div className="dc-ps-grid">
           {promos.map((promo) => {
             const isActiva     = mounted ? isPromocionActivaAhora(promo) : false;
@@ -129,7 +134,7 @@ export default function PromocionesSection() {
                 href={`/promociones/${promo.id}`}
                 className={`dc-ps-card${isHH ? " dc-ps-card--hh" : ""}${isUltimas ? " dc-ps-card--urgent" : ""}`}
                 style={{
-                  backgroundColor: "var(--bg-secondary)",
+                  backgroundColor: "rgba(45,26,8,0.85)",
                   border: isUltimas
                     ? "1px solid rgba(212,160,23,0.6)"
                     : isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)",
@@ -502,5 +507,91 @@ export default function PromocionesSection() {
         }
       `}</style>
     </section>
+  );
+}
+
+// ─── Birthday Banner ─────────────────────────────────────────────────────────
+
+function BirthdayBanner() {
+  const { setToastActivo } = useGenie();
+  const [hasBirthday, setHasBirthday] = useState(false);
+
+  useEffect(() => {
+    try { setHasBirthday(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
+  }, []);
+
+  const cumplePromos = PROMOCIONES.filter(p => p.esCumpleanos);
+
+  const triggerCumpleToast = () => {
+    setToastActivo({
+      id: "cumpleanos",
+      mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
+      opciones: ["Cuéntale al Genio 🧞", "Después"],
+    });
+  };
+
+  return (
+    <div style={{ marginBottom: "48px" }}>
+      <div style={{
+        background: hasBirthday ? "rgba(180,30,100,0.08)" : "rgba(180,30,100,0.06)",
+        border: `1px solid ${hasBirthday ? "rgba(220,50,120,0.3)" : "rgba(220,50,120,0.2)"}`,
+        borderRadius: "16px", padding: "24px", textAlign: "center",
+        marginBottom: cumplePromos.length > 0 && hasBirthday ? "20px" : "0",
+      }}>
+        <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🎂</div>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>
+          {hasBirthday ? "Ofertas para Cumpleañeros" : "¿Es tu cumpleaños pronto?"}
+        </p>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: hasBirthday ? "0" : "16px" }}>
+          {hasBirthday
+            ? "Estos locales tienen beneficios especiales para celebrar tu cumpleaños"
+            : "Registra tu fecha y te avisamos cuando haya ofertas especiales para celebrar"}
+        </p>
+        {!hasBirthday && (
+          <button onClick={triggerCumpleToast} style={{
+            background: "var(--accent)", color: "var(--bg-primary)",
+            border: "none", borderRadius: "10px", padding: "10px 24px",
+            fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
+            letterSpacing: "0.1em", textTransform: "uppercase",
+            fontWeight: 700, cursor: "pointer",
+          }}>
+            Registrar mi cumpleaños
+          </button>
+        )}
+      </div>
+
+      {hasBirthday && cumplePromos.length > 0 && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "16px" }}>
+          {cumplePromos.map(p => (
+            <a key={p.id} href={`/promociones/${p.id}`} style={{
+              backgroundColor: "rgba(45,26,8,0.85)", border: "1px solid rgba(220,50,120,0.25)",
+              borderRadius: "16px", overflow: "hidden", textDecoration: "none", display: "block",
+            }}>
+              <div style={{ height: "120px", overflow: "hidden" }}>
+                <img src={p.imagenUrl} alt={p.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              </div>
+              <div style={{ padding: "16px" }}>
+                <span style={{
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.12em",
+                  background: "rgba(220,50,120,0.15)", color: "#e8a84c",
+                  borderRadius: "20px", padding: "3px 10px",
+                }}>
+                  🎂 CUMPLEAÑOS
+                </span>
+                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginTop: "8px", marginBottom: "4px" }}>
+                  {p.titulo}
+                </p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                  {p.local} · {p.comuna}
+                </p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-primary)", lineHeight: 1.5, marginTop: "6px" }}>
+                  {p.descripcion}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

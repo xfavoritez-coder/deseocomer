@@ -130,33 +130,7 @@ export default function GenieLampara() {
     return () => clearTimeout(timer);
   }, [isLoggedIn, sessionCount, setToastActivo]);
 
-  // ── Trigger 6: Birthday request (logged in, no birthday, 2nd+ visit) ──
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (!isLoggedIn) return;
-    try {
-      if (localStorage.getItem("genio_cumple_solicitado")) return;
-      const profile = JSON.parse(localStorage.getItem("deseocomer_usuario_perfil") ?? "{}");
-      if (profile.cumpleanos?.mes) return;
-      // Count visits using sessionStorage to avoid counting reloads
-      const alreadyCounted = sessionStorage.getItem("genio_visita_logueado_counted");
-      let visitCount = Number(localStorage.getItem("genio_visitas_logueado") ?? "0");
-      if (!alreadyCounted) {
-        visitCount += 1;
-        localStorage.setItem("genio_visitas_logueado", String(visitCount));
-        sessionStorage.setItem("genio_visita_logueado_counted", "1");
-      }
-      if (visitCount < 2) return;
-    } catch { return; }
-    const timer = setTimeout(() => {
-      setToastActivo({
-        id: "cumpleanos",
-        mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
-        opciones: ["Cuéntale al Genio 🧞", "Después"],
-      });
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [isLoggedIn, setToastActivo]);
+  // Birthday trigger moved to GenieContext
 
   return (
     <>
