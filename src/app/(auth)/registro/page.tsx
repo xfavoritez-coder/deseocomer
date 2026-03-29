@@ -15,21 +15,6 @@ import {
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const COMUNAS = [
-  "Buin", "Cerrillos", "Colina", "Conchalí", "El Bosque", "Estación Central",
-  "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja",
-  "La Pintana", "La Reina", "Lampa", "Las Condes", "Lo Barnechea", "Lo Espejo",
-  "Lo Prado", "Macul", "Maipú", "Melipilla", "Ñuñoa", "Pedro Aguirre Cerda",
-  "Peñalolén", "Providencia", "Pudahuel", "Quilicura", "Recoleta", "Renca",
-  "San Bernardo", "San Miguel", "San Ramón", "Santiago", "Talagante", "Vitacura",
-];
-
-const TIPOS_COCINA = [
-  "Chilena", "Italiana", "Japonesa / Sushi", "Española", "Francesa",
-  "Mexicana", "Peruana", "China", "Árabe", "Americana",
-  "Vegetariana / Vegana", "Café y Pastelería", "Mariscos y Pescados",
-  "Carnes y Parrilla", "Comida Rápida", "Pizza", "Burgers", "Fusión", "Otro",
-];
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -49,8 +34,7 @@ function EyeIcon({ open }: { open: boolean }) {
 
 // ─── Form state types ────────────────────────────────────────────────────────
 
-const initUser = { nombre: "", email: "", password: "", confirm: "", comuna: "", terms: false };
-const initLocal = { nombreLocal: "", nombreEncargado: "", email: "", telefono: "", comuna: "", tipoCocina: "", password: "", terms: false };
+const initUser = { nombre: "", apellido: "", email: "", password: "", confirm: "", terms: false };
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -70,9 +54,7 @@ function RegistroContent() {
   const refCode     = searchParams.get("ref");
   const concursoId  = searchParams.get("concurso");
 
-  const [tab,      setTab]      = useState<"user" | "local">("user");
   const [userForm, setUserForm] = useState(initUser);
-  const [locForm,  setLocForm]  = useState(initLocal);
   const [showPw,   setShowPw]   = useState(false);
   const [showConf, setShowConf] = useState(false);
   const [error,    setError]    = useState("");
@@ -102,20 +84,20 @@ function RegistroContent() {
     e.preventDefault();
     setError("");
 
-    if (!userForm.nombre.trim())  return setError("El nombre es obligatorio.");
-    if (!userForm.email.trim())   return setError("El email es obligatorio.");
-    if (!userForm.comuna)         return setError("Selecciona tu comuna.");
+    if (!userForm.nombre.trim())    return setError("El nombre es obligatorio.");
+    if (!userForm.apellido.trim())  return setError("El apellido es obligatorio.");
+    if (!userForm.email.trim())     return setError("El email es obligatorio.");
     if (userForm.password.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
     if (userForm.password !== userForm.confirm) return setError("Las contraseñas no coinciden.");
-    if (!userForm.terms)          return setError("Debes aceptar los términos y condiciones.");
+    if (!userForm.terms)            return setError("Debes aceptar los términos y condiciones.");
 
     setLoading(true);
     const res = await register({
       type:     "user",
-      nombre:   userForm.nombre.trim(),
+      nombre:   `${userForm.nombre.trim()} ${userForm.apellido.trim()}`,
       email:    userForm.email.trim(),
       password: userForm.password,
-      comuna:   userForm.comuna,
+      comuna:   "",
     });
     setLoading(false);
 
@@ -147,45 +129,8 @@ function RegistroContent() {
     }
   };
 
-  // ── Local form submit ─────────────────────────────────────────────────────
-  const handleLocal = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!locForm.nombreLocal.trim())      return setError("El nombre del local es obligatorio.");
-    if (!locForm.nombreEncargado.trim())  return setError("El nombre del encargado es obligatorio.");
-    if (!locForm.email.trim())            return setError("El email es obligatorio.");
-    if (!locForm.telefono.trim())         return setError("El teléfono es obligatorio.");
-    if (!locForm.comuna)                  return setError("Selecciona la comuna.");
-    if (!locForm.tipoCocina)              return setError("Selecciona el tipo de cocina.");
-    if (locForm.password.length < 6)      return setError("La contraseña debe tener al menos 6 caracteres.");
-    if (!locForm.terms)                   return setError("Debes aceptar los términos y condiciones.");
-
-    setLoading(true);
-    const res = await register({
-      type:             "local",
-      nombreLocal:      locForm.nombreLocal.trim(),
-      nombreEncargado:  locForm.nombreEncargado.trim(),
-      email:            locForm.email.trim(),
-      telefono:         locForm.telefono.trim(),
-      comuna:           locForm.comuna,
-      tipoCocina:       locForm.tipoCocina,
-      password:         locForm.password,
-    });
-    setLoading(false);
-
-    if (res.success) {
-      setSuccess(true);
-      setTimeout(() => router.push("/panel/dashboard"), 1600);
-    } else {
-      setError(res.error ?? "Error al registrar el local.");
-    }
-  };
-
   const uSet = (k: keyof typeof initUser, v: string | boolean) =>
     setUserForm(f => ({ ...f, [k]: v }));
-  const lSet = (k: keyof typeof initLocal, v: string | boolean) =>
-    setLocForm(f => ({ ...f, [k]: v }));
 
   return (
     <main className="dc-auth-page">
@@ -203,7 +148,7 @@ function RegistroContent() {
           <div className="dc-auth-success">
             <div className="dc-auth-success-lamp">🏮</div>
             <h2 className="dc-auth-success-title">
-              {tab === "user" ? "¡Bienvenido!" : "¡Local registrado!"}
+              ¡Bienvenido!
             </h2>
             <p className="dc-auth-success-sub">
               {refMsg || "El Genio te está esperando..."}
@@ -257,28 +202,6 @@ function RegistroContent() {
             <h1 className="dc-auth-title">Crear cuenta</h1>
             <p className="dc-auth-subtitle">Únete a la plataforma gastronómica de Santiago</p>
 
-            {/* Tabs */}
-            <div className="dc-auth-tabs" role="tablist">
-              <button
-                role="tab"
-                aria-selected={tab === "user"}
-                className={`dc-auth-tab${tab === "user" ? " dc-auth-tab--active" : ""}`}
-                onClick={() => { setTab("user"); setError(""); }}
-                type="button"
-              >
-                👤 Soy usuario
-              </button>
-              <button
-                role="tab"
-                aria-selected={tab === "local"}
-                className={`dc-auth-tab${tab === "local" ? " dc-auth-tab--active" : ""}`}
-                onClick={() => { setTab("local"); setError(""); }}
-                type="button"
-              >
-                🏪 Soy un local
-              </button>
-            </div>
-
             {/* Error */}
             {error && (
               <div className="dc-auth-error" role="alert">
@@ -288,159 +211,68 @@ function RegistroContent() {
             )}
 
             {/* ── USER FORM ── */}
-            {tab === "user" && (
-              <form onSubmit={handleUser} className="dc-auth-form" noValidate>
+            <form onSubmit={handleUser} className="dc-auth-form" noValidate>
+              <div className="dc-field-row">
                 <div className="dc-field">
-                  <label className="dc-label">Nombre completo</label>
-                  <input type="text" className="dc-input" placeholder="Ej: María González"
+                  <label className="dc-label">Nombre</label>
+                  <input type="text" className="dc-input" placeholder="Ej: María"
                     value={userForm.nombre} onChange={e => uSet("nombre", e.target.value)} required />
                 </div>
-
                 <div className="dc-field">
-                  <label className="dc-label">Correo electrónico</label>
-                  <input type="email" className="dc-input" placeholder="tu@email.com"
-                    value={userForm.email} onChange={e => uSet("email", e.target.value)} required />
+                  <label className="dc-label">Apellido</label>
+                  <input type="text" className="dc-input" placeholder="Ej: González"
+                    value={userForm.apellido} onChange={e => uSet("apellido", e.target.value)} required />
                 </div>
+              </div>
 
-                <div className="dc-field-row">
-                  <div className="dc-field">
-                    <label className="dc-label">Contraseña</label>
-                    <div className="dc-pw-wrap">
-                      <input type={showPw ? "text" : "password"} className="dc-input dc-input--pw"
-                        placeholder="Mínimo 6 caracteres"
-                        value={userForm.password} onChange={e => uSet("password", e.target.value)} required />
-                      <button type="button" className="dc-pw-btn" onClick={() => setShowPw(s => !s)}
-                        aria-label={showPw ? "Ocultar contraseña" : "Mostrar contraseña"}>
-                        <EyeIcon open={showPw} />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="dc-field">
-                    <label className="dc-label">Confirmar contraseña</label>
-                    <div className="dc-pw-wrap">
-                      <input type={showConf ? "text" : "password"} className="dc-input dc-input--pw"
-                        placeholder="Repetir contraseña"
-                        value={userForm.confirm} onChange={e => uSet("confirm", e.target.value)} required />
-                      <button type="button" className="dc-pw-btn" onClick={() => setShowConf(s => !s)}
-                        aria-label={showConf ? "Ocultar contraseña" : "Mostrar contraseña"}>
-                        <EyeIcon open={showConf} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              <div className="dc-field">
+                <label className="dc-label">Correo electrónico</label>
+                <input type="email" className="dc-input" placeholder="tu@email.com"
+                  value={userForm.email} onChange={e => uSet("email", e.target.value)} required />
+              </div>
 
-                <div className="dc-field">
-                  <label className="dc-label">Comuna</label>
-                  <div className="dc-select-wrap">
-                    <select className="dc-input dc-select" value={userForm.comuna}
-                      onChange={e => uSet("comuna", e.target.value)} required>
-                      <option value="">Selecciona tu comuna</option>
-                      {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                    <span className="dc-select-arrow" aria-hidden="true">▾</span>
-                  </div>
-                </div>
-
-                <label className="dc-check-label">
-                  <input type="checkbox" className="dc-checkbox"
-                    checked={userForm.terms} onChange={e => uSet("terms", e.target.checked)} />
-                  <span>
-                    Acepto los{" "}
-                    <a href="#" className="dc-link">Términos y Condiciones</a>
-                    {" "}y la{" "}
-                    <a href="#" className="dc-link">Política de Privacidad</a>
-                  </span>
-                </label>
-
-                <button type="submit" className="dc-btn-primary" disabled={loading}>
-                  {loading ? <span className="dc-spinner" /> : "✨ Crear mi cuenta"}
-                </button>
-              </form>
-            )}
-
-            {/* ── LOCAL FORM ── */}
-            {tab === "local" && (
-              <form onSubmit={handleLocal} className="dc-auth-form" noValidate>
-                <div className="dc-field-row">
-                  <div className="dc-field">
-                    <label className="dc-label">Nombre del local</label>
-                    <input type="text" className="dc-input" placeholder="Ej: Pizza Napoli"
-                      value={locForm.nombreLocal} onChange={e => lSet("nombreLocal", e.target.value)} required />
-                  </div>
-                  <div className="dc-field">
-                    <label className="dc-label">Nombre del dueño / encargado</label>
-                    <input type="text" className="dc-input" placeholder="Tu nombre completo"
-                      value={locForm.nombreEncargado} onChange={e => lSet("nombreEncargado", e.target.value)} required />
-                  </div>
-                </div>
-
-                <div className="dc-field-row">
-                  <div className="dc-field">
-                    <label className="dc-label">Correo electrónico</label>
-                    <input type="email" className="dc-input" placeholder="local@email.com"
-                      value={locForm.email} onChange={e => lSet("email", e.target.value)} required />
-                  </div>
-                  <div className="dc-field">
-                    <label className="dc-label">Teléfono</label>
-                    <input type="tel" className="dc-input" placeholder="+56 9 1234 5678"
-                      value={locForm.telefono} onChange={e => lSet("telefono", e.target.value)} required />
-                  </div>
-                </div>
-
-                <div className="dc-field-row">
-                  <div className="dc-field">
-                    <label className="dc-label">Comuna</label>
-                    <div className="dc-select-wrap">
-                      <select className="dc-input dc-select" value={locForm.comuna}
-                        onChange={e => lSet("comuna", e.target.value)} required>
-                        <option value="">Selecciona la comuna</option>
-                        {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                      <span className="dc-select-arrow" aria-hidden="true">▾</span>
-                    </div>
-                  </div>
-                  <div className="dc-field">
-                    <label className="dc-label">Tipo de cocina</label>
-                    <div className="dc-select-wrap">
-                      <select className="dc-input dc-select" value={locForm.tipoCocina}
-                        onChange={e => lSet("tipoCocina", e.target.value)} required>
-                        <option value="">Selecciona el tipo</option>
-                        {TIPOS_COCINA.map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
-                      <span className="dc-select-arrow" aria-hidden="true">▾</span>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="dc-field-row">
                 <div className="dc-field">
                   <label className="dc-label">Contraseña</label>
                   <div className="dc-pw-wrap">
                     <input type={showPw ? "text" : "password"} className="dc-input dc-input--pw"
                       placeholder="Mínimo 6 caracteres"
-                      value={locForm.password} onChange={e => lSet("password", e.target.value)} required />
+                      value={userForm.password} onChange={e => uSet("password", e.target.value)} required />
                     <button type="button" className="dc-pw-btn" onClick={() => setShowPw(s => !s)}
                       aria-label={showPw ? "Ocultar contraseña" : "Mostrar contraseña"}>
                       <EyeIcon open={showPw} />
                     </button>
                   </div>
                 </div>
+                <div className="dc-field">
+                  <label className="dc-label">Confirmar contraseña</label>
+                  <div className="dc-pw-wrap">
+                    <input type={showConf ? "text" : "password"} className="dc-input dc-input--pw"
+                      placeholder="Repetir contraseña"
+                      value={userForm.confirm} onChange={e => uSet("confirm", e.target.value)} required />
+                    <button type="button" className="dc-pw-btn" onClick={() => setShowConf(s => !s)}
+                      aria-label={showConf ? "Ocultar contraseña" : "Mostrar contraseña"}>
+                      <EyeIcon open={showConf} />
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                <label className="dc-check-label">
-                  <input type="checkbox" className="dc-checkbox"
-                    checked={locForm.terms} onChange={e => lSet("terms", e.target.checked)} />
-                  <span>
-                    Acepto los{" "}
-                    <a href="#" className="dc-link">Términos y Condiciones</a>
-                    {" "}y la{" "}
-                    <a href="#" className="dc-link">Política de Privacidad</a>
-                  </span>
-                </label>
+              <label className="dc-check-label">
+                <input type="checkbox" className="dc-checkbox"
+                  checked={userForm.terms} onChange={e => uSet("terms", e.target.checked)} />
+                <span>
+                  Acepto los{" "}
+                  <a href="#" className="dc-link">Términos y Condiciones</a>
+                  {" "}y la{" "}
+                  <a href="#" className="dc-link">Política de Privacidad</a>
+                </span>
+              </label>
 
-                <button type="submit" className="dc-btn-primary" disabled={loading}>
-                  {loading ? <span className="dc-spinner" /> : "🏪 Registrar mi local"}
-                </button>
-              </form>
-            )}
+              <button type="submit" className="dc-btn-primary" disabled={loading}>
+                {loading ? <span className="dc-spinner" /> : "✨ Crear mi cuenta"}
+              </button>
+            </form>
 
             {/* Divider */}
             <div className="dc-divider"><span>o</span></div>
