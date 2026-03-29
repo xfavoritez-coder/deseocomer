@@ -8,27 +8,35 @@ export default function SectionDivider({
   toBg?: string;
 }) {
   return (
-    <div style={{ background: fromBg, lineHeight: 0, display: "block", marginTop: "-1px" }}>
-      <svg
-        viewBox="0 0 1440 80"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ display: "block", width: "100%", height: "80px" }}
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M0,68 Q360,52 720,68 Q1080,52 1440,68 L1440,80 L0,80 Z"
-          fill="#3d2408"
-        />
-        <path
-          d="M0,70 Q360,58 720,70 Q1080,58 1440,70 L1440,80 L0,80 Z"
-          fill="#c8922a"
-          opacity="0.35"
-        />
-        <path
-          d="M0,72 Q360,62 720,72 Q1080,62 1440,72 L1440,80 L0,80 Z"
-          fill={toBg}
-        />
-      </svg>
+    <div style={{
+      position: "relative",
+      height: "48px",
+      background: `linear-gradient(to bottom, ${fromBg} 0%, ${fromBg} 30%, ${toBg} 70%, ${toBg} 100%)`,
+      overflow: "hidden",
+    }}>
+      {/* Arena dorada central */}
+      <div style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "80%",
+        maxWidth: "600px",
+        height: "1px",
+        background: "linear-gradient(to right, transparent, rgba(200,146,42,0.5), rgba(200,146,42,0.7), rgba(200,146,42,0.5), transparent)",
+      }} />
+      {/* Glow sutil */}
+      <div style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "40%",
+        maxWidth: "300px",
+        height: "8px",
+        background: "radial-gradient(ellipse, rgba(200,146,42,0.15) 0%, transparent 70%)",
+        filter: "blur(4px)",
+      }} />
     </div>
   );
 }
