@@ -51,7 +51,7 @@ export default function PromocionesSection() {
   }, [updateTimers]);
 
   return (
-    <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-secondary)" }}>
+    <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-secondary)", borderTop: "1px solid rgba(61,184,158,0.08)", borderBottom: "1px solid rgba(61,184,158,0.08)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         {/* Header */}

@@ -31,7 +31,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     label: "Madrugada", icon: "✨",
     // Página
     bg:          "#07040f",
-    bgSecondary: "rgba(14,8,24,0.95)",
+    bgSecondary: "#12080a",
     text:        "#f0d080",
     textMuted:   "#7a6040",
     accent:      "#c4853a",
@@ -51,7 +51,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     label: "Día", icon: "☀️",
     // Página — mismos colores que mediodía
     bg:          "#1e1400",
-    bgSecondary: "rgba(32,20,2,0.95)",
+    bgSecondary: "#0a1f18",
     text:        "#fff8e0",
     textMuted:   "#b09040",
     accent:      "#e8a020",
@@ -71,7 +71,7 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     label: "Noche", icon: "🌙",
     // Página
     bg:          "#060410",
-    bgSecondary: "rgba(10,8,20,0.95)",
+    bgSecondary: "#0d1a0a",
     text:        "#e0d8f0",
     textMuted:   "#586090",
     accent:      "#b8860b",
