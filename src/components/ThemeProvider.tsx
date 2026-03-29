@@ -58,10 +58,9 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     let needsOverlay = false;
 
     if (!mountedRef.current) {
-      // Primer render: solo animar si el período cambió desde la última vez que se vio
+      // Primer render: NUNCA mostrar overlay en carga/refresh/navegación
       mountedRef.current = true;
-      const periodoGuardado = sessionStorage.getItem(SS_KEY);
-      needsOverlay = periodoGuardado !== null && periodoGuardado !== activeTheme.period;
+      needsOverlay = false;
     } else {
       // Renders posteriores: cambio real de período (setInterval) o dev panel
       needsOverlay = isDevForced || prevPeriodRef.current !== activeTheme.period;
