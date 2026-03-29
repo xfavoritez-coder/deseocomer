@@ -24,7 +24,7 @@ export default function Footer() {
               fontWeight: 300,
               maxWidth: "280px",
             }}>
-              La plataforma gastronómica de Santiago que conecta locales con personas apasionadas por comer bien.
+              El genio que cumple tu deseo de comer. La plataforma gastronómica donde los mejores locales, concursos y promociones de comida te esperan.
             </p>
           </div>
 
@@ -32,27 +32,25 @@ export default function Footer() {
             {
               titulo: "Plataforma",
               links: [
-                { label: "Concursos", href: "/concursos" },
-                { label: "Locales",   href: "/locales"   },
-                { label: "El Genio",  href: "/genio"     },
-                { label: "Ranking",   href: "/ranking"   },
+                { label: "Concursos",   href: "/concursos"   },
+                { label: "Promociones", href: "/promociones" },
+                { label: "Locales",     href: "/locales"     },
               ],
             },
             {
               titulo: "Para Locales",
               links: [
-                { label: "Registrarse",      href: "/registro"          },
-                { label: "Panel de Control", href: "/panel/dashboard"   },
-                { label: "Crear Concurso",   href: "/panel/concursos"   },
-                { label: "Demo",             href: "/panel/dashboard"   },
+                { label: "Registra tu local",  href: "/solo-locales"  },
+                { label: "Iniciar sesión",     href: "/login-local"   },
+                { label: "Panel de control",   href: "/panel"         },
               ],
             },
             {
               titulo: "Legal",
               links: [
-                { label: "Términos",   href: "#" },
-                { label: "Privacidad", href: "#" },
-                { label: "Contacto",   href: "#" },
+                { label: "Términos y condiciones", href: "#" },
+                { label: "Privacidad",             href: "#" },
+                { label: "Contacto",               href: "#" },
               ],
             },
           ].map(col => (
@@ -108,7 +106,7 @@ export default function Footer() {
             fontSize: "0.8rem",
             color: "var(--text-muted)",
           }}>
-            © 2025 DeseoComer.com · Santiago de Chile
+            © {new Date().getFullYear()} DeseoComer.com · Santiago de Chile
           </p>
           <p style={{
             fontFamily: "var(--font-cinzel)",
@@ -116,7 +114,7 @@ export default function Footer() {
             letterSpacing: "0.15em",
             color: "var(--text-muted)",
           }}>
-            Hecho con 🏮 y mucha hambre
+            Hecho con ❤️ y mucha hambre
           </p>
         </div>
       </div>
