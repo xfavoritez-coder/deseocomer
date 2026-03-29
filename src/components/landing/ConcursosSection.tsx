@@ -80,8 +80,18 @@ export default function ConcursosSection() {
                 color: "inherit",
               }}
             >
-              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none", background: "rgba(45,26,8,0.8)" }}>
+              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none", background: "rgba(45,26,8,0.8)", position: "relative" }}>
                 <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{
+                  position: "absolute", top: "14px", right: "-28px",
+                  background: "linear-gradient(135deg, #f5d080, #e8a84c, #c4853a)",
+                  color: "#1a0e05", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
+                  fontWeight: 900, letterSpacing: "0.12em", padding: "6px 40px",
+                  transform: "rotate(35deg)", boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
+                  whiteSpace: "nowrap",
+                }}>
+                  🏆 PREMIO GRATIS
+                </div>
               </div>
               <div style={{ padding: "24px 24px 0", pointerEvents: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
@@ -125,8 +135,8 @@ export default function ConcursosSection() {
                     }}>
                       {c.horasRestantes}h
                     </p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>
-                      RESTANTES
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "#ff6b6b", letterSpacing: "0.1em", fontWeight: 700 }}>
+                      🔥 CIERRA EN
                     </p>
                   </div>
                 </div>
@@ -152,21 +162,6 @@ export default function ConcursosSection() {
                   ))}
                 </div>
 
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  width: "100%",
-                  background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-                  borderRadius: "16px",
-                  fontFamily: "var(--font-cinzel)",
-                  fontSize: "clamp(0.9rem, 2.5vw, 1rem)", letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  color: "var(--bg-primary)",
-                  fontWeight: 700,
-                  minHeight: "56px",
-                  marginBottom: "24px",
-                }}>
-                  Ver concurso →
-                </div>
               </div>
             </a>
           ))}
@@ -204,7 +199,9 @@ export default function ConcursosSection() {
 
         @media (max-width: 767px) {
           .dc-cst-section { padding: 48px 20px 24px; }
-          .dc-cst-grid    { grid-template-columns: 1fr; gap: 16px; }
+          .dc-cst-grid    { display: flex !important; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
+          .dc-cst-grid::-webkit-scrollbar { display: none; }
+          .dc-cst-card    { flex-shrink: 0 !important; width: 300px !important; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
           .dc-cst-section { padding: 100px 40px; }

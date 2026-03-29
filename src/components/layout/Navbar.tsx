@@ -54,6 +54,8 @@ export default function Navbar() {
 
           <CitySelector />
 
+          <Link href="/registro?tipo=local" className="dc-nav-local-link">¿Tienes un local?</Link>
+
           {/* Auth: show user or "Entrar" */}
           {mounted && (
             isAuthenticated && user ? (
@@ -99,6 +101,13 @@ export default function Navbar() {
         ))}
 
         <CitySelector mobile />
+
+        <div style={{ borderTop: "1px solid rgba(232,168,76,0.15)", marginTop: "4px" }}>
+          <Link href="/registro?tipo=local" className="dc-mobile-link" onClick={() => setMenuOpen(false)}
+            style={{ color: "rgba(232,168,76,0.6)", fontSize: "0.8rem" }}>
+            ¿Tienes un local?
+          </Link>
+        </div>
 
         {/* Mobile auth section */}
         {mounted && (
@@ -204,6 +213,12 @@ export default function Navbar() {
           transition: border-color 0.2s, color 0.2s;
         }
         .dc-nav-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
+        .dc-nav-local-link {
+          font-family: var(--font-cinzel); font-size: 0.7rem;
+          color: rgba(232,168,76,0.6); text-decoration: none;
+          white-space: nowrap; transition: color 0.2s;
+        }
+        .dc-nav-local-link:hover { color: #e8a84c; }
 
         /* Hamburger button */
         .dc-hamburger {
@@ -226,9 +241,9 @@ export default function Navbar() {
         .dc-mobile-menu {
           display: none;
           position: fixed; top: 64px; left: 0; right: 0; z-index: 99;
-          background: color-mix(in srgb, var(--bg-primary) 97%, black);
-          backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--border-color);
+          background: rgba(13,7,3,0.98) !important;
+          backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(232,168,76,0.15);
           padding: 8px 24px 28px;
           flex-direction: column;
           opacity: 0; transform: translateY(-8px);
@@ -242,8 +257,8 @@ export default function Navbar() {
         .dc-mobile-link {
           font-family: var(--font-cinzel); font-size: 0.9rem;
           letter-spacing: 0.15em; text-transform: uppercase;
-          color: var(--text-primary); text-decoration: none;
-          padding: 16px 4px; border-bottom: 1px solid var(--border-color);
+          color: rgba(255,255,255,0.9) !important; text-decoration: none;
+          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.1);
           display: flex; align-items: center; min-height: 52px;
           font-weight: 500;
         }

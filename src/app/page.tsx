@@ -4,7 +4,6 @@ import ConcursosSection from "@/components/landing/ConcursosSection";
 import PromocionesSection from "@/components/landing/PromocionesSection";
 import LocalesSection from "@/components/landing/LocalesSection";
 import GenieSection from "@/components/landing/GenieSection";
-import CTASection from "@/components/landing/CTASection";
 import SectionDivider from "@/components/landing/SectionDivider";
 import Footer from "@/components/layout/Footer";
 
@@ -13,7 +12,6 @@ export default function Home() {
     <main style={{ background: "var(--bg-primary)" }}>
       <Navbar />
       <HeroSection />
-      <SectionDivider />
       <ConcursosSection />
       <SectionDivider />
       <PromocionesSection />
@@ -21,8 +19,6 @@ export default function Home() {
       <LocalesSection />
       <SectionDivider />
       <GenieSection />
-      <SectionDivider />
-      <CTASection />
       <Footer />
     </main>
   );

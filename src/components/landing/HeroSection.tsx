@@ -150,7 +150,7 @@ export default function HeroSection() {
         }}>
           <Link href="/concursos" className="dc-hero-btn dc-hero-btn--primary" style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
+            fontSize: "clamp(0.8rem, 2.5vw, 0.95rem)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             background: btnBg,
@@ -162,27 +162,10 @@ export default function HeroSection() {
             boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
             transition: "background 2s ease, color 2s ease",
             display: "flex", alignItems: "center", justifyContent: "center",
-            whiteSpace: "nowrap",
             minHeight: "56px",
+            textAlign: "center",
           }}>
-            Ver Concursos
-          </Link>
-          <Link href="/promociones" className="dc-hero-ghost" style={{
-            fontFamily: "var(--font-cinzel)",
-            fontSize: "0.85rem",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "rgba(255,255,255,0.9)",
-            textDecoration: "none",
-            padding: "12px 28px",
-            borderRadius: "10px",
-            border: "1.5px solid rgba(255,255,255,0.6)",
-            background: "transparent",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            transition: "border-color 0.2s, background 0.2s",
-            whiteSpace: "nowrap",
-          }}>
-            Ver promociones →
+            Gana Comida Gratis y Promociones
           </Link>
         </div>
       </div>
@@ -204,8 +187,6 @@ export default function HeroSection() {
         /* ── Responsive base ── */
         .dc-hero-content { margin-top: -80px; }
 
-        .dc-hero-ghost:hover { border-color: rgba(255,255,255,1) !important; background: rgba(255,255,255,0.08) !important; }
-
         .dc-hero-gratis { white-space: nowrap; }
 
         @media (max-width: 767px) {
@@ -216,8 +197,7 @@ export default function HeroSection() {
           .dc-sky--sun      { font-size: 56px !important; }
           /* sunrise/sunset icons removed */
           .dc-sky--moon     { font-size: 34px !important; right: 6% !important; top: 5% !important; }
-          .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.9rem !important; min-height: 56px; width: 100%; max-width: 320px; justify-content: center; }
-          .dc-hero-ghost    { width: 100%; max-width: 320px; justify-content: center; }
+          .dc-hero-btn      { padding: 16px 28px !important; font-size: 0.85rem !important; min-height: 56px; width: 100%; max-width: 340px; justify-content: center; }
         }
 
         @media (min-width: 768px) and (max-width: 1023px) {
