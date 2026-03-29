@@ -711,7 +711,7 @@ export default function ConcursoDetallePage() {
                     {copied ? "✓ Copiado" : "📋 Copiar link"}
                   </button>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`¡Hola! Ayúdame a ganar en el concurso ${c.premio} de ${c.local} en DeseoComer 🙏 Regístrate con mi link y ambos podemos ganar: ${refLink}`)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Ayúdame a ganar en el concurso ${c.premio} de ${c.local} en DeseoComer 🙏 Regístrate con mi link y ambos podemos ganar: ${refLink}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
