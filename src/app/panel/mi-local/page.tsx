@@ -36,7 +36,28 @@ export default function MiLocalPage() {
   const galeria: string[] = (d.galeria as string[]) ?? [];
   const [newFoto, setNewFoto] = useState("");
 
-  const handleSave = () => { save(d); setSaved(true); setTimeout(() => setSaved(false), 2500); };
+  const handleSave = async () => {
+    // Save locally as backup
+    save(d);
+    // Save to Supabase
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (session.id) {
+        const res = await fetch(`/api/locales/${session.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nombre: d.nombre, categoria: d.categoria, descripcion: d.descripcion,
+            historia: d.historia, telefono: d.telefono, instagram: d.instagram,
+            direccion: d.direccion, comuna: d.comuna, horarios: d.horarios,
+            logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria, tieneMenu: d.tieneMenu,
+          }),
+        });
+        if (!res.ok) console.warn("[Panel] Error al guardar en BD");
+      }
+    } catch { /* fallback to localStorage */ }
+    setSaved(true); setTimeout(() => setSaved(false), 2500);
+  };
 
   return (
     <div style={{ maxWidth: "680px" }}>

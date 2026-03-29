@@ -27,9 +27,21 @@ export default function PanelConcursos() {
   const pFinal = premio === "custom" ? custom : premio;
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "10px 18px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: sel ? 700 : 400 });
 
-  const publish = () => {
+  const publish = async () => {
     const n: Concurso = { id: Date.now(), premio: pFinal, duracion: dur, estado: "activo", participantes: 0, creadoEn: Date.now() };
-    const next = [n, ...concursos]; setConcursos(next); saveConcursos(next); setWizard(false); setStep(1); setPremio(""); setCustom("");
+    const next = [n, ...concursos]; setConcursos(next); saveConcursos(next);
+    // Save to Supabase
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (session.id) {
+        const fechaFin = new Date(); fechaFin.setDate(fechaFin.getDate() + dur);
+        await fetch("/api/concursos", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ localId: session.id, premio: pFinal, fechaFin: fechaFin.toISOString() }),
+        });
+      }
+    } catch { /* fallback to localStorage */ }
+    setWizard(false); setStep(1); setPremio(""); setCustom("");
   };
 
   if (wizard) return (

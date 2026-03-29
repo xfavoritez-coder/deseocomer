@@ -22,10 +22,24 @@ export default function PanelPromociones() {
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
-  const publish = () => {
+  const publish = async () => {
     if (!form.titulo.trim() || !form.tipo) return;
     const n: Promo = { id: Date.now(), ...form, creadoEn: Date.now() };
     const next = [n, ...promos]; setPromos(next); savePromos(next);
+    // Save to Supabase
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (session.id) {
+        await fetch("/api/promociones", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            localId: session.id, tipo: form.tipo, titulo: form.titulo.trim(),
+            descripcion: form.descripcion, porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
+            horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias, esCumpleanos: false,
+          }),
+        });
+      }
+    } catch { /* fallback to localStorage */ }
     setShowForm(false); setForm({ tipo: "", titulo: "", descripcion: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
   };
 
