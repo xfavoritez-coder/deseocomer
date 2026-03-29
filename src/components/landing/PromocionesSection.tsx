@@ -74,7 +74,7 @@ export default function PromocionesSection() {
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
-            Promociones Activas 🏷️
+            Promociones Activas
           </h2>
           <p className="section-description" style={{ marginBottom: "24px" }}>
             Descuentos, happy hours y cupones exclusivos en los mejores locales de Santiago. Algunos terminan hoy.

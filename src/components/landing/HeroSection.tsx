@@ -140,7 +140,7 @@ export default function HeroSection() {
           animation: "fadeUp 0.8s 0.55s both",
           margin: "16px auto 40px",
         }}>
-          El genio que cumple tu deseo de comer 🧞
+          El genio que cumple tu deseo de comer&nbsp;🧞
         </p>
 
         <div className="dc-hero-cta" style={{
@@ -209,9 +209,9 @@ export default function HeroSection() {
         .dc-hero-gratis { white-space: nowrap; }
 
         @media (max-width: 767px) {
-          .dc-hero-h1       { font-size: clamp(1.8rem, 6vw, 2.4rem) !important; }
+          .dc-hero-h1       { font-size: 2.8rem !important; }
           .dc-hero-gratis   { display: block; }
-          .dc-hero-subtitle { font-size: clamp(1rem, 4vw, 1.1rem) !important; line-height: 1.8 !important; }
+          .dc-hero-city     { font-size: 1.1rem !important; line-height: 1.6 !important; }
           .dc-hero-content  { margin-top: -16px !important; padding: 0 20px !important; }
           .dc-sky--sun      { font-size: 56px !important; }
           /* sunrise/sunset icons removed */

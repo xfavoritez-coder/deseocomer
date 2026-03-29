@@ -57,7 +57,7 @@ export default function ConcursosSection() {
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
-            Gana Comida Gratis 🎪
+            Gana Comida Gratis
           </h2>
           <p className="section-description">
             Comparte tu link con amigos y sube en el ranking. Los mejores ganan premios reales cada semana.

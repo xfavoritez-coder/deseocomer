@@ -260,9 +260,12 @@ export default function LocalesSection() {
 
         @media (max-width: 767px) {
           .dc-loc-section { padding: 48px 20px 24px; }
-          .dc-filters     { justify-content: flex-start; margin-bottom: 28px; }
-          .dc-filter-btn  { padding: 10px 18px; font-size: 0.65rem !important; }
-          .dc-loc-grid    { grid-template-columns: 1fr; gap: 14px; }
+          .dc-filters     { justify-content: flex-start; margin-bottom: 28px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; -ms-overflow-style: none; }
+          .dc-filters::-webkit-scrollbar { display: none; }
+          .dc-filter-btn  { padding: 10px 18px; font-size: 0.65rem !important; flex-shrink: 0; }
+          .dc-loc-grid    { display: flex !important; flex-direction: row; overflow-x: auto; gap: 12px; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
+          .dc-loc-grid::-webkit-scrollbar { display: none; }
+          .dc-loc-card    { flex-shrink: 0; width: 280px; }
           .dc-loc-card p  { font-size: 0.95rem !important; line-height: 1.7 !important; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
