@@ -11,7 +11,6 @@ export default function Home() {
     <main style={{ background: "var(--bg-primary)", margin: 0, padding: 0, display: "block" }}>
       <Navbar />
       <HeroSection />
-      <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-primary)" />
       <ConcursosSection />
       <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-secondary)" />
       <PromocionesSection />
