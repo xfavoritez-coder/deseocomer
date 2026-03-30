@@ -86,7 +86,7 @@ export default function ConcursosSection() {
             fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
             letterSpacing: "0.4em",
             textTransform: "uppercase",
-            color: "var(--color-label)",
+            color: "rgba(240,234,214,0.65)",
             marginBottom: "16px",
           }}>
             Concursos Activos
@@ -95,7 +95,7 @@ export default function ConcursosSection() {
             fontFamily: "var(--font-cinzel-decorative)",
             fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
             fontWeight: 800, letterSpacing: "0.02em",
-            color: "var(--color-title)",
+            color: "#f5d080",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
@@ -112,8 +112,8 @@ export default function ConcursosSection() {
               href={`/concursos/${c.id}`}
               className="dc-cst-card"
               style={{
-                backgroundColor: "rgba(45,26,8,0.85)",
-                border: "1px solid var(--border-color)",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: "20px",
                 cursor: "pointer",
                 transition: "transform 0.2s ease, border-color 0.2s ease",
@@ -142,14 +142,14 @@ export default function ConcursosSection() {
                       fontFamily: "var(--font-cinzel)",
                       fontSize: "0.65rem",
                       letterSpacing: "0.2em",
-                      color: "var(--color-label)",
+                      color: "rgba(240,234,214,0.65)",
                       textTransform: "uppercase",
                       marginBottom: "4px",
                     }}>{c.local}</p>
                     <p style={{
                       fontFamily: "var(--font-cinzel-decorative)",
                       fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-                      color: "var(--color-title)",
+                      color: "#f5d080",
                     }}>{c.premio}</p>
                   </div>
                 </div>

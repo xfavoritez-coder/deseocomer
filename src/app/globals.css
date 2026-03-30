@@ -4,18 +4,18 @@
 @property --bg-primary   { syntax: "<color>"; inherits: true; initial-value: #1a0e05; }
 @property --bg-secondary { syntax: "<color>"; inherits: true; initial-value: #080d18; }
 @property --bg-section-alt { syntax: "<color>"; inherits: true; initial-value: #0d1a14; }
-@property --text-primary { syntax: "<color>"; inherits: true; initial-value: #f5d080; }
-@property --text-muted   { syntax: "<color>"; inherits: true; initial-value: #8b5e2a; }
+@property --text-primary { syntax: "<color>"; inherits: true; initial-value: #fff8e0; }
+@property --text-muted   { syntax: "<color>"; inherits: true; initial-value: rgba(255,245,210,0.7); }
 @property --accent       { syntax: "<color>"; inherits: true; initial-value: #e8a84c; }
-@property --border-color { syntax: "<color>"; inherits: true; initial-value: rgba(232,168,76,0.22); }
+@property --border-color { syntax: "<color>"; inherits: true; initial-value: rgba(232,168,76,0.28); }
 /* Legacy */
 @property --theme-bg     { syntax: "<color>"; inherits: true; initial-value: #1a0e05; }
-@property --theme-text   { syntax: "<color>"; inherits: true; initial-value: #f5d080; }
+@property --theme-text   { syntax: "<color>"; inherits: true; initial-value: #fff8e0; }
 @property --theme-accent { syntax: "<color>"; inherits: true; initial-value: #e8a84c; }
-@property --color-title  { syntax: "<color>"; inherits: true; initial-value: #e8a84c; }
+@property --color-title  { syntax: "<color>"; inherits: true; initial-value: #f5d080; }
 @property --color-link   { syntax: "<color>"; inherits: true; initial-value: #3db89e; }
-@property --color-label  { syntax: "<color>"; inherits: true; initial-value: #5a4028; }
-@property --color-text   { syntax: "<color>"; inherits: true; initial-value: #c0a060; }
+@property --color-label  { syntax: "<color>"; inherits: true; initial-value: rgba(255,245,210,0.55); }
+@property --color-text   { syntax: "<color>"; inherits: true; initial-value: rgba(255,245,210,0.85); }
 
 :root {
   /* Transición suave de 2s entre todas las paletas */

@@ -66,7 +66,7 @@ export default function LocalesSection() {
             fontFamily: "var(--font-cinzel-decorative)",
             fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
             fontWeight: 800, letterSpacing: "0.02em",
-            color: "var(--color-title)",
+            color: "#f5d080",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
@@ -108,7 +108,7 @@ export default function LocalesSection() {
         <div className="dc-loc-grid">
           {localesFiltrados.map(local => (
             <Link key={local.id} href={`/locales/${local.id}`} className="dc-loc-card" style={{
-              backgroundColor: "rgba(45,26,8,0.85)",
+              backgroundColor: "rgba(255,255,255,0.04)",
               borderRadius: "20px",
               textDecoration: "none",
               display: "block",
@@ -132,7 +132,7 @@ export default function LocalesSection() {
                   <h3 style={{
                     fontFamily: "var(--font-cinzel-decorative)",
                     fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-                    color: "var(--color-title)",
+                    color: "#f5d080",
                     lineHeight: 1.2,
                     minWidth: 0,
                   }}>{local.nombre}</h3>
