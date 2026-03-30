@@ -3,19 +3,18 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useGenie } from "@/contexts/GenieContext";
 
-const CONTEXTUAL_PREFIX = "genio_contextual_mostrado_";
+// One key per day — once shown, don't show again on ANY page
+const CONTEXTUAL_KEY_PREFIX = "genio_contextual_dia_";
 
-function yaMostradoHoy(pathname: string): boolean {
+function yaMostradoHoy(): boolean {
   try {
-    const key = CONTEXTUAL_PREFIX + new Date().toISOString().slice(0, 10) + "_" + pathname;
-    return !!localStorage.getItem(key);
+    return !!localStorage.getItem(CONTEXTUAL_KEY_PREFIX + new Date().toISOString().slice(0, 10));
   } catch { return true; }
 }
 
-function marcarMostrado(pathname: string) {
+function marcarMostradoHoy() {
   try {
-    const key = CONTEXTUAL_PREFIX + new Date().toISOString().slice(0, 10) + "_" + pathname;
-    localStorage.setItem(key, "1");
+    localStorage.setItem(CONTEXTUAL_KEY_PREFIX + new Date().toISOString().slice(0, 10), "1");
   } catch {}
 }
 
@@ -97,22 +96,22 @@ export default function GenieContextual() {
   const pathname = usePathname();
   const { perfil, setToastActivo, toastActivo, userName, isLoggedIn } = useGenie();
 
-  // Ref tracks the LIVE value of toastActivo so the setTimeout callback sees current state
   const toastRef = useRef(toastActivo);
   useEffect(() => { toastRef.current = toastActivo; }, [toastActivo]);
 
   useEffect(() => {
     if (toastActivo) return;
     if (pathname.startsWith("/panel") || pathname.startsWith("/admin")) return;
-    if (yaMostradoHoy(pathname)) return;
+    // Only show ONCE per day across all pages
+    if (yaMostradoHoy()) return;
 
     const timer = setTimeout(() => {
-      // Re-check: if another toast appeared while we waited (e.g. birthday), don't override
       if (toastRef.current) return;
+      if (yaMostradoHoy()) return;
 
       const mensaje = getMensajeContextual(pathname, perfil, userName, isLoggedIn);
       if (mensaje) {
-        marcarMostrado(pathname);
+        marcarMostradoHoy();
         setToastActivo({
           id: "contextual_" + pathname,
           mensaje: mensaje.texto,

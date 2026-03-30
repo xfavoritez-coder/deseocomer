@@ -16,20 +16,33 @@ import {
   type Promocion,
 } from "@/lib/mockPromociones";
 
-// Top 3: prioritize active now, then happy_hour, then any
-function getTop3(): Promocion[] {
-  const noB = PROMOCIONES.filter(p => !p.esCumpleanos);
-  const activas   = noB.filter((p) => p.activa && isPromocionActivaAhora(p));
-  const happyHour = noB.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo === "happy_hour");
-  const resto     = noB.filter((p) => p.activa && !isPromocionActivaAhora(p) && p.tipo !== "happy_hour");
-  return [...activas, ...happyHour, ...resto].slice(0, 3);
+// Top 3: if birthday, show birthday promos first; then active, happy_hour, rest
+function getTop3(esCumple: boolean): Promocion[] {
+  const cumple = esCumple ? PROMOCIONES.filter(p => p.esCumpleanos && p.activa) : [];
+  const noB = PROMOCIONES.filter(p => !p.esCumpleanos && p.activa);
+  const activas   = noB.filter(p => isPromocionActivaAhora(p));
+  const happyHour = noB.filter(p => !isPromocionActivaAhora(p) && p.tipo === "happy_hour");
+  const resto     = noB.filter(p => !isPromocionActivaAhora(p) && p.tipo !== "happy_hour");
+  return [...cumple, ...activas, ...happyHour, ...resto].slice(0, 3);
+}
+
+function checkBirthday(): boolean {
+  try {
+    const raw = localStorage.getItem("deseocomer_user_birthday");
+    if (!raw) return false;
+    const b = JSON.parse(raw);
+    if (!b?.dia || !b?.mes) return false;
+    const hoy = new Date();
+    return hoy.getDate() === Number(b.dia) && (hoy.getMonth() + 1) === Number(b.mes);
+  } catch { return false; }
 }
 
 interface TimerState { horas: number; minutos: number; segundos: number }
 
 export default function PromocionesSection() {
   const [mounted, setMounted]   = useState(false);
-  const [promos, setPromos]     = useState<Promocion[]>(getTop3());
+  const [esCumple, setEsCumple] = useState(false);
+  const [promos, setPromos]     = useState<Promocion[]>(getTop3(false));
 
   // Try fetching from API (supplement mock data)
   useEffect(() => {
@@ -58,6 +71,9 @@ export default function PromocionesSection() {
 
   useEffect(() => {
     setMounted(true);
+    const cumple = checkBirthday();
+    setEsCumple(cumple);
+    if (cumple) setPromos(getTop3(true));
     updateTimers();
     const id = setInterval(updateTimers, 1000);
     return () => clearInterval(id);
@@ -120,7 +136,7 @@ export default function PromocionesSection() {
 
         {/* Cards grid */}
         {/* Birthday section */}
-        <BirthdayBanner />
+        <BirthdayBanner esCumpleHoy={esCumple} />
 
         <div className="dc-ps-grid">
           {promos.map((promo) => {
@@ -440,7 +456,7 @@ export default function PromocionesSection() {
 
 // ─── Birthday Banner ─────────────────────────────────────────────────────────
 
-function BirthdayBanner() {
+function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
   const { setToastActivo } = useGenie();
   const { isAuthenticated } = useAuth();
   const [tieneFecha, setTieneFecha] = useState(false);
@@ -462,7 +478,8 @@ function BirthdayBanner() {
   }, []);
 
   const box: React.CSSProperties = {
-    background: "rgba(180,30,100,0.06)", border: "1px solid rgba(220,50,120,0.2)",
+    background: esCumpleHoy ? "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(180,30,100,0.1))" : "rgba(180,30,100,0.06)",
+    border: esCumpleHoy ? "1px solid rgba(232,168,76,0.3)" : "1px solid rgba(220,50,120,0.2)",
     borderRadius: "16px", padding: "32px", textAlign: "center", marginBottom: "48px",
     animation: "bdFadeIn 0.3s ease",
   };
@@ -478,10 +495,36 @@ function BirthdayBanner() {
     fontWeight: 700, cursor: "pointer", width: "100%",
   };
 
-  // State 3: logged in with birthday
+  // ── Birthday greeting (it IS their birthday today) ──
+  if (esCumpleHoy && (tieneFecha || cumpleGuardado)) {
+    return (
+      <div style={box}>
+        <div style={{ position: "relative", overflow: "hidden" }}>
+          {["🎊", "✨", "🎉", "🎈", "🎊"].map((e, i) => (
+            <span key={i} style={{ position: "absolute", top: "50%", left: `${5 + i * 22}%`, transform: "translateY(-50%)", fontSize: "1.5rem", opacity: 0.25, pointerEvents: "none" }}>{e}</span>
+          ))}
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p style={{ fontSize: "2.5rem", margin: "0 0 12px" }}>🎂</p>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", color: "var(--accent)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", margin: "0 0 8px" }}>
+              ¡Hoy es tu día especial!
+            </h3>
+            <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.8))", fontSize: "1rem", marginBottom: "20px", lineHeight: 1.6 }}>
+              Estos locales tienen ofertas exclusivas para celebrar tu cumpleaños
+            </p>
+            <a href="/promociones" style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.12em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", padding: "14px 32px", borderRadius: "10px", textDecoration: "none", fontWeight: 700 }}>
+              Ver ofertas de cumpleaños
+            </a>
+          </div>
+        </div>
+        <style>{`@keyframes bdFadeIn { from { opacity:0 } to { opacity:1 } }`}</style>
+      </div>
+    );
+  }
+
+  // ── Already has birthday set & not their birthday → hide ──
   if ((isAuthenticated && tieneFecha) || cumpleGuardado) return null;
 
-  // State 2: logged in without birthday
+  // ── Logged in without birthday → ask via Genio ──
   if (isAuthenticated && !tieneFecha) return (
     <div style={box}>
       <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
@@ -494,7 +537,7 @@ function BirthdayBanner() {
     </div>
   );
 
-  // State 1: not logged in — multi-step flow
+  // ── Not logged in → multi-step flow ──
   return (
     <div style={box}>
       {paso === "banner" && (
