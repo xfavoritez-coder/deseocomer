@@ -9,11 +9,11 @@ const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial"] as 
 const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
-  if (promo.tipo === "happy_hour") return { text: "HOUR", color: "#d4a017" };
-  if (promo.tipo === "2x1") return { text: "2×1", color: "#3db89e" };
-  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff5020" };
-  if (promo.tipo === "cupon") return { text: "OFF", color: "#8040d0" };
-  return { text: "FREE", color: "#e8a84c" };
+  if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
+  if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
+  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
+  if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };
+  return { text: "REGALO", color: "#e8a84c" };
 }
 
 export default function PromocionesPage() {
@@ -154,14 +154,8 @@ export default function PromocionesPage() {
                     <div style={{ position: "relative", height: "160px", overflow: "hidden" }}>
                       <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                       {sello && (
-                        <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 3, pointerEvents: "none" }}>
-                          <svg width="58" height="58" viewBox="0 0 58 58">
-                            <circle cx="29" cy="29" r="26" fill="none" stroke={sello.color} strokeWidth="2.5" opacity="0.9" />
-                            <circle cx="29" cy="29" r="22" fill="none" stroke={sello.color} strokeWidth="1" opacity="0.6" strokeDasharray="2 2" />
-                            <text x="29" y="32" textAnchor="middle" fontFamily="serif" fontSize={sello.text.length > 4 ? "9" : "12"} fontWeight="900" fill={sello.color} opacity="0.95">{sello.text}</text>
-                            <text x="12" y="42" fontSize="6" fill={sello.color} opacity="0.7">★</text>
-                            <text x="42" y="42" fontSize="6" fill={sello.color} opacity="0.7">★</text>
-                          </svg>
+                        <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "5px 12px" }}>
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
                         </div>
                       )}
                     </div>

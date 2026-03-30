@@ -17,11 +17,11 @@ import {
 } from "@/lib/mockPromociones";
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
-  if (promo.tipo === "happy_hour") return { text: "HOUR", color: "#d4a017" };
+  if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
   if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
-  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff5020" };
-  if (promo.tipo === "cupon") return { text: "OFF", color: "#8040d0" };
-  return { text: "FREE", color: "#e8a84c" };
+  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
+  if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };
+  return { text: "REGALO", color: "#e8a84c" };
 }
 
 export default function PromocionDetailPage() {
@@ -96,16 +96,10 @@ export default function PromocionDetailPage() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 70%)" }} />
         )}
 
-        {/* Sello */}
+        {/* Sello pill */}
         {sello && (
-          <div style={{ position: "absolute", top: "100px", right: "clamp(20px, 5vw, 60px)", zIndex: 3, pointerEvents: "none" }}>
-            <svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="36" fill="none" stroke={sello.color} strokeWidth="2.5" opacity="0.9" />
-              <circle cx="40" cy="40" r="30" fill="none" stroke={sello.color} strokeWidth="1" opacity="0.5" strokeDasharray="3 3" />
-              <text x="40" y="45" textAnchor="middle" fontFamily="serif" fontSize={sello.text.length > 4 ? "12" : "16"} fontWeight="900" fill={sello.color} opacity="0.95">{sello.text}</text>
-              <text x="16" y="58" fontSize="8" fill={sello.color} opacity="0.6">{"\u2605"}</text>
-              <text x="58" y="58" fontSize="8" fill={sello.color} opacity="0.6">{"\u2605"}</text>
-            </svg>
+          <div style={{ position: "absolute", top: "100px", right: "clamp(20px, 5vw, 60px)", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "6px 16px" }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
           </div>
         )}
 
@@ -352,12 +346,8 @@ export default function PromocionDetailPage() {
                       <div style={{ position: "relative", height: "120px", overflow: "hidden", borderRadius: "14px 14px 0 0" }}>
                         <img src={rel.imagenUrl} alt={rel.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         {relSello && (
-                          <div style={{ position: "absolute", top: "8px", right: "8px", pointerEvents: "none" }}>
-                            <svg width="42" height="42" viewBox="0 0 42 42">
-                              <circle cx="21" cy="21" r="18" fill="none" stroke={relSello.color} strokeWidth="2" opacity="0.9" />
-                              <circle cx="21" cy="21" r="15" fill="none" stroke={relSello.color} strokeWidth="0.8" opacity="0.5" strokeDasharray="2 2" />
-                              <text x="21" y="24" textAnchor="middle" fontFamily="serif" fontSize={relSello.text.length > 4 ? "6" : "8"} fontWeight="900" fill={relSello.color} opacity="0.95">{relSello.text}</text>
-                            </svg>
+                          <div style={{ position: "absolute", top: "8px", right: "8px", pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${relSello.color}`, borderRadius: "16px", padding: "3px 10px" }}>
+                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", fontWeight: 700, color: relSello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{relSello.text}</span>
                           </div>
                         )}
                         {relActiva && (

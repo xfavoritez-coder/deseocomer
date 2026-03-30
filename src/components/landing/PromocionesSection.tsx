@@ -147,15 +147,15 @@ export default function PromocionesSection() {
             const isHH         = promo.tipo === "happy_hour";
             const accentColor  = isHH ? "#d4a017" : "var(--accent)";
             const badge        = isHH
-              ? { text: "HOUR", color: "#d4a017" }
+              ? { text: "HAPPY HOUR", color: "#d4a017" }
               : promo.tipo === "2x1"
-              ? { text: "2×1", color: "#3db89e" }
+              ? { text: "2\u00d71", color: "#3db89e" }
               : promo.porcentajeDescuento
-              ? { text: `-${promo.porcentajeDescuento}%`, color: "#ff5020" }
+              ? { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" }
               : promo.tipo === "cupon"
-              ? { text: "OFF", color: "#8040d0" }
+              ? { text: "CUP\u00d3N", color: "#8040d0" }
               : promo.tipo === "precio_especial"
-              ? { text: "FREE", color: "#e8a84c" }
+              ? { text: "REGALO", color: "#e8a84c" }
               : null;
 
             return (
@@ -194,14 +194,8 @@ export default function PromocionesSection() {
                   <div style={{ position: "relative", height: "160px", overflow: "hidden", flexShrink: 0, pointerEvents: "none" }}>
                     <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     {badge && (
-                      <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 3, pointerEvents: "none" }}>
-                        <svg width="58" height="58" viewBox="0 0 58 58">
-                          <circle cx="29" cy="29" r="26" fill="none" stroke={badge.color} strokeWidth="2.5" opacity="0.9" />
-                          <circle cx="29" cy="29" r="22" fill="none" stroke={badge.color} strokeWidth="1" opacity="0.6" strokeDasharray="2 2" />
-                          <text x="29" y="32" textAnchor="middle" fontFamily="serif" fontSize={badge.text.length > 4 ? "9" : "12"} fontWeight="900" fill={badge.color} opacity="0.95">{badge.text}</text>
-                          <text x="12" y="42" fontSize="6" fill={badge.color} opacity="0.7">★</text>
-                          <text x="42" y="42" fontSize="6" fill={badge.color} opacity="0.7">★</text>
-                        </svg>
+                      <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${badge.color}`, borderRadius: "20px", padding: "5px 12px" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: badge.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{badge.text}</span>
                       </div>
                     )}
                   </div>
