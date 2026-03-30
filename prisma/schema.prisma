@@ -32,6 +32,8 @@ model Usuario {
 model Local {
   id            String   @id @default(cuid())
   nombre        String
+  nombreDueno   String?
+  celularDueno  String?
   email         String   @unique
   password      String
   telefono      String?

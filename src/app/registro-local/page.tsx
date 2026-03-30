@@ -29,7 +29,7 @@ const inputStyle: React.CSSProperties = {
 
 export default function RegistroLocalPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ nombre: "", email: "", password: "", telefono: "", ciudad: "santiago" });
+  const [form, setForm] = useState({ nombreLocal: "", nombreDueno: "", email: "", password: "", celular: "", ciudad: "santiago" });
   const [otraCiudad, setOtraCiudad] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSaved, setWaitlistSaved] = useState(false);
@@ -46,10 +46,11 @@ export default function RegistroLocalPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!form.nombre.trim()) return setError("El nombre del local es obligatorio.");
+    if (!form.nombreLocal.trim()) return setError("El nombre del local es obligatorio.");
+    if (!form.nombreDueno.trim()) return setError("El nombre del dueño es obligatorio.");
     if (!form.email.trim() || !form.email.includes("@")) return setError("Ingresa un email válido.");
     if (form.password.length < 8) return setError("La contraseña debe tener al menos 8 caracteres.");
-    if (!form.telefono.trim()) return setError("El teléfono es obligatorio.");
+    if (!form.celular.trim()) return setError("El celular es obligatorio.");
 
     setLoading(true);
 
@@ -57,13 +58,13 @@ export default function RegistroLocalPage() {
       const res = await fetch("/api/locales", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: form.nombre.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.telefono.trim(), ciudad: form.ciudad }),
+        body: JSON.stringify({ nombre: form.nombreLocal.trim(), nombreDueno: form.nombreDueno.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.celular.trim(), ciudad: form.ciudad }),
       });
       const data = await res.json();
 
       if (!res.ok) { setLoading(false); return setError(data.error || "Error al registrarse"); }
 
-      const sessionObj = { id: data.id, nombre: data.nombre, email: data.email, tipo: "local", loggedIn: true };
+      const sessionObj = { id: data.id, nombre: data.nombre, email: data.email, tipo: "local", ciudad: data.ciudad, loggedIn: true };
       localStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
       sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch { setLoading(false); return setError("Error de conexión"); }
@@ -94,11 +95,19 @@ export default function RegistroLocalPage() {
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
           <div>
             <label style={labelStyle}>Nombre del local</label>
-            <input style={inputStyle} type="text" placeholder="Ej: Pizza Napoli" value={form.nombre} onChange={e => set("nombre", e.target.value)} />
+            <input style={inputStyle} type="text" placeholder="Ej: Pizza Napoli" value={form.nombreLocal} onChange={e => set("nombreLocal", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Nombre del dueño o encargado</label>
+            <input style={inputStyle} type="text" placeholder="Tu nombre completo" value={form.nombreDueno} onChange={e => set("nombreDueno", e.target.value)} />
           </div>
           <div>
             <label style={labelStyle}>Email</label>
             <input style={inputStyle} type="email" placeholder="hola@tulocal.cl" value={form.email} onChange={e => set("email", e.target.value)} />
+          </div>
+          <div>
+            <label style={labelStyle}>Celular del dueño</label>
+            <input style={inputStyle} type="tel" placeholder="+56 9 1234 5678" value={form.celular} onChange={e => set("celular", e.target.value)} />
           </div>
           <div>
             <label style={labelStyle}>Contraseña</label>
@@ -108,10 +117,6 @@ export default function RegistroLocalPage() {
                 <EyeIcon open={showPw} />
               </button>
             </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Teléfono</label>
-            <input style={inputStyle} type="tel" placeholder="+56 9 1234 5678" value={form.telefono} onChange={e => set("telefono", e.target.value)} />
           </div>
 
           <div>

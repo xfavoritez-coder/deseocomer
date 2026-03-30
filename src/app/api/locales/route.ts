@@ -22,7 +22,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, email, password, telefono, ciudad } = await req.json();
+    const { nombre, nombreDueno, email, password, telefono, ciudad } = await req.json();
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
     const hash = await bcrypt.hash(password, 10);
     const local = await prisma.local.create({
-      data: { nombre, email, password: hash, telefono, ciudad },
+      data: { nombre, nombreDueno, celularDueno: telefono, email, password: hash, ciudad },
     });
 
     const { password: _, ...localSinPassword } = local;

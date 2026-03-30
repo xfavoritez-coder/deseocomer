@@ -37,12 +37,16 @@ export default function MiLocalPage() {
                 ...local,
                 nombre: data.nombre ?? local.nombre,
                 categoria: data.categoria ?? local.categoria,
+                nombreDueno: data.nombreDueno ?? local.nombreDueno,
+                celularDueno: data.celularDueno ?? local.celularDueno,
+                emailDueno: data.email ?? local.emailDueno,
                 descripcion: data.descripcion ?? local.descripcion,
                 historia: data.historia ?? local.historia,
                 telefono: data.telefono ?? local.telefono,
                 instagram: data.instagram ?? local.instagram,
                 direccion: data.direccion ?? local.direccion,
                 comuna: data.comuna ?? local.comuna,
+                ciudad: data.ciudad ?? local.ciudad,
                 logoUrl: data.logoUrl ?? local.logoUrl,
                 portadaUrl: data.portadaUrl ?? local.portadaUrl,
                 galeria: data.galeria ?? local.galeria,
@@ -98,8 +102,16 @@ export default function MiLocalPage() {
     <div style={{ maxWidth: "680px" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Mi Local</h1>
 
+      {/* Datos del dueño/encargado */}
+      <SectionTitle>Datos del dueño o encargado</SectionTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
+        <Field label="Nombre del dueño o encargado" value={d.nombreDueno as string ?? ""} onChange={v => set("nombreDueno", v)} placeholder="Tu nombre completo" />
+        <Field label="Celular del dueño" value={d.celularDueno as string ?? ""} onChange={v => set("celularDueno", v)} placeholder="+56 9 1234 5678" />
+        <Field label="Email de acceso" value={d.emailDueno as string ?? ""} onChange={v => set("emailDueno", v)} placeholder="tu@email.com" />
+      </div>
+
       {/* Info básica */}
-      <SectionTitle>Información básica</SectionTitle>
+      <SectionTitle>Información del local</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <Field label="Nombre del local" value={d.nombre as string ?? ""} onChange={v => set("nombre", v)} placeholder="Pizza Napoli" />
         <div>
@@ -113,7 +125,7 @@ export default function MiLocalPage() {
           <label style={L}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label>
           <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." />
         </div>
-        <Field label="Teléfono" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 9 1234 5678" />
+        <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789 (fijo o celular del local)" />
         <Field label="Instagram" value={d.instagram as string ?? ""} onChange={v => set("instagram", v)} placeholder="@tunegocio" />
       </div>
 
