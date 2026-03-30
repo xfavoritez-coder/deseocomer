@@ -78,8 +78,8 @@ export default function PanelConcursos() {
       {step === 3 && (<div>
         <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Así se verá tu concurso</h2>
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", overflow: "hidden", marginBottom: "24px" }}>
-          <div style={{ height: "100px", background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.6))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-            <span style={{ fontSize: "2.5rem" }}>🏆</span>
+          <div style={{ height: "140px", background: imagenConcurso ? "none" : "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.6))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+            {imagenConcurso ? <img src={imagenConcurso} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "2.5rem" }}>🏆</span>}
             <div style={{ position: "absolute", top: "8px", right: "-20px", background: "linear-gradient(135deg, #f5d080, #e8a84c)", color: "#1a0e05", fontFamily: "var(--font-cinzel)", fontSize: "0.45rem", fontWeight: 900, padding: "4px 30px", transform: "rotate(35deg)" }}>🏆 PREMIO GRATIS</div>
           </div>
           <div style={{ padding: "16px" }}>

@@ -63,16 +63,54 @@ export default function LocalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { addInteraccion, perfil } = useGenie();
   const { isAuthenticated } = useAuth();
-  const local = getLocalById(Number(id));
+  const mockLocal = getLocalById(Number(id));
+  const [dbLocal, setDbLocal] = useState<Record<string, unknown> | null>(null);
   const [tab, setTab] = useState<Tab>("Información");
   const [lightbox, setLightbox] = useState<string | null>(null);
   const { toggleFavorito, esFavorito } = useFavoritos();
 
+  // If not a mock local (CUID), fetch from API
+  useEffect(() => {
+    if (mockLocal) return;
+    fetch(`/api/locales/${id}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setDbLocal(data); })
+      .catch(() => {});
+  }, [id, mockLocal]);
+
+  // Build a unified local object
+  const local = mockLocal ?? (dbLocal ? {
+    id: Number(id) || 0,
+    nombre: dbLocal.nombre as string ?? "",
+    categoria: dbLocal.categoria as string ?? "Otro",
+    descripcion: dbLocal.descripcion as string ?? "",
+    historia: "",
+    barrio: dbLocal.comuna as string ?? "Santiago",
+    direccion: dbLocal.direccion as string ?? "",
+    telefono: dbLocal.telefono as string ?? "",
+    instagram: dbLocal.instagram as string ?? "",
+    rating: 0,
+    totalResenas: (dbLocal._count as Record<string, number>)?.resenas ?? 0,
+    precio: "$$",
+    isOpen: true,
+    verificado: dbLocal.verificado as boolean ?? false,
+    totalFavoritos: (dbLocal._count as Record<string, number>)?.favoritos ?? 0,
+    imagenPortada: dbLocal.portadaUrl as string ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
+    imagenLogo: dbLocal.logoUrl as string ?? null,
+    galeria: (dbLocal.galeria as string[]) ?? [],
+    tieneMenu: dbLocal.tieneMenu as boolean ?? false,
+    menu: [],
+    horarios: ((dbLocal.horarios as Array<{dia:string;abre:string;cierra:string;cerrado:boolean}>) ?? []),
+    resenas: ((dbLocal.resenas as Resena[]) ?? []),
+    lat: dbLocal.lat as number ?? -33.43,
+    lng: dbLocal.lng as number ?? -70.65,
+  } : null);
+
   // Track visit
   useEffect(() => {
     if (!local) return;
-    addInteraccion("local_visitado", { id: String(local.id), nombre: local.nombre, categoria: local.categoria, comuna: local.barrio });
-  }, [local?.id]);
+    addInteraccion("local_visitado", { id: String(id), nombre: local.nombre, categoria: local.categoria, comuna: local.barrio });
+  }, [id, local?.nombre]);
 
   if (!local) {
     return (
