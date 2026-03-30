@@ -372,7 +372,7 @@ function ConcursoCard({
         <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative", background: "rgba(45,26,8,0.8)" }}>
           <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           {/* Sello GRATIS */}
-          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none", overflow: "visible" }}><SelloGratis size="sm" /></div>
+          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="sm" /></div>
           {/* Badge termina pronto over image */}
           {soon && (
             <div style={{
