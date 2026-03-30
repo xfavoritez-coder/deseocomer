@@ -71,13 +71,20 @@ export default function ConcursosPage() {
     return () => clearInterval(id);
   }, [updateTimers]);
 
-  // Filter logic
+  // Filter + sort: por terminar primero, luego más participantes
   const visibleActivos: Concurso[] = allConcursos.filter((c) => {
     const soon = isSoonEnding(c.endsAt);
     if (filter === "activos")      return !soon;
     if (filter === "por_terminar") return soon;
     if (filter === "finalizados")  return false;
     return true; // todos
+  }).sort((a, b) => {
+    const soonA = isSoonEnding(a.endsAt);
+    const soonB = isSoonEnding(b.endsAt);
+    if (soonA && !soonB) return -1;
+    if (!soonA && soonB) return 1;
+    if (soonA && soonB) return a.endsAt - b.endsAt; // más urgente primero
+    return b.participantes - a.participantes; // más participantes primero
   });
 
   const showFinalizados =
@@ -127,22 +134,6 @@ export default function ConcursosPage() {
             de los mejores restaurantes de Santiago.
           </p>
 
-          {/* Stats row */}
-          <div className="dc-cp-stats">
-            {[
-              { val: allConcursos.length, label: "concursos activos" },
-              { val: allConcursos.reduce((s, c) => s + c.participantes, 0).toLocaleString("es-CL"), label: "participantes" },
-              { val: CONCURSOS_FINALIZADOS.length, label: "premios entregados" },
-            ].map(({ val, label }, i) => (
-              <div key={label} className="dc-cp-stat-item">
-                {i > 0 && <div className="dc-cp-stat-sep" />}
-                <div style={{ textAlign: "center", flex: 1 }}>
-                  <p className="dc-cp-stat-val">{val}</p>
-                  <p className="dc-cp-stat-label">{label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -242,40 +233,9 @@ export default function ConcursosPage() {
           padding: 140px 60px 80px;
           text-align: center;
         }
-        .dc-cp-stats {
-          display: flex; justify-content: space-around; align-items: stretch;
-          margin-top: 48px;
-          padding: 20px 16px;
-          background: rgba(0,0,0,0.2);
-          border-radius: 16px;
-          border: 1px solid var(--border-color);
-          max-width: 600px;
-          margin-left: auto; margin-right: auto;
-        }
-        .dc-cp-stat-item {
-          display: flex; align-items: center; flex: 1;
-        }
-        .dc-cp-stat-sep {
-          width: 1px; height: 40px;
-          background: rgba(255,255,255,0.15);
-          flex-shrink: 0;
-        }
-        .dc-cp-stat-val {
-          font-family: var(--font-cinzel-decorative);
-          font-size: 2rem !important; font-weight: 700 !important;
-          color: var(--sand-gold) !important;
-          text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 40%, transparent);
-          line-height: 1.2 !important;
-        }
-        .dc-cp-stat-label {
-          font-family: var(--font-cinzel);
-          font-size: 0.75rem !important; font-weight: 500 !important;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          color: rgba(255,255,255,0.8) !important;
-          margin-top: 4px;
-        }
         .dc-cp-filters {
           display: flex; gap: 10px; flex-wrap: nowrap;
+          justify-content: center;
           margin-bottom: 44px;
           overflow-x: auto;
           padding-bottom: 8px;
@@ -312,8 +272,6 @@ export default function ConcursosPage() {
 
         @media (max-width: 767px) {
           .dc-cp-hero    { padding: 100px 20px 60px; }
-          .dc-cp-stats   { padding: 16px 12px; }
-          .dc-cp-stat-val { font-size: 1.6rem !important; }
           .dc-cp-content { padding: 0 20px 60px; }
           .dc-cp-grid    { grid-template-columns: 1fr; gap: 16px; }
         }
