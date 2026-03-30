@@ -143,47 +143,51 @@ export default function LocalDetailPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Header */}
-      <div style={{ position: "relative", height: "340px", overflow: "hidden" }}>
-        <img src={local.imagenPortada} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(13,7,3,0.95) 100%)" }} />
-        {/* Fav button */}
-        <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{
-          position: "absolute", top: "80px", right: "20px", zIndex: 10,
-          width: "44px", height: "44px", borderRadius: "50%",
-          background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer",
-          fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
+      {/* Hero */}
+      <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
+        <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.1) 0%, rgba(10,8,18,0.95) 100%)" }} />
+        <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "80px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {esFavorito(String(local.id)) ? "❤️" : "🤍"}
         </button>
-        {/* Info overlay */}
-        <div style={{ position: "absolute", bottom: "24px", left: "24px", right: "24px", zIndex: 10, display: "flex", alignItems: "flex-end", gap: "16px" }}>
-          <div style={{
-            width: "60px", height: "60px", borderRadius: "50%", flexShrink: 0,
-            background: getColor(local.nombre), border: "2px solid var(--accent)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff",
-          }}>
-            {getInitials(local.nombre)}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "4px" }}>
-              <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.2rem, 4vw, 1.8rem)", color: "#fff", margin: 0 }}>
-                {local.nombre}
-              </h1>
-              {local.verificado && (
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", background: "var(--accent)", color: "#1a0e05", padding: "2px 8px", borderRadius: "10px", fontWeight: 900 }}>
-                  ✓ Verificado
-                </span>
-              )}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>
+            <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0 }}>
+              {getInitials(local.nombre)}
             </div>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em" }}>
-              {local.categoria} · {local.barrio} · {local.precio} · ⭐ {local.rating} ({local.totalResenas})
-              {" · "}<span style={{ color: local.isOpen ? "#3db89e" : "#ff6b6b" }}>{local.isOpen ? "Abierto" : "Cerrado"}</span>
-            </p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>
+                <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
+                {local.verificado && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.1em", color: "rgba(232,168,76,0.55)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "2px 8px", whiteSpace: "nowrap" }}>✓ verificado</span>}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
+                <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
+                {local.isOpen && (<>
+                  <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e" }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "#3db89e", letterSpacing: "0.1em" }}>Abierto</span>
+                  </div>
+                </>)}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Activity badges */}
+      {(concursosLocal.length > 0 || local.totalFavoritos > 0) && (
+        <div style={{ display: "flex", gap: "8px", padding: "12px clamp(16px, 4vw, 32px)", overflowX: "auto", scrollbarWidth: "none", borderBottom: "1px solid rgba(232,168,76,0.06)", background: "rgba(0,0,0,0.2)" }}>
+          {concursosLocal.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", flexShrink: 0 }}>
+              <span style={{ fontSize: "0.8rem" }}>🏆</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", color: "#e8a84c", textTransform: "uppercase" }}>Concurso activo</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{
@@ -211,34 +215,82 @@ export default function LocalDetailPage() {
 
             {/* TAB: Información */}
             {tab === "Información" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                <p style={bodyStyle}>{local.descripcion}</p>
-                <Section title="Horarios">
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {local.horarios.map(h => (
-                      <div key={h.dia} style={{
-                        display: "flex", justifyContent: "space-between", padding: "8px 12px", borderRadius: "8px",
-                        background: h.dia === todayName ? "rgba(232,168,76,0.08)" : "transparent",
-                        border: h.dia === todayName ? "1px solid rgba(232,168,76,0.2)" : "1px solid transparent",
-                      }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--text-primary)" }}>{h.dia}</span>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: h.cerrado ? "#ff6b6b" : "var(--text-muted)" }}>
-                          {h.cerrado ? "Cerrado" : `${h.abre} - ${h.cierra}`}
-                        </span>
+              <div className="dc-local-layout">
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  {/* Descripción */}
+                  <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
+                    <p style={bodyStyle}>{local.descripcion}</p>
+                    {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
+                  </div>
+
+                  {/* Concursos activos */}
+                  {concursosLocal.length > 0 && (
+                    <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concursos activos</p>
+                      {concursosLocal.map(c => (
+                        <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", marginBottom: "8px", textDecoration: "none" }}>
+                          <span style={{ fontSize: "1.5rem" }}>🏆</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{c.premio}</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{c.participantes} participantes</p>
+                          </div>
+                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "0.9rem", flexShrink: 0 }}>→</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Reseñas preview */}
+                  {local.resenas.length > 0 && (
+                    <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Reseñas</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
+                        <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "3rem", fontWeight: 700, color: "#e8a84c", lineHeight: 1 }}>{local.rating?.toFixed(1) ?? "—"}</div>
+                        <div>
+                          <div style={{ color: "#e8a84c", fontSize: "1rem", marginBottom: "4px", letterSpacing: "2px" }}>{"★".repeat(Math.round(local.rating ?? 0))}</div>
+                          <div style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)" }}>Basado en {local.totalResenas} reseñas</div>
+                        </div>
                       </div>
-                    ))}
+                      {local.resenas.slice(0, 2).map(r => (
+                        <div key={r.id} style={{ paddingBottom: "12px", marginBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: getColor(r.usuario), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{getInitials(r.usuario)}</div>
+                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-primary)" }}>{r.usuario}</span>
+                            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "var(--text-muted)" }}>{"★".repeat(r.rating)} · {timeAgo(r.fecha)}</span>
+                          </div>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{r.comentario}</p>
+                        </div>
+                      ))}
+                      <button onClick={() => setTab("Reseñas")} style={{ background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", cursor: "pointer", padding: 0 }}>Ver todas las reseñas →</button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sidebar: horarios + ubicación */}
+                <div className="dc-local-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
+                    {local.horarios.map(h => {
+                      const esHoy = h.dia === todayName;
+                      return (
+                        <div key={h.dia} style={{ display: "flex", justifyContent: "space-between", padding: esHoy ? "9px 8px" : "9px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", background: esHoy ? "rgba(61,184,158,0.04)" : "transparent", borderRadius: esHoy ? "6px" : 0 }}>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: esHoy ? "#3db89e" : "rgba(240,234,214,0.55)", fontWeight: esHoy ? 700 : 400 }}>{h.dia}{esHoy ? " · hoy" : ""}</span>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: h.cerrado ? "rgba(255,100,100,0.6)" : (esHoy ? "#3db89e" : "#f0ead6"), fontWeight: esHoy ? 700 : 400 }}>{h.cerrado ? "Cerrado" : `${h.abre} - ${h.cierra}`}</span>
+                        </div>
+                      );
+                    })}
                   </div>
-                </Section>
-                <Section title="Ubicación">
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <p style={bodyStyle}>📍 {local.direccion}</p>
-                    <p style={bodyStyle}>📞 {local.telefono}</p>
-                    <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>
-                  </div>
-                  <div style={{ marginTop: "16px" }}>
+                  <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
+                      {local.direccion && <p style={bodyStyle}>📍 {local.direccion}</p>}
+                      {local.telefono && <p style={bodyStyle}>📞 {local.telefono}</p>}
+                      {local.instagram && <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>}
+                    </div>
                     <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
                   </div>
-                </Section>
+                </div>
               </div>
             )}
 
@@ -375,8 +427,14 @@ export default function LocalDetailPage() {
         .dc-ld-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
         .dc-ld-main { min-width: 0; }
         .dc-ld-sidebar { position: sticky; top: 120px; }
+        .dc-local-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+        .dc-local-sidebar { position: sticky; top: 100px; }
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        @media (max-width: 1023px) {
+          .dc-local-layout { grid-template-columns: 1fr; }
+          .dc-local-sidebar { position: static; }
+        }
         @media (max-width: 767px) {
           .dc-ld-layout { grid-template-columns: 1fr; }
           .dc-ld-sidebar { position: static; }
