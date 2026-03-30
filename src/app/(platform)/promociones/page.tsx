@@ -24,7 +24,6 @@ export default function PromocionesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
-  const [filtroComuna, setFiltroComuna] = useState("");
   const [esCumple, setEsCumple] = useState(false);
 
   // Fetch from BD and merge
@@ -49,13 +48,10 @@ export default function PromocionesPage() {
 
   const toggleTipo = (t: string) => setFiltrosTipo(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
 
-  const comunasDisponibles = Array.from(new Set(promos.filter(p => p.comuna).map(p => p.comuna))).sort();
-
   const filtered = promos.filter(p => {
-    if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo.toLowerCase().includes(q) && !p.local.toLowerCase().includes(q)) return false; }
+    if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
-    if (filtroComuna && p.comuna !== filtroComuna) return false;
     return true;
   });
 
@@ -80,7 +76,7 @@ export default function PromocionesPage() {
         {/* Fila 1 — Buscador */}
         <div style={{ position: "relative", marginBottom: "12px" }}>
           <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
-          <input type="text" placeholder="Buscar promociones o locales..." value={busqueda} onChange={e => setBusqueda(e.target.value)}
+          <input type="text" placeholder="Buscar por local, tipo o comuna..." value={busqueda} onChange={e => setBusqueda(e.target.value)}
             style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
             onFocus={e => { e.target.style.borderColor = "var(--accent)"; }} onBlur={e => { e.target.style.borderColor = "rgba(232,168,76,0.2)"; }} />
         </div>
@@ -106,16 +102,12 @@ export default function PromocionesPage() {
           })}
         </div>
 
-        {/* Fila 3 — Comuna + Limpiar */}
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <select value={filtroComuna} onChange={e => setFiltroComuna(e.target.value)} style={{ padding: "8px 32px 8px 14px", borderRadius: "20px", border: filtroComuna ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: filtroComuna ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.04)", color: filtroComuna ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", minHeight: "36px", flexShrink: 0 }}>
-            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>{"\ud83d\udccd"} Todas las comunas</option>
-            {comunasDisponibles.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
-          </select>
-          {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna) && (
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setFiltroComuna(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, letterSpacing: "0.08em" }}>✕ Limpiar</button>
-          )}
-        </div>
+        {/* Fila 3 — Limpiar */}
+        {(filtrosTipo.length > 0 || filtroActivas || busqueda) && (
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
+          </div>
+        )}
       </div>
 
       {/* Birthday section — only for authenticated users */}
@@ -148,9 +140,14 @@ export default function PromocionesPage() {
       <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 80px" }}>
         {promosNormales.length === 0 && promosCumple.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <p style={{ fontSize: "3rem", marginBottom: "12px" }}>⚡</p>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)" }}>Sin promociones con estos filtros</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "8px" }}>Prueba cambiando los filtros</p>
+            <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🔍</p>
+            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--color-title)", marginBottom: "10px" }}>Sin resultados</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", lineHeight: 1.6, maxWidth: "300px", margin: "0 auto 20px" }}>
+              {busqueda ? `No encontramos promociones para "${busqueda}". Puedes buscar por local, tipo o comuna` : "No hay promociones con estos filtros"}
+            </p>
+            <button onClick={() => { setBusqueda(""); setFiltrosTipo([]); setFiltroActivas(false); }} style={{ padding: "10px 20px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "var(--accent)", cursor: "pointer", textTransform: "uppercase" }}>
+              Limpiar filtros
+            </button>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
