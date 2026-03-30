@@ -116,16 +116,16 @@ export default function Navbar() {
                     </div>
                   </div>
                   {[
-                    { href: "/perfil", icon: "👤", label: "Mi perfil" },
-                    { href: "/perfil?tab=favoritos", icon: "❤️", label: "Mis favoritos" },
-                    { href: "/perfil?tab=concursos", icon: "🏆", label: "Mis concursos" },
+                    { href: "/perfil", label: "Mi perfil", svg: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,234,214,0.5)" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
+                    { href: "/perfil?tab=favoritos", label: "Mis favoritos", svg: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,234,214,0.5)" strokeWidth="1.5" strokeLinecap="round"><path d="M12 21C12 21 3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 13-9 13z"/></svg> },
+                    { href: "/perfil?tab=concursos", label: "Mis concursos", svg: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(240,234,214,0.5)" strokeWidth="1.5" strokeLinecap="round"><path d="M8 21h8M12 17v4M7 4H4v4c0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4V4h-3"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/></svg> },
                   ].map(item => (
                     <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                      <span style={{ fontSize: "1rem", width: "20px" }}>{item.icon}</span>{item.label}
+                      <span style={{ width: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>{item.svg}</span>{item.label}
                     </Link>
                   ))}
                   <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#ff6b6b", cursor: "pointer", width: "100%", textAlign: "left", marginTop: "4px" }}>
-                    <span style={{ fontSize: "1rem", width: "20px" }}>🚪</span>Cerrar sesión
+                    <span style={{ width: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,107,107,0.7)" strokeWidth="1.5" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Cerrar sesión
                   </button>
                 </div>
               ) : mounted ? (
@@ -134,9 +134,6 @@ export default function Navbar() {
                   <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700, marginBottom: "12px" }}>Entrar</Link>
                 </div>
               ) : null}
-              <a href="/solo-locales" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", textDecoration: "none", textAlign: "center", marginTop: "8px" }}>
-                <span style={{ textDecoration: "underline" }}>¿Tienes un local?</span>{" →"}
-              </a>
             </div>
           </div>
         </>
