@@ -61,7 +61,7 @@ export default function LocalesSection() {
             color: "var(--color-label)",
             marginBottom: "16px",
           }}>
-            Explorador de Locales
+            Explora Locales
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",

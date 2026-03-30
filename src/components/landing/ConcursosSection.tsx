@@ -100,7 +100,7 @@ export default function ConcursosSection() {
             color: "rgba(240,234,214,0.65)",
             marginBottom: "16px",
           }}>
-            Concursos Activos
+            Concursos
           </p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)",
