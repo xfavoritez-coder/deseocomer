@@ -16,7 +16,7 @@ const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 export default function PanelPromociones() {
   const [promos, setPromos] = useState<Promo[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ tipo: "", titulo: "", descripcion: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
+  const [form, setForm] = useState({ tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
 
   useEffect(() => { setPromos(loadPromos()); }, []);
 
@@ -34,13 +34,13 @@ export default function PanelPromociones() {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             localId: session.id, tipo: form.tipo, titulo: form.titulo.trim(),
-            descripcion: form.descripcion, porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
+            descripcion: form.descripcion, condiciones: form.condiciones || null, porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
             horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias, esCumpleanos: false,
           }),
         });
       }
     } catch { /* fallback to localStorage */ }
-    setShowForm(false); setForm({ tipo: "", titulo: "", descripcion: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
+    setShowForm(false); setForm({ tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
   };
 
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: sel ? 700 : 400 });
@@ -56,6 +56,7 @@ export default function PanelPromociones() {
         </div>
         <div><label style={L}>Título</label><input style={I} value={form.titulo} onChange={e => set("titulo", e.target.value)} placeholder="Ej: 2x1 en hamburguesas" /></div>
         <div><label style={L}>Descripción</label><textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={form.descripcion} onChange={e => set("descripcion", e.target.value)} placeholder="Describe la promoción..." /></div>
+        <div><label style={L}>Condiciones (opcional)</label><textarea style={{ ...I, resize: "vertical", minHeight: "50px" }} value={form.condiciones} onChange={e => set("condiciones", e.target.value)} placeholder="Ej: Válido presentando esta pantalla. No acumulable con otras promociones." rows={3} /></div>
         {form.tipo === "Descuento %" && <div><label style={L}>% de descuento</label><input style={I} value={form.descuento} onChange={e => set("descuento", e.target.value)} placeholder="20" /></div>}
         <div>
           <label style={L}>Días de la semana</label>

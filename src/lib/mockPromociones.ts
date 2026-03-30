@@ -31,6 +31,7 @@ export interface Promocion {
   telefono?: string;
   horarioLocal?: string;
   descripcionLocal?: string;
+  condiciones?: string;
 }
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -59,6 +60,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2345 6789",
     horarioLocal: "Lun-Vie 12:00-23:00 | Sáb-Dom 12:00-00:00",
     descripcionLocal: "La mejor pizza napolitana de Santiago, con ingredientes importados directamente de Italia. Masa madre, mozzarella fior di latte y 15 años de tradición.",
+    condiciones: "Válido solo en consumo en el local. No acumulable con otras promociones. Sujeto a disponibilidad.",
   },
   {
     id: 2,
@@ -81,6 +83,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2789 0123",
     horarioLocal: "Lun-Vie 12:00-22:30 | Sáb-Dom 13:00-23:00",
     descripcionLocal: "Sushi Oasis trae la tradición japonesa al corazón de Providencia. Pescado fresco diariamente y maestros sushiman con formación en Japón.",
+    condiciones: "Válido en rolls de entrada del menú regular. No incluye rolls premium ni especiales del chef. Máximo 2 por mesa.",
   },
   {
     id: 3,
@@ -107,6 +110,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2456 7890",
     horarioLocal: "Lun-Vie 12:00-15:30",
     descripcionLocal: "Desde 1998, Don Carlos lleva el sabor de la cocina chilena de abuela a las mesas de Barrio Italia. Almuerzo casero sin comparación en toda la ciudad.",
+    condiciones: "Válido solo almuerzo en el local. Cupos limitados por día. Presentar esta pantalla al mesero.",
   },
   {
     id: 4,
@@ -134,6 +138,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2567 8901",
     horarioLocal: "Lun-Sáb 07:30-20:00 | Dom 09:00-18:00",
     descripcionLocal: "Café Buen Día es el café de especialidad de Ñuñoa con más de 200 reseñas 5 estrellas. Granos de origen, baristas certificados y el mejor croissant de la ciudad.",
+    condiciones: "Código debe ingresarse al momento de pagar. Válido 1 uso por persona. No combinable con otros descuentos.",
   },
   {
     id: 5,
@@ -156,6 +161,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2901 2345",
     horarioLocal: "Mar-Dom 12:30-15:30 y 19:00-23:30",
     descripcionLocal: "Auténtica cocina italiana en el corazón de Vitacura. Pastas frescas elaboradas cada mañana, risottos cremosos y el ambiente más romántico de Santiago.",
+    condiciones: "Aplica en pastas frescas del menú regular. No incluye pastas rellenas ni especiales. Válido para mesa de 2.",
   },
   {
     id: 6,
@@ -180,6 +186,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2678 9012",
     horarioLocal: "Todos los días 12:00-23:00",
     descripcionLocal: "Burger Bros nació en 2019 en Las Condes y ya tiene 4 locales en Santiago. Carne angus premium, panes brioche horneados diariamente y salsas secretas de la casa.",
+    condiciones: "Bebida mediana a elección. No incluye bebidas premium ni jugos naturales. Sujeto a disponibilidad.",
   },
   {
     id: 7,
@@ -202,6 +209,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2456 1234",
     horarioLocal: "Todos los días 11:00-21:30",
     descripcionLocal: "Helados 100% artesanales elaborados con frutas frescas de la estación. Premiados como los mejores helados de Santiago tres años consecutivos.",
+    condiciones: "Válido en helados y postres de carta regular. El producto de menor valor es gratis. No aplica en combos.",
   },
   {
     id: 8,
@@ -226,6 +234,7 @@ export const PROMOCIONES: Promocion[] = [
     telefono: "+56 2 2789 3456",
     horarioLocal: "Mar-Vie 18:00-02:00 | Sáb-Dom 15:00-02:00",
     descripcionLocal: "La terraza con mejor vista de Bellavista. Cócteles de autor, tapas gourmet y música en vivo los fines de semana. El lugar favorito del barrio.",
+    condiciones: "Aplica en cócteles de carta regular. No incluye botellas ni shots. Máximo 3 cócteles por persona en happy hour.",
   },
   // ── Birthday promotions ──
   {

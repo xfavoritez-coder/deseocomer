@@ -90,8 +90,8 @@ export default function PromocionDetailPage() {
       <section className="dc-pd-hero">
         {promo.imagenUrl ? (
           <>
-            <img src={promo.imagenUrl} alt={promo.titulo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(8,13,24,0.3) 0%, rgba(8,13,24,0.85) 70%, var(--bg-primary) 100%)" }} />
+            <img src={promo.imagenUrl} alt={promo.titulo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.75 }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(8,13,24,0.2) 0%, rgba(8,13,24,0.7) 60%, var(--bg-primary) 100%)" }} />
           </>
         ) : (
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 70%)" }} />
@@ -149,35 +149,45 @@ export default function PromocionDetailPage() {
               </p>
 
               {/* Precios */}
-              {(promo.precioOriginal || promo.precioDescuento) && (
-                <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "24px", padding: "20px", background: "rgba(0,0,0,0.25)", borderRadius: "14px", border: "1px solid rgba(232,168,76,0.12)", flexWrap: "wrap" }}>
+              {(promo.precioOriginal || promo.precioDescuento || promo.porcentajeDescuento) && (
+                <div style={{ marginTop: "24px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", textAlign: "center" }}>
                   {promo.precioOriginal && (
-                    <div>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "4px" }}>Normal</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.2rem", color: "var(--text-muted)", textDecoration: "line-through" }}>
-                        ${promo.precioOriginal.toLocaleString("es-CL")}
-                      </p>
+                    <div style={{ marginBottom: "4px" }}>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>antes</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", color: "rgba(240,234,214,0.3)", textDecoration: "line-through" }}>${promo.precioOriginal.toLocaleString("es-CL")}</span>
                     </div>
                   )}
                   {promo.precioDescuento && (
-                    <>
-                      <span style={{ color: "rgba(232,168,76,0.3)", fontSize: "1.5rem" }}>{"\u2192"}</span>
-                      <div>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "4px" }}>Ahora</p>
-                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.8rem", color: "#f5d080", fontWeight: 700 }}>
-                          ${promo.precioDescuento.toLocaleString("es-CL")}
-                        </p>
-                      </div>
-                    </>
+                    <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "2.4rem", fontWeight: 900, color: "#e8a84c", lineHeight: 1, marginBottom: "8px" }}>
+                      ${promo.precioDescuento.toLocaleString("es-CL")}
+                    </div>
                   )}
                   {promo.porcentajeDescuento && (
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, padding: "8px 16px", borderRadius: "30px", background: "rgba(255,80,32,0.12)", color: "#ff5020", border: "1px solid rgba(255,80,32,0.25)" }}>
-                      -{promo.porcentajeDescuento}%
-                    </span>
+                    <div style={{ display: "inline-block", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "20px", padding: "4px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#3db89e", letterSpacing: "0.5px" }}>
+                      {promo.precioOriginal && promo.precioDescuento ? `Ahorras $${(promo.precioOriginal - promo.precioDescuento).toLocaleString("es-CL")}` : `-${promo.porcentajeDescuento}% de descuento`}
+                    </div>
+                  )}
+                  {promo.tipo === "2x1" && !promo.precioDescuento && (
+                    <>
+                      <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "3rem", fontWeight: 900, color: "#e8a84c", lineHeight: 1, marginBottom: "8px" }}>2{"\u00d7"}1</div>
+                      <div style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.6)" }}>Llevas 2, pagas 1</div>
+                    </>
                   )}
                 </div>
               )}
             </div>
+
+            {/* Condiciones */}
+            {promo.condiciones && (
+              <div className="dc-pd-card">
+                <h2 className="dc-pd-card-title">{"\ud83d\udccb"} Condiciones</h2>
+                <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {promo.condiciones.split(".").filter(c => c.trim()).map((condicion, i) => (
+                    <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>{condicion.trim()}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Código de cupón */}
             {promo.codigoCupon && (
@@ -233,17 +243,23 @@ export default function PromocionDetailPage() {
             )}
 
             {/* Sobre el local */}
-            {promo.descripcionLocal && (
+            {(promo.descripcionLocal || promo.localId) && (
               <div className="dc-pd-card">
-                <h2 className="dc-pd-card-title">Sobre {promo.local}</h2>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-primary)", lineHeight: 1.75, marginBottom: "20px" }}>
-                  {promo.descripcionLocal}
-                </p>
-                <Link href={`/locales/${promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 20px", borderRadius: "30px", border: "1px solid rgba(232,168,76,0.2)", color: "var(--accent)", textDecoration: "none", transition: "all 0.2s" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)"; (e.currentTarget as HTMLAnchorElement).style.background = "rgba(232,168,76,0.08)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(232,168,76,0.2)"; (e.currentTarget as HTMLAnchorElement).style.background = "transparent"; }}
-                >
-                  Ver perfil del local {"\u2192"}
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>Publicado por</p>
+                <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: promo.descripcionLocal ? "14px" : 0 }}>
+                  <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+                    {promo.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", fontWeight: 700, color: "#e8a84c", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{promo.local}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)" }}>{promo.categoria} · {promo.comuna}</p>
+                  </div>
+                </div>
+                {promo.descripcionLocal && (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{promo.descripcionLocal}</p>
+                )}
+                <Link href={`/locales/${promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>
+                  Ver perfil completo {"\u2192"}
                 </Link>
               </div>
             )}
@@ -379,7 +395,7 @@ export default function PromocionDetailPage() {
           padding: 160px 24px 60px;
           text-align: center;
           overflow: hidden;
-          min-height: 340px;
+          min-height: 380px;
           display: flex;
           align-items: flex-end;
           justify-content: center;
@@ -485,6 +501,9 @@ export default function PromocionDetailPage() {
         @media (min-width: 768px) and (max-width: 1023px) {
           .dc-pd-hero { padding: 140px 24px 50px; }
           .dc-pd-layout { grid-template-columns: 1fr 280px; }
+        }
+        @media (min-width: 1024px) {
+          .dc-pd-hero { min-height: 440px; }
         }
       `}</style>
     </main>
