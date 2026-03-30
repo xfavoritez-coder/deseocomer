@@ -28,27 +28,27 @@ export default function GanadoresPage() {
       <Navbar />
 
       {/* Hero */}
-      <section style={{ background: "linear-gradient(160deg, #1a0e05, #0a0812)", borderBottom: "1px solid rgba(232,168,76,0.1)", padding: "120px 24px 48px", textAlign: "center" }}>
+      <section className="dc-gan-hero">
         <div style={{ maxWidth: "680px", margin: "0 auto" }}>
-          <Link href="/concursos" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "32px" }}>
+          <Link href="/concursos" style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "24px" }}>
             ← Todos los concursos
           </Link>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#3db89e", marginBottom: "14px" }}>Historial de premios</p>
-          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2rem, 6vw, 3.5rem)", fontWeight: 900, color: "#e8a84c", marginBottom: "14px", lineHeight: 1.15 }}>🏆 Ganadores</h1>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2vw, 1.05rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto 40px" }}>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 6vw, 3.5rem)", fontWeight: 900, color: "#e8a84c", marginBottom: "14px", lineHeight: 1.15 }}>🏆 Ganadores</h1>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.85rem, 2vw, 1.05rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto 32px" }}>
             Estas personas ganaron comida gratis compartiendo DeseoComer con sus amigos
           </p>
 
           {/* Stats */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0", maxWidth: "480px", margin: "0 auto", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "16px", overflow: "hidden" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", maxWidth: "480px", margin: "0 auto", background: "rgba(0,0,0,0.2)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "16px", overflow: "hidden" }}>
             {[
-              { val: CONCURSOS_FINALIZADOS.length, label: "Premios\nentregados" },
-              { val: totalParticipantes.toLocaleString("es-CL"), label: "Participantes\ntotales" },
-              { val: locales, label: "Locales\nparticipantes" },
+              { val: CONCURSOS_FINALIZADOS.length, label: "Premios" },
+              { val: totalParticipantes.toLocaleString("es-CL"), label: "Participantes" },
+              { val: locales, label: "Locales" },
             ].map((s, i) => (
-              <div key={i} style={{ padding: "20px 12px", textAlign: "center", borderRight: i < 2 ? "1px solid rgba(232,168,76,0.1)" : "none" }}>
-                <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 700, color: "#e8a84c", lineHeight: 1.1, marginBottom: "6px" }}>{s.val}</div>
-                <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.5rem, 1.5vw, 0.6rem)", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", lineHeight: 1.5, whiteSpace: "pre-line" }}>{s.label}</div>
+              <div key={i} style={{ padding: "16px 8px", textAlign: "center", borderRight: i < 2 ? "1px solid rgba(232,168,76,0.1)" : "none" }}>
+                <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.2rem, 4vw, 2rem)", fontWeight: 700, color: "#e8a84c", lineHeight: 1.1, marginBottom: "4px" }}>{s.val}</div>
+                <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.5rem, 1.5vw, 0.6rem)", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)" }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -56,13 +56,13 @@ export default function GanadoresPage() {
       </section>
 
       {/* Body */}
-      <section style={{ maxWidth: "860px", margin: "0 auto", padding: "48px 24px 80px" }}>
+      <section className="dc-gan-body">
 
         {/* Podio top 3 */}
         {top3.length > 0 && (
-          <div style={{ marginBottom: "48px" }}>
+          <div style={{ marginBottom: "40px" }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "20px", textAlign: "center" }}>Últimos ganadores</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", alignItems: "end", maxWidth: "600px", margin: "0 auto" }}>
+            <div className="dc-gan-podio">
               {[top3[1], top3[0], top3[2]].map((c, i) => {
                 if (!c) return null;
                 const isCentral = i === 1;
@@ -70,11 +70,11 @@ export default function GanadoresPage() {
                 const borders = ["rgba(192,192,192,0.3)", "rgba(255,215,0,0.4)", "rgba(205,127,50,0.3)"];
                 const bgs = ["rgba(192,192,192,0.04)", "rgba(255,215,0,0.06)", "rgba(205,127,50,0.04)"];
                 return (
-                  <div key={c.id} style={{ background: bgs[i], border: `1px solid ${borders[i]}`, borderRadius: "14px", padding: isCentral ? "28px 10px 16px" : "16px 10px", textAlign: "center" }}>
-                    <div style={{ fontSize: "clamp(1.2rem, 3vw, 1.8rem)", marginBottom: "10px" }}>{medals[i]}</div>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.75rem, 2vw, 0.9rem)", fontWeight: 700, color: "#f0ead6", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador.nombre}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.6rem, 1.5vw, 0.72rem)", color: "rgba(240,234,214,0.4)", lineHeight: 1.4, marginBottom: "8px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem, 1.5vw, 0.65rem)", color: "#3db89e", letterSpacing: "0.05em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
+                  <div key={c.id} style={{ background: bgs[i], border: `1px solid ${borders[i]}`, borderRadius: "14px", padding: isCentral ? "24px 8px 14px" : "14px 8px", textAlign: "center" }}>
+                    <div style={{ fontSize: "clamp(1.1rem, 3vw, 1.6rem)", marginBottom: "8px" }}>{medals[i]}</div>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.7rem, 2vw, 0.85rem)", fontWeight: 700, color: "#f0ead6", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador.nombre}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.55rem, 1.5vw, 0.68rem)", color: "rgba(240,234,214,0.4)", lineHeight: 1.3, marginBottom: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.5rem, 1.3vw, 0.6rem)", color: "#3db89e", letterSpacing: "0.05em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
                   </div>
                 );
               })}
@@ -83,30 +83,30 @@ export default function GanadoresPage() {
         )}
 
         {/* Separador */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "28px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
           <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.1)" }} />
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", whiteSpace: "nowrap" }}>Historial completo</p>
           <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.1)" }} />
         </div>
 
-        {/* Grid historial */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "12px", marginBottom: "40px" }}>
+        {/* Lista historial */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {CONCURSOS_FINALIZADOS.map((c) => (
             <div key={c.id} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: "14px", overflow: "hidden", display: "flex", transition: "border-color 0.2s" }}
               onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.3)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.1)"; }}>
-              <div style={{ width: "80px", flexShrink: 0, background: "rgba(45,26,8,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem", position: "relative", overflow: "hidden" }}>
+              <div style={{ width: "70px", flexShrink: 0, background: "rgba(45,26,8,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", position: "relative", overflow: "hidden" }}>
                 {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} /> : emojiPorCategoria(c.premio + " " + c.local)}
               </div>
-              <div style={{ padding: "12px 14px", flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3db89e", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f5d080", marginBottom: "8px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "4px" }}>
-                  <div style={{ width: "22px", height: "22px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.nombre.charAt(0)}</div>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador.nombre}</span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>
+              <div style={{ padding: "10px 12px", flex: 1, minWidth: 0 }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#3db89e", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
+                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.78rem", color: "#f5d080", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                  <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.nombre.charAt(0)}</div>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador.nombre}</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "#e8a84c" }}>{c.ganador.referidos} referidos · {c.participantes} participantes</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "#e8a84c" }}>{c.ganador.referidos} referidos · {c.participantes} participantes</p>
               </div>
             </div>
           ))}
@@ -114,6 +114,33 @@ export default function GanadoresPage() {
       </section>
 
       <Footer />
+
+      <style>{`
+        .dc-gan-hero {
+          background: linear-gradient(160deg, #1a0e05, #0a0812);
+          border-bottom: 1px solid rgba(232,168,76,0.1);
+          padding: 120px 24px 48px;
+          text-align: center;
+        }
+        .dc-gan-body {
+          max-width: 700px;
+          margin: 0 auto;
+          padding: 40px 24px 80px;
+        }
+        .dc-gan-podio {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          align-items: end;
+          max-width: 500px;
+          margin: 0 auto;
+        }
+        @media (max-width: 767px) {
+          .dc-gan-hero { padding: 96px 16px 36px; }
+          .dc-gan-body { padding: 28px 16px 60px; }
+          .dc-gan-podio { gap: 6px; max-width: 100%; }
+        }
+      `}</style>
     </main>
   );
 }
