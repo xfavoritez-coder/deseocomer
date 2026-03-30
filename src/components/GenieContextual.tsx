@@ -3,18 +3,20 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useGenie } from "@/contexts/GenieContext";
 
-// One key per day — once shown, don't show again on ANY page
-const CONTEXTUAL_KEY_PREFIX = "genio_contextual_dia_";
+// Track per page per day — each page gets ONE contextual toast per day
+const KEY_PREFIX = "genio_ctx_";
 
-function yaMostradoHoy(): boolean {
+function yaVisto(pathname: string): boolean {
   try {
-    return !!localStorage.getItem(CONTEXTUAL_KEY_PREFIX + new Date().toISOString().slice(0, 10));
+    const key = KEY_PREFIX + new Date().toISOString().slice(0, 10) + "_" + pathname.replace(/\//g, "_");
+    return !!localStorage.getItem(key);
   } catch { return true; }
 }
 
-function marcarMostradoHoy() {
+function marcarVisto(pathname: string) {
   try {
-    localStorage.setItem(CONTEXTUAL_KEY_PREFIX + new Date().toISOString().slice(0, 10), "1");
+    const key = KEY_PREFIX + new Date().toISOString().slice(0, 10) + "_" + pathname.replace(/\//g, "_");
+    localStorage.setItem(key, "1");
   } catch {}
 }
 
@@ -25,11 +27,13 @@ function getBirthdayData(): { dia: string; mes: string } | null {
   } catch { return null; }
 }
 
-function isTodayBirthday(birthday: { dia: string; mes: string }): boolean {
+function isTodayBirthday(b: { dia: string; mes: string }): boolean {
   const hoy = new Date();
-  return hoy.getDate() === Number(birthday.dia) && (hoy.getMonth() + 1) === Number(birthday.mes);
+  return hoy.getDate() === Number(b.dia) && (hoy.getMonth() + 1) === Number(b.mes);
 }
 
+// Birthday greeting is handled by GenieButton, so contextual should NOT repeat it.
+// Instead, contextual gives page-specific tips that are DIFFERENT from the birthday greeting.
 function getMensajeContextual(
   pathname: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,16 +51,16 @@ function getMensajeContextual(
   const esCumple = birthday && isTodayBirthday(birthday);
 
   if (pathname === "/locales" || pathname.startsWith("/locales/")) {
-    if (esCumple) {
-      return {
-        texto: `🎂 ¡Feliz cumpleaños${nombre}! Hay locales con ofertas especiales para celebrar tu día`,
-        opciones: ["Ver ofertas de cumpleaños", "Gracias 🎂"],
-      };
-    }
     if (favCat && isLoggedIn) {
       return {
         texto: `🪔${nombre}, según tus gustos te puede interesar un local de ${favCat}`,
         opciones: ["Muéstrame", "Explorar todo"],
+      };
+    }
+    if (esCumple && isLoggedIn) {
+      return {
+        texto: `🎂 Hay locales con ofertas especiales para celebrar tu día${nombre}`,
+        opciones: ["Ver ofertas", "Explorar todo"],
       };
     }
     if (!isLoggedIn) {
@@ -75,9 +79,9 @@ function getMensajeContextual(
   }
 
   if (pathname === "/promociones" || pathname.startsWith("/promociones/")) {
-    if (esCumple) {
+    if (esCumple && isLoggedIn) {
       return {
-        texto: `🎂 ¡Hoy es tu día${nombre}! Hay promociones especiales de cumpleaños para ti`,
+        texto: `🎂 Hay promociones especiales de cumpleaños para ti${nombre}`,
         opciones: ["Ver mis ofertas", "Ver todas"],
       };
     }
@@ -102,16 +106,16 @@ export default function GenieContextual() {
   useEffect(() => {
     if (toastActivo) return;
     if (pathname.startsWith("/panel") || pathname.startsWith("/admin")) return;
-    // Only show ONCE per day across all pages
-    if (yaMostradoHoy()) return;
+    if (pathname === "/") return; // Home is handled by GenieButton triggers
+    if (yaVisto(pathname)) return;
 
     const timer = setTimeout(() => {
       if (toastRef.current) return;
-      if (yaMostradoHoy()) return;
+      if (yaVisto(pathname)) return;
 
       const mensaje = getMensajeContextual(pathname, perfil, userName, isLoggedIn);
       if (mensaje) {
-        marcarMostradoHoy();
+        marcarVisto(pathname);
         setToastActivo({
           id: "contextual_" + pathname,
           mensaje: mensaje.texto,

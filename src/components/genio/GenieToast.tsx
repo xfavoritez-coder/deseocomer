@@ -6,6 +6,8 @@ export default function GenieToast() {
   const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen } = useGenie();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const dismissToast = () => setToastActivo(null);
+
   const [mostrandoFecha, setMostrandoFecha] = useState(false);
   const [dia, setDia] = useState("");
   const [mes, setMes] = useState("");
@@ -27,7 +29,7 @@ export default function GenieToast() {
   useEffect(() => {
     if (!guardado) return;
     const t = setTimeout(() => {
-      setToastActivo(null);
+      dismissToast();
       window.dispatchEvent(new Event("cumpleanos_guardado"));
     }, 2500);
     return () => clearTimeout(t);
@@ -38,15 +40,15 @@ export default function GenieToast() {
   const handleOption = (opt: string) => {
     addRespuestaGenio(toastActivo.mensaje, opt);
     if (opt === "Sí, ayúdame" || opt === "Buscar restaurante") {
-      setToastActivo(null);
+      dismissToast();
       setIsOpen(true);
     } else if (opt === "Registrarme") {
-      setToastActivo(null);
+      dismissToast();
       try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
       window.location.href = "/registro";
     } else if (opt === "Seguir explorando") {
       try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
-      setToastActivo(null);
+      dismissToast();
     } else if (opt === "Cuéntale al Genio 🧞") {
       // Don't close — show inline birthday form
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -57,9 +59,9 @@ export default function GenieToast() {
         localStorage.setItem("genio_cumple_postponed_count", String(count));
         if (count >= 2) localStorage.setItem("genio_cumple_solicitado", "true");
       } catch {}
-      setToastActivo(null);
+      dismissToast();
     } else {
-      setToastActivo(null);
+      dismissToast();
     }
   };
 
@@ -111,7 +113,7 @@ export default function GenieToast() {
       animation: "genieToastIn 0.3s ease both",
     }}>
       {/* Close */}
-      <button onClick={() => setToastActivo(null)} style={{
+      <button onClick={dismissToast} style={{
         position: "absolute", top: "8px", right: "10px",
         background: "none", border: "none", color: "rgba(245,208,128,0.4)",
         fontSize: "0.9rem", cursor: "pointer",
