@@ -458,7 +458,7 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
   const { user, isAuthenticated } = useAuth();
   const [tieneFecha, setTieneFecha] = useState(false);
   const [cumpleGuardado, setCumpleGuardado] = useState(false);
-  const [cerrado, setCerrado] = useState(false);
+  const [bannerCerrado, setBannerCerrado] = useState(false);
   const [paso, setPaso] = useState<"banner"|"form"|"contrasena"|"fin">("banner");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -470,6 +470,12 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
 
   useEffect(() => {
     try { setTieneFecha(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
+    // Check if banner was dismissed
+    try {
+      if (sessionStorage.getItem("deseocomer_banner_cumple_cerrado_sesion")) { setBannerCerrado(true); }
+      const cerradoHasta = localStorage.getItem("deseocomer_banner_cumple_cerrado");
+      if (cerradoHasta && Date.now() < Number(cerradoHasta)) { setBannerCerrado(true); }
+    } catch {}
     const handler = () => setCumpleGuardado(true);
     window.addEventListener("cumpleanos_guardado", handler);
     return () => window.removeEventListener("cumpleanos_guardado", handler);
@@ -493,8 +499,22 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
     fontWeight: 700, cursor: "pointer", width: "100%",
   };
 
+  const handleCerrarBanner = () => {
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_session") || "{}");
+      if (session.loggedIn) {
+        localStorage.setItem("deseocomer_banner_cumple_cerrado", String(Date.now() + 7 * 24 * 60 * 60 * 1000));
+      } else {
+        sessionStorage.setItem("deseocomer_banner_cumple_cerrado_sesion", "true");
+      }
+    } catch {
+      sessionStorage.setItem("deseocomer_banner_cumple_cerrado_sesion", "true");
+    }
+    setBannerCerrado(true);
+  };
+
   const closeBtn = (
-    <button onClick={() => setCerrado(true)} style={{ position: "absolute", top: "12px", right: "12px", background: "none", border: "none", color: "var(--text-muted)", fontSize: "1rem", cursor: "pointer", opacity: 0.6, zIndex: 2 }}>✕</button>
+    <button onClick={handleCerrarBanner} style={{ position: "absolute", top: "12px", right: "12px", background: "none", border: "none", color: "rgba(240,234,214,0.4)", fontSize: "1rem", cursor: "pointer", padding: "4px", lineHeight: 1, zIndex: 2 }}>✕</button>
   );
 
   const userName = user?.nombre?.split(" ")[0] ?? "";
@@ -530,7 +550,7 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
   if ((isAuthenticated && tieneFecha) || cumpleGuardado) return null;
 
   // ── User closed it → hide ──
-  if (cerrado) return null;
+  if (bannerCerrado) return null;
 
   // ── Logged in without birthday → ask via Genio ──
   if (isAuthenticated && !tieneFecha) return (
@@ -561,10 +581,10 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
         </div>
       )}
 
+      {paso === "form" && closeBtn}
       {paso === "form" && (
         <div style={{ textAlign: "left", maxWidth: "340px", margin: "0 auto" }}>
           <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1rem, 3vw, 1.3rem)", color: "var(--color-title)", marginBottom: "8px", textAlign: "center" }}>🎂 Recibe ofertas exclusivas en tu cumpleaños</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "16px", textAlign: "center" }}>Solo tarda 30 segundos</p>
           {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff8080", marginBottom: "10px", textAlign: "center" }}>⚠️ {error}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <input style={{ ...inp, textAlign: "left", width: "100%" }} placeholder="Tu nombre" value={nombre} onChange={e => setNombre(e.target.value)} />
@@ -588,11 +608,12 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
                 localStorage.setItem("deseocomer_user_temp", JSON.stringify({ nombre: nombre.trim(), email: email.trim() }));
               } catch {}
               setPaso("contrasena");
-            }} style={btnP}>Guardar 🎂</button>
+            }} style={btnP}>Guardar</button>
           </div>
         </div>
       )}
 
+      {paso === "contrasena" && closeBtn}
       {paso === "contrasena" && (
         <div style={{ maxWidth: "340px", margin: "0 auto" }}>
           <div style={{ fontSize: "1.8rem", marginBottom: "8px", color: "var(--oasis-bright)" }}>✓</div>
