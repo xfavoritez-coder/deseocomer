@@ -408,7 +408,7 @@ export default function ConcursoDetallePage() {
             {c.imagenUrl ? (
               <div style={{ position: "relative", height: "100%", minHeight: "280px", overflow: "hidden", borderRadius: "20px", background: "rgba(45,26,8,0.8)" }}>
                 <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3, pointerEvents: "none" }}><SelloGratis size="lg" /></div>
+                <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none" }}><SelloGratis size="lg" /></div>
               </div>
             ) : (
               <div style={{ height: "280px", borderRadius: "20px", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
