@@ -83,68 +83,69 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Backdrop */}
+      {/* Mobile drawer */}
       {menuOpen && (
-        <div className="dc-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />
-      )}
+        <>
+          <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 1000, backdropFilter: "blur(2px)" }} />
+          <div style={{ position: "fixed", top: 0, right: 0, width: "min(320px, 80vw)", height: "100vh", background: "rgba(13,7,3,0.98)", borderLeft: "1px solid rgba(232,168,76,0.15)", zIndex: 1001, display: "flex", flexDirection: "column", animation: "dc-drawer-in 0.25s ease both", overflowY: "auto" }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
+              <Link href="/" onClick={() => setMenuOpen(false)} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>🧞 DeseoComer</Link>
+              <button onClick={() => setMenuOpen(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "1rem", cursor: "pointer" }}>✕</button>
+            </div>
 
-      {/* Mobile slide-down menu */}
-      <div
-        className={`dc-mobile-menu${menuOpen ? " dc-mobile-menu--open" : ""}`}
-        aria-hidden={!menuOpen}
-      >
-        {/* 1. Navigation links */}
-        {NAV_LINKS.map(({ label, href }) => (
-          <Link key={label} href={href} className="dc-mobile-link" onClick={() => setMenuOpen(false)}
-            style={{ padding: "20px 28px", fontSize: "1.05rem" }}>
-            {label}
-          </Link>
-        ))}
-
-        {/* Separator */}
-        <div style={{ height: "1px", background: "rgba(232,168,76,0.1)", margin: "4px 0" }} />
-
-        {/* Auth */}
-        {mounted && (
-          isAuthenticated && user ? (
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(232,168,76,0.08)", marginBottom: "4px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
-                <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: "#1a0e05", fontWeight: 700, flexShrink: 0 }}>
-                  {user.nombre?.charAt(0).toUpperCase() ?? "U"}
-                </div>
-                <div>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", margin: "0 0 2px", fontWeight: 600 }}>{user.nombre?.split(" ")[0]}</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", margin: 0 }}>Miembro de DeseoComer</p>
-                </div>
-              </div>
+            {/* Nav links */}
+            <nav style={{ padding: "8px 0", flex: 1 }}>
               {[
-                { href: "/perfil", icon: "👤", label: "Mi perfil" },
-                { href: "/perfil", icon: "❤️", label: "Mis favoritos" },
-                { href: "/perfil", icon: "🏆", label: "Mis concursos" },
+                { href: "/concursos", label: "Concursos", icon: "🏆" },
+                { href: "/promociones", label: "Promociones", icon: "⚡" },
+                { href: "/locales", label: "Locales", icon: "🍽️" },
               ].map(item => (
-                <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.05)" }}>
-                  <span style={{ fontSize: "1rem", width: "20px" }}>{item.icon}</span>{item.label}
+                <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 24px", fontFamily: "var(--font-cinzel)", fontSize: "1rem", letterSpacing: "0.1em", color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+                  <span style={{ fontSize: "1.1rem", width: "24px" }}>{item.icon}</span>{item.label}
                 </Link>
               ))}
-              <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "#ff6b6b", cursor: "pointer", width: "100%", textAlign: "left", marginTop: "4px" }}>
-                <span style={{ fontSize: "1rem", width: "20px" }}>🚪</span>Cerrar sesión
-              </button>
-            </div>
-          ) : (
-            <div style={{ marginTop: "16px" }}>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "10px" }}>Únete gratis o inicia sesión</p>
-              <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", margin: "0 20px", padding: "16px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700 }}>
-                Entrar
-              </Link>
-            </div>
-          )
-        )}
+            </nav>
 
-        {/* Local link */}
-        <Link href="/solo-locales" onClick={() => setMenuOpen(false)} style={{ display: "block", margin: "12px 20px 24px", padding: "16px 20px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: "14px", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", letterSpacing: "0.06em", color: "var(--accent)", textDecoration: "none", textAlign: "center", fontWeight: 600 }}>
-          <span style={{ textDecoration: "underline" }}>¿Tienes un local?</span>{" →"}
-        </Link>
-      </div>
+            {/* User section */}
+            <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
+              {mounted && isAuthenticated && user ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>
+                      {user.nombre?.charAt(0).toUpperCase() ?? "U"}
+                    </div>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", margin: 0 }}>{displayName}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", margin: 0 }}>Miembro de DeseoComer</p>
+                    </div>
+                  </div>
+                  {[
+                    { href: "/perfil", icon: "👤", label: "Mi perfil" },
+                    { href: "/perfil?tab=favoritos", icon: "❤️", label: "Mis favoritos" },
+                    { href: "/perfil?tab=concursos", icon: "🏆", label: "Mis concursos" },
+                  ].map(item => (
+                    <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                      <span style={{ fontSize: "1rem", width: "20px" }}>{item.icon}</span>{item.label}
+                    </Link>
+                  ))}
+                  <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#ff6b6b", cursor: "pointer", width: "100%", textAlign: "left", marginTop: "4px" }}>
+                    <span style={{ fontSize: "1rem", width: "20px" }}>🚪</span>Cerrar sesión
+                  </button>
+                </div>
+              ) : mounted ? (
+                <div>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "12px", textAlign: "center" }}>Únete gratis o inicia sesión</p>
+                  <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700, marginBottom: "12px" }}>Entrar</Link>
+                </div>
+              ) : null}
+              <a href="/solo-locales" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", textDecoration: "none", textAlign: "center", marginTop: "8px" }}>
+                <span style={{ textDecoration: "underline" }}>¿Tienes un local?</span>{" →"}
+              </a>
+            </div>
+          </div>
+        </>
+      )}
 
       <style>{`
         .dc-nav {
@@ -247,75 +248,15 @@ export default function Navbar() {
           flex-shrink: 0;
         }
 
-        /* Dark backdrop */
-        .dc-backdrop {
-          position: fixed; inset: 0; z-index: 98;
-          background: rgba(0,0,0,0.5);
-        }
-
-        /* Mobile menu panel */
-        .dc-mobile-menu {
-          display: none;
-          position: fixed; top: 64px; left: 0; right: 0; z-index: 99;
-          background: rgba(13,7,3,0.98) !important;
-          backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(232,168,76,0.15);
-          padding: 8px 24px 28px;
-          flex-direction: column;
-          opacity: 0; transform: translateY(-8px);
-          pointer-events: none;
-          transition: opacity 200ms ease, transform 200ms ease;
-        }
-        .dc-mobile-menu--open {
-          opacity: 1; transform: translateY(0);
-          pointer-events: auto;
-        }
-        .dc-mobile-link {
-          font-family: var(--font-cinzel); font-size: 0.9rem;
-          letter-spacing: 0.15em; text-transform: uppercase;
-          color: rgba(245,208,128,0.9) !important; text-decoration: none;
-          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.15) !important;
-          display: flex; align-items: center; min-height: 52px;
-          font-weight: 500;
-        }
-        .dc-mobile-cta {
-          font-family: var(--font-cinzel); font-size: 0.85rem;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          background: linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright));
-          color: var(--bg-primary); border-radius: 30px;
-          text-decoration: none; font-weight: 700; text-align: center;
-          margin-top: 16px; display: flex;
-          align-items: center; justify-content: center; min-height: 52px;
-        }
-
-        /* Mobile user info */
-        .dc-mobile-user-info {
-          display: flex; align-items: center; gap: 14px;
-          padding: 16px 4px; border-bottom: 1px solid rgba(232,168,76,0.15) !important;
-        }
-        .dc-mobile-user-name {
-          font-family: var(--font-cinzel); font-size: 0.8rem;
-          letter-spacing: 0.08em; color: rgba(245,208,128,0.9) !important; font-weight: 600;
-        }
-        .dc-mobile-user-email {
-          font-family: var(--font-lato); font-size: 0.75rem;
-          color: rgba(245,208,128,0.5) !important; margin-top: 2px;
-        }
-        .dc-mobile-logout {
-          font-family: var(--font-cinzel); font-size: 0.8rem;
-          letter-spacing: 0.1em; text-transform: uppercase;
-          background: none; border: 1px solid rgba(255,80,80,0.3);
-          color: #ff8080; padding: 14px 4px;
-          border-radius: 0; cursor: pointer;
-          text-align: left; margin-top: 4px;
-          min-height: 52px; width: 100%;
+        @keyframes dc-drawer-in {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);    opacity: 1; }
         }
 
         @media (max-width: 767px) {
           .dc-nav { padding: 14px 20px; }
           .dc-nav-links { display: none; }
           .dc-hamburger { display: flex; }
-          .dc-mobile-menu { display: flex; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
           .dc-nav { padding: 18px 32px; }
