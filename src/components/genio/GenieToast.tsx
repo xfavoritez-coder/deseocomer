@@ -39,30 +39,53 @@ export default function GenieToast() {
 
   const handleOption = (opt: string) => {
     addRespuestaGenio(toastActivo.mensaje, opt);
-    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante") {
+
+    // Open Genio panel
+    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante" || opt === "Muéstrame" || opt === "¿Cómo funciona?") {
       dismissToast();
       setIsOpen(true);
-    } else if (opt === "Registrarme") {
+      return;
+    }
+    // Navigate to specific pages
+    if (opt === "Ver promociones" || opt === "Ver ahora" || opt === "Ver mis ofertas" || opt === "Ver todas") {
+      dismissToast();
+      window.location.href = "/promociones";
+      return;
+    }
+    if (opt === "Ver ofertas" || opt === "Ver ofertas de cumpleaños") {
+      dismissToast();
+      window.location.href = "/promociones";
+      return;
+    }
+    // Registration
+    if (opt === "Registrarme") {
       dismissToast();
       try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
       window.location.href = "/registro";
-    } else if (opt === "Seguir explorando") {
+      return;
+    }
+    if (opt === "Seguir explorando") {
       try { localStorage.setItem("genio_trigger5_mostrado", "true"); } catch {}
       dismissToast();
-    } else if (opt === "Cuéntale al Genio 🧞") {
-      // Don't close — show inline birthday form
+      return;
+    }
+    // Birthday form
+    if (opt === "Cuéntale al Genio 🧞") {
       if (timerRef.current) clearTimeout(timerRef.current);
       setMostrandoFecha(true);
-    } else if (opt === "Después" && toastActivo.id === "cumpleanos") {
+      return;
+    }
+    if (opt === "Después" && toastActivo.id === "cumpleanos") {
       try {
         const count = Number(localStorage.getItem("genio_cumple_postponed_count") ?? "0") + 1;
         localStorage.setItem("genio_cumple_postponed_count", String(count));
         if (count >= 2) localStorage.setItem("genio_cumple_solicitado", "true");
       } catch {}
       dismissToast();
-    } else {
-      dismissToast();
+      return;
     }
+    // Default: just close
+    dismissToast();
   };
 
   const handleGuardarCumple = () => {
