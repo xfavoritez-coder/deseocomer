@@ -22,7 +22,9 @@ export async function POST(req: NextRequest) {
 
     const { password: _, ...usuarioSinPassword } = usuario;
     return NextResponse.json(usuarioSinPassword, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  } catch (error) {
+    console.error("[API /usuarios] Error:", error);
+    const msg = error instanceof Error ? error.message : "Error desconocido";
+    return NextResponse.json({ error: "Error interno", detalle: msg }, { status: 500 });
   }
 }

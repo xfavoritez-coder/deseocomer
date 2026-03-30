@@ -14,7 +14,8 @@ export async function GET() {
       },
     });
     return NextResponse.json(locales);
-  } catch {
+  } catch (error) {
+    console.error("[API /locales GET] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
