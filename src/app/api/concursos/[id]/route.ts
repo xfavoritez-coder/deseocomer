@@ -14,6 +14,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     return NextResponse.json(concurso);
+  } catch (error) {
+    console.error("[API /concursos/[id]] Error:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const body = await req.json();
+    const concurso = await prisma.concurso.update({ where: { id }, data: body });
+    return NextResponse.json(concurso);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }

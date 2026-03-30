@@ -65,16 +65,18 @@ export default function ConcursoDetallePage() {
   const concursoMock = CONCURSOS.find((c) => c.id === concursoId);
   const finalizadoMock = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
   const [dbConcurso, setDbConcurso] = useState<Record<string, unknown> | null>(null);
+  const [dbLoading, setDbLoading] = useState(!concursoMock && !finalizadoMock);
 
   // If not found in mocks, try fetching from DB
   useEffect(() => {
-    if (concursoMock || finalizadoMock) return;
+    if (concursoMock || finalizadoMock) { setDbLoading(false); return; }
     const param = segments[0] ?? "";
-    if (!param) return;
+    if (!param) { setDbLoading(false); return; }
+    setDbLoading(true);
     fetch(`/api/concursos/${param}`)
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setDbConcurso(data); })
-      .catch(() => {});
+      .then(data => { if (data) setDbConcurso(data); setDbLoading(false); })
+      .catch(() => setDbLoading(false));
   }, [segments[0]]);
 
   // Build concurso/finalizado from DB data if needed
@@ -199,12 +201,24 @@ export default function ConcursoDetallePage() {
   }, [user, concursoId, refreshRanking]);
 
   // 404
+  if (dbLoading) {
+    return (
+      <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
+        <Navbar />
+        <div style={{ padding: "160px 40px", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)" }}>🧞 Cargando concurso...</p>
+        </div>
+        <Footer />
+      </main>
+    );
+  }
+
   if (!concurso && !finalizado) {
     return (
       <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
         <Navbar />
         <div style={{ padding: "160px 40px", textAlign: "center" }}>
-          <p style={{ fontSize: "4rem", marginBottom: "20px" }}>🔍</p>
+          <p style={{ fontSize: "4rem", marginBottom: "20px" }}>🏆</p>
           <h2 style={{
             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem",
             color: "var(--accent)", marginBottom: "24px",
