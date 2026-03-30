@@ -164,6 +164,9 @@ export default function Navbar() {
           color: #e8a84c; text-decoration: none;
           letter-spacing: 0.08em;
           flex-shrink: 0;
+          cursor: pointer;
+          position: relative;
+          z-index: 2;
         }
         .dc-nav-links {
           display: flex; gap: 32px; align-items: center;

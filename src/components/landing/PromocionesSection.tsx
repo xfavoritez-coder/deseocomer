@@ -444,6 +444,7 @@ function BirthdayBanner() {
   const { setToastActivo } = useGenie();
   const { isAuthenticated } = useAuth();
   const [tieneFecha, setTieneFecha] = useState(false);
+  const [cumpleGuardado, setCumpleGuardado] = useState(false);
   const [paso, setPaso] = useState<"banner"|"form"|"contrasena"|"fin">("banner");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -455,6 +456,9 @@ function BirthdayBanner() {
 
   useEffect(() => {
     try { setTieneFecha(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
+    const handler = () => setCumpleGuardado(true);
+    window.addEventListener("cumpleanos_guardado", handler);
+    return () => window.removeEventListener("cumpleanos_guardado", handler);
   }, []);
 
   const box: React.CSSProperties = {
@@ -475,7 +479,7 @@ function BirthdayBanner() {
   };
 
   // State 3: logged in with birthday
-  if (isAuthenticated && tieneFecha) return null;
+  if ((isAuthenticated && tieneFecha) || cumpleGuardado) return null;
 
   // State 2: logged in without birthday
   if (isAuthenticated && !tieneFecha) return (

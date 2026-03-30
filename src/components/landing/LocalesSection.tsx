@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import BotonFavorito from "@/components/BotonFavorito";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
 
@@ -113,8 +114,9 @@ export default function LocalesSection() {
               textDecoration: "none",
               display: "block",
             }}>
-              <div style={{ height: "120px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0 }}>
+              <div style={{ height: "120px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative" }}>
                 <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categoria, comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
               </div>
               <div style={{ padding: "20px 24px 24px" }}>
                 {/* Línea 1: emoji + nombre */}

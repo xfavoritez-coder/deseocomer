@@ -31,7 +31,10 @@ export default function GenieToast() {
   // Auto-close after save confirmation
   useEffect(() => {
     if (!guardado) return;
-    const t = setTimeout(() => setToastActivo(null), 2500);
+    const t = setTimeout(() => {
+      setToastActivo(null);
+      window.dispatchEvent(new Event("cumpleanos_guardado"));
+    }, 2500);
     return () => clearTimeout(t);
   }, [guardado, setToastActivo]);
 
