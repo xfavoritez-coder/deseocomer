@@ -17,7 +17,7 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type Filter = "todos" | "activos" | "por_terminar" | "finalizados";
+type Filter = "todos" | "activos" | "por_terminar" | "ganadores";
 
 interface TimeLeft {
   dias: number;
@@ -76,7 +76,7 @@ export default function ConcursosPage() {
     const soon = isSoonEnding(c.endsAt);
     if (filter === "activos")      return !soon;
     if (filter === "por_terminar") return soon;
-    if (filter === "finalizados")  return false;
+    if (filter === "ganadores")    return false;
     return true; // todos
   }).sort((a, b) => {
     const soonA = isSoonEnding(a.endsAt);
@@ -87,14 +87,11 @@ export default function ConcursosPage() {
     return b.participantes - a.participantes; // más participantes primero
   });
 
-  const showFinalizados =
-    filter === "finalizados" || filter === "todos";
-
   const filters: { key: Filter; label: string }[] = [
     { key: "todos",        label: "Todos" },
     { key: "activos",      label: "Activos" },
     { key: "por_terminar", label: "Por terminar" },
-    { key: "finalizados",  label: "Finalizados" },
+    { key: "ganadores",    label: "Ganadores 🏆" },
   ];
 
   return (
@@ -143,7 +140,7 @@ export default function ConcursosPage() {
           {filters.map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => setFilter(key)}
+              onClick={() => { if (key === "ganadores") { router.push("/concursos/ganadores"); return; } setFilter(key); }}
               className={`dc-cp-filter-btn${filter === key ? " dc-cp-filter-btn--active" : ""}`}
             >
               {label}
@@ -174,7 +171,7 @@ export default function ConcursosPage() {
           </div>
         )}
 
-        {visibleActivos.length === 0 && filter !== "finalizados" && (
+        {visibleActivos.length === 0 && filter !== "ganadores" && (
           <div style={{ textAlign: "center", padding: "80px 20px" }}>
             <p style={{ fontSize: "3rem", marginBottom: "16px" }}>🔍</p>
             <p style={{
@@ -184,45 +181,6 @@ export default function ConcursosPage() {
           </div>
         )}
 
-        {/* ── Finalizados section ───────────────────────────────────── */}
-        {showFinalizados && CONCURSOS_FINALIZADOS.length > 0 && (
-          <>
-            <div style={{
-              display: "flex", alignItems: "center", gap: "20px",
-              margin: filter === "todos" ? "80px 0 40px" : "20px 0 40px",
-            }}>
-              <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
-              <p style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-                letterSpacing: "0.35em", textTransform: "uppercase",
-                color: "var(--text-muted)", whiteSpace: "nowrap",
-              }}>
-                Concursos Finalizados
-              </p>
-              <div style={{ flex: 1, height: "1px", background: "var(--border-color)" }} />
-            </div>
-
-            <div className="dc-cp-grid">
-              {CONCURSOS_FINALIZADOS.map((c) => (
-                <FinalizadoCard key={c.id} concurso={c} />
-              ))}
-            </div>
-
-            <div style={{ textAlign: "center", marginTop: "48px" }}>
-              <a
-                href="/concursos/ganadores"
-                style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
-                  letterSpacing: "0.15em", textTransform: "uppercase",
-                  color: "var(--accent)", textDecoration: "none",
-                  borderBottom: "1px solid var(--border-color)", paddingBottom: "4px",
-                }}
-              >
-                Ver historial completo de ganadores →
-              </a>
-            </div>
-          </>
-        )}
       </section>
 
       <Footer />
@@ -238,7 +196,9 @@ export default function ConcursosPage() {
           justify-content: center;
           margin-bottom: 44px;
           overflow-x: auto;
-          padding-bottom: 8px;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 4px;
+          width: 100%;
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
@@ -334,7 +294,7 @@ function ConcursoCard({
           {/* Badge termina pronto over image */}
           {soon && (
             <div style={{
-              position: "absolute", top: "12px", right: "12px",
+              position: "absolute", top: "12px", left: "12px",
               background: "linear-gradient(135deg, #ff2244, #ff6644)",
               color: "#fff", fontFamily: "var(--font-cinzel)",
               fontSize: "0.55rem", letterSpacing: "0.15em",
@@ -351,7 +311,7 @@ function ConcursoCard({
 
       {!c.imagenUrl && soon && (
         <div style={{
-          position: "absolute", top: "16px", right: "16px",
+          position: "absolute", top: "16px", left: "16px",
           background: "linear-gradient(135deg, #ff2244, #ff6644)",
           color: "#fff", fontFamily: "var(--font-cinzel)",
           fontSize: "0.55rem", letterSpacing: "0.15em",
