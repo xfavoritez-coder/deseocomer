@@ -116,18 +116,15 @@ export default function LocalesPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Header */}
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "120px 20px 0" }}>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--color-label, rgba(240,234,214,0.5))", marginBottom: "12px" }}>
-          Explorador de Locales
-        </p>
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3rem)", color: "var(--color-title, #f5d080)", marginBottom: "8px" }}>
-          Descubre Dónde Comer
-        </h1>
-        <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.75))", fontSize: "1rem", marginBottom: "32px", lineHeight: 1.7 }}>
-          Los mejores locales gastronómicos de Santiago, curados y verificados.
-        </p>
-      </div>
+      {/* Hero */}
+      <section className="dc-lp-hero">
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 65%)" }} />
+        <div style={{ position: "relative", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "16px" }}>Locales</p>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2.2rem, 7vw, 4.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Descubre Dónde Comer</h1>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Los mejores locales gastronómicos de Santiago, curados y verificados.</p>
+        </div>
+      </section>
 
       {/* Search + Filters */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 32px" }}>
@@ -332,6 +329,12 @@ export default function LocalesPage() {
           padding-bottom: 4px;
         }
         .dc-filtros-fila::-webkit-scrollbar { display: none; }
+        .dc-lp-hero {
+          position: relative;
+          overflow: hidden;
+          padding: 140px 60px 60px;
+          text-align: center;
+        }
         .dc-loc-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -359,9 +362,11 @@ export default function LocalesPage() {
           100% { background-position: -200% 0; }
         }
         @media (max-width: 767px) {
+          .dc-lp-hero { padding: 100px 20px 50px; }
           .dc-loc-grid { grid-template-columns: 1fr; gap: 16px; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
+          .dc-lp-hero { padding: 120px 40px 60px; }
           .dc-loc-grid { grid-template-columns: repeat(2, 1fr); }
         }
       `}</style>
