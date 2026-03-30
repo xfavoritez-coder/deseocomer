@@ -162,3 +162,13 @@ model ListaEsperaLocal {
   ciudad    String
   createdAt DateTime @default(now())
 }
+
+model ListaEsperaComuna {
+  id          String   @id @default(cuid())
+  email       String
+  nombre      String?
+  comuna      String
+  usuarioId   String?
+  notificado  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}

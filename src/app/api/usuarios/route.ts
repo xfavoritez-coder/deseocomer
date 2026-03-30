@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
       react: React.createElement(VerificacionEmail, { nombre, verificationUrl }),
     }).catch(console.error);
 
+    // Link to lista espera comunas if exists
+    try { await prisma.listaEsperaComuna.updateMany({ where: { email }, data: { usuarioId: usuario.id } }); } catch {}
+
     return NextResponse.json(usuarioSinPassword, { status: 201 });
   } catch (error) {
     console.error("[API /usuarios] Error:", error);
