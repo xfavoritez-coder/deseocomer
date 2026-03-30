@@ -27,8 +27,10 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
-      <div style={{ maxWidth: "420px", width: "100%", background: "rgba(45,26,8,0.9)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "24px", padding: "40px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+    <main style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "420px" }}>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px", opacity: 0.7, alignSelf: "flex-start" }}>← Volver al inicio</a>
+      <div style={{ width: "100%", background: "rgba(45,26,8,0.9)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "24px", padding: "40px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
@@ -75,6 +77,7 @@ export default function LoginPage() {
         <button onClick={() => alert("Escríbenos a hola@deseocomer.com")} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "16px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
           ¿Olvidaste tu contraseña?
         </button>
+      </div>
       </div>
     </main>
   );
