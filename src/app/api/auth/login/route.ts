@@ -18,9 +18,10 @@ export async function POST(req: NextRequest) {
       if (!usuario) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
       const ok = await bcrypt.compare(password, usuario.password);
       if (!ok) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
-      if (!usuario.emailVerificado) {
-        return NextResponse.json({ error: "Debes verificar tu email antes de entrar. Revisa tu bandeja de entrada.", codigo: "EMAIL_NO_VERIFICADO" }, { status: 401 });
-      }
+      // Allow login even if email not verified (emails not configured yet)
+      // if (!usuario.emailVerificado) {
+      //   return NextResponse.json({ error: "Debes verificar tu email antes de entrar.", codigo: "EMAIL_NO_VERIFICADO" }, { status: 401 });
+      // }
       const { password: _, ...usuarioSinPassword } = usuario;
       return NextResponse.json({ tipo: "usuario", data: usuarioSinPassword });
     }
