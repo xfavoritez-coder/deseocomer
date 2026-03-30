@@ -33,13 +33,35 @@ export default function ConcursosPage() {
   const [filter, setFilter] = useState<Filter>("todos");
   const [timers, setTimers] = useState<Record<number, TimeLeft>>({});
   const [mounted, setMounted] = useState(false);
+  const [bdConcursos, setBdConcursos] = useState<Concurso[]>([]);
+
+  // Fetch real concursos from BD
+  useEffect(() => {
+    fetch("/api/concursos").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mapped: Concurso[] = data.map((c: any) => ({
+          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", localId: c.local?.id ?? "",
+          imagen: "🏆", imagenUrl: c.imagenUrl ?? c.local?.portadaUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
+          premio: c.premio ?? "", descripcionPremio: c.descripcion ?? "",
+          participantes: c._count?.participantes ?? 0,
+          endsAt: new Date(c.fechaFin).getTime(),
+          reglas: [], descripcionLocal: "", ranking: [],
+        }));
+        setBdConcursos(mapped);
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Merge BD concursos with mock
+  const allConcursos = [...bdConcursos, ...CONCURSOS];
 
   // Initialize & tick timers
   const updateTimers = useCallback(() => {
     const next: Record<number, TimeLeft> = {};
-    for (const c of CONCURSOS) next[c.id] = getTimeLeft(c.endsAt);
+    for (const c of allConcursos) next[c.id] = getTimeLeft(c.endsAt);
     setTimers(next);
-  }, []);
+  }, [allConcursos.length]);
 
   useEffect(() => {
     setMounted(true);
@@ -49,7 +71,7 @@ export default function ConcursosPage() {
   }, [updateTimers]);
 
   // Filter logic
-  const visibleActivos: Concurso[] = CONCURSOS.filter((c) => {
+  const visibleActivos: Concurso[] = allConcursos.filter((c) => {
     const soon = isSoonEnding(c.endsAt);
     if (filter === "activos")      return !soon;
     if (filter === "por_terminar") return soon;
@@ -107,8 +129,8 @@ export default function ConcursosPage() {
           {/* Stats row */}
           <div className="dc-cp-stats">
             {[
-              { val: CONCURSOS.length, label: "concursos activos" },
-              { val: CONCURSOS.reduce((s, c) => s + c.participantes, 0).toLocaleString("es-CL"), label: "participantes" },
+              { val: allConcursos.length, label: "concursos activos" },
+              { val: allConcursos.reduce((s, c) => s + c.participantes, 0).toLocaleString("es-CL"), label: "participantes" },
               { val: CONCURSOS_FINALIZADOS.length, label: "premios entregados" },
             ].map(({ val, label }, i) => (
               <div key={label} className="dc-cp-stat-item">

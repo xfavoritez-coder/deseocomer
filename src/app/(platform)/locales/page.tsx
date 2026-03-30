@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café", "Italiano", "Mexicano"];
@@ -33,8 +33,27 @@ const localesMock = [
 export default function LocalesPage() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
   const [busqueda, setBusqueda] = useState("");
+  const [localesData, setLocalesData] = useState(localesMock);
+  const [loading, setLoading] = useState(true);
 
-  const localesFiltrados = localesMock.filter(l => {
+  useEffect(() => {
+    fetch("/api/locales").then(r => r.json()).then(data => {
+      if (Array.isArray(data) && data.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mapped = data.map((l: any) => ({
+          id: l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
+          barrio: l.comuna ?? l.ciudad ?? "Santiago", emoji: "🍽️",
+          rating: 4.5, precio: "$$", isOpen: true,
+          imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+          descripcion: l.descripcion ?? "",
+        }));
+        setLocalesData([...mapped, ...localesMock]);
+      }
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  const localesFiltrados = localesData.filter(l => {
     const matchCat  = categoriaActiva === "Todos" || l.categoria === categoriaActiva;
     const matchBusc = busqueda.trim() === "" ||
       l.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
