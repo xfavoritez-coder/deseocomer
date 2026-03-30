@@ -198,7 +198,6 @@ export default function ConcursosPage() {
           overflow-x: auto;
           -webkit-overflow-scrolling: touch;
           padding-bottom: 4px;
-          width: 100%;
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
@@ -211,6 +210,7 @@ export default function ConcursosPage() {
           background: transparent; color: var(--text-muted);
           transition: all 0.2s ease; white-space: nowrap;
           display: flex; align-items: center; min-height: 44px;
+          flex-shrink: 0;
         }
         .dc-cp-filter-btn:hover {
           border-color: var(--accent); color: var(--accent);
@@ -233,6 +233,7 @@ export default function ConcursosPage() {
         @media (max-width: 767px) {
           .dc-cp-hero    { padding: 100px 20px 60px; }
           .dc-cp-content { padding: 0 20px 60px; }
+          .dc-cp-filters { justify-content: flex-start; }
           .dc-cp-grid    { grid-template-columns: 1fr; gap: 16px; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
