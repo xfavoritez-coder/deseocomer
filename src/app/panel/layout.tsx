@@ -64,9 +64,12 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "block", padding: "24px 20px 8px" }}>
           🏮 DeseoComer
         </Link>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", color: "var(--text-muted)", padding: "0 20px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)" }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", color: "var(--text-muted)", padding: "0 20px 10px" }}>
           {localName || "Mi Local"}
         </p>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", textTransform: "uppercase", opacity: 0.7 }}>
+          ← Ver DeseoComer
+        </a>
 
         <nav style={{ flex: 1, padding: "12px 0" }}>
           {NAV.map(n => (
@@ -110,6 +113,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile bottom nav */}
       <nav className="dc-panel-mobile-nav">
+        <a href="/" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none", flex: 1, padding: "8px 0", color: "var(--text-muted)", fontSize: "0.6rem", fontFamily: "var(--font-cinzel)", letterSpacing: "0.05em" }}>
+          <span style={{ fontSize: "1.2rem" }}>🏮</span>
+          Home
+        </a>
         {NAV.map(n => (
           <Link key={n.href} href={n.href} style={{
             display: "flex", flexDirection: "column", alignItems: "center", gap: "2px",
