@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 
 export default function Home() {
   return (
-    <main style={{ background: "var(--bg-primary)" }}>
+    <main style={{ background: "var(--bg-primary)", margin: 0, padding: 0, display: "block" }}>
       <Navbar />
       <HeroSection />
       <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-primary)" />
