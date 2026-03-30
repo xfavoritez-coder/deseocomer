@@ -204,12 +204,6 @@ export default function GenieToast() {
         </>
       )}
 
-      {/* Genie indicator */}
-      <div style={{
-        position: "absolute", bottom: "-6px", right: "28px",
-        fontSize: "0.7rem",
-      }}>🧞</div>
-
       <style>{`
         @keyframes genieToastIn {
           from { opacity: 0; transform: translateY(12px); }
