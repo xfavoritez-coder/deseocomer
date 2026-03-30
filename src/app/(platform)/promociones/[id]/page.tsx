@@ -104,18 +104,8 @@ export default function PromocionDetailPage() {
           </div>
         )}
 
-        {/* Back button */}
-        <button onClick={() => router.push("/promociones")} className="dc-pd-back">
-          {"\u2190"} Promociones
-        </button>
-
         {/* Hero content overlay */}
         <div style={{ position: "relative", zIndex: 2 }}>
-          {/* Tipo badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", padding: "5px 14px", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.3)", color: "rgba(240,234,214,0.8)", marginBottom: "16px", backdropFilter: "blur(4px)" }}>
-            {TIPO_LABELS[promo.tipo]}
-          </div>
-
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 4vw, 2.8rem)", color: "#f5d080", textShadow: "0 2px 20px rgba(0,0,0,0.6)", marginBottom: "12px", lineHeight: 1.25, maxWidth: "700px", margin: "0 auto 12px" }}>
             {promo.titulo}
           </h1>
@@ -177,17 +167,35 @@ export default function PromocionDetailPage() {
               )}
             </div>
 
-            {/* Condiciones */}
-            {promo.condiciones && (
-              <div className="dc-pd-card">
-                <h2 className="dc-pd-card-title">{"\ud83d\udccb"} Condiciones</h2>
-                <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {promo.condiciones.split(".").filter(c => c.trim()).map((condicion, i) => (
-                    <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>{condicion.trim()}</li>
-                  ))}
-                </ul>
+            {/* Horario — mobile only */}
+            <div className="dc-pd-card dc-pd-horario-mobile">
+              <h2 className="dc-pd-card-title">Horario de la promoción</h2>
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", color: "#f5d080" }}>{promo.horaInicio} – {promo.horaFin}</p>
               </div>
-            )}
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
+              <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
+                {DIAS_SHORT.map((dia, idx) => {
+                  const active = promo.diasSemana.includes(idx);
+                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
+                })}
+              </div>
+            </div>
+
+            {/* Condiciones */}
+            <div className="dc-pd-card">
+              <h2 className="dc-pd-card-title">{"\ud83d\udccb"} Condiciones</h2>
+              <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                {promo.condiciones ? promo.condiciones.split(".").filter(c => c.trim()).map((condicion, i) => (
+                  <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>{condicion.trim()}</li>
+                )) : (
+                  <li style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>Sujeto a disponibilidad</li>
+                )}
+                {promo.fechaVencimiento && (
+                  <li style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>Válido hasta {promo.fechaVencimiento}</li>
+                )}
+              </ul>
+            </div>
 
             {/* Código de cupón */}
             {promo.codigoCupon && (
@@ -265,82 +273,21 @@ export default function PromocionDetailPage() {
             )}
           </div>
 
-          {/* ── Right: action card sidebar ── */}
+          {/* ── Right: sidebar — horario only ── */}
           <div className="dc-pd-sidebar">
-
-            {/* Horario card */}
-            <div className="dc-pd-card">
-              <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "16px" }}>
-                Horario de la promoción
-              </h3>
+            <div className="dc-pd-card dc-pd-horario-desktop">
+              <h2 className="dc-pd-card-title">Horario de la promoción</h2>
               <div style={{ textAlign: "center", marginBottom: "20px" }}>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", color: "#f5d080" }}>
-                  {promo.horaInicio} – {promo.horaFin}
-                </p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>
-                  Hasta {promo.fechaVencimiento}
-                </p>
+                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", color: "#f5d080" }}>{promo.horaInicio} – {promo.horaFin}</p>
               </div>
-
-              {/* Day circles */}
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>
-                Días válidos
-              </p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
               <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
                 {DIAS_SHORT.map((dia, idx) => {
                   const active = promo.diasSemana.includes(idx);
-                  return (
-                    <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: active ? 700 : 400, letterSpacing: "0.05em", transition: "all 0.2s" }}>
-                      {dia}
-                    </div>
-                  );
+                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
                 })}
               </div>
             </div>
-
-            {/* Ubicación */}
-            {promo.direccion && (
-              <div className="dc-pd-card">
-                <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>
-                  Ubicación
-                </h3>
-                <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: "12px", height: "120px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "14px", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.02) 19px, rgba(255,255,255,0.02) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.02) 19px, rgba(255,255,255,0.02) 20px)" }} />
-                  <div style={{ position: "relative", textAlign: "center" }}>
-                    <span style={{ fontSize: "2rem", display: "block" }}>{"\ud83d\udccd"}</span>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "6px" }}>{promo.comuna}</p>
-                  </div>
-                </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", lineHeight: 1.5, marginBottom: "6px" }}>
-                  {promo.direccion}
-                </p>
-                {promo.telefono && (
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                    {"\ud83d\udcde"} {promo.telefono}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Horario del local */}
-            {promo.horarioLocal && (
-              <div className="dc-pd-card">
-                <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>
-                  Horarios del local
-                </h3>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", lineHeight: 1.7 }}>
-                  {promo.horarioLocal}
-                </p>
-              </div>
-            )}
-
-            {/* CTA */}
-            <Link href={`/locales/${promo.localId}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "#07040f", padding: "16px 24px", borderRadius: "12px", textDecoration: "none", fontWeight: 700, transition: "opacity 0.2s" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.opacity = "1"; }}
-            >
-              Ir al local {"\u2192"}
-            </Link>
           </div>
         </div>
 
@@ -400,28 +347,7 @@ export default function PromocionDetailPage() {
           align-items: flex-end;
           justify-content: center;
         }
-        .dc-pd-back {
-          position: absolute;
-          top: 100px;
-          left: clamp(20px, 5vw, 60px);
-          font-family: var(--font-cinzel);
-          font-size: 0.6rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          background: rgba(0,0,0,0.35);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(255,255,255,0.15);
-          color: rgba(240,234,214,0.75);
-          padding: 8px 18px;
-          border-radius: 30px;
-          cursor: pointer;
-          transition: all 0.2s;
-          z-index: 3;
-        }
-        .dc-pd-back:hover {
-          border-color: var(--accent);
-          color: var(--accent);
-        }
+        .dc-pd-horario-mobile { display: none; }
         .dc-pd-content {
           padding: 40px clamp(20px, 5vw, 60px) 100px;
           max-width: 1100px;
@@ -492,8 +418,9 @@ export default function PromocionDetailPage() {
 
         @media (max-width: 767px) {
           .dc-pd-hero { padding: 120px 20px 40px; min-height: 280px; }
-          .dc-pd-back { top: 80px; left: 16px; }
           .dc-pd-content { padding: 24px 16px 80px; }
+          .dc-pd-horario-mobile { display: block; }
+          .dc-pd-horario-desktop { display: none; }
           .dc-pd-layout { grid-template-columns: 1fr; }
           .dc-pd-sidebar { position: static; }
           .dc-pd-related-card { width: 240px; }
