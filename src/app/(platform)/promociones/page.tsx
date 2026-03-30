@@ -63,12 +63,14 @@ export default function PromocionesPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Header */}
-      <section style={{ padding: "120px 24px 40px", textAlign: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "var(--color-title, #f5d080)", marginBottom: "12px" }}>Promociones</h1>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2.5vw, 1.1rem)", color: "var(--text-muted)", maxWidth: "500px", margin: "0 auto", lineHeight: 1.7 }}>
-          Descuentos reales, happy hours y cupones exclusivos en los mejores locales
-        </p>
+      {/* Hero */}
+      <section className="dc-pp-hero">
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 65%)" }} />
+        <div style={{ position: "relative", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "16px" }}>Promociones</p>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2.2rem, 7vw, 4.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Ofertas Exclusivas ⚡</h1>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Descuentos, happy hours y promociones especiales de los mejores restaurantes de Santiago.</p>
+        </div>
       </section>
 
       {/* Search + Filters */}
@@ -195,10 +197,19 @@ export default function PromocionesPage() {
       <Footer />
 
       <style>{`
+        .dc-pp-hero {
+          position: relative;
+          overflow: hidden;
+          padding: 140px 60px 60px;
+          text-align: center;
+        }
         @keyframes dc-ps-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .dc-filtros-tipo::-webkit-scrollbar { display: none; }
         @media (max-width: 767px) {
-          section:first-of-type { padding: 96px 20px 32px !important; }
+          .dc-pp-hero { padding: 100px 20px 50px; }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .dc-pp-hero { padding: 120px 40px 60px; }
         }
       `}</style>
     </main>
