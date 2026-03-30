@@ -21,13 +21,17 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     try {
-      const session = sessionStorage.getItem(SESSION_KEY);
-      if (session) {
-        const data = JSON.parse(session);
+      // Check sessionStorage first, then localStorage
+      const sessionData = sessionStorage.getItem(SESSION_KEY);
+      const localData = localStorage.getItem(SESSION_KEY);
+      const raw = sessionData || localData;
+      if (raw) {
+        const data = JSON.parse(raw);
         if (data.loggedIn) {
           setAuthorized(true);
-          const auth = localStorage.getItem(PANEL_KEY);
-          if (auth) setLocalName(JSON.parse(auth).nombreLocal ?? "");
+          setLocalName(data.nombre ?? "");
+          // Ensure sessionStorage has session for current tab
+          if (!sessionData) sessionStorage.setItem(SESSION_KEY, raw);
           return;
         }
       }

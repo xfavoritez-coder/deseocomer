@@ -26,8 +26,8 @@ export default function PanelDashboard() {
 
   useEffect(() => {
     try {
-      const auth = JSON.parse(localStorage.getItem(PANEL_KEY) ?? "{}");
-      setLocalName(auth.nombreLocal ?? "");
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      setLocalName(session.nombre ?? "");
     } catch {}
     setPct(getPerfilPct(getProfile()));
   }, []);

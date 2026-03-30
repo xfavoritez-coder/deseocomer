@@ -53,8 +53,9 @@ export default function LoginLocalPage() {
 
       if (!res.ok) { setLoading(false); return setError(data.error || "Email o contraseña incorrectos"); }
 
-      localStorage.setItem("deseocomer_local_session", JSON.stringify({ id: data.data.id, nombre: data.data.nombre, email: data.data.email, tipo: "local", loggedIn: true }));
-      sessionStorage.setItem("deseocomer_local_session", JSON.stringify({ loggedIn: true, email: data.data.email }));
+      const sessionObj = { id: data.data.id, nombre: data.data.nombre, email: data.data.email, tipo: "local", loggedIn: true };
+      localStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
+      sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch {
       setLoading(false);
       return setError("Error de conexión.");
