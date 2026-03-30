@@ -8,14 +8,12 @@ export default function BirthdayBanner() {
   const [nombre, setNombre] = useState("");
 
   useEffect(() => {
-    if (!isAuthenticated) return;
     try {
       const birthday = JSON.parse(localStorage.getItem("deseocomer_user_birthday") || "{}");
       if (!birthday?.dia || !birthday?.mes) return;
       const hoy = new Date();
       const esCumple = hoy.getDate() === Number(birthday.dia) && (hoy.getMonth() + 1) === Number(birthday.mes);
       if (esCumple) {
-        // Don't show if dismissed today
         const dismissKey = `cumple_banner_dismissed_${hoy.toISOString().slice(0, 10)}`;
         if (localStorage.getItem(dismissKey)) return;
         setNombre(user?.nombre?.split(" ")[0] || "");
@@ -37,10 +35,15 @@ export default function BirthdayBanner() {
     <div style={{
       background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(180,30,100,0.15))",
       borderBottom: "1px solid rgba(232,168,76,0.3)",
-      padding: "12px 20px",
+      padding: "12px 40px 12px 20px",
       textAlign: "center",
-      position: "relative",
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 101,
       overflow: "hidden",
+      backdropFilter: "blur(12px)",
     }}>
       {["🎊", "🎂", "✨", "🎉", "🎈"].map((emoji, i) => (
         <span key={i} style={{

@@ -252,6 +252,18 @@ export const PROMOCIONES: Promocion[] = [
     porcentajeDescuento: 20, diasSemana: [0,1,2,3,4,5,6], horaInicio: "13:00", horaFin: "23:00",
     fechaVencimiento: "2027-12-31", activa: true, esCumpleanos: true,
   },
+  {
+    id: 104, localId: "la-trattoria", local: "La Trattoria", comuna: "Vitacura",
+    tipo: "2x1" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600",
+    titulo: "2x1 Pastas en tu Cumpleaños", descripcion: "Celebra con pastas frescas: trae a un acompañante y ambos pagan como uno. Válido todo el día de tu cumpleaños.",
+    diasSemana: [0,1,2,3,4,5,6], horaInicio: "12:00", horaFin: "23:00",
+    fechaVencimiento: "2027-12-31", activa: true, esCumpleanos: true,
+    direccion: "El Bosque Norte 234, Vitacura",
+    telefono: "+56 2 2901 2345",
+    horarioLocal: "Mar-Dom 12:30-15:30 y 19:00-23:30",
+    descripcionLocal: "Auténtica cocina italiana en el corazón de Vitacura. Pastas frescas elaboradas cada mañana.",
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -21,12 +21,7 @@ export default function GenieToast() {
     setGuardado(false);
   }, [toastActivo?.id]);
 
-  // Auto-dismiss after 8 seconds (only if not showing birthday form)
-  useEffect(() => {
-    if (!toastActivo || mostrandoFecha) return;
-    timerRef.current = setTimeout(() => setToastActivo(null), 8000);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [toastActivo, setToastActivo, mostrandoFecha]);
+  // No auto-dismiss — toast stays until user closes it
 
   // Auto-close after save confirmation
   useEffect(() => {
