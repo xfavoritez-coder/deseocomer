@@ -70,6 +70,15 @@ input:-webkit-autofill:active {
   -webkit-tap-highlight-color: transparent;
 }
 
+select option {
+  background-color: #0a0812 !important;
+  color: #f0ead6 !important;
+}
+
+select:focus {
+  outline: none !important;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);

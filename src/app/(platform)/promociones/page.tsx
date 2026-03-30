@@ -107,13 +107,13 @@ export default function PromocionesPage() {
         </div>
 
         {/* Fila 3 — Comuna + Limpiar */}
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-          <select value={filtroComuna} onChange={e => setFiltroComuna(e.target.value)} style={{ flex: 1, padding: "10px 32px 10px 14px", borderRadius: "20px", border: filtroComuna ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: filtroComuna ? "rgba(232,168,76,0.08)" : "rgba(255,255,255,0.04)", color: filtroComuna ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", outline: "none", appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
-            <option value="">{"\ud83d\udccd"} Todas las comunas</option>
-            {comunasDisponibles.map(c => <option key={c} value={c}>{c}</option>)}
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <select value={filtroComuna} onChange={e => setFiltroComuna(e.target.value)} style={{ padding: "8px 32px 8px 14px", borderRadius: "20px", border: filtroComuna ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: filtroComuna ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.04)", color: filtroComuna ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center", minHeight: "36px", flexShrink: 0 }}>
+            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>{"\ud83d\udccd"} Todas las comunas</option>
+            {comunasDisponibles.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
           </select>
           {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna) && (
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setFiltroComuna(""); }} style={{ padding: "10px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, letterSpacing: "0.08em" }}>✕ Limpiar</button>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setFiltroComuna(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, letterSpacing: "0.08em" }}>✕ Limpiar</button>
           )}
         </div>
       </div>
