@@ -39,10 +39,8 @@ export default function GenieLampara() {
   if (pathname.startsWith("/panel")) return null;
 
   const handleClick = () => {
-    if (showBalloon) {
-      setShowBalloon(false);
-      try { localStorage.setItem("deseocomer_genio_presentado", "true"); } catch {}
-    }
+    if (showBalloon) setShowBalloon(false);
+    try { localStorage.setItem("deseocomer_genio_usado", "true"); } catch {}
     if (toastActivo) {
       setToastActivo(null);
     }
@@ -53,12 +51,34 @@ export default function GenieLampara() {
     }, 300);
   };
 
-  // ── Intro balloon (first visit only, stays until user clicks lamp) ──
+  // ── Intro balloon with 3-day reminder ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    try { if (localStorage.getItem("deseocomer_genio_presentado")) return; } catch { return; }
-    const showTimer = setTimeout(() => setShowBalloon(true), 3000);
-    return () => clearTimeout(showTimer);
+    try {
+      const USADO = "deseocomer_genio_usado";
+      const PRESENTADO = "deseocomer_genio_presentado";
+      const RECORDATORIO = "deseocomer_genio_ultimo_recordatorio";
+      if (localStorage.getItem(USADO)) return; // Already used, never show again
+      const yaPresentado = localStorage.getItem(PRESENTADO);
+      if (!yaPresentado) {
+        // First visit
+        const t = setTimeout(() => {
+          setShowBalloon(true);
+          localStorage.setItem(PRESENTADO, "true");
+          localStorage.setItem(RECORDATORIO, String(Date.now()));
+        }, 3000);
+        return () => clearTimeout(t);
+      }
+      // Already presented — check 3-day reminder
+      const ultimo = localStorage.getItem(RECORDATORIO);
+      if (ultimo && (Date.now() - Number(ultimo)) / 86400000 >= 3) {
+        const t = setTimeout(() => {
+          setShowBalloon(true);
+          localStorage.setItem(RECORDATORIO, String(Date.now()));
+        }, 3000);
+        return () => clearTimeout(t);
+      }
+    } catch {}
   }, []);
 
   // ── Trigger 3: Lunchtime toast ──
@@ -150,6 +170,7 @@ export default function GenieLampara() {
             borderRadius: "12px", padding: "10px 18px", whiteSpace: "nowrap",
             animation: balloonExiting ? "genieBalloonOut 0.3s ease forwards" : "genieBalloonIn 0.4s ease both",
           }}>
+            <button onClick={(e) => { e.stopPropagation(); setShowBalloon(false); try { localStorage.setItem("deseocomer_genio_ultimo_recordatorio", String(Date.now())); } catch {} }} style={{ position: "absolute", top: "-8px", right: "-8px", width: "20px", height: "20px", borderRadius: "50%", background: "rgba(232,168,76,0.9)", border: "none", color: "#1a0e05", fontSize: "0.55rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, zIndex: 2 }}>✕</button>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", fontWeight: 700, letterSpacing: "0.03em", color: s.color, margin: 0 }}>
               ✨ Pregúntame qué comer
             </p>

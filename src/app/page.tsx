@@ -17,7 +17,6 @@ export default function Home() {
       <PromocionesSection />
       <SectionDivider fromBg="var(--bg-secondary)" toBg="var(--bg-primary)" />
       <LocalesSection />
-      <SectionDivider fromBg="var(--bg-primary)" toBg="var(--bg-primary)" />
       <Footer />
     </main>
   );

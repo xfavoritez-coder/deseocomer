@@ -5,6 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPendingRef, hasEmailCounted, markEmailCounted, incrementRef, clearPendingRef, savePendingRef, getRefUserName } from "@/lib/referrals";
 
+function OjoIcon({ visible }: { visible: boolean }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,208,128,0.45)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {visible ? (<><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94" /><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19" /><line x1="1" y1="1" x2="23" y2="23" /></>) : (<><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></>)}
+    </svg>
+  );
+}
+
 export default function RegistroPage() {
   return <Suspense><RegistroContent /></Suspense>;
 }
@@ -94,9 +102,10 @@ function RegistroContent() {
         ) : (
           <>
             <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.6rem, 5vw, 2rem)", color: "var(--color-title, var(--accent))", marginBottom: "8px" }}>Crear cuenta</h1>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "32px" }}>
-              ¿Ya tienes cuenta? <Link href="/login" style={{ color: "var(--accent)", textDecoration: "none" }}>Inicia sesión</Link>
-            </p>
+            <div style={{ marginBottom: "32px" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", margin: "0 0 6px" }}>¿Ya tienes cuenta?</p>
+              <Link href="/login" style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Inicia sesión →</Link>
+            </div>
 
             {error && (
               <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "8px", padding: "12px", marginBottom: "16px" }}>
@@ -117,14 +126,14 @@ function RegistroContent() {
                 <label style={labelS}>Contraseña</label>
                 <div style={{ position: "relative" }}>
                   <input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} />
-                  <button type="button" onClick={() => setShowPw(s => !s)} style={eyeBtn}>{showPw ? "🙈" : "👁"}</button>
+                  <button type="button" onClick={() => setShowPw(s => !s)} style={eyeBtn}><OjoIcon visible={showPw} /></button>
                 </div>
               </div>
               <div>
                 <label style={labelS}>Confirmar contraseña</label>
                 <div style={{ position: "relative" }}>
                   <input style={{ ...inputS, paddingRight: "48px" }} type={showConf ? "text" : "password"} placeholder="Repite tu contraseña" value={form.confirm} onChange={e => set("confirm", e.target.value)} />
-                  <button type="button" onClick={() => setShowConf(s => !s)} style={eyeBtn}>{showConf ? "🙈" : "👁"}</button>
+                  <button type="button" onClick={() => setShowConf(s => !s)} style={eyeBtn}><OjoIcon visible={showConf} /></button>
                 </div>
               </div>
 

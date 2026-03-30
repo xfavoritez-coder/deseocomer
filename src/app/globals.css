@@ -55,10 +55,11 @@ html {
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px rgba(45,26,8,0.95) inset !important;
-  -webkit-text-fill-color: var(--text-primary) !important;
-  border-color: rgba(232,168,76,0.2) !important;
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(30,15,5,0.98) inset !important;
+  -webkit-text-fill-color: #f5d080 !important;
+  border-color: rgba(232,168,76,0.3) !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

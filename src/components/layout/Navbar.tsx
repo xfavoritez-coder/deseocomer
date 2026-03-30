@@ -101,41 +101,47 @@ export default function Navbar() {
           </Link>
         ))}
 
-        {/* 3. Auth */}
-        <div style={{ marginTop: "24px" }}>
-          {mounted && (
-            isAuthenticated && user ? (
-              <div style={{ padding: "8px 28px 4px" }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", marginBottom: "8px" }}>{user.nombre}</p>
-                <Link href="/perfil" onClick={() => setMenuOpen(false)} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", padding: "8px 0" }}>Mi perfil</Link>
-                <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer", padding: "8px 0", width: "100%", textAlign: "left" }}>Cerrar sesión</button>
-              </div>
-            ) : (
-              <>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "10px", letterSpacing: "0.03em" }}>
-                  Únete gratis o inicia sesión
-                </p>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-                  display: "block", margin: "0 20px", padding: "16px 20px",
-                  background: "var(--accent)", borderRadius: "12px",
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.85rem",
-                  letterSpacing: "0.12em", textTransform: "uppercase",
-                  color: "var(--bg-primary)", textDecoration: "none",
-                  textAlign: "center", fontWeight: 700,
-                }}>
-                  Entrar
-                </Link>
-              </>
-            )
-          )}
-        </div>
+        {/* Separator */}
+        <div style={{ height: "1px", background: "rgba(232,168,76,0.1)", margin: "4px 0" }} />
 
-        {/* 4. Local link */}
-        <Link href="/solo-locales" onClick={() => setMenuOpen(false)} style={{
-          display: "block", padding: "20px 24px 24px",
-          fontFamily: "var(--font-lato)", fontSize: "0.8rem",
-          color: "var(--text-muted)", textDecoration: "none", textAlign: "center",
-        }}>
+        {/* Auth */}
+        {mounted && (
+          isAuthenticated && user ? (
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(232,168,76,0.08)", marginBottom: "4px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
+                <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: "#1a0e05", fontWeight: 700, flexShrink: 0 }}>
+                  {user.nombre?.charAt(0).toUpperCase() ?? "U"}
+                </div>
+                <div>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", margin: "0 0 2px", fontWeight: 600 }}>{user.nombre?.split(" ")[0]}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", margin: 0 }}>Miembro de DeseoComer</p>
+                </div>
+              </div>
+              {[
+                { href: "/perfil", icon: "👤", label: "Mi perfil" },
+                { href: "/perfil", icon: "❤️", label: "Mis favoritos" },
+                { href: "/perfil", icon: "🏆", label: "Mis concursos" },
+              ].map(item => (
+                <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(245,208,128,0.9)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.05)" }}>
+                  <span style={{ fontSize: "1rem", width: "20px" }}>{item.icon}</span>{item.label}
+                </Link>
+              ))}
+              <button onClick={() => { logout(); setMenuOpen(false); }} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "10px 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "#ff6b6b", cursor: "pointer", width: "100%", textAlign: "left", marginTop: "4px" }}>
+                <span style={{ fontSize: "1rem", width: "20px" }}>🚪</span>Cerrar sesión
+              </button>
+            </div>
+          ) : (
+            <div style={{ marginTop: "16px" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "10px" }}>Únete gratis o inicia sesión</p>
+              <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", margin: "0 20px", padding: "16px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700 }}>
+                Entrar
+              </Link>
+            </div>
+          )
+        )}
+
+        {/* Local link */}
+        <Link href="/solo-locales" onClick={() => setMenuOpen(false)} style={{ display: "block", margin: "12px 20px 24px", padding: "16px 20px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: "14px", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", letterSpacing: "0.06em", color: "var(--accent)", textDecoration: "none", textAlign: "center", fontWeight: 600 }}>
           <span style={{ textDecoration: "underline" }}>¿Tienes un local?</span>{" →"}
         </Link>
       </div>
