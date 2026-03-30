@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useGenie } from "@/contexts/GenieContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavoritos } from "@/hooks/useFavoritos";
 import { getLocalById, LOCALES, type Local, type Resena } from "@/lib/mockLocales";
 import { CONCURSOS } from "@/lib/mockConcursos";
 
@@ -65,31 +66,13 @@ export default function LocalDetailPage() {
   const local = getLocalById(Number(id));
   const [tab, setTab] = useState<Tab>("Información");
   const [lightbox, setLightbox] = useState<string | null>(null);
-  const [isFav, setIsFav] = useState(false);
+  const { toggleFavorito, esFavorito } = useFavoritos();
 
   // Track visit
   useEffect(() => {
     if (!local) return;
     addInteraccion("local_visitado", { id: String(local.id), nombre: local.nombre, categoria: local.categoria, comuna: local.barrio });
   }, [local?.id]);
-
-  // Check fav
-  useEffect(() => {
-    try {
-      const favs = JSON.parse(localStorage.getItem("deseocomer_favoritos") ?? "[]") as number[];
-      setIsFav(favs.includes(Number(id)));
-    } catch {}
-  }, [id]);
-
-  const toggleFav = () => {
-    try {
-      const favs = JSON.parse(localStorage.getItem("deseocomer_favoritos") ?? "[]") as number[];
-      const newFavs = isFav ? favs.filter(f => f !== Number(id)) : [...favs, Number(id)];
-      localStorage.setItem("deseocomer_favoritos", JSON.stringify(newFavs));
-      setIsFav(!isFav);
-      if (!isFav) addInteraccion("favorito_guardado", { categoria: local?.categoria ?? "", comuna: local?.barrio ?? "" });
-    } catch {}
-  };
 
   if (!local) {
     return (
@@ -127,13 +110,13 @@ export default function LocalDetailPage() {
         <img src={local.imagenPortada} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(13,7,3,0.95) 100%)" }} />
         {/* Fav button */}
-        <button onClick={toggleFav} style={{
+        <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{
           position: "absolute", top: "80px", right: "20px", zIndex: 10,
           width: "44px", height: "44px", borderRadius: "50%",
           background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer",
           fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          {isFav ? "❤️" : "🤍"}
+          {esFavorito(String(local.id)) ? "❤️" : "🤍"}
         </button>
         {/* Info overlay */}
         <div style={{ position: "absolute", bottom: "24px", left: "24px", right: "24px", zIndex: 10, display: "flex", alignItems: "flex-end", gap: "16px" }}>

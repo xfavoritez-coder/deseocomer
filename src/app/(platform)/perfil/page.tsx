@@ -174,17 +174,42 @@ export default function PerfilPage() {
 // ─── Tab: Favoritos ──────────────────────────────────────────────────────────
 
 function TabFavoritos() {
-  const [favs] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem(FAVS_KEY) ?? "[]"); } catch { return []; }
-  });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [locales, setLocales] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (favs.length === 0) return (
-    <EmptyState icon="❤️" text="Aún no tienes favoritos guardados. Explora locales y guarda los que te gusten 🧞" btnText="Explorar locales" btnHref="/locales" />
+  useEffect(() => {
+    const session = JSON.parse(localStorage.getItem("deseocomer_session") || "{}");
+    if (!session.id) { setLoading(false); return; }
+    fetch(`/api/favoritos?usuarioId=${session.id}`)
+      .then(r => r.json())
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((data: any[]) => { if (Array.isArray(data)) setLocales(data.map(f => f.local).filter(Boolean)); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>{[1,2].map(i => <div key={i} style={{ height: "100px", borderRadius: "12px", background: "rgba(45,26,8,0.85)", animation: "pulse 1.5s ease infinite" }} />)}</div>;
+
+  if (locales.length === 0) return (
+    <EmptyState icon="🤍" text="Aún no tienes favoritos. Guarda locales para encontrarlos fácilmente." btnText="Explorar locales" btnHref="/locales" />
   );
 
-  return <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-muted)", fontSize: "0.9rem" }}>
-    Tienes {favs.length} favorito{favs.length !== 1 ? "s" : ""} guardado{favs.length !== 1 ? "s" : ""}.
-  </p>;
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "12px" }}>
+      {locales.map((l: { id: string; nombre: string; comuna: string; categoria: string }) => (
+        <Link key={l.id} href={`/locales/${l.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "16px", textDecoration: "none" }}>
+          <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: "var(--bg-primary)", flexShrink: 0 }}>
+            {l.nombre?.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--accent)" }}>{l.nombre}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)" }}>{l.categoria} · {l.comuna}</p>
+          </div>
+        </Link>
+      ))}
+      <style>{`@keyframes pulse { 0%,100% { opacity:0.4 } 50% { opacity:0.8 } }`}</style>
+    </div>
+  );
 }
 
 // ─── Tab: Concursos ──────────────────────────────────────────────────────────

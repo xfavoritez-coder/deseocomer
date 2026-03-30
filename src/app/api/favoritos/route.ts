@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const usuarioId = searchParams.get("usuarioId");
+    if (!usuarioId) return NextResponse.json({ error: "Falta usuarioId" }, { status: 400 });
+    const favoritos = await prisma.favorito.findMany({
+      where: { usuarioId },
+      include: { local: { select: { id: true, nombre: true, categoria: true, comuna: true, logoUrl: true, portadaUrl: true, descripcion: true, verificado: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(favoritos);
+  } catch {
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { usuarioId, localId } = await req.json();

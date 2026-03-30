@@ -284,6 +284,18 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     } catch { /* noop */ }
   }, [isLoggedIn, setToastActivo]);
 
+  // Listen for favorito events from useFavoritos hook
+  useEffect(() => {
+    const handleFav = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d?.categoria || d?.comuna) addInteraccion("favorito_guardado", { categoria: d.categoria || "", comuna: d.comuna || "" });
+    };
+    const handleNoLogin = () => showFavoritoToast();
+    window.addEventListener("favorito_guardado", handleFav);
+    window.addEventListener("favorito_sin_login", handleNoLogin);
+    return () => { window.removeEventListener("favorito_guardado", handleFav); window.removeEventListener("favorito_sin_login", handleNoLogin); };
+  }, [addInteraccion, showFavoritoToast]);
+
   return (
     <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast }}>
       {children}
