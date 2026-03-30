@@ -1,6 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
 
+function Medallon({ size = 64 }: { size?: number }) {
+  return (
+    <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.5))", pointerEvents: "none" }}>
+      <svg width={size} height={size} viewBox="0 0 64 64">
+        <circle cx="32" cy="32" r="30" fill="url(#goldGrad)" stroke="#f5d080" strokeWidth="1.5" />
+        <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,240,150,0.6)" strokeWidth="1" strokeDasharray="3 2" />
+        {[0,30,60,90,120,150,180,210,240,270,300,330].map((a, i) => { const r = (a * Math.PI) / 180; return <line key={i} x1={32+25*Math.cos(r)} y1={32+25*Math.sin(r)} x2={32+29*Math.cos(r)} y2={32+29*Math.sin(r)} stroke="rgba(255,240,150,0.7)" strokeWidth="1" />; })}
+        <text x="32" y="26" textAnchor="middle" fontSize="14">🏆</text>
+        <text x="32" y="38" textAnchor="middle" fontFamily="serif" fontSize="7" fontWeight="bold" fill="#1a0e05" letterSpacing="1">GRATIS</text>
+        <defs><radialGradient id="goldGrad" cx="40%" cy="35%"><stop offset="0%" stopColor="#f5d080"/><stop offset="50%" stopColor="#e8a84c"/><stop offset="100%" stopColor="#c4853a"/></radialGradient></defs>
+      </svg>
+    </div>
+  );
+}
+
 const concursosMock = [
   {
     id: 1, local: "Pizza Napoli", premio: "Pizza familiar gratis",
@@ -42,11 +57,21 @@ export default function ConcursosSection() {
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
+        // Sort: urgent (<=24h) first, then by participants
+        const ahora = Date.now();
+        const sorted = [...data].sort((a, b) => {
+          const rA = new Date(a.fechaFin).getTime() - ahora;
+          const rB = new Date(b.fechaFin).getTime() - ahora;
+          const uA = rA <= 86400000, uB = rB <= 86400000;
+          if (uA && !uB) return -1; if (!uA && uB) return 1;
+          if (uA && uB) return rA - rB;
+          return (b._count?.participantes ?? 0) - (a._count?.participantes ?? 0);
+        });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setConcursos(data.slice(0, 3).map((c: any) => ({
+        setConcursos(sorted.slice(0, 3).map((c: any) => ({
           id: c.id as number, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
           participantes: c._count?.participantes ?? 0,
-          horasRestantes: Math.max(1, Math.floor((new Date(c.fechaFin).getTime() - Date.now()) / 3600000)),
+          horasRestantes: Math.max(1, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
           imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
           topRanking: [],
         })));
@@ -124,16 +149,7 @@ export default function ConcursosSection() {
             >
               <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none", background: "rgba(45,26,8,0.8)", position: "relative" }}>
                 <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{
-                  position: "absolute", top: "14px", right: "-28px",
-                  background: "linear-gradient(135deg, #f5d080, #e8a84c, #c4853a)",
-                  color: "#1a0e05", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
-                  fontWeight: 900, letterSpacing: "0.12em", padding: "6px 40px",
-                  transform: "rotate(35deg)", boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                  whiteSpace: "nowrap",
-                }}>
-                  🏆 PREMIO GRATIS
-                </div>
+                <Medallon />
               </div>
               <div style={{ padding: "24px 24px 0", pointerEvents: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
@@ -157,8 +173,8 @@ export default function ConcursosSection() {
                 {/* Countdown */}
                 <div style={{
                   marginBottom: "20px", borderRadius: "14px", overflow: "hidden",
-                  border: c.horasRestantes <= 6 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
-                  background: c.horasRestantes <= 6 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
+                  border: c.horasRestantes <= 24 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
+                  background: c.horasRestantes <= 24 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
                 }}>
                   <div style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -167,12 +183,12 @@ export default function ConcursosSection() {
                     <span style={{
                       fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
                       letterSpacing: "0.2em", textTransform: "uppercase",
-                      color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
+                      color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--oasis-bright)",
                       display: "flex", alignItems: "center", gap: "6px",
                     }}>
                       <span style={{
                         width: "6px", height: "6px", borderRadius: "50%",
-                        background: c.horasRestantes <= 6 ? "#ff4444" : "var(--oasis-bright)",
+                        background: c.horasRestantes <= 24 ? "#ff4444" : "var(--oasis-bright)",
                         display: "inline-block",
                         animation: "dc-cst-pulse 1.5s ease-in-out infinite",
                       }}/>
@@ -195,8 +211,8 @@ export default function ConcursosSection() {
                         <div style={{ textAlign: "center" }}>
                           <div style={{
                             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", lineHeight: 1,
-                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
-                            textShadow: c.horasRestantes <= 6 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
+                            color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--accent)",
+                            textShadow: c.horasRestantes <= 24 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
                             minWidth: "42px", textAlign: "center",
                             animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1s ease-in-out infinite" : "none",
                           }}>
@@ -211,7 +227,7 @@ export default function ConcursosSection() {
                         {idx < 2 && (
                           <span style={{
                             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
-                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
+                            color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--accent)",
                             opacity: 0.6, marginBottom: "16px", alignSelf: "flex-start", paddingTop: "2px",
                           }}>:</span>
                         )}
