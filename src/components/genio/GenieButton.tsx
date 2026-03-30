@@ -144,7 +144,28 @@ export default function GenieLampara() {
     return () => clearTimeout(timer);
   }, [isLoggedIn, sessionCount, setToastActivo]);
 
-  // Birthday trigger moved to GenieContext
+  // ── Birthday special greeting ──
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    try {
+      const birthday = JSON.parse(localStorage.getItem("deseocomer_user_birthday") || "{}");
+      if (!birthday?.dia || !birthday?.mes) return;
+      const hoy = new Date();
+      const esCumple = hoy.getDate() === Number(birthday.dia) && (hoy.getMonth() + 1) === Number(birthday.mes);
+      if (!esCumple) return;
+      const keyHoy = `genio_cumple_saludo_${hoy.toISOString().slice(0, 10)}`;
+      if (localStorage.getItem(keyHoy)) return;
+      const timer = setTimeout(() => {
+        setToastActivo({
+          id: "cumple_saludo",
+          mensaje: "🎂 ¡Feliz cumpleaños! Hoy hay ofertas especiales para celebrar tu día 🎉",
+          opciones: ["Ver ofertas", "¡Gracias! 🎂"],
+        });
+        localStorage.setItem(keyHoy, "true");
+      }, 2000);
+      return () => clearTimeout(timer);
+    } catch {}
+  }, [setToastActivo]);
 
   return (
     <>

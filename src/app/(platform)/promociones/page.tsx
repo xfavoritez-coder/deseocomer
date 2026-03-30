@@ -21,6 +21,7 @@ export default function PromocionesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
+  const [esCumple, setEsCumple] = useState(false);
 
   // Fetch from BD and merge
   useEffect(() => {
@@ -31,6 +32,17 @@ export default function PromocionesPage() {
     }).catch(() => {});
   }, []);
 
+  // Detect birthday
+  useEffect(() => {
+    try {
+      const birthday = JSON.parse(localStorage.getItem("deseocomer_user_birthday") || "{}");
+      if (birthday?.dia && birthday?.mes) {
+        const hoy = new Date();
+        setEsCumple(hoy.getDate() === Number(birthday.dia) && (hoy.getMonth() + 1) === Number(birthday.mes));
+      }
+    } catch {}
+  }, []);
+
   const toggleTipo = (t: string) => setFiltrosTipo(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
 
   const filtered = promos.filter(p => {
@@ -39,6 +51,10 @@ export default function PromocionesPage() {
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
     return true;
   });
+
+  // Birthday: show birthday promos first
+  const promosCumple = esCumple ? filtered.filter(p => p.esCumpleanos) : [];
+  const promosNormales = esCumple ? filtered.filter(p => !p.esCumpleanos) : filtered;
 
   const activasAhora = promos.filter(p => isPromocionActivaAhora(p)).length;
   const localesUnicos = new Set(promos.map(p => p.local)).size;
@@ -85,9 +101,35 @@ export default function PromocionesPage() {
         </div>
       </div>
 
+      {/* Birthday section */}
+      {esCumple && promosCumple.length > 0 && (
+        <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 48px" }}>
+          <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(180,30,100,0.1))", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "32px", textAlign: "center", marginBottom: "0" }}>
+            <p style={{ fontSize: "2.5rem", margin: "0 0 12px" }}>🎂</p>
+            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", color: "var(--accent)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", margin: "0 0 8px" }}>¡Hoy es tu día especial!</h2>
+            <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.8))", fontSize: "1rem", marginBottom: "24px" }}>Estos locales tienen ofertas exclusivas para celebrar tu cumpleaños</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", textAlign: "left" }}>
+              {promosCumple.map(promo => (
+                <Link key={promo.id} href={`/promociones/${promo.id}`} style={{ background: "rgba(8,13,24,0.7)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", overflow: "hidden", textDecoration: "none", display: "block", transition: "transform 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+                  {promo.imagenUrl && (
+                    <div style={{ height: "120px", overflow: "hidden" }}>
+                      <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                  )}
+                  <div style={{ padding: "14px" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "4px" }}>{promo.titulo}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.6)" }}>{promo.local} · {promo.comuna}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Grid */}
       <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 80px" }}>
-        {filtered.length === 0 ? (
+        {promosNormales.length === 0 && promosCumple.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <p style={{ fontSize: "3rem", marginBottom: "12px" }}>⚡</p>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)" }}>Sin promociones con estos filtros</p>
@@ -95,7 +137,7 @@ export default function PromocionesPage() {
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
-            {filtered.map(promo => {
+            {promosNormales.map(promo => {
               const activa = isPromocionActivaAhora(promo);
               const sello = getSello(promo);
               return (

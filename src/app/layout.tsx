@@ -6,6 +6,8 @@ import ThemeProvider from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { GenieProvider } from "@/contexts/GenieContext";
 import GenieLampara from "@/components/genio/GenieButton";
+import GenieContextual from "@/components/GenieContextual";
+import BirthdayBanner from "@/components/BirthdayBanner";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -66,8 +68,10 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <GenieProvider>
+              <BirthdayBanner />
               {children}
               <GenieLampara />
+              <GenieContextual />
             </GenieProvider>
           </AuthProvider>
         </ThemeProvider>
