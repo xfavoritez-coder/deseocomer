@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, type Promocion } from "@/lib/mockPromociones";
 
 const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
@@ -18,6 +19,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
 }
 
 export default function PromocionesPage() {
+  const { isAuthenticated } = useAuth();
   const [promos, setPromos] = useState<Promocion[]>(PROMOCIONES.filter(p => p.activa));
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
@@ -57,9 +59,6 @@ export default function PromocionesPage() {
   const promosCumple = esCumple ? filtered.filter(p => p.esCumpleanos) : [];
   const promosNormales = esCumple ? filtered.filter(p => !p.esCumpleanos) : filtered;
 
-  const activasAhora = promos.filter(p => isPromocionActivaAhora(p)).length;
-  const localesUnicos = new Set(promos.map(p => p.local)).size;
-
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
@@ -67,17 +66,9 @@ export default function PromocionesPage() {
       {/* Header */}
       <section style={{ padding: "120px 24px 40px", textAlign: "center" }}>
         <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2rem, 6vw, 3.5rem)", color: "var(--color-title, #f5d080)", marginBottom: "12px" }}>Promociones</h1>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2.5vw, 1.1rem)", color: "var(--text-muted)", maxWidth: "500px", margin: "0 auto 24px", lineHeight: 1.7 }}>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2.5vw, 1.1rem)", color: "var(--text-muted)", maxWidth: "500px", margin: "0 auto", lineHeight: 1.7 }}>
           Descuentos reales, happy hours y cupones exclusivos en los mejores locales
         </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "clamp(16px, 4vw, 48px)", flexWrap: "nowrap" }}>
-          {[{ num: activasAhora, label: "Activas ahora" }, { num: promos.length, label: "Promociones" }, { num: localesUnicos, label: "Locales" }].map(s => (
-            <div key={s.label} style={{ textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2rem)", color: "var(--accent)", margin: 0 }}>{s.num}</p>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem, 1.5vw, 0.7rem)", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label)", margin: 0 }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Search + Filters */}
@@ -102,8 +93,8 @@ export default function PromocionesPage() {
         </div>
       </div>
 
-      {/* Birthday section */}
-      {esCumple && promosCumple.length > 0 && (
+      {/* Birthday section — only for authenticated users */}
+      {isAuthenticated && esCumple && promosCumple.length > 0 && (
         <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 48px" }}>
           <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(180,30,100,0.1))", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "32px", textAlign: "center", marginBottom: "0" }}>
             <p style={{ fontSize: "2.5rem", margin: "0 0 12px" }}>🎂</p>
