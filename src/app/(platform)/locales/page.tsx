@@ -112,22 +112,6 @@ export default function LocalesPage() {
 
   const hayFiltros = busqueda || categoriaActiva !== "Todos" || soloAbiertos || soloConConcursos || soloConPromociones;
 
-  const chipStyle = (active: boolean): React.CSSProperties => ({
-    padding: "8px 14px",
-    borderRadius: "20px",
-    border: active ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)",
-    background: active ? "rgba(232,168,76,0.12)" : "transparent",
-    color: active ? "var(--accent)" : "var(--text-muted)",
-    fontFamily: "var(--font-cinzel)",
-    fontSize: "0.65rem",
-    letterSpacing: "0.08em",
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-    display: "flex",
-    alignItems: "center",
-    gap: "5px",
-  });
-
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
@@ -159,39 +143,37 @@ export default function LocalesPage() {
           />
         </div>
 
-        {/* Category chips */}
-        <div className="dc-loc-cat-scroll">
+        {/* Fila 1 — Categorías */}
+        <div className="dc-filtros-fila" style={{ marginBottom: "10px" }}>
           {CATEGORIAS.map(cat => {
             const active = categoriaActiva === cat;
             return (
-              <button key={cat} onClick={() => setCategoriaActiva(cat)} style={{ padding: "8px 16px", borderRadius: "20px", border: active ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: active ? "rgba(232,168,76,0.15)" : "transparent", color: active ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase" }}>
+              <button key={cat} onClick={() => setCategoriaActiva(cat)} style={{ padding: "8px 16px", borderRadius: "20px", border: active ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: active ? "rgba(232,168,76,0.15)" : "transparent", color: active ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
                 {cat}
               </button>
             );
           })}
         </div>
 
-        {/* Extra filters row */}
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px", alignItems: "center" }}>
-          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={chipStyle(soloAbiertos)}>
-            {soloAbiertos && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e", display: "inline-block" }} />}
-            🟢 Abierto ahora
+        {/* Fila 2 — Estado + Ordenamiento */}
+        <div className="dc-filtros-fila">
+          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloAbiertos ? "1px solid #3db89e" : "1px solid rgba(232,168,76,0.2)", background: soloAbiertos ? "rgba(61,184,158,0.12)" : "transparent", color: soloAbiertos ? "#3db89e" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+            {soloAbiertos && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#3db89e", display: "inline-block" }} />}
+            Abierto ahora
           </button>
-          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={chipStyle(soloConConcursos)}>
-            {soloConConcursos && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />}
+          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConConcursos ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConConcursos ? "rgba(232,168,76,0.12)" : "transparent", color: soloConConcursos ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             🏆 Con concursos
           </button>
-          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={chipStyle(soloConPromociones)}>
-            {soloConPromociones && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />}
+          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             ⚡ Con promociones
           </button>
-          <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", outline: "none", letterSpacing: "0.05em" }}>
-            <option value="rating">⭐ Mejor valorados</option>
-            <option value="nuevo">🆕 Más nuevos</option>
-            <option value="favoritos">❤️ Más guardados</option>
+          <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
+            <option value="nuevo" style={{ background: "#0a0812", color: "#f0ead6" }}>🆕 Más nuevos</option>
+            <option value="favoritos" style={{ background: "#0a0812", color: "#f0ead6" }}>❤️ Más guardados</option>
           </select>
           {hayFiltros && (
-            <button onClick={limpiarFiltros} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap" }}>
+            <button onClick={limpiarFiltros} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
               ✕ Limpiar
             </button>
           )}
@@ -339,15 +321,17 @@ export default function LocalesPage() {
       <Footer />
 
       <style>{`
-        .dc-loc-cat-scroll {
+        .dc-filtros-fila {
           display: flex;
           gap: 8px;
+          flex-wrap: nowrap;
           overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
           scrollbar-width: none;
           -ms-overflow-style: none;
           padding-bottom: 4px;
         }
-        .dc-loc-cat-scroll::-webkit-scrollbar { display: none; }
+        .dc-filtros-fila::-webkit-scrollbar { display: none; }
         .dc-loc-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
