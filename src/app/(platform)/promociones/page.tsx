@@ -24,6 +24,7 @@ export default function PromocionesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
+  const [filtroComuna, setFiltroComuna] = useState("");
   const [esCumple, setEsCumple] = useState(false);
 
   // Fetch from BD and merge
@@ -48,10 +49,13 @@ export default function PromocionesPage() {
 
   const toggleTipo = (t: string) => setFiltrosTipo(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
 
+  const comunasDisponibles = Array.from(new Set(promos.filter(p => p.comuna).map(p => p.comuna))).sort();
+
   const filtered = promos.filter(p => {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo.toLowerCase().includes(q) && !p.local.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
+    if (filtroComuna && p.comuna !== filtroComuna) return false;
     return true;
   });
 
@@ -73,22 +77,43 @@ export default function PromocionesPage() {
 
       {/* Search + Filters */}
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "0 20px 32px" }}>
-        <div style={{ position: "relative", marginBottom: "16px" }}>
-          <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
+        {/* Fila 1 — Buscador */}
+        <div style={{ position: "relative", marginBottom: "12px" }}>
+          <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
           <input type="text" placeholder="Buscar promociones o locales..." value={busqueda} onChange={e => setBusqueda(e.target.value)}
-            style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }} />
+            style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
+            onFocus={e => { e.target.style.borderColor = "var(--accent)"; }} onBlur={e => { e.target.style.borderColor = "rgba(232,168,76,0.2)"; }} />
         </div>
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
-          <button onClick={() => setFiltroActivas(!filtroActivas)} style={{ padding: "8px 16px", borderRadius: "20px", border: filtroActivas ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.25)", background: filtroActivas ? "rgba(232,168,76,0.15)" : "transparent", color: filtroActivas ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap" }}>
-            {filtroActivas && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />}Activas ahora
-          </button>
-          {TIPOS.map(t => (
-            <button key={t} onClick={() => toggleTipo(t)} style={{ padding: "8px 14px", borderRadius: "20px", border: filtrosTipo.includes(t) ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: filtrosTipo.includes(t) ? "rgba(232,168,76,0.12)" : "transparent", color: filtrosTipo.includes(t) ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase" }}>
-              {TIPO_LABEL[t] ?? t}
-            </button>
-          ))}
-          {(filtrosTipo.length > 0 || filtroActivas || busqueda) && (
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); }} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap" }}>✕ Limpiar</button>
+
+        {/* Fila 2 — Filtros de tipo */}
+        <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "nowrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none" }}>
+          {[
+            { key: "activas", label: "Activas ahora", color: "var(--oasis-bright)" },
+            { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
+            { key: "descuento", label: "Descuento", color: "#ff6644" },
+            { key: "2x1", label: "2\u00d71", color: "#3db89e" },
+            { key: "cupon", label: "Cupón", color: "#8040d0" },
+            { key: "precio_especial", label: "Especial", color: "#e8a84c" },
+            { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
+          ].map(({ key, label, color }) => {
+            const isActive = key === "activas" ? filtroActivas : filtrosTipo.includes(key);
+            return (
+              <button key={key} onClick={() => { if (key === "activas") setFiltroActivas(!filtroActivas); else toggleTipo(key); }} style={{ padding: "8px 16px", borderRadius: "20px", border: isActive ? `1px solid ${color}` : "1px solid rgba(232,168,76,0.2)", background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : "transparent", color: isActive ? color : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: "5px", transition: "all 0.2s" }}>
+                {key === "activas" && isActive && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: color, display: "inline-block", animation: "dc-ps-blink 1.5s infinite" }} />}
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Fila 3 — Comuna + Limpiar */}
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <select value={filtroComuna} onChange={e => setFiltroComuna(e.target.value)} style={{ flex: 1, padding: "10px 32px 10px 14px", borderRadius: "20px", border: filtroComuna ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: filtroComuna ? "rgba(232,168,76,0.08)" : "rgba(255,255,255,0.04)", color: filtroComuna ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", outline: "none", appearance: "none", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="">{"\ud83d\udccd"} Todas las comunas</option>
+            {comunasDisponibles.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+          {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna) && (
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setFiltroComuna(""); }} style={{ padding: "10px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, letterSpacing: "0.08em" }}>✕ Limpiar</button>
           )}
         </div>
       </div>
@@ -174,6 +199,7 @@ export default function PromocionesPage() {
 
       <style>{`
         @keyframes dc-ps-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .dc-filtros-tipo::-webkit-scrollbar { display: none; }
         @media (max-width: 767px) {
           section:first-of-type { padding: 96px 20px 32px !important; }
         }
