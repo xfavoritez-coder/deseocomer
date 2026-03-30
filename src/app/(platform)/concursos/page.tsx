@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
+import SelloGratis from "@/components/SelloGratis";
 import Footer from "@/components/layout/Footer";
 import {
   CONCURSOS,
@@ -370,6 +371,8 @@ function ConcursoCard({
       {c.imagenUrl && (
         <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative", background: "rgba(45,26,8,0.8)" }}>
           <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+          {/* Sello GRATIS */}
+          <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 3, pointerEvents: "none" }}><SelloGratis size="sm" /></div>
           {/* Badge termina pronto over image */}
           {soon && (
             <div style={{

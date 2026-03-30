@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
+import SelloGratis from "@/components/SelloGratis";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -425,19 +426,9 @@ export default function ConcursoDetallePage() {
           {c.imagenUrl && (
             <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
               <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              {/* Ribbon */}
-              <div style={{
-                position: "absolute", top: "18px", right: "-32px",
-                background: "linear-gradient(135deg, #f5d080, #e8a84c, #c4853a)",
-                color: "#1a0e05",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-                fontWeight: 900, letterSpacing: "0.12em",
-                padding: "8px 48px",
-                transform: "rotate(35deg)",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
-                whiteSpace: "nowrap",
-              }}>
-                🏆 Premio Gratis
+              {/* Sello GRATIS */}
+              <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3, pointerEvents: "none" }}>
+                <SelloGratis size="lg" />
               </div>
             </div>
           )}
