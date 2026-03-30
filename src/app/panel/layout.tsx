@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import GeniePanelLocal from "@/components/panel/GeniePanelLocal";
 
 const PANEL_KEY = "deseocomer_local_auth";
 const SESSION_KEY = "deseocomer_local_session";
@@ -129,6 +130,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           </Link>
         ))}
       </nav>
+
+      <GeniePanelLocal />
 
       <style>{`
         .dc-panel-sidebar {
