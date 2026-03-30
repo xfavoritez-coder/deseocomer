@@ -10,7 +10,7 @@ function savePromos(p: Promo[]) { try { const d = JSON.parse(localStorage.getIte
 
 const I: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
-const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo"];
+const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
 export default function PanelPromociones() {

@@ -18,6 +18,7 @@ import {
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
+  if (promo.tipo === "cumpleanos") return { text: "CUMPLEA\u00d1OS", color: "#e05090" };
   if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
   if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
   if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };

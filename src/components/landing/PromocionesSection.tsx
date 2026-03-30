@@ -148,6 +148,8 @@ export default function PromocionesSection() {
             const accentColor  = isHH ? "#d4a017" : "var(--accent)";
             const badge        = isHH
               ? { text: "HAPPY HOUR", color: "#d4a017" }
+              : promo.tipo === "cumpleanos"
+              ? { text: "CUMPLEA\u00d1OS", color: "#e05090" }
               : promo.tipo === "2x1"
               ? { text: "2\u00d71", color: "#3db89e" }
               : promo.porcentajeDescuento

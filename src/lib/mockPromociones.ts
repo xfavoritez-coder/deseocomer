@@ -1,6 +1,6 @@
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour";
+export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour" | "cumpleanos";
 export type CategoriaPromocion = "almuerzo" | "cena" | "desayuno" | "bebidas" | "postres";
 
 export interface Promocion {
@@ -230,7 +230,7 @@ export const PROMOCIONES: Promocion[] = [
   // ── Birthday promotions ──
   {
     id: 101, localId: "pizza-napoli", local: "Pizza Napoli", comuna: "Providencia",
-    tipo: "descuento" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    tipo: "cumpleanos" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
     imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
     titulo: "Cena de Cumpleaños Especial", descripcion: "30% de descuento en tu cumpleaños presentando tu cédula",
     porcentajeDescuento: 30, diasSemana: [0,1,2,3,4,5,6], horaInicio: "19:00", horaFin: "23:00",
@@ -238,7 +238,7 @@ export const PROMOCIONES: Promocion[] = [
   },
   {
     id: 102, localId: "cafe-buen-dia", local: "Café Arenas", comuna: "Bellavista",
-    tipo: "descuento" as TipoPromocion, categoria: "desayuno" as CategoriaPromocion,
+    tipo: "cumpleanos" as TipoPromocion, categoria: "desayuno" as CategoriaPromocion,
     imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600",
     titulo: "Postre Gratis en tu Día", descripcion: "Postre de la casa gratis el día de tu cumpleaños",
     diasSemana: [0,1,2,3,4,5,6], horaInicio: "08:00", horaFin: "22:00",
@@ -246,7 +246,7 @@ export const PROMOCIONES: Promocion[] = [
   },
   {
     id: 103, localId: "sushi-oasis", local: "Sushi Oasis", comuna: "Las Condes",
-    tipo: "descuento" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    tipo: "cumpleanos" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
     imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600",
     titulo: "Cumpleaños Omakase", descripcion: "20% off en menú omakase para cumpleañeros",
     porcentajeDescuento: 20, diasSemana: [0,1,2,3,4,5,6], horaInicio: "13:00", horaFin: "23:00",
@@ -254,7 +254,7 @@ export const PROMOCIONES: Promocion[] = [
   },
   {
     id: 104, localId: "la-trattoria", local: "La Trattoria", comuna: "Vitacura",
-    tipo: "2x1" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
+    tipo: "cumpleanos" as TipoPromocion, categoria: "cena" as CategoriaPromocion,
     imagen: "🎂", imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600",
     titulo: "2x1 Pastas en tu Cumpleaños", descripcion: "Celebra con pastas frescas: trae a un acompañante y ambos pagan como uno. Válido todo el día de tu cumpleaños.",
     diasSemana: [0,1,2,3,4,5,6], horaInicio: "12:00", horaFin: "23:00",
@@ -320,6 +320,7 @@ export const TIPO_LABELS: Record<TipoPromocion, string> = {
   cupon: "Cupón",
   precio_especial: "Precio Especial",
   happy_hour: "Happy Hour",
+  cumpleanos: "Cumpleaños",
 };
 
 export const TIPO_ICONS: Record<TipoPromocion, string> = {
@@ -328,6 +329,7 @@ export const TIPO_ICONS: Record<TipoPromocion, string> = {
   cupon: "🎟️",
   precio_especial: "⭐",
   happy_hour: "⚡",
+  cumpleanos: "🎂",
 };
 
 export const CATEGORIA_LABELS: Record<CategoriaPromocion, string> = {

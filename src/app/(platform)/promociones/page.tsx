@@ -5,11 +5,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, type Promocion } from "@/lib/mockPromociones";
 
-const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial"] as const;
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial" };
+const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
+  if (promo.tipo === "cumpleanos") return { text: "CUMPLEA\u00d1OS", color: "#e05090" };
   if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
   if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
   if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };
