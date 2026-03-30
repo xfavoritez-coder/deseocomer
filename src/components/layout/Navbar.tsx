@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import CitySelector from "@/components/CitySelector";
 
 const NAV_LINKS = [
   { label: "Concursos",   href: "/concursos"   },
@@ -47,13 +46,9 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="dc-nav-links">
-          <CitySelector />
-
           {NAV_LINKS.map(({ label, href }) => (
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
-
-          <Link href="/solo-locales" className="dc-nav-local-link">¿Tienes un local?</Link>
 
           {/* Auth: show user or "Entrar" */}
           {mounted && (
@@ -223,20 +218,6 @@ export default function Navbar() {
           transition: border-color 0.2s, color 0.2s;
         }
         .dc-nav-logout:hover { border-color: #ff6b6b; color: #ff6b6b; }
-        .dc-nav-local-link {
-          font-family: var(--font-cinzel); font-size: 0.7rem;
-          color: var(--accent); text-decoration: none;
-          white-space: nowrap; transition: all 0.2s;
-          background: rgba(232,168,76,0.12);
-          border: 1px solid rgba(232,168,76,0.35);
-          border-radius: 20px; padding: 8px 16px;
-          font-weight: 600;
-        }
-        .dc-nav-local-link:hover {
-          background: rgba(232,168,76,0.22);
-          border-color: rgba(232,168,76,0.6);
-        }
-
         /* Hamburger button */
         .dc-hamburger {
           display: none;
