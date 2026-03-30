@@ -173,8 +173,8 @@ export default function ConcursosSection() {
                 {/* Countdown */}
                 <div style={{
                   marginBottom: "20px", borderRadius: "14px", overflow: "hidden",
-                  border: c.horasRestantes <= 24 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
-                  background: c.horasRestantes <= 24 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
+                  border: c.horasRestantes <= 6 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
+                  background: c.horasRestantes <= 6 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
                 }}>
                   <div style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -183,12 +183,12 @@ export default function ConcursosSection() {
                     <span style={{
                       fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
                       letterSpacing: "0.2em", textTransform: "uppercase",
-                      color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--oasis-bright)",
+                      color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
                       display: "flex", alignItems: "center", gap: "6px",
                     }}>
                       <span style={{
                         width: "6px", height: "6px", borderRadius: "50%",
-                        background: c.horasRestantes <= 24 ? "#ff4444" : "var(--oasis-bright)",
+                        background: c.horasRestantes <= 6 ? "#ff4444" : "var(--oasis-bright)",
                         display: "inline-block",
                         animation: "dc-cst-pulse 1.5s ease-in-out infinite",
                       }}/>
@@ -211,8 +211,8 @@ export default function ConcursosSection() {
                         <div style={{ textAlign: "center" }}>
                           <div style={{
                             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", lineHeight: 1,
-                            color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--accent)",
-                            textShadow: c.horasRestantes <= 24 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
+                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
+                            textShadow: c.horasRestantes <= 6 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
                             minWidth: "42px", textAlign: "center",
                             animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1s ease-in-out infinite" : "none",
                           }}>
@@ -227,7 +227,7 @@ export default function ConcursosSection() {
                         {idx < 2 && (
                           <span style={{
                             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
-                            color: c.horasRestantes <= 24 ? "#ff6b6b" : "var(--accent)",
+                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
                             opacity: 0.6, marginBottom: "16px", alignSelf: "flex-start", paddingTop: "2px",
                           }}>:</span>
                         )}
