@@ -159,10 +159,13 @@ export default function Navbar() {
           flex-shrink: 0;
           cursor: pointer;
           position: relative;
-          z-index: 2;
+          z-index: 10;
+          pointer-events: auto;
         }
         .dc-nav-links {
           display: flex; gap: 32px; align-items: center;
+          position: relative;
+          z-index: 1;
         }
         .dc-nav-link {
           font-family: var(--font-cinzel); font-size: 0.75rem;
