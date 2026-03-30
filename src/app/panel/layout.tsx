@@ -16,11 +16,13 @@ const NAV = [
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [montado, setMontado] = useState(false);
   const [authorized, setAuthorized] = useState(false);
   const [localName, setLocalName] = useState("");
   const [localId, setLocalId] = useState("");
 
   useEffect(() => {
+    setMontado(true);
     try {
       // Check sessionStorage first, then localStorage
       const sessionData = sessionStorage.getItem(SESSION_KEY);
@@ -45,10 +47,10 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     router.push("/login-local");
   };
 
-  if (!authorized) {
+  if (!montado || !authorized) {
     return (
-      <div style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-muted)" }}>Cargando...</p>
+      <div style={{ minHeight: "100vh", background: "var(--bg-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.2em", color: "var(--accent)", opacity: 0.6 }}>🧞 Cargando...</div>
       </div>
     );
   }

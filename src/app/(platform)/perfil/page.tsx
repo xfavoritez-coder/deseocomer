@@ -27,6 +27,7 @@ const PROFILE_KEY = "deseocomer_usuario_perfil";
 const FAVS_KEY = "deseocomer_favoritos";
 
 function loadProfile(): Record<string, unknown> {
+  if (typeof window === "undefined") return {};
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) ?? "{}"); }
   catch { return {}; }
 }

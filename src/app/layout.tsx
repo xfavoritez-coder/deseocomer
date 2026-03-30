@@ -41,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){
           var h=new Date().getHours(),p;
@@ -62,7 +62,7 @@ export default function RootLayout({
           requestAnimationFrame(function(){requestAnimationFrame(function(){s.removeProperty("transition")})});
         })()` }} />
       </head>
-      <body className={`${cinzelDecorative.variable} ${cinzel.variable} ${lato.variable}`}>
+      <body className={`${cinzelDecorative.variable} ${cinzel.variable} ${lato.variable}`} suppressHydrationWarning>
         <ThemeProvider>
           <AuthProvider>
             <GenieProvider>
