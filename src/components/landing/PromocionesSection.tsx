@@ -40,6 +40,7 @@ function checkBirthday(): boolean {
 interface TimerState { horas: number; minutos: number; segundos: number }
 
 export default function PromocionesSection() {
+  const { isAuthenticated } = useAuth();
   const [mounted, setMounted]   = useState(false);
   const [esCumple, setEsCumple] = useState(false);
   const [promos, setPromos]     = useState<Promocion[]>(getTop3(false));
@@ -71,13 +72,13 @@ export default function PromocionesSection() {
 
   useEffect(() => {
     setMounted(true);
-    const cumple = checkBirthday();
+    const cumple = isAuthenticated && checkBirthday();
     setEsCumple(cumple);
     if (cumple) setPromos(getTop3(true));
     updateTimers();
     const id = setInterval(updateTimers, 1000);
     return () => clearInterval(id);
-  }, [updateTimers]);
+  }, [updateTimers, isAuthenticated]);
 
   return (
     <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-secondary)", borderTop: "1px solid rgba(61,184,158,0.08)", borderBottom: "1px solid rgba(61,184,158,0.08)" }}>
@@ -458,9 +459,10 @@ export default function PromocionesSection() {
 
 function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
   const { setToastActivo } = useGenie();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [tieneFecha, setTieneFecha] = useState(false);
   const [cumpleGuardado, setCumpleGuardado] = useState(false);
+  const [cerrado, setCerrado] = useState(false);
   const [paso, setPaso] = useState<"banner"|"form"|"contrasena"|"fin">("banner");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -495,10 +497,17 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
     fontWeight: 700, cursor: "pointer", width: "100%",
   };
 
-  // ── Birthday greeting (it IS their birthday today) ──
-  if (esCumpleHoy && (tieneFecha || cumpleGuardado)) {
+  const closeBtn = (
+    <button onClick={() => setCerrado(true)} style={{ position: "absolute", top: "12px", right: "12px", background: "none", border: "none", color: "var(--text-muted)", fontSize: "1rem", cursor: "pointer", opacity: 0.6, zIndex: 2 }}>✕</button>
+  );
+
+  const userName = user?.nombre?.split(" ")[0] ?? "";
+
+  // ── Birthday greeting (it IS their birthday today, ONLY if logged in) ──
+  if (esCumpleHoy && isAuthenticated && (tieneFecha || cumpleGuardado)) {
     return (
-      <div style={box}>
+      <div style={{ ...box, position: "relative" }}>
+        {closeBtn}
         <div style={{ position: "relative", overflow: "hidden" }}>
           {["🎊", "✨", "🎉", "🎈", "🎊"].map((e, i) => (
             <span key={i} style={{ position: "absolute", top: "50%", left: `${5 + i * 22}%`, transform: "translateY(-50%)", fontSize: "1.5rem", opacity: 0.25, pointerEvents: "none" }}>{e}</span>
@@ -506,10 +515,10 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
           <div style={{ position: "relative", zIndex: 1 }}>
             <p style={{ fontSize: "2.5rem", margin: "0 0 12px" }}>🎂</p>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", color: "var(--accent)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", margin: "0 0 8px" }}>
-              ¡Hoy es tu día especial!
+              {userName ? `¡Feliz cumpleaños, ${userName}!` : "¡Feliz cumpleaños!"}
             </h3>
             <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.8))", fontSize: "1rem", marginBottom: "20px", lineHeight: 1.6 }}>
-              Estos locales tienen ofertas exclusivas para celebrar tu cumpleaños
+              Estos locales tienen ofertas exclusivas para celebrar tu día
             </p>
             <a href="/promociones" style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.12em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", padding: "14px 32px", borderRadius: "10px", textDecoration: "none", fontWeight: 700 }}>
               Ver ofertas de cumpleaños
@@ -524,9 +533,13 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
   // ── Already has birthday set & not their birthday → hide ──
   if ((isAuthenticated && tieneFecha) || cumpleGuardado) return null;
 
+  // ── User closed it → hide ──
+  if (cerrado) return null;
+
   // ── Logged in without birthday → ask via Genio ──
   if (isAuthenticated && !tieneFecha) return (
-    <div style={box}>
+    <div style={{ ...box, position: "relative" }}>
+      {closeBtn}
       <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px", fontWeight: 700 }}>¿Cuándo es tu cumpleaños?</p>
       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", marginBottom: "16px" }}>Cuéntale al Genio y te avisamos cuando haya ofertas especiales para ti</p>
@@ -539,7 +552,8 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
 
   // ── Not logged in → multi-step flow ──
   return (
-    <div style={box}>
+    <div style={{ ...box, position: "relative" }}>
+      {paso === "banner" && closeBtn}
       {paso === "banner" && (
         <div>
           <div style={{ fontSize: "2.5rem", marginBottom: "8px" }}>🎂</div>
