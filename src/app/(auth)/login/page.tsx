@@ -13,6 +13,10 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +78,32 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <button onClick={() => alert("Escríbenos a hola@deseocomer.com")} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "16px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+        <button onClick={() => setShowReset(true)} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "16px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
           ¿Olvidaste tu contraseña?
         </button>
+
+        {showReset && (
+          <div style={{ marginTop: "20px", padding: "20px", background: "rgba(0,0,0,0.3)", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.15)" }}>
+            {resetSent ? (
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)", textAlign: "center" }}>✓ Si tu email está registrado, recibirás un link en minutos.</p>
+            ) : (
+              <>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", marginBottom: "10px", letterSpacing: "0.1em" }}>Recuperar contraseña</p>
+                <input style={inputS} type="email" placeholder="tu@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} />
+                <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+                  <button onClick={async () => {
+                    if (!resetEmail.includes("@")) return;
+                    setResetLoading(true);
+                    await fetch("/api/emails/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: resetEmail.trim().toLowerCase() }) }).catch(() => {});
+                    setResetLoading(false);
+                    setResetSent(true);
+                  }} disabled={resetLoading} style={{ ...btnS, flex: 1, fontSize: "0.8rem", padding: "10px" }}>{resetLoading ? "Enviando..." : "Enviar link"}</button>
+                  <button onClick={() => { setShowReset(false); setResetSent(false); }} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem" }}>Cancelar</button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
       </div>
     </main>

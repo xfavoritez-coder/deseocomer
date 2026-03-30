@@ -18,9 +18,11 @@ model Usuario {
   cumpleDia   Int?
   cumpleMes   Int?
   cumpleAnio  Int?
-  tipo        String   @default("usuario")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  tipo                String    @default("usuario")
+  resetToken          String?
+  resetTokenExpira    DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   favoritos       Favorito[]
   resenas         Resena[]

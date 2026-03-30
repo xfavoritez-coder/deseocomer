@@ -21,6 +21,14 @@ export async function POST(req: NextRequest) {
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;
+
+    // Send welcome email (non-blocking)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    fetch(`${baseUrl}/api/emails/bienvenida`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre: usuario.nombre, email: usuario.email }),
+    }).catch(console.error);
+
     return NextResponse.json(usuarioSinPassword, { status: 201 });
   } catch (error) {
     console.error("[API /usuarios] Error:", error);
