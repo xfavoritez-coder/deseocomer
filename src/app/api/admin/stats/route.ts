@@ -1,0 +1,17 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+export async function GET() {
+  try {
+    const [totalUsuarios, totalLocales, localesActivos, totalConcursos, concursosActivos, totalPromociones, totalFavoritos, totalResenas, listaEspera] = await Promise.all([
+      prisma.usuario.count(), prisma.local.count(), prisma.local.count({ where: { activo: true } }),
+      prisma.concurso.count(), prisma.concurso.count({ where: { activo: true } }),
+      prisma.promocion.count(), prisma.favorito.count(), prisma.resena.count(), prisma.listaEsperaLocal.count(),
+    ]);
+    const ultimosUsuarios = await prisma.usuario.findMany({ take: 5, orderBy: { createdAt: "desc" }, select: { id: true, nombre: true, email: true, ciudad: true, createdAt: true } });
+    const ultimosLocales = await prisma.local.findMany({ take: 5, orderBy: { createdAt: "desc" }, select: { id: true, nombre: true, email: true, ciudad: true, activo: true, verificado: true, createdAt: true } });
+    return NextResponse.json({ totalUsuarios, totalLocales, localesActivos, totalConcursos, concursosActivos, totalPromociones, totalFavoritos, totalResenas, listaEspera, ultimosUsuarios, ultimosLocales });
+  } catch {
+    return NextResponse.json({ error: "Error" }, { status: 500 });
+  }
+}
