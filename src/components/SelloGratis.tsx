@@ -5,17 +5,17 @@ interface SelloGratisProps {
 }
 
 export default function SelloGratis({ size = "sm" }: SelloGratisProps) {
-  const dim = size === "lg" ? 90 : 64;
-  const fontSize = size === "lg" ? 8 : 7;
-  const iconSize = size === "lg" ? 11 : 9;
+  const dim = size === "lg" ? 96 : 72;
 
   return (
-    <svg width={dim} height={dim} viewBox="0 0 64 64" style={{ display: "block" }}>
-      <polygon points="32,0 64,0 64,64" fill="rgba(13,7,3,0.92)" />
-      <g transform="translate(52,22) rotate(45)">
-        <text textAnchor="middle" y={-5} fontFamily="Georgia,'Times New Roman',serif" fontSize={fontSize} fontWeight="700" fill="#e8a84c" letterSpacing="1">GRATIS</text>
-        <text textAnchor="middle" y={iconSize - 2} fontFamily="Georgia,serif" fontSize={iconSize} fill="#e8a84c">🏆</text>
-      </g>
-    </svg>
+    <div style={{ width: dim, height: dim, position: "relative", overflow: "visible" }}>
+      <svg width={dim} height={dim} viewBox="0 0 72 72" style={{ display: "block", overflow: "visible" }}>
+        <polygon points="0,0 72,0 72,72" fill="rgba(13,7,3,0.9)" />
+        <g transform="translate(48,24) rotate(45)">
+          <text textAnchor="middle" y="-8" fontFamily="Georgia,'Times New Roman',serif" fontSize={size === "lg" ? 9 : 8} fontWeight="700" fill="#e8a84c" letterSpacing="0.8">GRATIS</text>
+          <text textAnchor="middle" y="8" fontFamily="Georgia,serif" fontSize={size === "lg" ? 12 : 10} fill="#e8a84c">🏆</text>
+        </g>
+      </svg>
+    </div>
   );
 }

@@ -135,7 +135,7 @@ export default function ConcursosSection() {
             >
               <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none", background: "rgba(45,26,8,0.8)", position: "relative" }}>
                 <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none" }}><SelloGratis size="sm" /></div>
+                <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none", overflow: "visible" }}><SelloGratis size="sm" /></div>
               </div>
               <div style={{ padding: "24px 24px 0", pointerEvents: "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
