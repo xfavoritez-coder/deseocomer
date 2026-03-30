@@ -121,6 +121,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loggedIn: true,
       }));
 
+      // Sync birthday from BD to localStorage
+      if (data.data.cumpleDia && data.data.cumpleMes) {
+        localStorage.setItem("deseocomer_user_birthday", JSON.stringify({
+          dia: data.data.cumpleDia,
+          mes: data.data.cumpleMes,
+          anio: data.data.cumpleAnio || null,
+        }));
+      } else {
+        // No birthday in BD — remove any stale test data
+        localStorage.removeItem("deseocomer_user_birthday");
+      }
+
       return { success: true };
     } catch {
       return { success: false, error: "Error de conexión." };
@@ -172,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("deseocomer_user_birthday");
   }, []);
 
   return (
