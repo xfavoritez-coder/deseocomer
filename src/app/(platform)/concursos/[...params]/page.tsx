@@ -400,80 +400,36 @@ export default function ConcursoDetallePage() {
         );
       })()}
 
-      {/* Banner */}
+      {/* ── Banner: 2-col on desktop ── */}
       <section className="dc-cd-banner">
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 60%)",
-        }} />
-        <Link href="/concursos" style={{
-          position: "relative", display: "inline-flex", alignItems: "center", gap: "6px",
-          fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
-          letterSpacing: "0.15em", textTransform: "uppercase",
-          color: "var(--text-muted)", textDecoration: "none", marginBottom: "36px",
-        }}>
-          ← Todos los concursos
-        </Link>
-
-        {/* Premio card */}
-        <div style={{
-          position: "relative", overflow: "hidden", borderRadius: "24px",
-          border: "1px solid rgba(232,168,76,0.3)",
-          background: "linear-gradient(160deg, #2d1a08, #1a0e05)",
-          boxShadow: "0 0 60px rgba(0,0,0,0.6), 0 0 30px rgba(232,168,76,0.08)",
-        }}>
-          {/* Foto full width */}
-          {c.imagenUrl && (
-            <div style={{ position: "relative", height: "220px", overflow: "hidden" }}>
-              <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-              {/* Sello GRATIS */}
-              <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3, pointerEvents: "none" }}>
-                <SelloGratis size="lg" />
+        <div className="dc-cd-banner-inner">
+          {/* Left: photo */}
+          <div className="dc-cd-banner-photo">
+            {c.imagenUrl ? (
+              <div style={{ position: "relative", height: "100%", minHeight: "280px", overflow: "hidden", borderRadius: "20px", background: "rgba(45,26,8,0.8)" }}>
+                <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{ position: "absolute", top: "16px", right: "16px", zIndex: 3, pointerEvents: "none" }}><SelloGratis size="lg" /></div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div style={{ height: "280px", borderRadius: "20px", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
+            )}
+          </div>
 
-          {/* Contenido */}
-          <div style={{ padding: "28px 28px 32px", textAlign: "center" }}>
-            <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-              letterSpacing: "0.3em", textTransform: "uppercase",
-              color: "#3db89e", marginBottom: "12px",
-            }}>
-              {c.local}
-            </p>
-            <h1 style={{
-              fontFamily: "var(--font-cinzel-decorative)",
-              fontSize: "1.4rem", fontWeight: 900,
-              color: "#e8a84c", lineHeight: 1.3,
-              marginBottom: "16px",
-            }}>
-              {c.premio}
-            </h1>
-            {/* Separador */}
-            <div style={{
-              width: "60px", height: "1px", margin: "0 auto 16px",
-              background: "linear-gradient(90deg, transparent, #e8a84c, transparent)",
-            }} />
+          {/* Right: info */}
+          <div className="dc-cd-banner-info">
+            <Link href="/concursos" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "24px" }}>
+              ← Todos los concursos
+            </Link>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#3db89e", marginBottom: "12px" }}>{c.local}</p>
+            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 3vw, 1.8rem)", fontWeight: 900, color: "#e8a84c", lineHeight: 1.3, marginBottom: "16px" }}>{c.premio}</h1>
+            <div style={{ width: "60px", height: "1px", marginBottom: "16px", background: "linear-gradient(90deg, #e8a84c, transparent)" }} />
             {"descripcionPremio" in c && (
-              <p style={{
-                fontFamily: "var(--font-lato)", fontSize: "0.95rem",
-                color: "rgba(253,240,200,0.75)", fontWeight: 400,
-                lineHeight: 1.65, maxWidth: "520px", margin: "0 auto",
-              }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(253,240,200,0.75)", fontWeight: 400, lineHeight: 1.65 }}>
                 {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
               </p>
             )}
             {isEnded && "fechaFin" in c && (
-              <div style={{
-                display: "inline-block", marginTop: "16px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid var(--border-color)",
-                borderRadius: "20px", padding: "6px 16px",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.58rem",
-                letterSpacing: "0.18em", textTransform: "uppercase",
-                color: "var(--text-muted)",
-              }}>
+              <div style={{ display: "inline-block", marginTop: "16px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>
                 Concurso finalizado · {(c as typeof c & { fechaFin: string }).fechaFin}
               </div>
             )}
@@ -481,119 +437,113 @@ export default function ConcursoDetallePage() {
         </div>
       </section>
 
-      {/* ── 2. Tu link de participación ──────────────────────────────── */}
-      {!isEnded && (
-        <div className="dc-cd-fullwidth">
-          <div style={{
-            width: "100%",
-            background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))",
-            border: "1px solid rgba(232,168,76,0.4)",
-            borderRadius: "20px",
-            padding: "20px 24px",
-            textAlign: "center",
-            boxShadow: "0 0 40px rgba(232,168,76,0.08)",
-          }}>
-            <p style={{ fontSize: "1.2rem", marginBottom: "8px", display: "inline" }}>🔗 </p>
-            <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
-              letterSpacing: "0.2em", textTransform: "uppercase",
-              color: "#e8a84c", marginBottom: "12px", fontWeight: 700, display: "inline",
-            }}>
-              Tu link de participación
-            </p>
-
-            {isAuthenticated && refLink ? (
-              <div style={{ marginTop: "12px" }}>
-                {myRefs > 0 && (
-                  <p style={{
-                    fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-                    color: "var(--oasis-bright)", marginBottom: "12px",
-                  }}>
-                    🎉 Ya tienes <strong>{myRefs} referido{myRefs !== 1 ? "s" : ""}</strong>. ¡Sigue compartiendo!
-                  </p>
-                )}
-                <div style={{
-                  background: "rgba(0,0,0,0.4)",
-                  border: "1px solid rgba(232,168,76,0.3)",
-                  borderRadius: "10px", padding: "10px 16px",
-                  width: "100%", maxWidth: "500px", margin: "0 auto 12px",
-                  wordBreak: "break-all",
-                }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#e8a84c" }}>
-                    {refLink}
-                  </p>
-                </div>
-                <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginBottom: "8px" }}>
-                  <button onClick={copyLink} style={{
-                    background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-                    border: "none", borderRadius: "10px",
-                    fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                    letterSpacing: "0.1em", textTransform: "uppercase",
-                    color: copied ? "#fff" : "var(--bg-primary)",
-                    padding: "10px 20px", cursor: "pointer", fontWeight: 700,
-                    opacity: copied ? 0.8 : 1,
-                  }}>
-                    {copied ? "✓ Copiado" : "📋 Copiar link"}
-                  </button>
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Ayúdame a ganar en el concurso ${c.premio} de ${c.local} en DeseoComer 🙏 Regístrate con mi link y ambos podemos ganar: ${refLink}`)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{
-                      background: "#25D366", border: "none", borderRadius: "10px",
-                      fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                      letterSpacing: "0.1em", textTransform: "uppercase",
-                      color: "#fff", padding: "10px 20px", fontWeight: 700,
-                      textDecoration: "none", display: "inline-flex", alignItems: "center",
-                    }}
-                  >
-                    WhatsApp
-                  </a>
-                </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(253,240,200,0.5)" }}>
-                  Comparte por WhatsApp, Instagram o donde quieras
-                </p>
-              </div>
-            ) : (
-              <div style={{ marginTop: "12px" }}>
-                <p style={{
-                  fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-                  color: "rgba(253,240,200,0.6)", marginBottom: "16px", lineHeight: 1.6,
-                }}>
-                  Inicia sesión para obtener tu link único y empezar a sumar referidos
-                </p>
-                <Link href={`/login?next=/concursos/${concursoId}`} style={{
-                  display: "inline-block",
-                  background: "linear-gradient(135deg, #f5d080, #e8a84c)",
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.8rem",
-                  letterSpacing: "0.12em", textTransform: "uppercase",
-                  color: "#1a0e05", fontWeight: 700,
-                  padding: "12px 24px", borderRadius: "10px", textDecoration: "none",
-                }}>
-                  Inicia sesión para participar
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── 3. Cuenta regresiva + 4. Ranking (grid) ───────────────── */}
+      {/* ── Body: 2-col grid (main + ranking sidebar) ── */}
       <div className="dc-cd-body">
         <div className="dc-cd-main">
+
+          {/* 1. Link de participación */}
+          {!isEnded && (
+            <div style={{ background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "20px 24px", boxShadow: "0 0 40px rgba(232,168,76,0.08)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                <span style={{ fontSize: "1.1rem" }}>🔗</span>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#e8a84c", fontWeight: 700, margin: 0 }}>Tu link de participación</p>
+              </div>
+              {isAuthenticated && refLink ? (
+                <div>
+                  {myRefs > 0 && (
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)", marginBottom: "12px" }}>
+                      🎉 Ya tienes <strong>{myRefs} referido{myRefs !== 1 ? "s" : ""}</strong>. ¡Sigue compartiendo!
+                    </p>
+                  )}
+                  <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", padding: "10px 16px", marginBottom: "12px", wordBreak: "break-all" }}>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#e8a84c", margin: 0 }}>{refLink}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+                    <button onClick={copyLink} style={{ background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: copied ? "#fff" : "var(--bg-primary)", padding: "10px 20px", cursor: "pointer", fontWeight: 700, opacity: copied ? 0.8 : 1 }}>
+                      {copied ? "✓ Copiado" : "📋 Copiar link"}
+                    </button>
+                    <a href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`¡Hola! Ayúdame a ganar en el concurso ${c.premio} de ${c.local} en DeseoComer 🙏 Regístrate con mi link y ambos podemos ganar: ${refLink}`)}`} target="_blank" rel="noopener noreferrer" style={{ background: "#25D366", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#fff", padding: "10px 20px", fontWeight: 700, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+                      WhatsApp
+                    </a>
+                  </div>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(253,240,200,0.5)", margin: 0 }}>Comparte por WhatsApp, Instagram o donde quieras</p>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(253,240,200,0.6)", marginBottom: "16px", lineHeight: 1.6 }}>Inicia sesión para obtener tu link único y empezar a sumar referidos</p>
+                  <Link href={`/login?next=/concursos/${concursoId}`} style={{ display: "inline-block", background: "linear-gradient(135deg, #f5d080, #e8a84c)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a0e05", fontWeight: 700, padding: "12px 24px", borderRadius: "10px", textDecoration: "none" }}>
+                    Inicia sesión para participar
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 2. Cuenta regresiva */}
           {!isEnded && timer && (
-            <div className="dc-cd-block">
-              <h2 style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.72rem",
-                fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
-                color: "var(--accent)", marginBottom: "22px",
-                paddingBottom: "12px", borderBottom: "1px solid var(--border-color)",
-                textAlign: "center",
-              }}>
+            <div>
+              <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "22px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)", textAlign: "center" }}>
                 ⏱ Cuenta regresiva
               </h2>
               <BigTimer timer={timer} soon={soon} />
             </div>
           )}
+
+          {/* 3. Así se gana */}
+          {!isEnded && (
+            <div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#e8a84c", textAlign: "center", marginBottom: "20px" }}>⚡ Así se gana</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }} className="dc-asi-grid">
+                {[
+                  { icon: "🎉", action: "Te registras por invitación", points: "+1 punto de bienvenida", color: "#3db89e" },
+                  { icon: "👥", action: "Un amigo se registra con tu link", points: "+2 puntos para ti", color: "#e8a84c" },
+                  { icon: "🤝", action: "Apoyas a un participante", points: "+1 punto para él", color: "#2a7a6f" },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "24px 20px", textAlign: "center" }}>
+                    <span style={{ fontSize: "2rem", display: "block", marginBottom: "12px" }}>{item.icon}</span>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.75)", margin: "0 0 12px", lineHeight: 1.5 }}>{item.action}</p>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", fontWeight: 900, color: item.color, margin: 0 }}>{item.points}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 4. Reglas */}
+          {"reglas" in c && (
+            <div>
+              <div style={{ width: "60px", height: "1px", margin: "0 auto 24px", background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)" }} />
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", marginBottom: "20px", textAlign: "center" }}>Reglas del concurso</p>
+              <ol style={{ margin: 0, paddingLeft: "20px" }}>
+                {(c as typeof c & { reglas: string[] }).reglas.map((r, i, arr) => (
+                  <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(253,240,200,0.5)", lineHeight: 1.7, marginBottom: i < arr.length - 1 ? "10px" : 0 }}>{r}</li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* 5. Sobre el local */}
+          {"descripcionLocal" in c && (() => {
+            const localColors = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
+            const localColor = localColors[c.local.charCodeAt(0) % localColors.length];
+            const localInitials = c.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+            return (
+              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "16px", padding: "24px", display: "flex", gap: "20px", alignItems: "center" }}>
+                {LOCAL_IMAGES[c.localId] ? (
+                  <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: "72px", height: "72px", borderRadius: "50%", flexShrink: 0, background: localColor, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", fontWeight: 700, color: "#fff" }}>{localInitials}</div>
+                )}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", fontWeight: 700, marginBottom: "4px" }}>{c.local}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(253,240,200,0.7)", lineHeight: 1.7, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: "8px" }}>
+                    {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
+                  </p>
+                  <Link href={`/locales/${c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--oasis-bright)", textDecoration: "none" }}>Ver perfil completo →</Link>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Sidebar: ranking */}
@@ -744,139 +694,56 @@ export default function ConcursoDetallePage() {
         </div>
       </div>
 
-      {/* ── 5. Así se gana ───────────────────────────────────────── */}
-      {!isEnded && (
-        <div className="dc-cd-fullwidth">
-          <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.9rem",
-            fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase",
-            color: "#e8a84c", textAlign: "center", marginBottom: "20px",
-          }}>
-            ⚡ Así se gana
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }} className="dc-asi-grid">
-            {[
-              { icon: "🎉", action: "Te registras por invitación", points: "+1 punto de bienvenida", color: "#3db89e" },
-              { icon: "👥", action: "Un amigo se registra con tu link", points: "+2 puntos para ti", color: "#e8a84c" },
-              { icon: "🤝", action: "Apoyas a un participante", points: "+1 punto para él", color: "#2a7a6f" },
-            ].map((item, i) => (
-              <div key={i} style={{
-                background: "rgba(45,26,8,0.6)",
-                border: "1px solid rgba(232,168,76,0.2)",
-                borderRadius: "12px", padding: "16px", textAlign: "center",
-              }}>
-                <span style={{ fontSize: "1.5rem", display: "block", marginBottom: "8px" }}>{item.icon}</span>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(253,240,200,0.7)", margin: "8px 0", lineHeight: 1.4 }}>
-                  {item.action}
-                </p>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", fontWeight: 900, color: item.color }}>
-                  {item.points}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── 6. Reglas del concurso ────────────────────────────────── */}
-      {"reglas" in c && (
-        <div className="dc-cd-fullwidth">
-          <div style={{ width: "60px", height: "1px", margin: "0 auto 24px", background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)" }} />
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", marginBottom: "20px", textAlign: "center" }}>
-            Reglas del concurso
-          </p>
-          <ol style={{ margin: 0, paddingLeft: "20px" }}>
-            {(c as typeof c & { reglas: string[] }).reglas.map((r, i, arr) => (
-              <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(253,240,200,0.5)", lineHeight: 1.7, marginBottom: i < arr.length - 1 ? "10px" : 0 }}>
-                {r}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
-      {/* ── 7. Sobre el local ─────────────────────────────────────── */}
-      {"descripcionLocal" in c && (() => {
-        const localColors = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
-        const localColor = localColors[c.local.charCodeAt(0) % localColors.length];
-        const localInitials = c.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
-        return (
-        <div className="dc-cd-fullwidth" style={{ paddingBottom: "60px" }}>
-          <div style={{
-            display: "flex", flexDirection: "row", alignItems: "center", gap: "16px",
-            background: "rgba(0,0,0,0.2)",
-            border: "1px solid var(--border-color)",
-            borderRadius: "14px", padding: "20px",
-          }}>
-            {LOCAL_IMAGES[c.localId] ? (
-              <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{
-                width: "64px", height: "64px", borderRadius: "50%",
-                objectFit: "cover", flexShrink: 0,
-              }} />
-            ) : (
-              <div style={{
-                width: "64px", height: "64px", borderRadius: "50%", flexShrink: 0,
-                background: localColor,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-cinzel)", fontSize: "1rem",
-                fontWeight: 700, color: "#fff",
-              }}>
-                {localInitials}
-              </div>
-            )}
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", overflow: "hidden", flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {c.local}
-              </p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(253,240,200,0.7)", lineHeight: 1.7, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
-              </p>
-              <Link href={`/locales/${c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--oasis-bright)", textDecoration: "none", marginTop: "4px" }}>
-                Ver perfil del local →
-              </Link>
-            </div>
-          </div>
-        </div>
-        );
-      })()}
-
       <Footer />
 
       <style>{`
         .dc-cd-banner {
-          position: relative; overflow: hidden;
-          padding: 120px 60px 60px;
-          border-bottom: 1px solid var(--border-color);
+          padding: 100px 60px 40px;
         }
+        .dc-cd-banner-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .dc-cd-banner-photo { margin-bottom: 24px; }
+        .dc-cd-banner-info {}
+
         .dc-cd-body {
           max-width: 1200px; margin: 0 auto;
-          padding: 32px 60px 80px;
+          padding: 40px 60px 80px;
           display: grid;
-          grid-template-columns: 1fr 340px;
-          gap: 32px; align-items: start;
+          grid-template-columns: 1fr 320px;
+          gap: 40px; align-items: start;
         }
-        .dc-cd-main { min-width: 0; }
+        .dc-cd-main {
+          display: flex; flex-direction: column;
+          gap: 32px; min-width: 0;
+        }
         .dc-cd-sidebar { min-width: 0; }
-        .dc-cd-block { margin-bottom: 48px; }
-        .dc-cd-fullwidth {
-          max-width: 800px; margin: 0 auto; padding: 0 60px 48px;
-        }
 
         @keyframes dc-slideUp {
           from { opacity: 0; transform: translateX(-50%) translateY(16px); }
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
+        @media (min-width: 1024px) {
+          .dc-cd-banner-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+          }
+          .dc-cd-banner-photo { margin-bottom: 0; }
+          .dc-cd-banner-photo > div { height: 420px !important; min-height: 420px !important; }
+        }
+
         @media (max-width: 1023px) {
-          .dc-cd-body { grid-template-columns: 1fr; padding: 40px 40px 60px; }
+          .dc-cd-body { grid-template-columns: 1fr; padding: 32px 40px 60px; gap: 24px; }
           .dc-cd-sidebar { order: -1; }
           .dc-cd-sidebar > div { position: static !important; }
         }
         @media (max-width: 767px) {
-          .dc-cd-banner { padding: 96px 20px 40px; }
-          .dc-cd-body { padding: 28px 20px 60px; }
-          .dc-cd-fullwidth { padding: 0 20px 36px; max-width: 100%; }
-          .dc-cd-fullwidth > div { border-radius: 12px; }
+          .dc-cd-banner { padding: 80px 20px 24px; }
+          .dc-cd-body { padding: 24px 20px 48px; }
           .dc-asi-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
