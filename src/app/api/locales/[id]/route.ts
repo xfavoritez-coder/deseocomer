@@ -8,7 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { id },
       include: {
         menuItems: true,
-        concursos: { where: { activo: true }, include: { _count: { select: { participantes: true } } } },
+        concursos: { include: { participantes: { include: { usuario: { select: { id: true, nombre: true } } }, orderBy: { puntos: "desc" } }, _count: { select: { participantes: true } } }, orderBy: { createdAt: "desc" } },
         promociones: { where: { activa: true } },
         resenas: { include: { usuario: { select: { id: true, nombre: true } } } },
         _count: { select: { favoritos: true, resenas: true } },
