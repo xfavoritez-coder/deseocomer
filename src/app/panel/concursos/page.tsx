@@ -71,7 +71,7 @@ export default function PanelConcursos() {
     const horasRest = Math.max(0, Math.floor((new Date(detalle.fechaFin).getTime() - Date.now()) / 3600000));
     const terminado = horasRest <= 0;
     const participantes = detalle._count?.participantes ?? detalle.participantes?.length ?? 0;
-    const link = `https://deseocomer.com/concursos/${detalle.id}`;
+    const link = `https://deseocomer.com/concursos/${detalle.slug || detalle.id}`;
 
     return (
       <div style={{ maxWidth: "600px" }}>

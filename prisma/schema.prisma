@@ -30,6 +30,7 @@ model Usuario {
 
 model Local {
   id            String   @id @default(cuid())
+  slug          String?  @unique
   nombre        String
   nombreDueno   String?
   celularDueno  String?
@@ -78,6 +79,7 @@ model MenuItem {
 
 model Concurso {
   id           String   @id @default(cuid())
+  slug         String?  @unique
   localId      String
   premio       String
   descripcion  String?

@@ -62,8 +62,39 @@ export default function ConcursoDetallePage() {
     refNameFromUrl = searchParams.get("refName");
   }
 
-  const concurso   = CONCURSOS.find((c) => c.id === concursoId);
-  const finalizado = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
+  const concursoMock = CONCURSOS.find((c) => c.id === concursoId);
+  const finalizadoMock = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
+  const [dbConcurso, setDbConcurso] = useState<Record<string, unknown> | null>(null);
+
+  // If not found in mocks, try fetching from DB
+  useEffect(() => {
+    if (concursoMock || finalizadoMock) return;
+    const param = segments[0] ?? "";
+    if (!param) return;
+    fetch(`/api/concursos/${param}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setDbConcurso(data); })
+      .catch(() => {});
+  }, [segments[0]]);
+
+  // Build concurso/finalizado from DB data if needed
+  const concurso = concursoMock ?? (dbConcurso ? {
+    ...CONCURSOS[0], // Use first mock as template for structure
+    id: 0,
+    slug: dbConcurso.slug as string ?? "",
+    local: (dbConcurso.local as Record<string, string>)?.nombre ?? "Local",
+    localId: (dbConcurso.local as Record<string, string>)?.id ?? "",
+    imagen: "🏆",
+    imagenUrl: (dbConcurso.imagenUrl as string) ?? (dbConcurso.local as Record<string, string>)?.portadaUrl ?? "",
+    premio: dbConcurso.premio as string ?? "",
+    descripcionPremio: dbConcurso.descripcion as string ?? "",
+    participantes: (dbConcurso._count as Record<string, number>)?.participantes ?? 0,
+    endsAt: new Date(dbConcurso.fechaFin as string).getTime(),
+    ranking: ((dbConcurso.participantes as Array<{usuario: {nombre: string}; puntos: number}>) ?? []).map(p => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
+    reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
+    descripcionLocal: "",
+  } : null);
+  const finalizado = finalizadoMock;
 
   const [timer, setTimer] = useState(() =>
     concurso ? getTimeLeft(concurso.endsAt) : null

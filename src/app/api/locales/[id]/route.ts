@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const local = await prisma.local.findUnique({
-      where: { id },
+    // Support both CUID and slug lookup
+    const local = await prisma.local.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
       include: {
         menuItems: true,
         concursos: { include: { participantes: { include: { usuario: { select: { id: true, nombre: true } } }, orderBy: { puntos: "desc" } }, _count: { select: { participantes: true } } }, orderBy: { createdAt: "desc" } },

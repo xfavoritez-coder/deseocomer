@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { makeLocalSlug } from "@/lib/slugify";
 
 export async function GET() {
   try {
@@ -34,8 +35,9 @@ export async function POST(req: NextRequest) {
     }
 
     const hash = await bcrypt.hash(password, 10);
+    const slug = makeLocalSlug(nombre, ciudad);
     const local = await prisma.local.create({
-      data: { nombre, nombreDueno, celularDueno: telefono, email, password: hash, ciudad },
+      data: { nombre, slug, nombreDueno, celularDueno: telefono, email, password: hash, ciudad },
     });
 
     const { password: _, ...localSinPassword } = local;
