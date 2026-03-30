@@ -20,7 +20,42 @@ export default function MiLocalPage() {
   const [d, setD] = useState<Record<string, unknown>>({});
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => { setD(load()); }, []);
+  useEffect(() => {
+    // Load from localStorage first
+    const local = load();
+    setD(local);
+    // Then fetch from BD and merge
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (session.id) {
+        fetch(`/api/locales/${session.id}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (data) {
+              const merged = {
+                ...local,
+                nombre: data.nombre ?? local.nombre,
+                categoria: data.categoria ?? local.categoria,
+                descripcion: data.descripcion ?? local.descripcion,
+                historia: data.historia ?? local.historia,
+                telefono: data.telefono ?? local.telefono,
+                instagram: data.instagram ?? local.instagram,
+                direccion: data.direccion ?? local.direccion,
+                comuna: data.comuna ?? local.comuna,
+                logoUrl: data.logoUrl ?? local.logoUrl,
+                portadaUrl: data.portadaUrl ?? local.portadaUrl,
+                galeria: data.galeria ?? local.galeria,
+                horarios: data.horarios ?? local.horarios,
+                tieneMenu: data.tieneMenu ?? local.tieneMenu,
+              };
+              setD(merged);
+              save(merged);
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
 
   const set = (k: string, v: unknown) => setD(prev => ({ ...prev, [k]: v }));
 

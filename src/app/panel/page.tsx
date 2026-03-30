@@ -1,8 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const PANEL_KEY = "deseocomer_local_auth";
+const SESSION_KEY = "deseocomer_local_session";
 const LOCAL_DATA_KEY = "deseocomer_panel_local_data";
 
 function getProfile(): Record<string, unknown> {
@@ -21,12 +22,18 @@ function getPerfilPct(p: Record<string, unknown>): number {
 }
 
 export default function PanelDashboard() {
+  return <Suspense><DashboardContent /></Suspense>;
+}
+
+function DashboardContent() {
+  const params = useSearchParams();
+  const bienvenido = params.get("bienvenido") === "1";
   const [localName, setLocalName] = useState("");
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
     try {
-      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      const session = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "{}");
       setLocalName(session.nombre ?? "");
     } catch {}
     setPct(getPerfilPct(getProfile()));
@@ -40,7 +47,14 @@ export default function PanelDashboard() {
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", color: "var(--accent)", marginBottom: "4px" }}>
         Hola, {localName} 👋
       </h1>
-      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "28px", textTransform: "capitalize" }}>{fecha}</p>
+      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: bienvenido ? "16px" : "28px", textTransform: "capitalize" }}>{fecha}</p>
+
+      {bienvenido && (
+        <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "14px", padding: "20px 24px", marginBottom: "28px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--oasis-bright)", marginBottom: "6px", fontWeight: 700 }}>🎉 ¡Bienvenido a DeseoComer!</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Mi Local</Link> para empezar a publicar concursos y promociones.</p>
+        </div>
+      )}
 
       {/* Profile progress */}
       <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px 24px", marginBottom: "24px" }}>
