@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import SubirFoto from "@/components/SubirFoto";
 
 const DATA_KEY = "deseocomer_panel_local_data";
 const AUTH_KEY = "deseocomer_local_auth";
@@ -20,6 +21,7 @@ export default function PanelConcursos() {
   const [premio, setPremio] = useState("");
   const [custom, setCustom] = useState("");
   const [dur, setDur] = useState(7);
+  const [imagenConcurso, setImagenConcurso] = useState("");
   const [localName, setLocalName] = useState("");
 
   useEffect(() => { setConcursos(loadConcursos()); try { setLocalName(JSON.parse(localStorage.getItem(AUTH_KEY) ?? "{}").nombreLocal ?? ""); } catch {} }, []);
@@ -37,7 +39,7 @@ export default function PanelConcursos() {
         const fechaFin = new Date(); fechaFin.setDate(fechaFin.getDate() + dur);
         await fetch("/api/concursos", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ localId: session.id, premio: pFinal, fechaFin: fechaFin.toISOString() }),
+          body: JSON.stringify({ localId: session.id, premio: pFinal, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null }),
         });
       }
     } catch { /* fallback to localStorage */ }
@@ -58,6 +60,10 @@ export default function PanelConcursos() {
         {premio === "custom" && <input style={I} value={custom} onChange={e => setCustom(e.target.value)} placeholder="Describe el premio..." />}
         <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>¿Cuánto dura?</h3>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
+
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Foto del concurso (opcional)</h3>
+        <SubirFoto folder="concursos" preview={imagenConcurso || null} label="Subir foto del premio" height="140px" onUpload={url => setImagenConcurso(url)} />
+
         <button onClick={() => pFinal.trim() && setStep(2)} disabled={!pFinal.trim()} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() ? 1 : 0.5 }}>Siguiente →</button>
       </div>)}
 

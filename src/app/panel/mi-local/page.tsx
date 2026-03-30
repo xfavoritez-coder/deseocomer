@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import SubirFoto from "@/components/SubirFoto";
 
 const DATA_KEY = "deseocomer_panel_local_data";
 const COMUNAS = ["Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura", "Lo Barnechea", "San Miguel", "Maipú", "Bellavista", "Recoleta", "La Florida", "Otra"];
@@ -69,7 +70,6 @@ export default function MiLocalPage() {
   const setMenuCats = (cats: MenuCat[]) => set("menuCategorias", cats);
 
   const galeria: string[] = (d.galeria as string[]) ?? [];
-  const [newFoto, setNewFoto] = useState("");
 
   const handleSave = async () => {
     // Save locally as backup
@@ -153,9 +153,13 @@ export default function MiLocalPage() {
       {/* Fotos */}
       <SectionTitle>Fotos</SectionTitle>
       <div style={{ marginBottom: "32px" }}>
-        <label style={L}>Logo (URL)</label>
-        <input style={I} value={d.logoUrl as string ?? ""} onChange={e => set("logoUrl", e.target.value)} placeholder="https://..." />
-        <label style={{ ...L, marginTop: "16px" }}>Galería ({galeria.length}/6)</label>
+        <label style={L}>Logo del local</label>
+        <SubirFoto folder="logos" circular preview={d.logoUrl as string || null} label="Subir logo" onUpload={url => set("logoUrl", url)} />
+
+        <label style={{ ...L, marginTop: "20px" }}>Foto de portada</label>
+        <SubirFoto folder="portadas" preview={d.portadaUrl as string || null} label="Subir portada" height="160px" onUpload={url => set("portadaUrl", url)} />
+
+        <label style={{ ...L, marginTop: "20px" }}>Galería ({galeria.length}/6)</label>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px", marginBottom: "10px" }}>
           {galeria.map((url, i) => (
             <div key={i} style={{ position: "relative", height: "80px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)" }}>
@@ -165,10 +169,7 @@ export default function MiLocalPage() {
           ))}
         </div>
         {galeria.length < 6 && (
-          <div style={{ display: "flex", gap: "8px" }}>
-            <input style={{ ...I, flex: 1 }} value={newFoto} onChange={e => setNewFoto(e.target.value)} placeholder="URL de la foto" />
-            <button onClick={() => { if (newFoto.trim()) { set("galeria", [...galeria, newFoto.trim()]); setNewFoto(""); } }} style={{ ...I, width: "auto", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem" }}>+ Agregar</button>
-          </div>
+          <SubirFoto folder="galeria" label="+ Agregar foto" height="80px" onUpload={url => set("galeria", [...galeria, url])} />
         )}
       </div>
 
@@ -208,9 +209,10 @@ export default function MiLocalPage() {
       </div>
 
       {/* Save */}
-      <div style={{ position: "sticky", bottom: "16px", padding: "16px 0" }}>
+      <div style={{ padding: "24px 0 40px" }}>
         <button onClick={handleSave} style={{
-          width: "100%", padding: "14px", background: saved ? "var(--oasis-teal)" : "var(--accent)",
+          width: "100%", maxWidth: "300px", padding: "14px 32px",
+          background: saved ? "var(--oasis-teal)" : "var(--accent)",
           color: saved ? "#fff" : "var(--bg-primary)", fontFamily: "var(--font-cinzel)",
           fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer",
         }}>
