@@ -32,65 +32,79 @@ export default function BirthdayBanner() {
   };
 
   return (
-    <div style={{
-      background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(180,30,100,0.15))",
-      borderBottom: "1px solid rgba(232,168,76,0.3)",
-      padding: "12px 40px 12px 20px",
-      textAlign: "center",
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 101,
-      overflow: "hidden",
-      backdropFilter: "blur(12px)",
-    }}>
-      {["🎊", "🎂", "✨", "🎉", "🎈"].map((emoji, i) => (
-        <span key={i} style={{
-          position: "absolute",
-          top: "50%",
-          left: `${10 + i * 20}%`,
-          transform: "translateY(-50%)",
-          fontSize: "1.2rem",
-          opacity: 0.4,
-          pointerEvents: "none",
-        }}>
-          {emoji}
-        </span>
-      ))}
-      <p style={{
-        fontFamily: "var(--font-cinzel)",
-        fontSize: "clamp(0.75rem, 2vw, 0.9rem)",
-        color: "var(--accent)",
-        margin: 0,
-        letterSpacing: "0.05em",
-        position: "relative",
-        zIndex: 1,
-      }}>
-        🎂 ¡Feliz cumpleaños{nombre ? `, ${nombre}` : ""}! Hoy los restaurantes tienen{" "}
-        <a href="/promociones?cumpleanos=1" style={{
+    <>
+      {/* Spacer so fixed banner doesn't overlap page content */}
+      <div style={{ height: "44px" }} />
+      <div className="dc-birthday-banner">
+        {["🎊", "🎂", "✨", "🎉", "🎈"].map((emoji, i) => (
+          <span key={i} style={{
+            position: "absolute",
+            top: "50%",
+            left: `${10 + i * 20}%`,
+            transform: "translateY(-50%)",
+            fontSize: "1.2rem",
+            opacity: 0.3,
+            pointerEvents: "none",
+          }}>
+            {emoji}
+          </span>
+        ))}
+        <p style={{
+          fontFamily: "var(--font-cinzel)",
+          fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
           color: "var(--accent)",
-          textDecoration: "underline",
-          fontWeight: 700,
+          margin: 0,
+          letterSpacing: "0.05em",
+          position: "relative",
+          zIndex: 1,
         }}>
-          ofertas especiales para ti
-        </a>
-        {" "}🎉
-      </p>
-      <button onClick={dismiss} style={{
-        position: "absolute",
-        right: "12px",
-        top: "50%",
-        transform: "translateY(-50%)",
-        background: "none",
-        border: "none",
-        color: "var(--text-muted)",
-        fontSize: "0.8rem",
-        cursor: "pointer",
-        zIndex: 2,
-      }}>
-        ✕
-      </button>
-    </div>
+          🎂 ¡Feliz cumpleaños{nombre ? `, ${nombre}` : ""}! Hoy los restaurantes tienen{" "}
+          <a href="/promociones" style={{
+            color: "var(--accent)",
+            textDecoration: "underline",
+            fontWeight: 700,
+          }}>
+            ofertas especiales para ti
+          </a>
+          {" "}🎉
+        </p>
+        <button onClick={dismiss} style={{
+          position: "absolute",
+          right: "12px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          background: "none",
+          border: "none",
+          color: "var(--text-muted)",
+          fontSize: "0.8rem",
+          cursor: "pointer",
+          zIndex: 2,
+        }}>
+          ✕
+        </button>
+      </div>
+      <style>{`
+        .dc-birthday-banner {
+          position: fixed;
+          top: 66px;
+          left: 0;
+          right: 0;
+          z-index: 99;
+          background: linear-gradient(135deg, rgba(232,168,76,0.15), rgba(180,30,100,0.15));
+          border-bottom: 1px solid rgba(232,168,76,0.3);
+          padding: 10px 40px 10px 20px;
+          text-align: center;
+          overflow: hidden;
+          backdrop-filter: blur(12px);
+          background-color: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+        }
+        @media (max-width: 767px) {
+          .dc-birthday-banner { top: 52px; padding: 8px 36px 8px 12px; }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .dc-birthday-banner { top: 60px; }
+        }
+      `}</style>
+    </>
   );
 }

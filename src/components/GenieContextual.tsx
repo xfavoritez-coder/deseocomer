@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useGenie } from "@/contexts/GenieContext";
 
@@ -97,12 +97,19 @@ export default function GenieContextual() {
   const pathname = usePathname();
   const { perfil, setToastActivo, toastActivo, userName, isLoggedIn } = useGenie();
 
+  // Ref tracks the LIVE value of toastActivo so the setTimeout callback sees current state
+  const toastRef = useRef(toastActivo);
+  useEffect(() => { toastRef.current = toastActivo; }, [toastActivo]);
+
   useEffect(() => {
     if (toastActivo) return;
     if (pathname.startsWith("/panel") || pathname.startsWith("/admin")) return;
     if (yaMostradoHoy(pathname)) return;
 
     const timer = setTimeout(() => {
+      // Re-check: if another toast appeared while we waited (e.g. birthday), don't override
+      if (toastRef.current) return;
+
       const mensaje = getMensajeContextual(pathname, perfil, userName, isLoggedIn);
       if (mensaje) {
         marcarMostrado(pathname);
