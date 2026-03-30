@@ -18,8 +18,17 @@ function VerificarContent() {
     fetch(`/api/verificar-email?token=${token}`)
       .then(r => r.json())
       .then(data => {
-        if (data.ok) { setStatus("ok"); setNombre(data.nombre ?? ""); }
-        else setStatus("error");
+        if (data.ok) {
+          setStatus("ok");
+          setNombre(data.nombre ?? "");
+          // Auto-login: save session
+          try {
+            localStorage.setItem("deseocomer_session", JSON.stringify({
+              id: data.id, nombre: data.nombre, email: data.email,
+              tipo: "usuario", loggedIn: true,
+            }));
+          } catch {}
+        } else setStatus("error");
       })
       .catch(() => setStatus("error"));
   }, [token]);
@@ -37,9 +46,9 @@ function VerificarContent() {
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>
               {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa. Ya puedes participar en concursos y guardar favoritos.
             </p>
-            <Link href="/" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
-              Ir a DeseoComer →
-            </Link>
+            <a href="/" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
+              Entrar a DeseoComer →
+            </a>
           </>
         )}
         {status === "error" && (

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     if (!usuario) return NextResponse.json({ error: "Token inválido o ya usado" }, { status: 400 });
 
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, tokenVerificacion: null } });
-    return NextResponse.json({ ok: true, nombre: usuario.nombre });
+    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
