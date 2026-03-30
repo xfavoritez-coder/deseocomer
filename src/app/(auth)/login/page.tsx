@@ -25,6 +25,8 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [emailNoVerificado, setEmailNoVerificado] = useState(false);
+  const [reenvioSent, setReenvioSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +37,10 @@ export default function LoginPage() {
     const res = await login(email.trim(), password, remember);
     setLoading(false);
     if (res.success) router.push("/");
-    else setError(res.error ?? "Error al iniciar sesión.");
+    else {
+      setError(res.error ?? "Error al iniciar sesión.");
+      if (res.codigo === "EMAIL_NO_VERIFICADO") setEmailNoVerificado(true);
+    }
   };
 
   return (
@@ -58,7 +63,13 @@ export default function LoginPage() {
 
         {error && (
           <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "8px", padding: "12px", marginBottom: "16px" }}>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b", marginBottom: emailNoVerificado ? "10px" : 0 }}>⚠️ {error}</p>
+            {emailNoVerificado && !reenvioSent && (
+              <button onClick={async () => { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase() }) }).catch(() => {}); setReenvioSent(true); }} style={{ background: "none", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "8px", padding: "8px 14px", color: "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", cursor: "pointer", width: "100%" }}>
+                Reenviar email de verificación
+              </button>
+            )}
+            {reenvioSent && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#3db89e", marginTop: "6px" }}>✓ Email reenviado. Revisa tu bandeja.</p>}
           </div>
         )}
 

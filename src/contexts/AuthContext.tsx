@@ -39,6 +39,7 @@ interface AuthResult {
   success: boolean;
   error?: string;
   userId?: string;
+  codigo?: string;
 }
 
 interface AuthContextType {
@@ -101,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const data = await res.json();
 
       if (!res.ok) {
-        return { success: false, error: data.error || "Email o contraseña incorrectos." };
+        return { success: false, error: data.error || "Email o contraseña incorrectos.", codigo: data.codigo };
       }
 
       const authUser: AuthUser = {

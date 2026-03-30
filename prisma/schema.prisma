@@ -18,6 +18,8 @@ model Usuario {
   cumpleMes   Int?
   cumpleAnio  Int?
   tipo                String    @default("usuario")
+  emailVerificado     Boolean   @default(false)
+  tokenVerificacion   String?
   resetToken          String?
   resetTokenExpira    DateTime?
   createdAt           DateTime  @default(now())

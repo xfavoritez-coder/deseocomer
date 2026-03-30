@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resend } from "@/lib/resend";
+import { VerificacionEmail } from "@/emails/VerificacionEmail";
 import bcrypt from "bcryptjs";
+import * as crypto from "crypto";
+import * as React from "react";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,17 +20,23 @@ export async function POST(req: NextRequest) {
     }
 
     const hash = await bcrypt.hash(password, 10);
+    const tokenVerificacion = crypto.randomBytes(32).toString("hex");
+
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio },
+      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion },
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;
 
-    // Send welcome email (non-blocking)
+    // Send verification email
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    fetch(`${baseUrl}/api/emails/bienvenida`, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre: usuario.nombre, email: usuario.email }),
+    const verificationUrl = `${baseUrl}/verificar-email?token=${tokenVerificacion}`;
+
+    resend.emails.send({
+      from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
+      to: email,
+      subject: "Activa tu cuenta en DeseoComer 📧",
+      react: React.createElement(VerificacionEmail, { nombre, verificationUrl }),
     }).catch(console.error);
 
     return NextResponse.json(usuarioSinPassword, { status: 201 });
