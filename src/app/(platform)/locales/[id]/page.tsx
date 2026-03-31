@@ -52,8 +52,7 @@ function getColor(name: string): string {
   return COLORS[name.charCodeAt(0) % COLORS.length];
 }
 
-const TABS = ["Información", "Menú", "Reseñas", "Fotos", "Concursos"] as const;
-type Tab = typeof TABS[number];
+type Tab = "Información" | "Menú" | "Reseñas" | "Fotos" | "Concursos" | "Promociones";
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -159,7 +158,12 @@ export default function LocalDetailPage() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>
                 <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
-                {local.verificado && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.1em", color: "rgba(232,168,76,0.55)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "2px 8px", whiteSpace: "nowrap" }}>✓ verificado</span>}
+                {local.rating > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }}>
+                    <span style={{ fontSize: "0.75rem", color: "#e8a84c" }}>★</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
+                  </div>
+                )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
@@ -178,33 +182,19 @@ export default function LocalDetailPage() {
         </div>
       </section>
 
-      {/* Activity badges */}
-      {(concursosLocal.length > 0 || local.totalFavoritos > 0) && (
-        <div style={{ display: "flex", gap: "8px", padding: "12px clamp(16px, 4vw, 32px)", overflowX: "auto", scrollbarWidth: "none", borderBottom: "1px solid rgba(232,168,76,0.06)", background: "rgba(0,0,0,0.2)" }}>
-          {concursosLocal.length > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", padding: "7px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", flexShrink: 0 }}>
-              <span style={{ fontSize: "0.8rem" }}>🏆</span>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", color: "#e8a84c", textTransform: "uppercase" }}>Concurso activo</span>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Tabs */}
-      <div style={{
-        position: "sticky", top: "64px", zIndex: 50,
-        background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)",
-        display: "flex", overflowX: "auto", scrollbarWidth: "none",
-        padding: "0 24px",
-      }}>
-        {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase",
-            color: tab === t ? "var(--accent)" : "var(--text-muted)",
-            background: "none", border: "none", borderBottom: tab === t ? "2px solid var(--accent)" : "2px solid transparent",
-            padding: "14px 16px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
-          }}>
-            {t}
+      <div style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
+        {[
+          { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
+          { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
+          { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
+          { key: "Fotos" as Tab, label: "Fotos", count: null, countColor: "", countBg: "" },
+          { key: "Concursos" as Tab, label: "Concursos", count: concursosLocal.length > 0 ? concursosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c" },
+          { key: "Promociones" as Tab, label: "Promociones", count: null, countColor: "", countBg: "" },
+        ].map(t => (
+          <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
+            {t.label}
+            {t.count !== null && <span style={{ background: tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)", color: tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)", fontSize: "0.6rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
           </button>
         ))}
       </div>
@@ -369,19 +359,13 @@ export default function LocalDetailPage() {
                 <EmptyState icon="🏆" title="Sin concursos" text="No hay concursos activos en este momento" />
               )
             )}
+
+            {/* TAB: Promociones */}
+            {tab === "Promociones" && (
+              <EmptyState icon="⚡" title="Sin promociones activas" text="Este local no tiene promociones activas en este momento." />
+            )}
           </div>
 
-          {/* Sidebar */}
-          <div className="dc-ld-sidebar">
-            {/* Stats */}
-            <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "20px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <StatRow icon="❤️" text={`${local.totalFavoritos} personas lo tienen como favorito`} />
-                <StatRow icon="⭐" text={`${local.rating} rating promedio`} />
-                <StatRow icon="💬" text={`${local.totalResenas} reseñas`} />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Similares */}
@@ -425,9 +409,8 @@ export default function LocalDetailPage() {
       <Footer />
 
       <style>{`
-        .dc-ld-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+        .dc-ld-layout { display: block; }
         .dc-ld-main { min-width: 0; }
-        .dc-ld-sidebar { position: sticky; top: 120px; }
         .dc-local-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
         .dc-local-sidebar { position: sticky; top: 100px; }
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
@@ -437,8 +420,6 @@ export default function LocalDetailPage() {
           .dc-local-sidebar { position: static; }
         }
         @media (max-width: 767px) {
-          .dc-ld-layout { grid-template-columns: 1fr; }
-          .dc-ld-sidebar { position: static; }
           .dc-ld-menu-grid { grid-template-columns: 1fr; }
           .dc-ld-gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
         }
