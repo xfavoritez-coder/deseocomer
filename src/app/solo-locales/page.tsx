@@ -102,9 +102,11 @@ export default function SoloLocalesPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
           {BENEFICIOS.map((b, i) => (
             <Reveal key={b.titulo} delay={i * 0.1}>
-              <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "32px", height: "100%" }}>
-                <div style={{ fontSize: "2.2rem", marginBottom: "16px" }}>{b.icon}</div>
-                <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "10px", fontWeight: 700 }}>{b.titulo}</h3>
+              <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "28px 24px", height: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                  <span style={{ fontSize: "1.6rem", flexShrink: 0 }}>{b.icon}</span>
+                  <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", fontWeight: 700, margin: 0 }}>{b.titulo}</h3>
+                </div>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>{b.texto}</p>
               </div>
             </Reveal>
@@ -197,9 +199,6 @@ export default function SoloLocalesPage() {
           }}>
             Comenzar gratis →
           </Link>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "16px" }}>
-            Ya son 6 locales en Santiago — sé de los primeros
-          </p>
         </Reveal>
       </section>
 
