@@ -111,14 +111,25 @@ function getPeriod(hour: number): TimePeriod {
 }
 
 export function useTimeTheme(): TimeTheme {
-  // Inicializar sincrónicamente con el período correcto — nunca null
+  // Default to "dia" on SSR to avoid hydration mismatch, then sync on client
   const [theme, setTheme] = useState<TimeTheme>(() =>
-    getThemeByPeriod(getPeriod(new Date().getHours()))
+    typeof window !== "undefined"
+      ? getThemeByPeriod(getPeriod(new Date().getHours()))
+      : getThemeByPeriod("dia")
   );
   const periodRef = useRef(theme.period);
 
   useEffect(() => {
-    applyThemeVars(theme);
+    // Sync correct period on client mount (SSR defaults to "dia")
+    const correctPeriod = getPeriod(new Date().getHours());
+    if (correctPeriod !== theme.period) {
+      const correct = getThemeByPeriod(correctPeriod);
+      setTheme(correct);
+      periodRef.current = correctPeriod;
+      applyThemeVars(correct);
+    } else {
+      applyThemeVars(theme);
+    }
 
     // Interval: solo actualizar cuando el período cambia realmente
     const interval = setInterval(() => {
