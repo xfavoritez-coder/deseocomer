@@ -386,40 +386,38 @@ export default function ConcursoDetallePage() {
         );
       })()}
 
-      {/* ── Banner: 2-col on desktop ── */}
+      {/* ── Banner ── */}
       <section className="dc-cd-banner">
-        <div className="dc-cd-banner-inner">
-          {/* Left: photo */}
-          <div className="dc-cd-banner-photo">
-            {c.imagenUrl ? (
-              <div style={{ position: "relative", height: "100%", minHeight: "280px", overflow: "hidden", borderRadius: "20px", background: "rgba(45,26,8,0.8)" }}>
-                <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="lg" /></div>
-              </div>
-            ) : (
-              <div style={{ height: "280px", borderRadius: "20px", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
-            )}
-          </div>
+        {/* Image full width — no padding */}
+        <div style={{ position: "relative", width: "100%", height: "clamp(220px, 45vw, 420px)", overflow: "hidden", background: "rgba(45,26,8,0.8)" }}>
+          {c.imagenUrl ? (
+            <>
+              <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
+              <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="lg" /></div>
+            </>
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
+          )}
+        </div>
 
-          {/* Right: info */}
-          <div className="dc-cd-banner-info">
-            <Link href="/concursos" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "24px" }}>
-              ← Todos los concursos
-            </Link>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#3db89e", marginBottom: "12px" }}>{c.local}</p>
-            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 3vw, 1.8rem)", fontWeight: 900, color: "#e8a84c", lineHeight: 1.3, marginBottom: "16px" }}>{c.premio}</h1>
-            <div style={{ width: "60px", height: "1px", marginBottom: "16px", background: "linear-gradient(90deg, #e8a84c, transparent)" }} />
-            {"descripcionPremio" in c && (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(253,240,200,0.75)", fontWeight: 400, lineHeight: 1.65 }}>
-                {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
-              </p>
-            )}
-            {isEnded && "fechaFin" in c && (
-              <div style={{ display: "inline-block", marginTop: "16px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>
-                Concurso finalizado · {(c as typeof c & { fechaFin: string }).fechaFin}
-              </div>
-            )}
-          </div>
+        {/* Info with padding */}
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px clamp(20px, 5vw, 60px) 0" }}>
+          <Link href="/concursos" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px" }}>
+            ← Todos los concursos
+          </Link>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#3db89e", marginBottom: "12px" }}>{c.local}</p>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 3vw, 2rem)", fontWeight: 900, color: "#e8a84c", lineHeight: 1.3, marginBottom: "16px" }}>{c.premio}</h1>
+          <div style={{ width: "60px", height: "1px", marginBottom: "16px", background: "linear-gradient(90deg, #e8a84c, transparent)" }} />
+          {"descripcionPremio" in c && (
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(253,240,200,0.75)", fontWeight: 400, lineHeight: 1.65, maxWidth: "600px" }}>
+              {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
+            </p>
+          )}
+          {isEnded && "fechaFin" in c && (
+            <div style={{ display: "inline-block", marginTop: "16px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+              Concurso finalizado · {(c as typeof c & { fechaFin: string }).fechaFin}
+            </div>
+          )}
         </div>
       </section>
 
@@ -695,14 +693,9 @@ export default function ConcursoDetallePage() {
 
       <style>{`
         .dc-cd-banner {
-          padding: 100px 60px 40px;
+          padding-top: 64px;
+          padding-bottom: 32px;
         }
-        .dc-cd-banner-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        .dc-cd-banner-photo { margin-bottom: 24px; }
-        .dc-cd-banner-info {}
 
         .dc-cd-body {
           max-width: 1200px; margin: 0 auto;
@@ -726,16 +719,6 @@ export default function ConcursoDetallePage() {
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        @media (min-width: 1024px) {
-          .dc-cd-banner-inner {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
-          }
-          .dc-cd-banner-photo { margin-bottom: 0; }
-          .dc-cd-banner-photo > div { height: 420px !important; min-height: 420px !important; }
-        }
 
         @media (max-width: 1023px) {
           .dc-cd-body { grid-template-columns: 1fr; padding: 32px 40px 60px; gap: 24px; }
@@ -743,7 +726,7 @@ export default function ConcursoDetallePage() {
           .dc-cd-sidebar > div { position: static !important; }
         }
         @media (max-width: 767px) {
-          .dc-cd-banner { padding: 80px 20px 24px; }
+          .dc-cd-banner { padding-top: 56px; padding-bottom: 20px; }
           .dc-cd-body { padding: 24px 20px 48px; }
           .dc-asi-grid { grid-template-columns: 1fr !important; }
         }
