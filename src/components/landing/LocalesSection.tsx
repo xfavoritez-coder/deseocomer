@@ -106,6 +106,13 @@ export default function LocalesSection() {
         </div>
 
         {/* Grid */}
+        {localesFiltrados.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 20px" }}>
+            <p style={{ fontSize: "2rem", marginBottom: "12px" }}>🍽️</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", color: "var(--accent)", marginBottom: "6px" }}>Aún no hay locales de {categoriaActiva}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Estamos incorporando nuevos locales cada semana</p>
+          </div>
+        ) : (
         <div className="dc-loc-grid">
           {localesFiltrados.map(local => (
             <Link key={local.id} href={`/locales/${local.id}`} className="dc-loc-card" style={{
@@ -214,6 +221,7 @@ export default function LocalesSection() {
             </Link>
           ))}
         </div>
+        )}
 
         <div style={{ textAlign: "center", marginTop: "48px" }}>
           <Link href="/locales" style={{
