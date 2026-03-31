@@ -113,6 +113,12 @@ export default function MiLocalPage() {
           const merged = { ...d, logoUrl: updated.logoUrl ?? d.logoUrl, portadaUrl: updated.portadaUrl ?? d.portadaUrl, galeria: updated.galeria ?? d.galeria, horarios: updated.horarios ?? d.horarios, direccion: direccionFormateada };
           setD(merged);
           save(merged);
+          // Update session with slug if it was generated
+          if (updated.slug && !session.slug) {
+            session.slug = updated.slug;
+            localStorage.setItem("deseocomer_local_session", JSON.stringify(session));
+            sessionStorage.setItem("deseocomer_local_session", JSON.stringify(session));
+          }
         }
         showToast("✓ Cambios guardados correctamente");
       } else {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { makeLocalSlug } from "@/lib/slugify";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -27,6 +28,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await req.json();
+
+    // Generate slug if missing
+    const existing = await prisma.local.findUnique({ where: { id }, select: { slug: true, comuna: true } });
+    let slugUpdate: { slug?: string } = {};
+    if (existing && !existing.slug && body.nombre) {
+      const slug = makeLocalSlug(body.nombre, body.comuna ?? existing.comuna ?? undefined);
+      const taken = await prisma.local.findUnique({ where: { slug }, select: { id: true } });
+      if (!taken) slugUpdate = { slug };
+    }
+
     const local = await prisma.local.update({
       where: { id },
       data: {
@@ -36,6 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,
         galeria: body.galeria, tieneMenu: body.tieneMenu,
         ...(body.tags !== undefined && { tags: body.tags }),
+        ...slugUpdate,
       },
     });
     const { password: _, ...safe } = local;
