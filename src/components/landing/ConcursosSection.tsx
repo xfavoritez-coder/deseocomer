@@ -9,11 +9,9 @@ export default function ConcursosSection() {
   const [concursos, setConcursos] = useState(concursosMock);
   const [tiempos, setTiempos] = useState<Record<string, {d:number,h:number,m:number,s:number}>>({});
 
-  // Try fetching from API, fallback to mock
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
-        // Sort: urgent (<=24h) first, then by participants
         const ahora = Date.now();
         const sorted = [...data].sort((a, b) => {
           const rA = new Date(a.fechaFin).getTime() - ahora;
@@ -64,29 +62,9 @@ export default function ConcursosSection() {
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
 
         <div style={{ textAlign: "center", marginBottom: "64px" }}>
-          <p style={{
-            fontFamily: "var(--font-cinzel)",
-            fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
-            letterSpacing: "0.4em",
-            textTransform: "uppercase",
-            color: "rgba(240,234,214,0.65)",
-            marginBottom: "16px",
-          }}>
-            Concursos
-          </p>
-          <h2 style={{
-            fontFamily: "var(--font-cinzel-decorative)",
-            fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
-            fontWeight: 800, letterSpacing: "0.02em",
-            color: "#f5d080",
-            textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
-            marginBottom: "20px",
-          }}>
-            Gana Comida Gratis
-          </h2>
-          <p className="section-description">
-            Comparte tu link con amigos y sube en el ranking. Los mejores ganan premios reales cada semana.
-          </p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.4em", textTransform: "uppercase", color: "rgba(240,234,214,0.65)", marginBottom: "16px" }}>Concursos</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "#f5d080", textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)", marginBottom: "20px" }}>Gana Comida Gratis</h2>
+          <p className="section-description">Comparte tu link con amigos y sube en el ranking. Los mejores ganan premios reales cada semana.</p>
         </div>
 
         {concursos.length === 0 ? (
@@ -98,153 +76,100 @@ export default function ConcursosSection() {
           </div>
         ) : (
         <div className="dc-cst-grid">
-          {concursos.map((c) => (
-            <a key={c.id}
-              href={`/concursos/${c.slug || c.id}`}
-              className="dc-cst-card"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "20px",
-                cursor: "pointer",
-                transition: "transform 0.2s ease, border-color 0.2s ease",
-                textDecoration: "none",
-                display: "block",
-                color: "inherit",
-              }}
-            >
-              <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, pointerEvents: "none", background: "rgba(45,26,8,0.8)", position: "relative" }}>
-                <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="sm" /></div>
-              </div>
-              <div style={{ padding: "24px 24px 0", pointerEvents: "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{
-                      fontFamily: "var(--font-cinzel)",
-                      fontSize: "0.65rem",
-                      letterSpacing: "0.2em",
-                      color: "rgba(240,234,214,0.65)",
-                      textTransform: "uppercase",
-                      marginBottom: "4px",
-                    }}>{c.local}</p>
-                    <p style={{
-                      fontFamily: "var(--font-cinzel-decorative)",
-                      fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-                      color: "#f5d080",
-                    }}>{c.premio}</p>
+          {concursos.map((c) => {
+            const t = tiempos[c.id] ?? { d: 0, h: 0, m: 0, s: 0 };
+            const totalSeg = t.d * 86400 + t.h * 3600 + t.m * 60 + t.s;
+            const ended = totalSeg <= 0;
+            const esUrgente = !ended && c.horasRestantes < 6;
+            const urgColor = "#e05555";
+            const accentColor = esUrgente ? urgColor : "var(--accent)";
+            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina pronto!" : "Concurso activo";
+            const badgeDot = ended ? "var(--text-muted)" : esUrgente ? urgColor : "#3db89e";
+
+            return (
+              <a key={c.id} href={`/concursos/${c.slug || c.id}`} className="dc-cst-card" style={{
+                background: "rgba(20,12,35,0.95)",
+                border: `1px solid ${esUrgente ? "rgba(224,85,85,0.4)" : "rgba(232,168,76,0.25)"}`,
+                borderRadius: "20px", overflow: "hidden", textDecoration: "none", display: "block", color: "inherit",
+                transition: "transform 0.2s, border-color 0.2s",
+              }}>
+                {/* Image */}
+                <div className="dc-cst-img" style={{ position: "relative", overflow: "hidden" }}>
+                  <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
+                  {/* Badge */}
+                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px", animation: ended ? "none" : `dc-pulse-badge ${esUrgente ? "0.8s" : "2s"} ease-in-out infinite` }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: badgeDot }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "rgba(240,234,214,0.7)", textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
-                {/* Countdown */}
-                <div style={{
-                  marginBottom: "20px", borderRadius: "14px", overflow: "hidden",
-                  border: c.horasRestantes <= 6 ? "1px solid rgba(255,100,60,0.4)" : "1px solid rgba(232,168,76,0.2)",
-                  background: c.horasRestantes <= 6 ? "rgba(255,60,30,0.06)" : "rgba(0,0,0,0.2)",
-                }}>
-                  <div style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.05)",
-                  }}>
-                    <span style={{
-                      fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
-                      letterSpacing: "0.2em", textTransform: "uppercase",
-                      color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--oasis-bright)",
-                      display: "flex", alignItems: "center", gap: "6px",
-                    }}>
-                      <span style={{
-                        width: "6px", height: "6px", borderRadius: "50%",
-                        background: c.horasRestantes <= 6 ? "#ff4444" : "var(--oasis-bright)",
-                        display: "inline-block",
-                        animation: "dc-cst-pulse 1.5s ease-in-out infinite",
-                      }}/>
-                      Termina en
-                    </span>
-                    <span style={{
-                      fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
-                      letterSpacing: "0.15em", color: "var(--text-muted)", textTransform: "uppercase",
-                    }}>
-                      👥 {c.participantes}
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "4px", padding: "12px 16px" }}>
-                    {[
-                      ...((tiempos[c.id]?.d ?? 0) > 0 ? [{ val: tiempos[c.id]?.d ?? 0, label: "días" }] : []),
-                      { val: tiempos[c.id]?.h ?? 0, label: "hrs" },
-                      { val: tiempos[c.id]?.m ?? 0, label: "min" },
-                      { val: tiempos[c.id]?.s ?? 0, label: "seg" },
-                    ].map(({ val, label }, idx, arr) => (
-                      <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{
-                            fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", lineHeight: 1,
-                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
-                            textShadow: c.horasRestantes <= 6 ? "0 0 20px rgba(255,80,50,0.5)" : "0 0 20px rgba(232,168,76,0.4)",
-                            minWidth: "42px", textAlign: "center",
-                            animation: c.horasRestantes <= 2 ? "dc-cst-pulse 1s ease-in-out infinite" : "none",
-                          }}>
-                            {pad(val)}
+                {/* Content */}
+                <div className="dc-cst-content" style={{ padding: "16px 20px 18px" }}>
+                  {/* Local name */}
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)", marginBottom: "4px" }}>{c.local}</p>
+                  {/* Premio */}
+                  <p className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.3 }}>{c.premio}</p>
+                  {/* Descripcion - desktop only */}
+                  <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
+
+                  {/* Countdown box */}
+                  {!ended && (
+                    <div style={{ background: "rgba(10,8,18,0.6)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: "12px", padding: "10px 14px", marginBottom: "14px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                        <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: esUrgente ? urgColor : "var(--oasis-bright)", animation: `dc-pulse-badge ${esUrgente ? "0.8s" : "2s"} ease-in-out infinite` }} />
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.15em", textTransform: "uppercase", color: esUrgente ? urgColor : "var(--oasis-bright)" }}>Termina en</span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
+                        {[
+                          ...(t.d > 0 ? [{ val: t.d, label: "días" }] : []),
+                          { val: t.h, label: "hrs" },
+                          { val: t.m, label: "min" },
+                          { val: t.s, label: "seg" },
+                        ].map(({ val, label }, idx, arr) => (
+                          <div key={label} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                            <div style={{ textAlign: "center" }}>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, lineHeight: 1, color: accentColor, minWidth: "32px" }}>{pad(val)}</div>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
+                            </div>
+                            {idx < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: accentColor, opacity: 0.5, marginBottom: "12px" }}>:</span>}
                           </div>
-                          <div style={{
-                            fontFamily: "var(--font-cinzel)", fontSize: "0.45rem",
-                            letterSpacing: "0.15em", textTransform: "uppercase",
-                            color: "var(--text-muted)", marginTop: "4px",
-                          }}>{label}</div>
-                        </div>
-                        {idx < arr.length - 1 && (
-                          <span style={{
-                            fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
-                            color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",
-                            opacity: 0.6, marginBottom: "16px", alignSelf: "flex-start", paddingTop: "2px",
-                          }}>:</span>
-                        )}
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                  )}
+                  {ended && (
+                    <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
+                    </div>
+                  )}
+
+                  {/* Footer */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+                      👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}
+                    </span>
+                    {!ended && (
+                      <span className="dc-cst-btn" style={{
+                        fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
+                        padding: "7px 16px", borderRadius: "20px",
+                        border: `1px solid ${esUrgente ? urgColor : "var(--accent)"}`,
+                        color: esUrgente ? urgColor : "var(--accent)",
+                        background: "transparent",
+                      }}>
+                        Participar →
+                      </span>
+                    )}
                   </div>
                 </div>
-
-                {/* Ranking top 3 */}
-                <div style={{ marginBottom: "24px" }}>
-                  {c.topRanking.map((r, i) => (
-                    <div key={i} style={{
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      padding: "8px 0",
-                      borderBottom: i < 2 ? "1px solid var(--border-color)" : "none",
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        <span style={{ fontSize: "1rem" }}>{["🥇","🥈","🥉"][i]}</span>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>
-                          {r.nombre}
-                        </span>
-                      </div>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--oasis-bright)", whiteSpace: "nowrap", paddingLeft: "8px" }}>
-                        {r.referidos} amigos
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            </a>
-          ))}
+              </a>
+            );
+          })}
         </div>
         )}
 
         <div style={{ textAlign: "center", marginTop: "60px" }}>
-          <a href="/concursos" style={{
-            fontFamily: "var(--font-cinzel)",
-            fontSize: "0.8rem",
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "var(--color-link)",
-            textDecoration: "none",
-            borderBottom: "1px solid var(--border-color)",
-            paddingBottom: "4px",
-            transition: "border-color 0.2s",
-          }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-color)"; }}
-          >
+          <a href="/concursos" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-link)", textDecoration: "none", borderBottom: "1px solid var(--border-color)", paddingBottom: "4px" }}>
             Ver todos los concursos →
           </a>
         </div>
@@ -252,27 +177,35 @@ export default function ConcursosSection() {
 
       <style>{`
         .dc-cst-section { padding: 100px 60px 80px; }
-        .dc-cst-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-          gap: 28px;
-        }
-        .dc-cst-card { padding: 0; overflow: visible; }
+        .dc-cst-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px; }
         .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
-        @keyframes dc-cst-pulse {
+        .dc-cst-img { height: 180px; }
+        .dc-cst-premio { font-size: 17px; }
+        .dc-cst-desc { display: none !important; }
+        .dc-cst-btn { }
+
+        @keyframes dc-pulse-badge {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          50% { opacity: 0.4; }
         }
 
+        @media (min-width: 768px) {
+          .dc-cst-card { display: flex !important; flex-direction: row !important; }
+          .dc-cst-img { width: 280px; height: auto; min-height: 220px; flex-shrink: 0; }
+          .dc-cst-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+          .dc-cst-premio { font-size: 20px; }
+          .dc-cst-desc { display: -webkit-box !important; }
+          .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
+        }
         @media (max-width: 767px) {
           .dc-cst-section { padding: 72px 20px 48px; }
-          .dc-cst-grid    { display: flex !important; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
+          .dc-cst-grid { display: flex !important; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; scrollbar-width: none; }
           .dc-cst-grid::-webkit-scrollbar { display: none; }
-          .dc-cst-card    { flex-shrink: 0 !important; width: 300px !important; }
+          .dc-cst-card { flex-shrink: 0 !important; width: 300px !important; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {
           .dc-cst-section { padding: 100px 40px; }
-          .dc-cst-grid    { grid-template-columns: repeat(2, 1fr); }
+          .dc-cst-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </section>

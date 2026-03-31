@@ -258,7 +258,7 @@ export default function ConcursosPage() {
 function ConcursoCard({
   concurso: c,
   timer,
-  mounted,
+  mounted: _mounted,
   onParticipate,
 }: {
   concurso: Concurso;
@@ -267,204 +267,104 @@ function ConcursoCard({
   onParticipate: () => void;
 }) {
   const soon = isSoonEnding(c.endsAt);
+  const ended = !!timer?.ended;
+  const urgColor = "#e05555";
+  const accentColor = soon ? urgColor : "var(--accent)";
+  const badgeText = ended ? "Finalizado" : soon ? "¡Termina pronto!" : "Concurso activo";
+  const badgeDot = ended ? "var(--text-muted)" : soon ? urgColor : "#3db89e";
 
   return (
-    <div
-      className="dc-cc-card"
-      onClick={onParticipate}
-      style={{
-        backgroundColor: "var(--bg-secondary)",
-        border: "1px solid var(--border-color)",
-        borderRadius: "20px",
-        position: "relative",
-        overflow: "hidden",
-        transition: "transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease",
-      }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.transform = "translateY(-6px)";
-        el.style.borderColor = "var(--accent)";
-        el.style.boxShadow = "0 20px 60px color-mix(in srgb, var(--accent) 15%, transparent)";
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.transform = "translateY(0)";
-        el.style.borderColor = "var(--border-color)";
-        el.style.boxShadow = "none";
-      }}
+    <div className="dc-cc-card" onClick={onParticipate} style={{
+      background: "rgba(20,12,35,0.95)",
+      border: `1px solid ${soon ? "rgba(224,85,85,0.4)" : "rgba(232,168,76,0.25)"}`,
+      borderRadius: "20px", overflow: "hidden", cursor: "pointer",
+      transition: "transform 0.25s, border-color 0.25s",
+    }}
+      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-6px)"; (e.currentTarget as HTMLDivElement).style.borderColor = "var(--accent)"; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLDivElement).style.borderColor = soon ? "rgba(224,85,85,0.4)" : "rgba(232,168,76,0.25)"; }}
     >
       {/* Image */}
-      {c.imagenUrl && (
-        <div style={{ height: "160px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative", background: "rgba(45,26,8,0.8)" }}>
+      <div className="dc-cc-img" style={{ position: "relative", overflow: "hidden", background: "rgba(45,26,8,0.8)" }}>
+        {c.imagenUrl ? (
           <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-          {/* Sello GRATIS */}
-          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="sm" /></div>
-          {/* Badge termina pronto over image */}
-          {soon && (
-            <div style={{
-              position: "absolute", top: "12px", left: "12px",
-              background: "linear-gradient(135deg, #ff2244, #ff6644)",
-              color: "#fff", fontFamily: "var(--font-cinzel)",
-              fontSize: "0.55rem", letterSpacing: "0.15em",
-              textTransform: "uppercase", padding: "5px 12px",
-              borderRadius: "20px", fontWeight: 700,
-              boxShadow: "0 0 16px rgba(255,34,68,0.5)",
-              animation: "dc-pulse 1.5s ease-in-out infinite",
-            }}>
-              ¡Termina pronto!
-            </div>
-          )}
-        </div>
-      )}
-
-      {!c.imagenUrl && soon && (
-        <div style={{
-          position: "absolute", top: "16px", left: "16px",
-          background: "linear-gradient(135deg, #ff2244, #ff6644)",
-          color: "#fff", fontFamily: "var(--font-cinzel)",
-          fontSize: "0.55rem", letterSpacing: "0.15em",
-          textTransform: "uppercase", padding: "5px 12px",
-          borderRadius: "20px", fontWeight: 700,
-          boxShadow: "0 0 16px rgba(255,34,68,0.5)",
-          animation: "dc-pulse 1.5s ease-in-out infinite",
-        }}>
-          ¡Termina pronto!
-        </div>
-      )}
-
-      <div style={{ padding: "28px 28px 0" }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-          <div style={{ minWidth: 0 }}>
-            <p style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)",
-              letterSpacing: "0.2em", color: "var(--oasis-bright)",
-              textTransform: "uppercase", marginBottom: "4px",
-            }}>
-              {c.local}
-            </p>
-            <p style={{
-              fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-              color: "var(--accent)", lineHeight: 1.3,
-            }}>
-              {c.premio}
-            </p>
-          </div>
-        </div>
-
-        {/* Countdown */}
-        <div style={{
-          background: "rgba(0,0,0,0.3)",
-          border: "1px solid var(--border-color)",
-          borderRadius: "14px", padding: "16px",
-          marginBottom: "20px",
-        }}>
-          <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
-            letterSpacing: "0.25em", textTransform: "uppercase",
-            color: "var(--text-muted)", textAlign: "center", marginBottom: "10px",
-          }}>
-            Tiempo restante
-          </p>
-          {mounted && timer ? (
-            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "8px", flexWrap: "nowrap", width: "100%" }}>
-              {timer.dias > 0 && (
-                <>
-                  <TimerUnit value={timer.dias} label="días" urgent={soon} />
-                  <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
-                </>
-              )}
-              <TimerUnit value={timer.horas}    label="horas"    urgent={soon} />
-              <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
-              <TimerUnit value={timer.minutos}  label="min"      urgent={soon} />
-              <span style={{ color: "var(--text-muted)", fontSize: "1.5rem", flexShrink: 0, alignSelf: "center", marginBottom: "16px" }}>:</span>
-              <TimerUnit value={timer.segundos} label="seg"      urgent={soon} />
-            </div>
-          ) : (
-            <div style={{ height: "56px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <div style={{
-                width: "120px", height: "24px", borderRadius: "6px",
-                background: "rgba(255,255,255,0.05)", animation: "dc-shimmer 1.5s ease infinite",
-              }} />
-            </div>
-          )}
-        </div>
-
-        {/* Participants */}
-        <p style={{
-          fontFamily: "var(--font-lato)", fontSize: "0.8rem",
-          color: "var(--text-muted)", marginBottom: "20px",
-          textAlign: "center",
-        }}>
-          <span style={{ color: "var(--oasis-bright)", fontWeight: 700 }}>{c.participantes}</span> participantes
-        </p>
-
-        {/* Top 3 ranking */}
-        <div style={{ marginBottom: "24px" }}>
-          {c.ranking.slice(0, 3).map((r, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "8px 0",
-                borderBottom: i < 2 ? "1px solid var(--border-color)" : "none",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "1rem" }}>{["🥇", "🥈", "🥉"][i]}</span>
-                <span style={{
-                  fontFamily: "var(--font-lato)", fontSize: "0.88rem",
-                  color: "var(--text-primary)",
-                }}>
-                  {r.nombre}
-                </span>
-              </div>
-              <span style={{
-                fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
-                color: "var(--oasis-bright)", whiteSpace: "nowrap", paddingLeft: "8px",
-              }}>
-                {r.referidos} refs
-              </span>
-            </div>
-          ))}
+        ) : (
+          <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem" }}>🏆</div>
+        )}
+        <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
+        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${soon ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px", animation: ended ? "none" : `dc-cc-pulse ${soon ? "0.8s" : "2s"} ease-in-out infinite` }}>
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: badgeDot }} />
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: soon ? urgColor : "rgba(240,234,214,0.7)", textTransform: "uppercase" }}>{badgeText}</span>
         </div>
       </div>
 
-      {/* CTA */}
-      <div style={{ padding: "0 28px 28px" }}>
-        <button
-          onClick={onParticipate}
-          style={{
-            width: "100%",
-            background: soon
-              ? "linear-gradient(135deg, #ff2244, #ff6644)"
-              : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
-            border: "none", borderRadius: "16px",
-            fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-            letterSpacing: "0.08em", textTransform: "uppercase",
-            color: soon ? "#fff" : "var(--bg-primary)",
-            fontWeight: 700, cursor: "pointer", minHeight: "56px", padding: "16px",
-            boxShadow: soon
-              ? "0 4px 24px rgba(255,34,68,0.35)"
-              : "0 4px 24px rgba(42,122,111,0.25)",
-            transition: "opacity 0.2s",
-          }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-        >
-          {soon ? "⚡ Quiero participar ya" : "Quiero participar →"}
-        </button>
+      {/* Content */}
+      <div className="dc-cc-body" style={{ padding: "16px 20px 18px" }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)", marginBottom: "4px" }}>{c.local}</p>
+        <p className="dc-cc-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.3 }}>{c.premio}</p>
+        <p className="dc-cc-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
+
+        {/* Countdown */}
+        {!ended && timer && (
+          <div style={{ background: "rgba(10,8,18,0.6)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: "12px", padding: "10px 14px", marginBottom: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: soon ? urgColor : "var(--oasis-bright)", animation: `dc-cc-pulse ${soon ? "0.8s" : "2s"} ease-in-out infinite` }} />
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.15em", textTransform: "uppercase", color: soon ? urgColor : "var(--oasis-bright)" }}>Termina en</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
+              {[
+                ...(timer.dias > 0 ? [{ val: timer.dias, label: "días" }] : []),
+                { val: timer.horas, label: "hrs" },
+                { val: timer.minutos, label: "min" },
+                { val: timer.segundos, label: "seg" },
+              ].map(({ val, label }, idx, arr) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, lineHeight: 1, color: accentColor, minWidth: "32px" }}>{pad2(val)}</div>
+                    <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
+                  </div>
+                  {idx < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: accentColor, opacity: 0.5, marginBottom: "12px" }}>:</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {ended && (
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+            👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}
+          </span>
+          {!ended && (
+            <span className="dc-cc-btn" style={{
+              fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
+              padding: "7px 16px", borderRadius: "20px",
+              border: `1px solid ${soon ? urgColor : "var(--accent)"}`,
+              color: soon ? urgColor : "var(--accent)", background: "transparent",
+            }}>
+              Participar →
+            </span>
+          )}
+        </div>
       </div>
 
       <style>{`
         .dc-cc-card { cursor: pointer; }
-        @keyframes dc-pulse {
-          0%, 100% { box-shadow: 0 0 16px rgba(255,34,68,0.5); }
-          50%       { box-shadow: 0 0 28px rgba(255,34,68,0.8); }
-        }
-        @keyframes dc-shimmer {
-          0%, 100% { opacity: 0.4; }
-          50%       { opacity: 0.8; }
+        .dc-cc-img { height: 180px; }
+        .dc-cc-premio { font-size: 17px; }
+        .dc-cc-desc { display: none !important; }
+        @keyframes dc-cc-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @media (min-width: 768px) {
+          .dc-cc-card { display: flex !important; flex-direction: row !important; }
+          .dc-cc-img { width: 280px; height: auto !important; min-height: 220px; flex-shrink: 0; }
+          .dc-cc-body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+          .dc-cc-premio { font-size: 20px; }
+          .dc-cc-desc { display: -webkit-box !important; }
+          .dc-cc-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
         }
       `}</style>
     </div>
