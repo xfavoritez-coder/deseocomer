@@ -28,13 +28,26 @@ function RegistroContent() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [refMsg, setRefMsg] = useState("");
+  const [emailBlockedMsg, setEmailBlockedMsg] = useState("");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, Number(concursoId)); }, [refCode, concursoId]);
 
+  const BLOCKED_DOMAINS = ["tempmail.com", "guerrillamail.com", "mailinator.com", "throwaway.email", "yopmail.com", "10minutemail.com", "trashmail.com", "fakeinbox.com", "sharklasers.com", "guerrillamailblock.com", "grr.la", "dispostable.com", "maildrop.cc", "temp-mail.org"];
+  const checkDisposableEmail = (email: string) => {
+    const domain = email.split("@")[1]?.toLowerCase();
+    if (domain && BLOCKED_DOMAINS.includes(domain)) {
+      setEmailBlockedMsg("Este tipo de correo no está permitido. Usa Gmail, Outlook u otro correo personal.");
+      return false;
+    }
+    setEmailBlockedMsg("");
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
+    e.preventDefault(); setError(""); setEmailBlockedMsg("");
     if (!form.nombre.trim()) return setError("El nombre es obligatorio.");
     if (!form.email.trim()) return setError("El email es obligatorio.");
+    if (!checkDisposableEmail(form.email.trim())) return;
     if (form.password.length < 8) return setError("Mínimo 8 caracteres.");
     if (form.password !== form.confirm) return setError("Las contraseñas no coinciden.");
     if (!form.terms) return setError("Debes aceptar los términos.");
@@ -69,7 +82,7 @@ function RegistroContent() {
             {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div><label style={labelS}>Nombre completo</label><input style={inputS} type="text" placeholder="Tu nombre" value={form.nombre} onChange={e => set("nombre", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-              <div><label style={labelS}>Email</label><input style={inputS} type="email" placeholder="tu@email.com" value={form.email} onChange={e => set("email", e.target.value)} onFocus={fi} onBlur={fo} /></div>
+              <div><label style={labelS}>Email</label><input style={inputS} type="email" placeholder="tu@email.com" value={form.email} onChange={e => { set("email", e.target.value); setEmailBlockedMsg(""); }} onFocus={fi} onBlur={fo} />{emailBlockedMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "12px", color: "#e05555", marginTop: "6px", lineHeight: 1.4 }}>{emailBlockedMsg}</p>}</div>
               <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><OjoIcon visible={showPw} /></button></div></div>
               <div><label style={labelS}>Confirmar</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showConf ? "text" : "password"} placeholder="Repite contraseña" value={form.confirm} onChange={e => set("confirm", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowConf(s => !s)} style={eyeS}><OjoIcon visible={showConf} /></button></div></div>
               <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}><input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px", marginTop: "2px", flexShrink: 0 }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>Acepto los <a href="/terminos" style={{ color: "var(--accent)", textDecoration: "none" }}>Términos</a> y <a href="/privacidad" style={{ color: "var(--accent)", textDecoration: "none" }}>Privacidad</a></span></label>

@@ -226,9 +226,17 @@ function ConcursoDetallePage() {
   );
 
   // Condiciones unificadas
+  const condicionesSistema = [
+    "Se requiere cuenta verificada en DeseoComer para participar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
+    "Queda estrictamente prohibido el uso de correos temporales, cuentas falsas o cualquier método fraudulento para acumular puntos.",
+    "El local organizador y DeseoComer se reservan el derecho de descalificar a cualquier participante que presente patrones sospechosos de fraude, sin necesidad de justificación previa.",
+    "DeseoComer actúa como plataforma intermediaria. La entrega del premio es responsabilidad exclusiva del local organizador.",
+    "La participación en este concurso implica la aceptación total de estos términos y los Términos y Condiciones de DeseoComer.",
+  ];
   const allRules: string[] = [];
   if (c.condiciones) allRules.push(c.condiciones);
   allRules.push("Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre con tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso.");
+  allRules.push(...condicionesSistema);
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>

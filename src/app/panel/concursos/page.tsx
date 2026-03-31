@@ -26,6 +26,19 @@ export default function PanelConcursos() {
   const [descripcionPremio, setDescripcionPremio] = useState("");
   const [condiciones, setCondiciones] = useState("");
   const [copied, setCopied] = useState(false);
+  const [reportModal, setReportModal] = useState<{ id: string; nombre: string } | null>(null);
+  const [reportToast, setReportToast] = useState(false);
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
+  const [editando, setEditando] = useState(false);
+  const [editPremio, setEditPremio] = useState("");
+  const [editDescripcion, setEditDescripcion] = useState("");
+  const [editCondiciones, setEditCondiciones] = useState("");
+  const [editImagen, setEditImagen] = useState("");
+  const [editFechaFin, setEditFechaFin] = useState("");
+  const [editError, setEditError] = useState("");
+  const [cancelModal, setCancelModal] = useState(false);
+  const [cancelMotivo, setCancelMotivo] = useState("");
+  const [actionToast, setActionToast] = useState("");
 
   useEffect(() => {
     const s = getSession();
@@ -77,9 +90,100 @@ export default function PanelConcursos() {
     const participantes = detalle._count?.participantes ?? detalle.participantes?.length ?? 0;
     const link = `https://deseocomer.com/concursos/${detalle.slug || detalle.id}`;
 
+    const sinParticipantes = participantes === 0;
+
+    const iniciarEdicion = () => {
+      setEditPremio(detalle.premio ?? "");
+      setEditDescripcion(detalle.descripcion ?? "");
+      setEditCondiciones(detalle.condiciones ?? "");
+      setEditImagen(detalle.imagenUrl ?? "");
+      setEditFechaFin(new Date(detalle.fechaFin).toISOString().slice(0, 16));
+      setEditError("");
+      setEditando(true);
+    };
+
+    const guardarEdicion = async () => {
+      setEditError("");
+      try {
+        const res = await fetch(`/api/concursos/${detalle.id}`, {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ premio: editPremio, descripcion: editDescripcion.trim() || null, condiciones: editCondiciones.trim() || null, imagenUrl: editImagen || null, fechaFin: new Date(editFechaFin).toISOString() }),
+        });
+        if (!res.ok) { const d = await res.json(); setEditError(d.error ?? "Error al guardar"); return; }
+        const updated = await res.json();
+        setDetalle({ ...detalle, ...updated });
+        setConcursos(prev => prev.map(c => c.id === detalle.id ? { ...c, ...updated } : c));
+        setEditando(false);
+        setActionToast("Concurso actualizado");
+        setTimeout(() => setActionToast(""), 3000);
+      } catch { setEditError("Error de conexión"); }
+    };
+
+    const cancelarConcurso = async () => {
+      try {
+        const res = await fetch(`/api/concursos/${detalle.id}`, {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cancelar: true, motivo: cancelMotivo.trim() }),
+        });
+        if (!res.ok) { const d = await res.json(); setEditError(d.error ?? "Error al cancelar"); setCancelModal(false); return; }
+        setConcursos(prev => prev.filter(c => c.id !== detalle.id));
+        setCancelModal(false);
+        setDetalle(null);
+        setActionToast("Concurso cancelado");
+        setTimeout(() => setActionToast(""), 3000);
+      } catch { setEditError("Error de conexión"); setCancelModal(false); }
+    };
+
+    const handleReport = async () => {
+      if (!reportModal || !detalle) return;
+      const s = getSession();
+      try {
+        await fetch(`/api/concursos/${detalle.id}/reportar`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ participanteId: reportModal.id, localId: s.id, localNombre: s.nombre }),
+        });
+        setReportedIds(prev => new Set(prev).add(reportModal.id));
+        setReportModal(null);
+        setReportToast(true);
+        setTimeout(() => setReportToast(false), 4000);
+      } catch {}
+    };
+
     return (
       <div style={{ maxWidth: "600px" }}>
-        <button onClick={() => setDetalle(null)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
+        {/* Action toast */}
+        {actionToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(61,184,158,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>{actionToast}</div>}
+        {/* Report toast */}
+        {reportToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(232,168,76,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>Reporte enviado. Revisaremos este participante antes del cierre.</div>}
+
+        {/* Report modal */}
+        {reportModal && (<>
+          <div onClick={() => setReportModal(null)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)" }} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: "400px", zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "32px 24px", textAlign: "center" }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", marginBottom: "14px" }}>¿Reportar participante sospechoso?</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>Notificaremos al equipo de DeseoComer para revisar a <strong style={{ color: "var(--accent)" }}>{reportModal.nombre}</strong> antes del cierre del concurso.</p>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={() => setReportModal(null)} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", color: "#e8a84c", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", cursor: "pointer" }}>Cancelar</button>
+              <button onClick={handleReport} style={{ flex: 1, padding: "12px", background: "#e8a84c", border: "none", borderRadius: "10px", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>Reportar</button>
+            </div>
+          </div>
+        </>)}
+
+        {/* Cancel modal */}
+        {cancelModal && (<>
+          <div onClick={() => setCancelModal(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)" }} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: "400px", zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(255,80,80,0.4)", borderRadius: "20px", padding: "32px 24px", textAlign: "center" }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#ff6b6b", marginBottom: "14px" }}>¿Cancelar este concurso?</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "16px" }}>Esta acción no se puede deshacer. El concurso dejará de estar visible.</p>
+            <textarea style={{ ...I, resize: "vertical", minHeight: "60px", marginBottom: "16px" }} value={cancelMotivo} onChange={e => setCancelMotivo(e.target.value)} placeholder="Motivo de cancelación (opcional)" />
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={() => setCancelModal(false)} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", color: "#e8a84c", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", cursor: "pointer" }}>Volver</button>
+              <button onClick={cancelarConcurso} style={{ flex: 1, padding: "12px", background: "#ff6b6b", border: "none", borderRadius: "10px", color: "#fff", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>Cancelar concurso</button>
+            </div>
+          </div>
+        </>)}
+
+        <button onClick={() => { setDetalle(null); setEditando(false); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
 
         {/* Header */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", overflow: "hidden", marginBottom: "20px" }}>
@@ -125,10 +229,14 @@ export default function PanelConcursos() {
                   </span>
                   <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", flex: 1 }}>
                     {p.usuario?.nombre ?? "Participante"}
+                    {reportedIds.has(p.id) && <span style={{ marginLeft: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "4px", padding: "1px 6px", color: "#e8a84c" }}>En revisión</span>}
                   </span>
                   <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)" }}>
                     {p.puntos ?? 0} pts
                   </span>
+                  {!reportedIds.has(p.id) && (
+                    <button onClick={() => setReportModal({ id: p.id, nombre: p.usuario?.nombre ?? "Participante" })} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", fontSize: "0.85rem", opacity: 0.5 }} title="Reportar sospechoso">⚠️</button>
+                  )}
                 </div>
               ))}
             </div>
@@ -143,6 +251,55 @@ export default function PanelConcursos() {
             </div>
           )}
         </div>
+
+        {/* Formulario de edición (solo sin participantes) */}
+        {editando && sinParticipantes && (
+          <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", marginBottom: "20px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Editar concurso</p>
+            {editError && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "10px", marginBottom: "12px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff6b6b" }}>⚠️ {editError}</p></div>}
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Premio</label>
+                <input style={I} value={editPremio} onChange={e => setEditPremio(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Descripción del premio</label>
+                <input style={I} value={editDescripcion} onChange={e => setEditDescripcion(e.target.value)} placeholder="Descripción (opcional)" />
+              </div>
+              <div>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Fecha de cierre</label>
+                <input style={I} type="datetime-local" value={editFechaFin} onChange={e => setEditFechaFin(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Condiciones</label>
+                <textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Condiciones (opcional)" maxLength={500} />
+              </div>
+              <div>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Foto del concurso</label>
+                <SubirFoto folder="concursos" preview={editImagen || null} label="Cambiar foto" height="120px" onUpload={url => setEditImagen(url)} />
+              </div>
+              <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+                <button onClick={() => setEditando(false)} style={{ ...B, background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)", flex: 1 }}>Cancelar</button>
+                <button onClick={guardarEdicion} disabled={!editPremio.trim()} style={{ ...B, flex: 2, opacity: editPremio.trim() ? 1 : 0.5 }}>Guardar cambios</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Acciones: Editar y Cancelar (solo sin participantes y no terminado) */}
+        {!terminado && sinParticipantes && !editando && (
+          <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+            <button onClick={iniciarEdicion} style={{ ...B, flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>✏️ Editar concurso</button>
+            <button onClick={() => { setCancelMotivo(""); setCancelModal(true); }} style={{ ...B, flex: 1, background: "transparent", border: "1px solid rgba(255,80,80,0.3)", color: "#ff6b6b", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>Cancelar concurso</button>
+          </div>
+        )}
+
+        {/* Info: no se puede editar con participantes */}
+        {!terminado && !sinParticipantes && (
+          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", textAlign: "center" }}>No puedes editar ni cancelar un concurso con participantes activos.</p>
+          </div>
+        )}
       </div>
     );
   }

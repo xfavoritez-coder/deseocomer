@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
 import bcrypt from "bcryptjs";
 import * as crypto from "crypto";
+import disposableDomains from "disposable-email-domains";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,6 +11,15 @@ export async function POST(req: NextRequest) {
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+    }
+
+    // Blacklist de dominios desechables
+    const domain = email.split("@")[1]?.toLowerCase();
+    if (domain && disposableDomains.includes(domain)) {
+      return NextResponse.json(
+        { error: "Este tipo de correo no está permitido. Por favor usa un correo personal como Gmail u Outlook." },
+        { status: 400 }
+      );
     }
 
     const existe = await prisma.usuario.findUnique({ where: { email } });
@@ -20,8 +30,12 @@ export async function POST(req: NextRequest) {
     const hash = await bcrypt.hash(password, 10);
     const tokenVerificacion = crypto.randomBytes(32).toString("hex");
 
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]
+      || req.headers.get("x-real-ip")
+      || "unknown";
+
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion },
+      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip },
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;

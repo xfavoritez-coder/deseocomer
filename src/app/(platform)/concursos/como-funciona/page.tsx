@@ -133,6 +133,31 @@ export default function ComoFuncionaPage() {
           </div>
         </section>
 
+        {/* Integridad del concurso */}
+        <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Transparencia</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "8px", lineHeight: 1.3 }}>Integridad del concurso</h2>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem,1.5vw,1rem)", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.7 }}>¿Cómo protegemos la honestidad del juego?</p>
+
+          <div style={{ maxWidth: "680px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "12px" }}>
+            {[
+              { icon: "✉️", title: "Verificación obligatoria", desc: "Solo los usuarios que verifican su correo electrónico cuentan como referidos válidos. Esto evita el registro masivo de cuentas falsas." },
+              { icon: "🚫", title: "Correos desechables bloqueados", desc: "No permitimos el registro con correos temporales o de un solo uso. Debes usar un correo personal real." },
+              { icon: "🔍", title: "Monitoreo de actividad", desc: "Nuestro sistema detecta automáticamente patrones de comportamiento sospechosos y los marca para revisión antes de declarar un ganador." },
+              { icon: "🏆", title: "Revisión antes del premio", desc: "Ningún premio se entrega sin una revisión previa. Tanto el local organizador como el equipo de DeseoComer pueden descalificar participantes con actividad irregular." },
+              { icon: "⚖️", title: "Derecho de descalificación", desc: "El local organizador y DeseoComer se reservan el derecho de descalificar participantes sin necesidad de justificación previa, en caso de detectar conductas fraudulentas." },
+            ].map((item, i) => (
+              <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "18px 20px", display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                <span style={{ fontSize: "1.2rem", flexShrink: 0, marginTop: "2px" }}>{item.icon}</span>
+                <div>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.82rem,1.3vw,0.9rem)", fontWeight: 700, color: "#f5d080", marginBottom: "6px" }}>{item.title}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.82rem,1.3vw,0.9rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7 }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* CTA Final */}
         <section style={{ background: "linear-gradient(160deg, #1a0e05, #0a0812)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "24px", padding: "clamp(36px,6vw,64px) clamp(24px,5vw,60px)", textAlign: "center" }}>
           <div style={{ fontSize: "clamp(2rem,4vw,3rem)", marginBottom: "16px" }}>🧞</div>

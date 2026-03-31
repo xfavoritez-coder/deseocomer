@@ -11,6 +11,21 @@ export async function GET(req: NextRequest) {
     if (!usuario) return NextResponse.json({ error: "Token inválido o ya usado" }, { status: 400 });
 
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, tokenVerificacion: null } });
+
+    // Mover puntos pendientes a reales en concursos activos
+    const participaciones = await prisma.participanteConcurso.findMany({
+      where: { usuarioId: usuario.id, puntosPendientes: { gt: 0 } },
+      include: { concurso: { select: { activo: true, fechaFin: true } } },
+    });
+    for (const p of participaciones) {
+      if (p.concurso.activo && new Date(p.concurso.fechaFin) > new Date()) {
+        await prisma.participanteConcurso.update({
+          where: { id: p.id },
+          data: { puntos: { increment: p.puntosPendientes }, puntosPendientes: 0 },
+        });
+      }
+    }
+
     return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

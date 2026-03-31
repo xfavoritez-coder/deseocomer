@@ -23,6 +23,7 @@ model Usuario {
   tokenVerificacion   String?
   resetToken          String?
   resetTokenExpira    DateTime?
+  ipRegistro          String    @default("")
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
@@ -105,9 +106,11 @@ model ParticipanteConcurso {
   id          String   @id @default(cuid())
   concursoId  String
   usuarioId   String
-  referidoPor String?
-  puntos      Int      @default(1)
-  createdAt   DateTime @default(now())
+  referidoPor      String?
+  puntos           Int      @default(1)
+  puntosPendientes Int      @default(0)
+  estado           String   @default("activo")
+  createdAt        DateTime @default(now())
 
   concurso    Concurso @relation(fields: [concursoId], references: [id])
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])

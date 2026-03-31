@@ -49,8 +49,8 @@ export default function Footer() {
             {
               titulo: "Legal",
               links: [
-                { label: "Términos y condiciones", href: "#" },
-                { label: "Privacidad",             href: "#" },
+                { label: "Términos y condiciones", href: "/terminos" },
+                { label: "Privacidad",             href: "/privacidad" },
                 { label: "Contacto",               href: "/contacto" },
               ],
             },
