@@ -20,20 +20,8 @@ function getInitials(nombre: string): string {
   return nombre.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
 
-const localesMock = [
-  { id: "1", nombre: "Pizza Napoli", categoria: "Pizza", comuna: "Providencia", rating: 4.8, precio: "$$$", imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", logoUrl: null, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.", verificado: true, horarios: null, createdAt: "2025-01-15", _count: { favoritos: 42, resenas: 18, concursos: 1, promociones: 2 } },
-  { id: "2", nombre: "Sushi Oasis", categoria: "Sushi", comuna: "Las Condes", rating: 4.9, precio: "$$$$", imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", logoUrl: null, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.", verificado: true, horarios: null, createdAt: "2025-02-10", _count: { favoritos: 67, resenas: 24, concursos: 1, promociones: 1 } },
-  { id: "3", nombre: "El Menú de Don Carlos", categoria: "Almuerzo", comuna: "Santiago Centro", rating: 4.7, precio: "$", imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600", logoUrl: null, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.", verificado: false, horarios: null, createdAt: "2025-03-01", _count: { favoritos: 31, resenas: 12, concursos: 1, promociones: 1 } },
-  { id: "4", nombre: "Burger Desierto", categoria: "Hamburguesa", comuna: "Ñuñoa", rating: 4.6, precio: "$$", imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", logoUrl: null, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.", verificado: false, horarios: null, createdAt: "2025-01-20", _count: { favoritos: 28, resenas: 9, concursos: 0, promociones: 1 } },
-  { id: "5", nombre: "Verde Oasis", categoria: "Vegano", comuna: "Vitacura", rating: 4.5, precio: "$$", imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", logoUrl: null, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.", verificado: true, horarios: null, createdAt: "2025-02-28", _count: { favoritos: 55, resenas: 15, concursos: 0, promociones: 0 } },
-  { id: "6", nombre: "Café Arenas", categoria: "Café", comuna: "Bellavista", rating: 4.7, precio: "$", imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", logoUrl: null, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.", verificado: false, horarios: null, createdAt: "2025-03-10", _count: { favoritos: 39, resenas: 11, concursos: 0, promociones: 1 } },
-  { id: "7", nombre: "La Trattoria", categoria: "Pastas", comuna: "Lastarria", rating: 4.6, precio: "$$$", imagenUrl: "https://images.unsplash.com/photo-1551183053-bf91798d96f4?w=600", logoUrl: null, descripcion: "Pastas frescas artesanales y risotto al estilo de la nonna.", verificado: true, horarios: null, createdAt: "2025-01-05", _count: { favoritos: 48, resenas: 20, concursos: 0, promociones: 1 } },
-  { id: "8", nombre: "Taquería del Desierto", categoria: "Mexicano", comuna: "Ñuñoa", rating: 4.4, precio: "$$", imagenUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=600", logoUrl: null, descripcion: "Tacos al pastor auténticos, mezcal artesanal y ambiente festivo.", verificado: false, horarios: null, createdAt: "2025-02-15", _count: { favoritos: 22, resenas: 7, concursos: 0, promociones: 0 } },
-  { id: "9", nombre: "Ramen Noche", categoria: "Sushi", comuna: "Providencia", rating: 4.8, precio: "$$", imagenUrl: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600", logoUrl: null, descripcion: "Ramen tonkotsu cocido 18 horas, gyozas caseras y sake importado.", verificado: false, horarios: null, createdAt: "2025-03-05", _count: { favoritos: 35, resenas: 14, concursos: 0, promociones: 0 } },
-  { id: "10", nombre: "Parrilla del Sur", categoria: "Almuerzo", comuna: "Maipú", rating: 4.5, precio: "$$", imagenUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600", logoUrl: null, descripcion: "Cortes premium a las brasas, chimichurri secreto de la casa.", verificado: false, horarios: null, createdAt: "2025-01-25", _count: { favoritos: 19, resenas: 6, concursos: 0, promociones: 0 } },
-  { id: "11", nombre: "Vegan Garden", categoria: "Vegano", comuna: "Providencia", rating: 4.3, precio: "$", imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", logoUrl: null, descripcion: "Bowl therapy, wraps energéticos y jugos cold press.", verificado: false, horarios: null, createdAt: "2025-02-20", _count: { favoritos: 26, resenas: 8, concursos: 0, promociones: 0 } },
-  { id: "12", nombre: "Espresso Duna", categoria: "Café", comuna: "Las Condes", rating: 4.6, precio: "$", imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", logoUrl: null, descripcion: "Café de especialidad de origen único, té de autor y cheesecake.", verificado: true, horarios: null, createdAt: "2025-03-12", _count: { favoritos: 44, resenas: 16, concursos: 0, promociones: 0 } },
-];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const localesMock: any[] = [];
 
 export default function LocalesPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,17 +46,17 @@ export default function LocalesPage() {
             nombre: l.nombre ?? "",
             categoria: l.categoria ?? "Otro",
             comuna: l.comuna ?? "Santiago",
-            rating: 4.5,
-            precio: "$$",
+            rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
+            precio: "",
             imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
             logoUrl: l.logoUrl,
             descripcion: l.descripcion ?? "",
-            verificado: l.verificado ?? false,
+            verificado: false,
             horarios: l.horarios,
             createdAt: l.createdAt,
             _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },
           }));
-          setLocales(mapped.length > 0 ? [...mapped, ...localesMock] : localesMock);
+          setLocales(mapped);
         }
         setLoading(false);
       })
