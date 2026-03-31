@@ -73,6 +73,7 @@ export default function LocalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { addInteraccion, perfil } = useGenie();
   const { isAuthenticated } = useAuth();
+  const [esLocal, setEsLocal] = useState(false);
   const mockLocal = getLocalById(Number(id));
   const [dbLocal, setDbLocal] = useState<Record<string, unknown> | null>(null);
   const [tab, setTab] = useState<Tab>("Información");
@@ -117,11 +118,12 @@ export default function LocalDetailPage() {
     lng: dbLocal.lng as number ?? -70.65,
   } : null);
 
-  // Detect owner
+  // Detect owner / local session
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      if (s?.id && (String(s.id) === String(id) || (local && s.nombre === local.nombre))) setEsPropioDueno(true);
+      if (s?.loggedIn) setEsLocal(true);
+      if (s?.id && (String(s.id) === String(id) || s?.slug === id || (local && s.nombre === local.nombre))) setEsPropioDueno(true);
     } catch {}
   }, [id, local?.nombre]);
 
@@ -166,14 +168,6 @@ export default function LocalDetailPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Owner banner */}
-      {esPropioDueno && (
-        <div className="dc-owner-banner" style={{ position: "sticky", top: "64px", zIndex: 90, background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><span style={{ fontSize: "0.9rem" }}>👁</span>Estás viendo tu perfil público</p>
-          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "6px 16px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>Editar en el panel →</Link>
-        </div>
-      )}
-
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
         <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
@@ -213,6 +207,14 @@ export default function LocalDetailPage() {
           </div>
         </div>
       </section>
+
+      {/* Owner banner */}
+      {esPropioDueno && (
+        <div className="dc-owner-banner" style={{ position: "sticky", top: "64px", zIndex: 55, background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><span style={{ fontSize: "0.9rem" }}>👁</span>Estás viendo tu perfil público</p>
+          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "6px 16px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>Editar en el panel →</Link>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className={`dc-tabs-sticky${esPropioDueno ? " dc-tabs-sticky--owner" : ""}`} style={{ position: "sticky", top: esPropioDueno ? "108px" : "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
@@ -281,9 +283,9 @@ export default function LocalDetailPage() {
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.6, marginBottom: "16px" }}>Sé el primero en compartir tu experiencia</p>
                       {isAuthenticated ? (
                         <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "10px 24px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>
-                      ) : (
+                      ) : !esLocal ? (
                         <Link href={`/login?next=/locales/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "var(--accent)", borderRadius: "20px", padding: "10px 24px", textDecoration: "none", fontWeight: 700 }}>Inicia sesión para comentar →</Link>
-                      )}
+                      ) : null}
                     </div>
                   ) : (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
@@ -381,7 +383,7 @@ export default function LocalDetailPage() {
             )}
 
             {/* TAB: Reseñas */}
-            {tab === "Reseñas" && <ResenasTab local={local} isAuth={isAuthenticated} />}
+            {tab === "Reseñas" && <ResenasTab local={local} isAuth={isAuthenticated} esLocal={esLocal} />}
 
             {/* TAB: Fotos */}
             {tab === "Fotos" && (
@@ -528,7 +530,7 @@ function EmptyState({ icon, title, text }: { icon: string; title: string; text: 
   );
 }
 
-function ResenasTab({ local, isAuth }: { local: Local; isAuth: boolean }) {
+function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean; esLocal?: boolean }) {
   const [resenas, setResenas] = useState<Resena[]>(local.resenas);
   const [writing, setWriting] = useState(false);
   const [stars, setStars] = useState(0);
@@ -574,7 +576,7 @@ function ResenasTab({ local, isAuth }: { local: Local; isAuth: boolean }) {
         )}
       </div>
 
-      {!isAuth && (
+      {!isAuth && !esLocal && (
         <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "16px 20px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>¿Visitaste este local? Comparte tu experiencia</p>
           <Link href="/login" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", borderRadius: "20px", padding: "8px 18px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Iniciar sesión →</Link>
