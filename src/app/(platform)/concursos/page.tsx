@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import SelloGratis from "@/components/SelloGratis";
 import Footer from "@/components/layout/Footer";
@@ -130,6 +131,12 @@ export default function ConcursosPage() {
             Comparte tu link con amigos, sube en el ranking y gana premios reales
             de los mejores restaurantes de Santiago.
           </p>
+
+          <div style={{ marginTop: "12px" }}>
+            <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: "2px" }}>
+              ¿No sabes cómo funciona? Aprende aquí →
+            </Link>
+          </div>
 
         </div>
       </section>

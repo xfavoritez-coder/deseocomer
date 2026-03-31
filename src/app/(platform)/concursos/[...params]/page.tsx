@@ -474,6 +474,11 @@ export default function ConcursoDetallePage() {
                   <Link href={`/login?next=/concursos/${concursoId}`} style={{ display: "inline-block", background: "linear-gradient(135deg, #f5d080, #e8a84c)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#1a0e05", fontWeight: 700, padding: "12px 24px", borderRadius: "10px", textDecoration: "none" }}>
                     Inicia sesión para participar
                   </Link>
+                  <div style={{ marginTop: "10px" }}>
+                    <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.12)", paddingBottom: "1px" }}>
+                      ¿Primera vez? Así funcionan los concursos →
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -505,6 +510,11 @@ export default function ConcursoDetallePage() {
                     <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", fontWeight: 900, color: item.color, margin: 0 }}>{item.points}</p>
                   </div>
                 ))}
+              </div>
+              <div style={{ textAlign: "center", marginTop: "16px" }}>
+                <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.3)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.12)", paddingBottom: "2px" }}>
+                  ¿Tienes dudas? Ver guía completa →
+                </Link>
               </div>
             </div>
           )}
