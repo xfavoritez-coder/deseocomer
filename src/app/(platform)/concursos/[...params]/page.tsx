@@ -395,8 +395,7 @@ export default function ConcursoDetallePage() {
             <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
           )}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.15) 0%, rgba(10,8,18,0.92) 100%)" }} />
-          <Link href="/concursos" style={{ position: "absolute", top: "16px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Concursos</Link>
-          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="sm" /></div>
+          <Link href="/concursos" style={{ position: "absolute", top: "clamp(80px, 12vw, 100px)", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Concursos</Link>
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: "clamp(16px,4vw,32px)", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "#3db89e", marginBottom: "8px" }}>{c.local}</p>
             <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.2, margin: 0 }}>{c.premio}</h1>
