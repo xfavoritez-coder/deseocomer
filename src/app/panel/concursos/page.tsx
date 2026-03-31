@@ -23,6 +23,7 @@ export default function PanelConcursos() {
   const [custom, setCustom] = useState("");
   const [dur, setDur] = useState(7);
   const [imagenConcurso, setImagenConcurso] = useState("");
+  const [descripcionPremio, setDescripcionPremio] = useState("");
   const [condiciones, setCondiciones] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -49,14 +50,14 @@ export default function PanelConcursos() {
     try {
       const res = await fetch("/api/concursos", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localId: s.id, premio: pFinal, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null }),
+        body: JSON.stringify({ localId: s.id, premio: pFinal, descripcion: descripcionPremio.trim() || null, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null }),
       });
       if (res.ok) {
         const nuevo = await res.json();
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setCustom(""); setImagenConcurso(""); setCondiciones("");
+    setWizard(false); setStep(1); setPremio(""); setCustom(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones("");
   };
 
   const copyLink = (c: Concurso) => {
@@ -159,6 +160,9 @@ export default function PanelConcursos() {
           <button onClick={() => setPremio("custom")} style={chip(premio === "custom")}>Escribe el tuyo...</button>
         </div>
         {premio === "custom" && <input style={I} value={custom} onChange={e => setCustom(e.target.value)} placeholder="Describe el premio..." />}
+
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Descripción del premio (opcional)</h3>
+        <input style={I} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
 
         <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>¿Cuánto dura?</h3>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>

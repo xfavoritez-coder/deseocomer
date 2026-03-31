@@ -24,9 +24,44 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await req.json();
-    const concurso = await prisma.concurso.update({ where: { id }, data: body });
+
+    // Check participants
+    const existing = await prisma.concurso.findUnique({
+      where: { id },
+      include: { _count: { select: { participantes: true } } },
+    });
+    if (!existing) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
+    // Cancel action
+    if (body.cancelar === true) {
+      if ((existing._count?.participantes ?? 0) > 0) {
+        return NextResponse.json({ error: "No puedes cancelar un concurso con participantes activos" }, { status: 403 });
+      }
+      const updated = await prisma.concurso.update({
+        where: { id },
+        data: { cancelado: true, activo: false, motivoCancelacion: body.motivo ?? "" },
+      });
+      return NextResponse.json(updated);
+    }
+
+    // Edit action — block if has participants
+    if ((existing._count?.participantes ?? 0) > 0) {
+      return NextResponse.json({ error: "No puedes editar un concurso con participantes activos" }, { status: 403 });
+    }
+
+    const concurso = await prisma.concurso.update({
+      where: { id },
+      data: {
+        ...(body.premio !== undefined && { premio: body.premio }),
+        ...(body.descripcion !== undefined && { descripcion: body.descripcion }),
+        ...(body.imagenUrl !== undefined && { imagenUrl: body.imagenUrl }),
+        ...(body.fechaFin !== undefined && { fechaFin: new Date(body.fechaFin) }),
+        ...(body.condiciones !== undefined && { condiciones: body.condiciones }),
+      },
+    });
     return NextResponse.json(concurso);
-  } catch {
+  } catch (error) {
+    console.error("[API /concursos/[id] PUT] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }

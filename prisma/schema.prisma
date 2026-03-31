@@ -92,8 +92,10 @@ model Concurso {
   imagenUrl    String?
   fechaInicio  DateTime @default(now())
   fechaFin     DateTime
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  activo            Boolean  @default(true)
+  cancelado         Boolean  @default(false)
+  motivoCancelacion String   @default("")
+  createdAt         DateTime @default(now())
 
   local         Local    @relation(fields: [localId], references: [id])
   participantes ParticipanteConcurso[]

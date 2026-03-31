@@ -13,8 +13,7 @@ export default function SelloGratis({ size = "sm" }: SelloGratisProps) {
     <svg width={dim} height={dim} viewBox="0 0 68 68" style={{ display: "block" }}>
       <polygon points="0,0 68,0 68,68" fill="rgba(13,7,3,0.88)" />
       <g transform="translate(46,22) rotate(45)">
-        <text textAnchor="middle" y="-7" fontFamily="Georgia,serif" fontSize={iconSize} fill="#e8a84c">🏆</text>
-        <text textAnchor="middle" y="7" fontFamily="Georgia,serif" fontSize={fontSize} fontWeight="700" fill="#e8a84c" letterSpacing="1">GRATIS</text>
+        <text textAnchor="middle" y="0" fontFamily="Georgia,serif" fontSize={fontSize} fontWeight="700" fill="#e8a84c" letterSpacing="1">GRATIS</text>
       </g>
     </svg>
   );

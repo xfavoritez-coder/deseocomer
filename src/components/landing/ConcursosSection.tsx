@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
 
+
+
 interface ConcursoHome { id: string; slug: string; local: string; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
 const concursosMock: ConcursoHome[] = [];
 
@@ -82,8 +84,9 @@ export default function ConcursosSection() {
             const ended = totalSeg <= 0;
             const esUrgente = !ended && c.horasRestantes < 6;
             const urgColor = "#e05555";
-            const accentColor = esUrgente ? urgColor : "var(--accent)";
-            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina pronto!" : "Concurso activo";
+            const numColor = esUrgente ? urgColor : "rgba(240,234,214,0.9)";
+            const sepColor = esUrgente ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)";
+            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina pronto!" : "Activo";
             const badgeDot = ended ? "var(--text-muted)" : esUrgente ? urgColor : "#3db89e";
 
             return (
@@ -100,16 +103,19 @@ export default function ConcursosSection() {
                   {/* Badge */}
                   <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "rgba(240,234,214,0.7)", textTransform: "uppercase" }}>{badgeText}</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="dc-cst-content" style={{ padding: "16px 20px 18px" }}>
-                  {/* Local name */}
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)", marginBottom: "4px" }}>{c.local}</p>
+                  {/* Local */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.5)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "13px", fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{c.local?.[0] ?? "L"}</div>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)" }}>{c.local}</span>
+                  </div>
                   {/* Premio */}
-                  <p className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.3 }}>{c.premio}</p>
+                  <p className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.15, fontWeight: 700, letterSpacing: "0.03em", display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 16 }}>🏆</span>{c.premio}</p>
                   {/* Descripcion - desktop only */}
                   <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
 
@@ -129,10 +135,10 @@ export default function ConcursosSection() {
                         ].map(({ val, label }, idx, arr) => (
                           <div key={label} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
                             <div style={{ textAlign: "center" }}>
-                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, lineHeight: 1, color: accentColor, minWidth: "32px" }}>{pad(val)}</div>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, lineHeight: 1, color: numColor, minWidth: "32px" }}>{pad(val)}</div>
                               <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
                             </div>
-                            {idx < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: accentColor, opacity: 0.5, marginBottom: "12px" }}>:</span>}
+                            {idx < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: sepColor, marginBottom: "12px" }}>:</span>}
                           </div>
                         ))}
                       </div>
@@ -180,20 +186,20 @@ export default function ConcursosSection() {
         .dc-cst-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px; }
         .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
         .dc-cst-img { height: 180px; }
-        .dc-cst-premio { font-size: 17px; }
+        .dc-cst-premio { font-size: 24px; }
         .dc-cst-desc { display: none !important; }
         .dc-cst-btn { }
 
         @keyframes dc-pulse-dot {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.25; }
+          50% { opacity: 0.15; }
         }
 
         @media (min-width: 768px) {
           .dc-cst-card { display: flex !important; flex-direction: row !important; }
           .dc-cst-img { width: 280px; height: auto; min-height: 220px; flex-shrink: 0; }
           .dc-cst-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-          .dc-cst-premio { font-size: 20px; }
+          .dc-cst-premio { font-size: 30px; }
           .dc-cst-desc { display: -webkit-box !important; }
           .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
         }
