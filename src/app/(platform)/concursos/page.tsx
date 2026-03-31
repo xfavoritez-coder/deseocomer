@@ -291,8 +291,8 @@ function ConcursoCard({
           <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "3rem" }}>🏆</div>
         )}
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
-        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${soon ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px", animation: ended ? "none" : `dc-cc-pulse ${soon ? "0.8s" : "2s"} ease-in-out infinite` }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: badgeDot }} />
+        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${soon ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
+          <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: soon ? urgColor : "#e8a84c", animation: `dc-cc-pulse-dot ${soon ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: soon ? urgColor : "rgba(240,234,214,0.7)", textTransform: "uppercase" }}>{badgeText}</span>
         </div>
       </div>
@@ -307,7 +307,7 @@ function ConcursoCard({
         {!ended && timer && (
           <div style={{ background: "rgba(10,8,18,0.6)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: "12px", padding: "10px 14px", marginBottom: "14px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
-              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: soon ? urgColor : "var(--oasis-bright)", animation: `dc-cc-pulse ${soon ? "0.8s" : "2s"} ease-in-out infinite` }} />
+              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: soon ? urgColor : "#e8a84c", animation: `dc-cc-pulse-dot ${soon ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.15em", textTransform: "uppercase", color: soon ? urgColor : "var(--oasis-bright)" }}>Termina en</span>
             </div>
             <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
@@ -357,7 +357,7 @@ function ConcursoCard({
         .dc-cc-img { height: 180px; }
         .dc-cc-premio { font-size: 17px; }
         .dc-cc-desc { display: none !important; }
-        @keyframes dc-cc-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes dc-cc-pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.25} }
         @media (min-width: 768px) {
           .dc-cc-card { display: flex !important; flex-direction: row !important; }
           .dc-cc-img { width: 280px; height: auto !important; min-height: 220px; flex-shrink: 0; }
