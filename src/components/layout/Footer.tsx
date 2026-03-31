@@ -43,7 +43,7 @@ export default function Footer() {
               links: [
                 { label: "Registra tu local",  href: "/solo-locales"  },
                 { label: "Iniciar sesión",     href: "/login-local"   },
-                { label: "Panel de control",   href: "/panel"         },
+                { label: "Panel de control",   href: "/login-local"   },
               ],
             },
             {
