@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
       if (!local) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
       const ok = await bcrypt.compare(password, local.password);
       if (!ok) return NextResponse.json({ error: "Email o contraseña incorrectos" }, { status: 401 });
+      if (!local.activo) return NextResponse.json({ error: "Tu local está pendiente de aprobación. Te contactaremos pronto.", codigo: "LOCAL_PENDIENTE" }, { status: 401 });
       const { password: _, ...localSinPassword } = local;
       return NextResponse.json({ tipo: "local", data: localSinPassword });
     } else {

@@ -15,6 +15,7 @@ export default function RegistroLocalPage() {
   const [form, setForm] = useState({ nombreLocal: "", nombreDueno: "", email: "", password: "", celular: "", ciudad: "santiago" });
   const [otraCiudad, setOtraCiudad] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [registroExitoso, setRegistroExitoso] = useState(false);
   const [waitlistSaved, setWaitlistSaved] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
@@ -35,12 +36,9 @@ export default function RegistroLocalPage() {
       const res = await fetch("/api/locales", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: form.nombreLocal.trim(), nombreDueno: form.nombreDueno.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.celular.trim(), ciudad: form.ciudad }) });
       const data = await res.json();
       if (!res.ok) { setLoading(false); return setError(data.error || "Error al registrarse"); }
-      const sessionObj = { id: data.id, nombre: data.nombre, email: data.email, tipo: "local", ciudad: data.ciudad, loggedIn: true };
-      localStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
-      sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch { setLoading(false); return setError("Error de conexión"); }
     setLoading(false);
-    router.push("/panel?bienvenido=1");
+    setRegistroExitoso(true);
   };
 
   return (
@@ -53,6 +51,23 @@ export default function RegistroLocalPage() {
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", color: "var(--oasis-bright)", textTransform: "uppercase", marginTop: "4px" }}>Para locales y restaurantes</p>
         </div>
 
+        {registroExitoso ? (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: "16px" }}>✨</div>
+            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "12px" }}>¡Registro recibido!</h2>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: "8px" }}>
+              Hemos recibido los datos de <strong style={{ color: "var(--accent)" }}>{form.nombreLocal}</strong>.
+            </p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.7, marginBottom: "24px" }}>
+              Nuestro equipo revisará tu solicitud y te contactaremos a <strong style={{ color: "rgba(240,234,214,0.6)" }}>{form.email}</strong> dentro de las próximas 24 horas para activar tu cuenta.
+            </p>
+            <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: "12px", padding: "14px 16px", marginBottom: "24px" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--oasis-bright)", lineHeight: 1.6 }}>💡 Mientras tanto, puedes explorar la plataforma como usuario para conocer cómo se ven los concursos y promociones.</p>
+            </div>
+            <Link href="/" style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none", borderBottom: "1px solid rgba(61,184,158,0.3)", paddingBottom: "2px" }}>Explorar DeseoComer →</Link>
+          </div>
+        ) : (
+        <>
         <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
 
@@ -89,6 +104,8 @@ export default function RegistroLocalPage() {
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.2)" }}>¿Solo quieres comer?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
         <Link href="/registro" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>Crear cuenta de usuario →</Link>
+        </>
+        )}
       </div>
     </main>
   );
