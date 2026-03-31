@@ -51,7 +51,7 @@ export default function Footer() {
               links: [
                 { label: "Términos y condiciones", href: "#" },
                 { label: "Privacidad",             href: "#" },
-                { label: "Contacto",               href: "#" },
+                { label: "Contacto",               href: "/contacto" },
               ],
             },
           ].map(col => (
