@@ -106,7 +106,8 @@ export default function GenieContextual() {
   useEffect(() => {
     if (toastActivo) return;
     if (pathname.startsWith("/panel") || pathname.startsWith("/admin")) return;
-    if (pathname === "/") return; // Home is handled by GenieButton triggers
+    if (pathname === "/") return;
+    if (pathname.startsWith("/concursos/como-funciona")) return;
     if (yaVisto(pathname)) return;
 
     const timer = setTimeout(() => {
