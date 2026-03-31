@@ -43,66 +43,56 @@ function ConcursoDetallePage() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const segments = rawParams.params ?? [];
+  const slug = segments[0] ?? "";
 
-  // Parse URL: /concursos/[slug-or-id] OR /concursos/[slug]/[nombre]/[codigo]
-  let concursoId: number;
+  // Parse referral from URL
   let refUserId: string | null = null;
   let refNameFromUrl: string | null = null;
-
   if (segments.length >= 3) {
-    // Pretty URL: /concursos/pizza-napoli/jaime/ABC123
-    const [slugOrId, refName, refCode] = segments;
-    const found = findConcurso(slugOrId);
-    concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
-    refNameFromUrl = decodeURIComponent(refName);
-    // Resolve userId from refCode via localStorage
-    const resolvedUser = findUserByRefCode(refCode.toUpperCase());
+    refNameFromUrl = decodeURIComponent(segments[1] ?? "");
+    const resolvedUser = findUserByRefCode((segments[2] ?? "").toUpperCase());
     refUserId = resolvedUser?.id ?? null;
   } else {
-    // Classic URL: /concursos/1?ref=xxx or /concursos/pizza-napoli
-    const param = segments[0] ?? "";
-    const found = findConcurso(param);
-    concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
     refUserId = searchParams.get("ref");
     refNameFromUrl = searchParams.get("refName");
   }
 
-  const concursoMock = CONCURSOS.find((c) => c.id === concursoId);
-  const finalizadoMock = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId);
-  const [dbConcurso, setDbConcurso] = useState<Record<string, unknown> | null>(null);
-  const [dbLoading, setDbLoading] = useState(!concursoMock && !finalizadoMock);
+  // Check mocks first
+  const found = findConcurso(slug);
+  const concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
+  const concursoMock = CONCURSOS.find((c) => c.id === concursoId) ?? null;
+  const finalizadoMock = CONCURSOS_FINALIZADOS.find((c) => c.id === concursoId) ?? null;
 
-  // If not found in mocks, try fetching from DB
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [dbConcurso, setDbConcurso] = useState<any>(null);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  // Always fetch from API
   useEffect(() => {
     if (concursoMock || finalizadoMock) { setDbLoading(false); return; }
-    const param = segments[0] ?? "";
-    if (!param) { setDbLoading(false); return; }
-    setDbLoading(true);
-    fetch(`/api/concursos/${encodeURIComponent(param)}`)
-      .then(r => {
-        if (!r.ok) throw new Error("Not found");
-        return r.json();
-      })
+    if (!slug) { setDbLoading(false); return; }
+    fetch(`/api/concursos/${encodeURIComponent(slug)}`)
+      .then(r => r.ok ? r.json() : null)
       .then(data => { setDbConcurso(data); setDbLoading(false); })
-      .catch(() => { setDbConcurso(null); setDbLoading(false); });
+      .catch(() => { setDbLoading(false); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [segments.join("/")]);
+  }, [slug]);
 
-  // Build concurso/finalizado from DB data if needed
+  // Build concurso from DB data
   const concurso = concursoMock ?? (dbConcurso ? {
-    id: 0,
-    slug: dbConcurso.slug as string ?? "",
-    local: (dbConcurso.local as Record<string, string>)?.nombre ?? "Local",
-    localId: (dbConcurso.local as Record<string, string>)?.id ?? "",
-    localSlug: (dbConcurso.local as Record<string, string>)?.slug ?? "",
+    id: dbConcurso.id ?? 0,
+    slug: dbConcurso.slug ?? "",
+    local: dbConcurso.local?.nombre ?? "Local",
+    localId: dbConcurso.local?.id ?? "",
+    localSlug: dbConcurso.local?.slug ?? "",
     imagen: "🏆",
-    imagenUrl: (dbConcurso.imagenUrl as string) ?? (dbConcurso.local as Record<string, string>)?.portadaUrl ?? "",
-    premio: dbConcurso.premio as string ?? "",
-    descripcionPremio: dbConcurso.descripcion as string ?? "",
-    condiciones: dbConcurso.condiciones as string ?? "",
-    participantes: (dbConcurso._count as Record<string, number>)?.participantes ?? 0,
-    endsAt: new Date(dbConcurso.fechaFin as string).getTime(),
-    ranking: ((dbConcurso.participantes as Array<{usuario: {nombre: string}; puntos: number}>) ?? []).map(p => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
+    imagenUrl: dbConcurso.imagenUrl ?? dbConcurso.local?.portadaUrl ?? "",
+    premio: dbConcurso.premio ?? "",
+    descripcionPremio: dbConcurso.descripcion ?? "",
+    condiciones: dbConcurso.condiciones ?? "",
+    participantes: dbConcurso._count?.participantes ?? 0,
+    endsAt: new Date(dbConcurso.fechaFin).getTime(),
+    ranking: (dbConcurso.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
     reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
     descripcionLocal: "",
   } : null);
@@ -173,11 +163,11 @@ function ConcursoDetallePage() {
     if (!concurso || !user) return;
     const myCount = getRefCount(concursoId, user.id);
     setMyRefs(myCount);
-    if (myCount === 0) { setRanking(concurso.ranking); return; }
-    const firstName = user.nombre.split(" ")[0];
-    const lastInit  = user.nombre.split(" ")[1]?.[0] ?? "";
+    if (myCount === 0) { setRanking(concurso!.ranking); return; }
+    const firstName = user!.nombre.split(" ")[0];
+    const lastInit  = user!.nombre.split(" ")[1]?.[0] ?? "";
     const myEntry: RankingEntry = { nombre: `${firstName} ${lastInit}.`, referidos: myCount };
-    const base   = concurso.ranking.filter((r) => r.nombre !== myEntry.nombre);
+    const base   = concurso!.ranking.filter((r: RankingEntry) => r.nombre !== myEntry.nombre);
     const merged = [...base, myEntry].sort((a, b) => b.referidos - a.referidos);
     setRanking(merged);
   }, [concurso, concursoId, user]);
@@ -523,7 +513,7 @@ function ConcursoDetallePage() {
 
           {/* 5. Sobre el local */}
           {"descripcionLocal" in c && (() => {
-            const localInitials = c.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+            const localInitials = c.local.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
             return (
               <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "18px 20px", display: "flex", gap: "14px", alignItems: "center" }}>
                 {LOCAL_IMAGES[c.localId] ? (
