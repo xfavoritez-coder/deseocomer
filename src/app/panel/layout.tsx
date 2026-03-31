@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
 import GeniePanelLocal from "@/components/panel/GeniePanelLocal";
 
 const PANEL_KEY = "deseocomer_local_auth";
@@ -62,6 +63,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
+      {/* Navbar for mobile (hidden on desktop via sidebar) */}
+      <div className="dc-panel-navbar"><Navbar /></div>
+
       {/* Desktop Sidebar */}
       <aside className="dc-panel-sidebar">
         <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "block", padding: "24px 20px 8px" }}>
@@ -114,25 +118,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         {children}
       </main>
 
-      {/* Mobile bottom nav */}
-      <nav className="dc-panel-mobile-nav">
-        <a href="/" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", textDecoration: "none", flex: 1, padding: "8px 0", color: "var(--text-muted)", fontSize: "0.6rem", fontFamily: "var(--font-cinzel)", letterSpacing: "0.05em" }}>
-          <span style={{ fontSize: "1.2rem" }}>🏮</span>
-          Home
-        </a>
-        {NAV.map(n => (
-          <Link key={n.href} href={n.href} style={{
-            display: "flex", flexDirection: "column", alignItems: "center", gap: "2px",
-            textDecoration: "none", flex: 1, padding: "8px 0",
-            color: isActive(n.href) ? "var(--accent)" : "var(--text-muted)",
-            fontSize: "0.6rem", fontFamily: "var(--font-cinzel)", letterSpacing: "0.05em",
-          }}>
-            <span style={{ fontSize: "1.2rem" }}>{n.icon}</span>
-            {n.label}
-          </Link>
-        ))}
-      </nav>
-
       <GeniePanelLocal />
 
       <style>{`
@@ -146,15 +131,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         .dc-panel-main {
           flex: 1; margin-left: 240px; padding: 32px 40px; min-height: 100vh;
         }
-        .dc-panel-mobile-nav { display: none; }
+        .dc-panel-navbar { display: none; }
         @media (max-width: 767px) {
+          .dc-panel-navbar { display: block; }
           .dc-panel-sidebar { display: none; }
-          .dc-panel-main { margin-left: 0; padding: 20px 16px 80px; }
-          .dc-panel-mobile-nav {
-            display: flex; position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(13,7,3,0.98); border-top: 1px solid rgba(232,168,76,0.15);
-            z-index: 50; padding: 4px 0;
-          }
+          .dc-panel-main { margin-left: 0; padding: 80px 16px 32px; }
         }
       `}</style>
     </div>
