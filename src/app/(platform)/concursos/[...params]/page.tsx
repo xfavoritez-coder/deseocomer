@@ -667,8 +667,10 @@ export default function ConcursoDetallePage() {
                             <div style={{ position: "absolute", bottom: "-5px", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "5px solid rgba(232,168,76,0.4)" }} />
                           </div>
                         )}
-                        <button onClick={() => handleSupport(r.nombre, targetKey)} disabled={!!already} style={{ border: already ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(61,184,158,0.4)", color: already ? "var(--text-muted)" : "var(--oasis-bright)", fontSize: "0.65rem", padding: "3px 8px", borderRadius: "20px", background: "transparent", cursor: already ? "default" : "pointer", fontFamily: "var(--font-cinzel)", whiteSpace: "nowrap" }}>
-                          {already ? "✓" : "+1"}
+                        <button onClick={() => handleSupport(r.nombre, targetKey)} disabled={!!already} style={{ border: already ? "1px solid rgba(61,184,158,0.2)" : "1px solid rgba(232,168,76,0.35)", color: already ? "rgba(61,184,158,0.6)" : "#e8a84c", fontSize: "0.72rem", fontWeight: already ? 400 : 700, padding: "5px 12px", borderRadius: "20px", background: already ? "transparent" : "rgba(232,168,76,0.1)", cursor: already ? "default" : "pointer", fontFamily: "var(--font-cinzel)", whiteSpace: "nowrap", letterSpacing: "0.05em", transition: "all 0.15s" }}
+                          onMouseEnter={e => { if (!already) { (e.currentTarget as HTMLButtonElement).style.background = "rgba(232,168,76,0.2)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(232,168,76,0.6)"; } }}
+                          onMouseLeave={e => { if (!already) { (e.currentTarget as HTMLButtonElement).style.background = "rgba(232,168,76,0.1)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(232,168,76,0.35)"; } }}>
+                          {already ? "✓ dado" : "🤝 +1"}
                         </button>
                       </div>
                     );
