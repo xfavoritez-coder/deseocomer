@@ -39,6 +39,7 @@ export interface Local {
   direccion: string;
   telefono: string;
   instagram: string;
+  sitioWeb: string;
   rating: number;
   totalResenas: number;
   precio: string;
@@ -81,7 +82,7 @@ export const LOCALES: Local[] = [
     barrio: "Providencia",
     direccion: "Av. Providencia 1234, Providencia",
     telefono: "+56 2 2345 6789",
-    instagram: "@pizzanapoli.cl",
+    instagram: "@pizzanapoli.cl", sitioWeb: "",
     rating: 4.8,
     totalResenas: 247,
     precio: "$$$",
@@ -151,7 +152,7 @@ export const LOCALES: Local[] = [
     barrio: "Las Condes",
     direccion: "Isidora Goyenechea 3456, Las Condes",
     telefono: "+56 2 2456 7890",
-    instagram: "@sushioasis.cl",
+    instagram: "@sushioasis.cl", sitioWeb: "",
     rating: 4.9,
     totalResenas: 189,
     precio: "$$$$",
@@ -211,7 +212,7 @@ export const LOCALES: Local[] = [
     barrio: "Santiago Centro",
     direccion: "Compañía 567, Santiago Centro",
     telefono: "+56 2 2567 8901",
-    instagram: "@doncarlos.menu",
+    instagram: "@doncarlos.menu", sitioWeb: "",
     rating: 4.7,
     totalResenas: 312,
     precio: "$",
@@ -246,7 +247,7 @@ export const LOCALES: Local[] = [
     barrio: "Ñuñoa",
     direccion: "Irarrázaval 2345, Ñuñoa",
     telefono: "+56 2 2678 9012",
-    instagram: "@burgerdesierto",
+    instagram: "@burgerdesierto", sitioWeb: "",
     rating: 4.6,
     totalResenas: 156,
     precio: "$$",
@@ -295,7 +296,7 @@ export const LOCALES: Local[] = [
     barrio: "Vitacura",
     direccion: "Nueva Costanera 4567, Vitacura",
     telefono: "+56 2 2789 0123",
-    instagram: "@verdeoasis.cl",
+    instagram: "@verdeoasis.cl", sitioWeb: "",
     rating: 4.5,
     totalResenas: 98,
     precio: "$$",
@@ -342,7 +343,7 @@ export const LOCALES: Local[] = [
     barrio: "Bellavista",
     direccion: "Constitución 234, Bellavista",
     telefono: "+56 2 2890 1234",
-    instagram: "@cafearenas.cl",
+    instagram: "@cafearenas.cl", sitioWeb: "",
     rating: 4.7,
     totalResenas: 134,
     precio: "$",

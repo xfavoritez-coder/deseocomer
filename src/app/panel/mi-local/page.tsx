@@ -60,7 +60,7 @@ export default function MiLocalPage() {
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
-            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng };
+            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng };
             setD(merged); save(merged);
           }
         }).catch(() => {});
@@ -100,6 +100,7 @@ export default function MiLocalPage() {
           historia: d.historia,
           telefono: d.telefono,
           instagram: d.instagram,
+          sitioWeb: d.sitioWeb,
           direccion: direccionFormateada,
           comuna: d.comuna,
           ciudad: d.ciudad,
@@ -189,6 +190,7 @@ export default function MiLocalPage() {
         <div><label style={LS}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label><textarea style={{ ...IS, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." /></div>
         <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789" />
         <Field label="Instagram" value={d.instagram as string ?? ""} onChange={v => set("instagram", v)} placeholder="@tunegocio" />
+        <Field label="Sitio web" value={d.sitioWeb as string ?? ""} onChange={v => set("sitioWeb", v)} placeholder="https://tunegocio.cl" />
       </div>
 
       <SectionTitle>Ubicación</SectionTitle>

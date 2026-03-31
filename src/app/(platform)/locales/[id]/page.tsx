@@ -101,6 +101,7 @@ export default function LocalDetailPage() {
     direccion: dbLocal.direccion as string ?? "",
     telefono: dbLocal.telefono as string ?? "",
     instagram: dbLocal.instagram as string ?? "",
+    sitioWeb: dbLocal.sitioWeb as string ?? "",
     rating: 0,
     totalResenas: (dbLocal._count as Record<string, number>)?.resenas ?? 0,
     precio: "$$",
@@ -342,9 +343,10 @@ export default function LocalDetailPage() {
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
-                      {local.direccion && <p style={bodyStyle}>📍 {local.direccion}</p>}
+                      {local.direccion && <p style={bodyStyle}>📍 {local.direccion}{local.barrio ? `, ${local.barrio}` : ""}</p>}
                       {local.telefono && <p style={bodyStyle}>📞 {local.telefono}</p>}
                       {local.instagram && <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>}
+                      {local.sitioWeb && <p style={bodyStyle}>🌐 <a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
                     </div>
                     <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
                       <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />

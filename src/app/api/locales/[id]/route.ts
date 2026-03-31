@@ -43,7 +43,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data: {
         nombre: body.nombre, categoria: body.categoria, descripcion: body.descripcion,
         historia: body.historia, telefono: body.telefono, instagram: body.instagram,
-        direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad,
+        direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad, sitioWeb: body.sitioWeb,
         lat: body.lat, lng: body.lng,
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,
         galeria: body.galeria, tieneMenu: body.tieneMenu,

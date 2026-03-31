@@ -48,6 +48,7 @@ model Local {
   lat           Float?
   lng           Float?
   instagram     String?
+  sitioWeb      String?
   horarios      Json?
   logoUrl       String?
   portadaUrl    String?
