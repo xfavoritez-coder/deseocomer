@@ -21,6 +21,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [authorized, setAuthorized] = useState(false);
   const [localName, setLocalName] = useState("");
   const [localId, setLocalId] = useState("");
+  const [localSlug, setLocalSlug] = useState("");
 
   useEffect(() => {
     setMontado(true);
@@ -35,6 +36,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           setAuthorized(true);
           setLocalName(data.nombre ?? "");
           setLocalId(data.id ?? "");
+          setLocalSlug(data.slug ?? "");
           if (!sessionData) sessionStorage.setItem(SESSION_KEY, raw);
           return;
         }
@@ -86,7 +88,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <span style={{ fontSize: "1rem" }}>{n.icon}</span> {n.label}
             </Link>
           ))}
-          <a href={localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" style={{
+          <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" style={{
             display: "flex", alignItems: "center", gap: "10px",
             padding: "12px 20px", textDecoration: "none",
             fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.08em",

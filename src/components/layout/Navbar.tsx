@@ -13,7 +13,7 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
-  const [localSession, setLocalSession] = useState<{ id: string; nombre: string } | null>(null);
+  const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string } | null>(null);
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll);
     try {
       const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      if (ls?.id && ls?.nombre && ls?.loggedIn) setLocalSession({ id: ls.id, nombre: ls.nombre });
+      if (ls?.id && ls?.nombre && ls?.loggedIn) setLocalSession({ id: ls.id, slug: ls.slug, nombre: ls.nombre });
     } catch {}
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -125,7 +125,7 @@ export default function Navbar() {
                   </div>
                   {[
                     { href: "/panel", label: "Mi Panel", color: "#3db89e" },
-                    { href: `/locales/${localSession?.id}`, label: "Ver mi local público", color: "var(--text-primary)" },
+                    { href: `/locales/${localSession?.slug || localSession?.id}`, label: "Ver mi local público", color: "var(--text-primary)" },
                     { href: "/panel/concursos", label: "Mis concursos", color: "var(--text-primary)" },
                     { href: "/panel/promociones", label: "Mis promociones", color: "var(--text-primary)" },
                   ].map(item => (

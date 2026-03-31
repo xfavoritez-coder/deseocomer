@@ -101,7 +101,7 @@ export default function GeniePanelLocal() {
     return () => clearTimeout(timer);
   }, [pathname, datosLocal]);
 
-  const localId = datosLocal?.id || "";
+  const localId = datosLocal?.slug || datosLocal?.id || "";
 
   const tipoLabel = (t: string) => t === "logro" ? "✨ Logro" : t === "alerta" ? "⚠️ Alerta" : t === "onboarding" ? "🧞 Guía" : "💡 Sugerencia";
   const tipoColor = (t: string) => t === "logro" ? "var(--oasis-bright)" : t === "alerta" ? "#ff8080" : "var(--accent)";
