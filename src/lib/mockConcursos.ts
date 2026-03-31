@@ -59,7 +59,9 @@ const h = (hours: number) => Date.now() + hours * 3_600_000;
 
 // ─── Active contests ─────────────────────────────────────────────────────────
 
-export const CONCURSOS: Concurso[] = [
+export const CONCURSOS: Concurso[] = [];
+
+const _CONCURSOS_EJEMPLO: Concurso[] = [
   {
     id: 1,
     slug: "pizza-napoli",

@@ -36,7 +36,10 @@ export interface Promocion {
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
-export const PROMOCIONES: Promocion[] = [
+export const PROMOCIONES: Promocion[] = [];
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _PROMOS_EJEMPLO: Promocion[] = [
   {
     id: 1,
     localId: "pizza-napoli",
