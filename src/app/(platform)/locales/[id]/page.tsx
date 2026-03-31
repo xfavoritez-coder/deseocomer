@@ -215,7 +215,7 @@ export default function LocalDetailPage() {
       </section>
 
       {/* Tabs */}
-      <div className={`dc-tabs-sticky${esPropioDueno ? " dc-tabs-sticky--owner" : ""}`} style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
+      <div className={`dc-tabs-sticky${esPropioDueno ? " dc-tabs-sticky--owner" : ""}`} style={{ position: "sticky", top: esPropioDueno ? "108px" : "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
@@ -335,7 +335,9 @@ export default function LocalDetailPage() {
                       {local.telefono && <p style={bodyStyle}>📞 {local.telefono}</p>}
                       {local.instagram && <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>}
                     </div>
-                    <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
+                    <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
+                      <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
+                    </div>
                   </div>
                   )}
                 </div>

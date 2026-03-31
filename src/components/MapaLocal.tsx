@@ -90,16 +90,22 @@ export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
         ref={mapRef}
         style={{
           width: "100%",
+          maxWidth: "100%",
           height: "220px",
-          borderRadius: "12px",
+          borderRadius: "10px",
           overflow: "hidden",
           border: "1px solid rgba(232,168,76,0.2)",
+          zIndex: 1,
         }}
       />
       <style>{`
         .leaflet-container {
           background: #0d0d0d !important;
           border-radius: 12px;
+          z-index: 1 !important;
+        }
+        .leaflet-popup {
+          z-index: 10 !important;
         }
         .leaflet-popup-content-wrapper {
           background: #f5d080;
