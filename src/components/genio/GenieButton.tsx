@@ -32,11 +32,15 @@ export default function GenieLampara() {
   const [rubbing, setRubbing] = useState(false);
   const [showBalloon, setShowBalloon] = useState(false);
   const [balloonExiting, setBalloonExiting] = useState(false);
+  const [esLocal, setEsLocal] = useState(false);
   const mountTimeRef = useRef(Date.now());
   const triggerCheckedRef = useRef(false);
 
-  // Don't render on /panel routes
-  if (pathname.startsWith("/panel")) return null;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => { try { const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}"); if (s?.id && s?.loggedIn) setEsLocal(true); } catch {} }, []);
+
+  // Don't render on /panel routes or if local is logged in
+  if (pathname.startsWith("/panel") || esLocal) return null;
 
   const handleClick = () => {
     if (showBalloon) setShowBalloon(false);
