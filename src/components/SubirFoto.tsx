@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -20,6 +20,11 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState(preview || "");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview when prop changes (e.g. data loads from API)
+  useEffect(() => {
+    if (preview) setPreviewUrl(preview);
+  }, [preview]);
 
   const handleFile = async (file: File) => {
     if (!file) return;

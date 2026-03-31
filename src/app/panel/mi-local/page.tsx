@@ -19,11 +19,18 @@ function load(): Record<string, unknown> { try { return JSON.parse(localStorage.
 function save(d: Record<string, unknown>) { localStorage.setItem(DATA_KEY, JSON.stringify(d)); }
 
 function formatearDireccion(displayName: string): string {
-  const partes = displayName.split(",");
+  const partes = displayName.split(",").map(p => p.trim());
   if (partes.length < 2) return displayName;
-  const calle = partes[0]?.trim() ?? "";
-  const numero = partes[1]?.trim() ?? "";
-  const sector = partes[2]?.trim() ?? "";
+
+  let calle = partes[0];
+  let numero = partes[1];
+  const sector = partes[2] ?? "";
+
+  // Nominatim a veces devuelve "68, Dardignac, ..." (número primero)
+  if (!isNaN(Number(calle)) && isNaN(Number(numero))) {
+    [calle, numero] = [numero, calle];
+  }
+
   const calleFormateada = calle.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
   if (numero && !isNaN(Number(numero))) {
     return sector ? `${calleFormateada} ${numero}, ${sector}` : `${calleFormateada} ${numero}`;
