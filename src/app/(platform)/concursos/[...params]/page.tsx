@@ -67,43 +67,57 @@ function ConcursoDetallePage() {
   const [dbConcurso, setDbConcurso] = useState<any>(null);
   const [dbLoading, setDbLoading] = useState(true);
 
+  const [timer, setTimer] = useState<ReturnType<typeof getTimeLeft> | null>(null);
+  const [ranking, setRanking] = useState<RankingEntry[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [concursoData, setConcursoData] = useState<any>(null);
+  const finalizado = finalizadoMock;
+
   // Always fetch from API
   useEffect(() => {
-    if (concursoMock || finalizadoMock) { setDbLoading(false); return; }
+    if (concursoMock || finalizadoMock) {
+      if (concursoMock) {
+        setConcursoData(concursoMock);
+        setTimer(getTimeLeft(concursoMock.endsAt));
+        setRanking(concursoMock.ranking);
+      }
+      if (finalizadoMock) setRanking(finalizadoMock.ranking);
+      setDbLoading(false);
+      return;
+    }
     if (!slug) { setDbLoading(false); return; }
     fetch(`/api/concursos/${encodeURIComponent(slug)}`)
       .then(r => r.ok ? r.json() : null)
-      .then(data => { setDbConcurso(data); setDbLoading(false); })
+      .then(data => {
+        if (data) {
+          const built = {
+            id: data.id ?? 0,
+            slug: data.slug ?? "",
+            local: data.local?.nombre ?? "Local",
+            localId: data.local?.id ?? "",
+            localSlug: data.local?.slug ?? "",
+            imagen: "🏆",
+            imagenUrl: data.imagenUrl ?? data.local?.portadaUrl ?? "",
+            premio: data.premio ?? "",
+            descripcionPremio: data.descripcion ?? "",
+            condiciones: data.condiciones ?? "",
+            participantes: data._count?.participantes ?? 0,
+            endsAt: new Date(data.fechaFin).getTime(),
+            ranking: (data.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
+            reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
+            descripcionLocal: "",
+          };
+          setConcursoData(built);
+          setTimer(getTimeLeft(built.endsAt));
+          setRanking(built.ranking);
+        }
+        setDbLoading(false);
+      })
       .catch(() => { setDbLoading(false); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
-  // Build concurso from DB data
-  const concurso = concursoMock ?? (dbConcurso ? {
-    id: dbConcurso.id ?? 0,
-    slug: dbConcurso.slug ?? "",
-    local: dbConcurso.local?.nombre ?? "Local",
-    localId: dbConcurso.local?.id ?? "",
-    localSlug: dbConcurso.local?.slug ?? "",
-    imagen: "🏆",
-    imagenUrl: dbConcurso.imagenUrl ?? dbConcurso.local?.portadaUrl ?? "",
-    premio: dbConcurso.premio ?? "",
-    descripcionPremio: dbConcurso.descripcion ?? "",
-    condiciones: dbConcurso.condiciones ?? "",
-    participantes: dbConcurso._count?.participantes ?? 0,
-    endsAt: new Date(dbConcurso.fechaFin).getTime(),
-    ranking: (dbConcurso.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
-    reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
-    descripcionLocal: "",
-  } : null);
-  const finalizado = finalizadoMock;
-
-  const [timer, setTimer] = useState(() =>
-    concurso ? getTimeLeft(concurso.endsAt) : null
-  );
-  const [ranking, setRanking] = useState<RankingEntry[]>(() =>
-    concurso ? concurso.ranking : (finalizado?.ranking ?? [])
-  );
+  const concurso = concursoData;
   const [copied,       setCopied]       = useState(false);
   const [refToast,     setRefToast]     = useState(false);
   const [newRefToast,  setNewRefToast]  = useState(false);
@@ -123,17 +137,11 @@ function ConcursoDetallePage() {
 
   // Tick countdown every second
   useEffect(() => {
-    if (!concurso) return;
-    const tick = () => setTimer(getTimeLeft(concurso.endsAt));
-    tick();
+    if (!concursoData) return;
+    const tick = () => setTimer(getTimeLeft(concursoData.endsAt));
     const iid = setInterval(tick, 1000);
     return () => clearInterval(iid);
-  }, [concurso?.endsAt]);
-
-  // Sync ranking when concurso loads from DB
-  useEffect(() => {
-    if (concurso?.ranking && ranking.length === 0) setRanking(concurso.ranking);
-  }, [concurso?.ranking?.length]);
+  }, [concursoData?.endsAt]);
 
   // Process incoming referral param
   useEffect(() => {
@@ -504,7 +512,7 @@ function ConcursoDetallePage() {
               <div style={{ width: "60px", height: "1px", margin: "0 auto 24px", background: "linear-gradient(90deg, transparent, rgba(232,168,76,0.4), transparent)" }} />
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", marginBottom: "20px", textAlign: "center" }}>Reglas del concurso</p>
               <ol style={{ margin: 0, paddingLeft: "20px" }}>
-                {(c as typeof c & { reglas: string[] }).reglas.map((r, i, arr) => (
+                {(c as typeof c & { reglas: string[] }).reglas.map((r: string, i: number, arr: string[]) => (
                   <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(253,240,200,0.5)", lineHeight: 1.7, marginBottom: i < arr.length - 1 ? "10px" : 0 }}>{r}</li>
                 ))}
               </ol>
