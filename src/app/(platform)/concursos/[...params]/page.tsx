@@ -213,6 +213,17 @@ function ConcursoDetallePage() {
     return () => window.removeEventListener("storage", handleStorage);
   }, [user, concursoId, refreshRanking]);
 
+  // Check which users were already supported today
+  useEffect(() => {
+    if (!user) return;
+    const map: Record<string, boolean> = {};
+    for (const r of ranking) {
+      const key = `mock_${r.nombre}`;
+      map[key] = hasSupportedToday(concursoId, user.id, key);
+    }
+    setSupportedMap(map);
+  }, [user, concursoId, ranking]);
+
   // 404
   if (dbLoading) {
     return (
@@ -278,17 +289,6 @@ function ConcursoDetallePage() {
     }
   };
 
-  // Check which users were already supported today
-  useEffect(() => {
-    if (!user) return;
-    const map: Record<string, boolean> = {};
-    for (const r of ranking) {
-      // Use nombre as a proxy key since we don't have real user IDs in mock ranking
-      const key = `mock_${r.nombre}`;
-      map[key] = hasSupportedToday(concursoId, user.id, key);
-    }
-    setSupportedMap(map);
-  }, [user, concursoId, ranking]);
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
