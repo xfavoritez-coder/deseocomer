@@ -41,7 +41,12 @@ export default function GenieToast() {
     addRespuestaGenio(toastActivo.mensaje, opt);
 
     // Open Genio panel
-    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante" || opt === "Muéstrame" || opt === "¿Cómo funciona?") {
+    if (opt === "¿Cómo funciona?") {
+      dismissToast();
+      window.location.href = "/concursos/como-funciona";
+      return;
+    }
+    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante" || opt === "Muéstrame") {
       dismissToast();
       setIsOpen(true);
       return;
