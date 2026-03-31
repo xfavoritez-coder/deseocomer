@@ -7,7 +7,7 @@ const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
   const [concursos, setConcursos] = useState(concursosMock);
-  const [tiempos, setTiempos] = useState<Record<number, {h:number,m:number,s:number}>>({});
+  const [tiempos, setTiempos] = useState<Record<number, {d:number,h:number,m:number,s:number}>>({});
 
   // Try fetching from API, fallback to mock
   useEffect(() => {
@@ -38,13 +38,14 @@ export default function ConcursosSection() {
 
   useEffect(() => {
     const calcular = () => {
-      const next: Record<number, {h:number,m:number,s:number}> = {};
+      const next: Record<number, {d:number,h:number,m:number,s:number}> = {};
       const ahora = Date.now();
       concursos.forEach(c => {
         const restMs = Math.max(0, new Date(c.fechaFin).getTime() - ahora);
         const restSeg = Math.floor(restMs / 1000);
         next[c.id] = {
-          h: Math.floor(restSeg / 3600),
+          d: Math.floor(restSeg / 86400),
+          h: Math.floor((restSeg % 86400) / 3600),
           m: Math.floor((restSeg % 3600) / 60),
           s: restSeg % 60,
         };
@@ -168,10 +169,11 @@ export default function ConcursosSection() {
                   </div>
                   <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "4px", padding: "12px 16px" }}>
                     {[
+                      ...((tiempos[c.id]?.d ?? 0) > 0 ? [{ val: tiempos[c.id]?.d ?? 0, label: "días" }] : []),
                       { val: tiempos[c.id]?.h ?? 0, label: "hrs" },
                       { val: tiempos[c.id]?.m ?? 0, label: "min" },
                       { val: tiempos[c.id]?.s ?? 0, label: "seg" },
-                    ].map(({ val, label }, idx) => (
+                    ].map(({ val, label }, idx, arr) => (
                       <div key={label} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                         <div style={{ textAlign: "center" }}>
                           <div style={{
@@ -189,7 +191,7 @@ export default function ConcursosSection() {
                             color: "var(--text-muted)", marginTop: "4px",
                           }}>{label}</div>
                         </div>
-                        {idx < 2 && (
+                        {idx < arr.length - 1 && (
                           <span style={{
                             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem",
                             color: c.horasRestantes <= 6 ? "#ff6b6b" : "var(--accent)",

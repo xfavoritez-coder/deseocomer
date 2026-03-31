@@ -68,8 +68,11 @@ export default function PanelConcursos() {
 
   // ── Detail view ──
   if (detalle) {
-    const horasRest = Math.max(0, Math.floor((new Date(detalle.fechaFin).getTime() - Date.now()) / 3600000));
-    const terminado = horasRest <= 0;
+    const restMs = Math.max(0, new Date(detalle.fechaFin).getTime() - Date.now());
+    const terminado = restMs <= 0;
+    const diasRest = Math.floor(restMs / 86400000);
+    const hrsRest = Math.floor((restMs % 86400000) / 3600000);
+    const tiempoDetalle = diasRest > 0 ? `${diasRest}d ${hrsRest}h` : `${hrsRest}h`;
     const participantes = detalle._count?.participantes ?? detalle.participantes?.length ?? 0;
     const link = `https://deseocomer.com/concursos/${detalle.slug || detalle.id}`;
 
@@ -85,7 +88,7 @@ export default function PanelConcursos() {
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", padding: "3px 10px", borderRadius: "20px", background: terminado ? "rgba(255,255,255,0.06)" : "rgba(61,184,158,0.12)", border: terminado ? "1px solid var(--border-color)" : "1px solid rgba(61,184,158,0.4)", color: terminado ? "var(--text-muted)" : "#3db89e" }}>
                 {terminado ? "Finalizado" : "Activo"}
               </span>
-              {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{horasRest}h restantes</span>}
+              {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{tiempoDetalle} restantes</span>}
             </div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "4px" }}>{detalle.premio}</h2>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 {participantes} participantes</p>
@@ -206,8 +209,12 @@ export default function PanelConcursos() {
     ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {concursos.map(c => {
-          const hrs = Math.max(0, Math.floor((new Date(c.fechaFin).getTime() - Date.now()) / 3600000));
-          const ended = hrs <= 0;
+          const restMs = Math.max(0, new Date(c.fechaFin).getTime() - Date.now());
+          const ended = restMs <= 0;
+          const dias = Math.floor(restMs / 86400000);
+          const hrs = Math.floor((restMs % 86400000) / 3600000);
+          const mins = Math.floor((restMs % 3600000) / 60000);
+          const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
             <div key={c.id} onClick={() => setDetalle(c)} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "center", cursor: "pointer", transition: "border-color 0.2s" }}>
@@ -219,7 +226,7 @@ export default function PanelConcursos() {
               <div style={{ flex: 1, padding: "12px 16px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                  {parts} participantes · {ended ? <span style={{ color: "var(--text-muted)" }}>Finalizado</span> : <span style={{ color: "#3db89e" }}>{hrs}h restantes</span>}
+                  {parts} participantes · {ended ? <span style={{ color: "var(--text-muted)" }}>Finalizado</span> : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Ver →</span>
