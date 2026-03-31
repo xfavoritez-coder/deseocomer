@@ -30,7 +30,7 @@ export default function LoginLocalPage() {
       sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch { setLoading(false); return setError("Error de conexión."); }
     setLoading(false);
-    router.push("/panel");
+    window.location.href = "/panel";
   };
 
   return (
