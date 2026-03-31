@@ -125,73 +125,48 @@ export default function LocalesSection() {
                 <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categoria, comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
               </div>
-              <div style={{ padding: "20px 24px 24px" }}>
-                {/* Línea 1: emoji + nombre */}
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "10px" }}>
-                  <div style={{
-                    width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0,
-                    background: `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
-                    border: `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
-                    color: `hsl(${nameToHue(local.nombre)}, 65%, 72%)`,
-                  }}>
-                    {getInitials(local.nombre)}
+              <div style={{ padding: "16px 20px 20px" }}>
+                {/* Header: logo + nombre + meta + rating */}
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0,
+                      background: `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
+                      border: `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.8rem",
+                      color: `hsl(${nameToHue(local.nombre)}, 65%, 72%)`,
+                    }}>
+                      {getInitials(local.nombre)}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)", color: "#f5d080", lineHeight: 1.2, margin: 0 }}>{local.nombre}</h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
+                        <span className="dc-comuna">{local.barrio}</span>
+                        <span className="dc-sep">·</span>
+                        <span className="dc-categoria">{local.categoria}</span>
+                      </div>
+                    </div>
                   </div>
-                  <h3 style={{
-                    fontFamily: "var(--font-cinzel-decorative)",
-                    fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-                    color: "#f5d080",
-                    lineHeight: 1.2,
-                    minWidth: 0,
-                  }}>{local.nombre}</h3>
+                  {local.rating > 0 ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px" }}>
+                      <span style={{ color: "var(--accent)" }}>★</span>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating.toFixed ? local.rating.toFixed(1) : local.rating}</span>
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
+                  )}
                 </div>
 
-                {/* Línea 2: pin + barrio */}
-                <div style={{ marginBottom: "10px" }}>
-                  <span style={{
-                    fontFamily: "var(--font-lato)",
-                    fontSize: "0.8rem",
-                    color: "var(--color-link)",
-                  }}>📍 {local.barrio}</span>
-                </div>
-
-                {/* Línea 3: descripción */}
+                {/* Descripción */}
                 <p style={{
                   fontFamily: "var(--font-lato)",
                   fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
                   color: "var(--text-muted)",
                   lineHeight: 1.7,
                   fontWeight: 400,
-                  marginBottom: "18px",
+                  display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden",
                 }}>{local.descripcion}</p>
-
-                {/* Línea 4: footer */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{
-                    fontFamily: "var(--font-cinzel)",
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "var(--text-muted)",
-                    background: "rgba(0,0,0,0.2)",
-                    padding: "4px 10px",
-                    borderRadius: "20px",
-                    border: "1px solid var(--border-color)",
-                  }}>{local.categoria}</span>
-
-                  <span style={{
-                    fontFamily: "var(--font-cinzel)",
-                    fontSize: "0.75rem",
-                    color: "var(--accent)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}>
-                    {local.rating > 0 && <>⭐ {local.rating}</>}
-                    <span className="dc-loc-arrow">→</span>
-                  </span>
-                </div>
               </div>
             </Link>
           ))}
@@ -247,17 +222,9 @@ export default function LocalesSection() {
           border-color: var(--accent);
         }
 
-        .dc-loc-arrow {
-          color: var(--accent);
-          font-size: 1rem;
-          display: inline-block;
-          transition: transform 0.2s ease;
-          opacity: 0.7;
-        }
-        .dc-loc-card:hover .dc-loc-arrow {
-          transform: translateX(5px);
-          opacity: 1;
-        }
+        .dc-comuna { font-family: var(--font-lato); font-size: 12px; color: rgba(240,234,214,0.4); font-weight: 400; }
+        .dc-sep { font-size: 11px; color: rgba(240,234,214,0.2); }
+        .dc-categoria { font-family: var(--font-lato); font-size: 12px; color: var(--oasis-bright, #3db89e); font-weight: 500; }
 
         @media (max-width: 767px) {
           .dc-loc-section { padding: 72px 20px 48px; }

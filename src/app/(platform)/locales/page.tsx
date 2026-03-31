@@ -247,45 +247,40 @@ export default function LocalesPage() {
 
                     {/* Content */}
                     <div style={{ padding: "16px 20px 20px" }}>
-                      {/* Row 1: Logo + Name */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-                        {local.logoUrl ? (
-                          <img src={local.logoUrl} alt="" style={{ width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
-                        ) : (
-                          <div style={{ width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0, background: `hsl(${hue}, 35%, 22%)`, border: `1px solid hsl(${hue}, 40%, 38%)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: `hsl(${hue}, 60%, 70%)` }}>
-                            {getInitials(local.nombre)}
+                      {/* Header: logo + nombre + meta + rating */}
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", flex: 1, minWidth: 0 }}>
+                          {local.logoUrl ? (
+                            <img src={local.logoUrl} alt="" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
+                          ) : (
+                            <div style={{ width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0, background: `hsl(${hue}, 35%, 22%)`, border: `1px solid hsl(${hue}, 40%, 38%)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.85rem", color: `hsl(${hue}, 60%, 70%)` }}>
+                              {getInitials(local.nombre)}
+                            </div>
+                          )}
+                          <div style={{ minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.05rem", fontWeight: 700, color: "#f5d080", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{local.nombre}</p>
+                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
+                              <span className="dc-comuna">{local.comuna}</span>
+                              <span className="dc-sep">·</span>
+                              <span className="dc-categoria">{local.categoria}</span>
+                            </div>
                           </div>
-                        )}
-                        <div style={{ minWidth: 0 }}>
-                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.15rem", fontWeight: 700, color: "#f5d080" }}>
-                            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{local.nombre}</span>
-                          </p>
                         </div>
+                        {(local._count?.resenas ?? 0) > 0 ? (
+                          <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px" }}>
+                            <span style={{ color: "var(--accent)" }}>★</span>
+                            <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating?.toFixed ? local.rating.toFixed(1) : local.rating}</span>
+                            <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
+                        )}
                       </div>
 
-                      {/* Row 2: Location */}
-                      <div style={{ marginBottom: "8px" }}>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--oasis-bright, rgba(95,240,208,0.8))" }}>
-                          📍 {local.comuna}
-                        </span>
-                      </div>
-
-                      {/* Row 3: Description (2 lines) */}
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {/* Descripción */}
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.92rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", margin: 0 }}>
                         {local.descripcion}
                       </p>
-
-                      {/* Row 4: Footer */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", background: "rgba(0,0,0,0.2)", padding: "5px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.12)" }}>
-                          {local.categoria}
-                        </span>
-                        {(local._count?.resenas ?? 0) > 0 && (
-                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>
-                            ⭐ {local.rating}
-                          </span>
-                        )}
-                      </div>
                     </div>
                   </Link>
                 );
@@ -309,6 +304,9 @@ export default function LocalesPage() {
           padding-bottom: 4px;
         }
         .dc-filtros-fila::-webkit-scrollbar { display: none; }
+        .dc-comuna { font-family: var(--font-lato); font-size: 12px; color: rgba(240,234,214,0.4); font-weight: 400; }
+        .dc-sep { font-size: 11px; color: rgba(240,234,214,0.2); }
+        .dc-categoria { font-family: var(--font-lato); font-size: 12px; color: var(--oasis-bright, #3db89e); font-weight: 500; }
         .dc-lp-hero {
           position: relative;
           overflow: hidden;
