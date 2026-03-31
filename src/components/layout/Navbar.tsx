@@ -24,16 +24,19 @@ export default function Navbar() {
       const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
       if (ls?.id && ls?.nombre && ls?.loggedIn) {
         setLocalSession({ id: ls.id, slug: ls.slug, nombre: ls.nombre, logoUrl: ls.logoUrl });
-        // Fetch fresh logoUrl if not in session
-        if (!ls.logoUrl) {
-          fetch(`/api/locales/${ls.id}`).then(r => r.ok ? r.json() : null).then(data => {
-            if (data?.logoUrl) {
-              setLocalSession(prev => prev ? { ...prev, logoUrl: data.logoUrl } : prev);
-              ls.logoUrl = data.logoUrl;
+        // Always fetch fresh data (logo may have been added after login)
+        fetch(`/api/locales/${ls.id}`).then(r => r.ok ? r.json() : null).then(data => {
+          if (data) {
+            const logoUrl = data.logoUrl || null;
+            const slug = data.slug || ls.slug;
+            setLocalSession(prev => prev ? { ...prev, logoUrl, slug } : prev);
+            if (logoUrl !== ls.logoUrl || slug !== ls.slug) {
+              ls.logoUrl = logoUrl;
+              ls.slug = slug;
               localStorage.setItem("deseocomer_local_session", JSON.stringify(ls));
             }
-          }).catch(() => {});
-        }
+          }
+        }).catch(() => {});
       }
     } catch {}
     return () => window.removeEventListener("scroll", onScroll);

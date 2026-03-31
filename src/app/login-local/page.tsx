@@ -25,7 +25,7 @@ export default function LoginLocalPage() {
       const res = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase(), password, tipo: "local" }) });
       const data = await res.json();
       if (!res.ok) { setLoading(false); return setError(data.error || "Email o contraseña incorrectos"); }
-      const sessionObj = { id: data.data.id, slug: data.data.slug, nombre: data.data.nombre, email: data.data.email, tipo: "local", loggedIn: true };
+      const sessionObj = { id: data.data.id, slug: data.data.slug, nombre: data.data.nombre, email: data.data.email, logoUrl: data.data.logoUrl ?? null, tipo: "local", loggedIn: true };
       localStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
       sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch { setLoading(false); return setError("Error de conexión."); }
