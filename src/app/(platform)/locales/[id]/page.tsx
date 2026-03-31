@@ -47,6 +47,17 @@ function getInitials(name: string): string {
   return name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalizarHorarios(horarios: any): Array<{ dia: string; abre: string; cierra: string; cerrado: boolean }> {
+  if (!horarios || !Array.isArray(horarios)) return [];
+  const DIAS_N = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return horarios.map((h: any, i: number) => {
+    if (h?.dia) return h;
+    return { dia: DIAS_N[i] ?? `Día ${i + 1}`, abre: h?.abre ?? "12:00", cierra: h?.cierra ?? "22:00", cerrado: h?.activo === false };
+  });
+}
+
 const COLORS = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
 function getColor(name: string): string {
   return COLORS[name.charCodeAt(0) % COLORS.length];
@@ -100,7 +111,7 @@ export default function LocalDetailPage() {
     galeria: (dbLocal.galeria as string[]) ?? [],
     tieneMenu: dbLocal.tieneMenu as boolean ?? false,
     menu: [],
-    horarios: ((dbLocal.horarios as Array<{dia:string;abre:string;cierra:string;cerrado:boolean}>) ?? []),
+    horarios: normalizarHorarios(dbLocal.horarios),
     resenas: ((dbLocal.resenas as Resena[]) ?? []),
     lat: dbLocal.lat as number ?? -33.43,
     lng: dbLocal.lng as number ?? -70.65,
@@ -137,7 +148,7 @@ export default function LocalDetailPage() {
   const todayName = DAY_NAMES[new Date().getDay()];
   const concursosLocal = CONCURSOS.filter(c => c.local === local.nombre);
   const similares = LOCALES.filter(l => l.categoria === local.categoria && l.id !== local.id).slice(0, 3);
-  const tieneHorarios = local.horarios && local.horarios.length > 0;
+  const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
   const tieneSidebar = tieneHorarios || tieneUbicacion;
   const mostrarAbierto = tieneHorarios && local.isOpen;
@@ -157,9 +168,9 @@ export default function LocalDetailPage() {
 
       {/* Owner banner */}
       {esPropioDueno && (
-        <div style={{ position: "sticky", top: "64px", zIndex: 90, background: "rgba(61,184,158,0.08)", borderBottom: "1px solid rgba(61,184,158,0.2)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>👁 Estás viendo tu perfil público</p>
-          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "5px 14px", whiteSpace: "nowrap" }}>Editar en el panel →</Link>
+        <div style={{ background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", zIndex: 89 }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><span style={{ fontSize: "0.9rem" }}>👁</span>Estás viendo tu perfil público</p>
+          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "6px 16px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>Editar en el panel →</Link>
         </div>
       )}
 
@@ -204,7 +215,7 @@ export default function LocalDetailPage() {
       </section>
 
       {/* Tabs */}
-      <div style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
+      <div className={`dc-tabs-sticky${esPropioDueno ? " dc-tabs-sticky--owner" : ""}`} style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
@@ -264,11 +275,15 @@ export default function LocalDetailPage() {
 
                   {/* Reseñas preview */}
                   {local.resenas.length === 0 ? (
-                    <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "12px", padding: "24px", textAlign: "center" }}>
+                    <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "12px", padding: "28px 24px", textAlign: "center" }}>
                       <div style={{ fontSize: "2rem", marginBottom: "10px" }}>✍️</div>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)", marginBottom: "6px" }}>Sin reseñas aún</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.6, marginBottom: "14px" }}>Sé el primero en compartir tu experiencia</p>
-                      {isAuthenticated && <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>}
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.6, marginBottom: "16px" }}>Sé el primero en compartir tu experiencia</p>
+                      {isAuthenticated ? (
+                        <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "10px 24px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>
+                      ) : (
+                        <Link href={`/login?next=/locales/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "var(--accent)", borderRadius: "20px", padding: "10px 24px", textDecoration: "none", fontWeight: 700 }}>Inicia sesión para comentar →</Link>
+                      )}
                     </div>
                   ) : (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
@@ -431,23 +446,24 @@ export default function LocalDetailPage() {
 
         {/* Similares */}
         {similares.length > 0 && (
-          <div style={{ marginTop: "60px" }}>
-            <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "20px" }}>
-              También te puede gustar
-            </h3>
-            <div style={{ display: "flex", gap: "16px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "8px" }}>
+          <div style={{ marginTop: "48px", paddingTop: "32px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", marginBottom: "6px" }}>También te puede gustar</p>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--accent)", marginBottom: "20px" }}>Locales similares</h3>
+            <div style={{ display: "flex", gap: "14px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "8px" }}>
               {similares.map(s => (
-                <Link key={s.id} href={`/locales/${s.id}`} style={{
-                  flexShrink: 0, width: "240px", display: "flex", alignItems: "center", gap: "12px",
-                  background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)",
-                  borderRadius: "14px", padding: "14px", textDecoration: "none",
-                }}>
-                  <div style={{ width: "50px", height: "50px", borderRadius: "50%", flexShrink: 0, background: getColor(s.nombre), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: "#fff" }}>
-                    {getInitials(s.nombre)}
-                  </div>
-                  <div>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--accent)" }}>{s.nombre}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)" }}>{s.barrio} · ⭐ {s.rating}</p>
+                <Link key={s.id} href={`/locales/${s.id}`} style={{ textDecoration: "none", flexShrink: 0 }}>
+                  <div style={{ width: "200px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "16px", overflow: "hidden", transition: "transform 0.2s, border-color 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.35)"; }} onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.1)"; }}>
+                    <div style={{ height: "100px", background: s.imagenPortada ? "transparent" : `linear-gradient(135deg, ${getColor(s.nombre)}, ${getColor(s.nombre)}88)`, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {s.imagenPortada ? (<><img src={s.imagenPortada} alt={s.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /><div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(10,8,18,0.6) 100%)" }} /></>) : <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.8rem", fontWeight: 700, color: "rgba(255,255,255,0.35)" }}>{getInitials(s.nombre)}</span>}
+                    </div>
+                    <div style={{ padding: "12px 14px" }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.nombre}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)", marginBottom: "8px" }}>{s.barrio}</p>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", background: "rgba(255,255,255,0.05)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "20px", padding: "2px 8px" }}>{s.categoria}</span>
+                        {s.rating > 0 && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#e8a84c" }}>★ {s.rating}</span>}
+                      </div>
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -484,6 +500,8 @@ export default function LocalDetailPage() {
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }
           .dc-ld-gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+          .dc-tabs-sticky { top: 56px !important; }
+          .dc-tabs-sticky--owner { top: 100px !important; }
         }
       `}</style>
     </main>
@@ -569,6 +587,13 @@ function ResenasTab({ local, isAuth }: { local: Local; isAuth: boolean }) {
           }}>Escribir reseña</button>
         )}
       </div>
+
+      {!isAuth && (
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "16px 20px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>¿Visitaste este local? Comparte tu experiencia</p>
+          <Link href="/login" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", borderRadius: "20px", padding: "8px 18px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Iniciar sesión →</Link>
+        </div>
+      )}
 
       {/* Write form */}
       {writing && (
