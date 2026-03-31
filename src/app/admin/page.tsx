@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type S = any;
@@ -7,7 +8,7 @@ type S = any;
 export default function AdminDashboard() {
   const [stats, setStats] = useState<S>(null);
 
-  useEffect(() => { fetch("/api/admin/stats").then(r => r.json()).then(setStats).catch(() => {}); }, []);
+  useEffect(() => { adminFetch("/api/admin/stats").then(r => r.json()).then(setStats).catch(() => {}); }, []);
 
   if (!stats) return <p style={{ color: "rgba(240,234,214,0.5)", fontFamily: "Georgia" }}>Cargando...</p>;
 

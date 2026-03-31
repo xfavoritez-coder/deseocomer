@@ -16,9 +16,10 @@ export default function ContactoPage() {
     if (!nombre || !email || !mensaje) return;
     setEnviando(true);
     try {
-      await fetch("/api/emails/contacto", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre, email, motivo, mensaje }) });
-      setEnviado(true);
-    } catch {}
+      const res = await fetch("/api/emails/contacto", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre, email, motivo, mensaje }) });
+      if (res.ok) setEnviado(true);
+      else setEnviando(false);
+    } catch { setEnviando(false); }
     setEnviando(false);
   };
 

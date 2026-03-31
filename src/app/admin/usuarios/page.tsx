@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type U = any;
@@ -9,7 +10,7 @@ export default function AdminUsuarios() {
   const [busq, setBusq] = useState("");
   const [sel, setSel] = useState<U | null>(null);
 
-  useEffect(() => { fetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  useEffect(() => { adminFetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
   const filtered = usuarios.filter(u => !busq || u.nombre.toLowerCase().includes(busq.toLowerCase()) || u.email.toLowerCase().includes(busq.toLowerCase()));
 

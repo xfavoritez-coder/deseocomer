@@ -56,7 +56,7 @@ export default function ConcursosPage() {
   }, []);
 
   // Merge BD concursos with mock
-  const allConcursos = [...bdConcursos, ...CONCURSOS];
+  const allConcursos = bdConcursos.length > 0 ? bdConcursos : CONCURSOS;
 
   // Initialize & tick timers
   const updateTimers = useCallback(() => {

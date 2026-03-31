@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type C = any;
@@ -13,7 +14,7 @@ export default function AdminConcursos() {
   useEffect(() => { fetch("/api/concursos").then(r => r.json()).then(d => setConcursos(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
   const cerrar = async (id: string) => {
-    await fetch(`/api/admin/concursos/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ activo: false }) });
+    await adminFetch(`/api/admin/concursos/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ activo: false }) });
     setConcursos(prev => prev.map(c => c.id === id ? { ...c, activo: false } : c));
     if (sel?.id === id) setSel((p: C) => p ? { ...p, activo: false } : p);
   };

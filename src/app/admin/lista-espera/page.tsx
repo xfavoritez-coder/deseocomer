@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/adminFetch";
 
 export default function AdminListaEspera() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,7 +11,7 @@ export default function AdminListaEspera() {
   const [rankingComunas, setRankingComunas] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/admin/lista-espera").then(r => r.json()).then(setData).catch(() => {});
+    adminFetch("/api/admin/lista-espera").then(r => r.json()).then(setData).catch(() => {});
     fetch("/api/lista-espera-comuna").then(r => r.json()).then(d => { setListaComunas(d.lista || []); setRankingComunas(d.ranking || []); }).catch(() => {});
   }, []);
 

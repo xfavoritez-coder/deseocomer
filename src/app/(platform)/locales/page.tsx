@@ -68,7 +68,7 @@ export default function LocalesPage() {
             createdAt: l.createdAt,
             _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },
           }));
-          setLocales([...mapped, ...localesMock]);
+          setLocales(mapped.length > 0 ? [...mapped, ...localesMock] : localesMock);
         }
         setLoading(false);
       })

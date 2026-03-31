@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
@@ -10,10 +11,10 @@ export default function AdminLocales() {
   const [filtro, setFiltro] = useState("todos");
   const [sel, setSel] = useState<L | null>(null);
 
-  useEffect(() => { fetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  useEffect(() => { adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
   const toggle = async (id: string, field: string, value: boolean) => {
-    await fetch(`/api/admin/locales/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [field]: value }) });
+    await adminFetch(`/api/admin/locales/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ [field]: value }) });
     setLocales(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
     if (sel?.id === id) setSel((p: L) => p ? { ...p, [field]: value } : p);
   };
