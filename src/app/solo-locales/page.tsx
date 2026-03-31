@@ -78,19 +78,6 @@ export default function SoloLocalesPage() {
               Publica concursos virales, gestiona tus promociones y llega a clientes que buscan exactamente lo que ofreces.
             </p>
           </Reveal>
-          <Reveal delay={0.3}>
-            <div style={{ display: "flex", justifyContent: "center", gap: "24px", flexWrap: "wrap", marginBottom: "36px" }}>
-              {[
-                { icon: "🧞", text: "Gratis durante el lanzamiento" },
-                { icon: "📍", text: "Solo en Santiago por ahora" },
-              ].map(s => (
-                <div key={s.text} style={{ display: "flex", alignItems: "center", gap: "8px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "30px", padding: "10px 20px" }}>
-                  <span style={{ fontSize: "1rem" }}>{s.icon}</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.08em", color: "var(--text-primary)" }}>{s.text}</span>
-                </div>
-              ))}
-            </div>
-          </Reveal>
           <Reveal delay={0.4}>
             <Link href="/registro-local" style={{
               display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
@@ -101,9 +88,6 @@ export default function SoloLocalesPage() {
             }}>
               Registrar mi local gratis →
             </Link>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "16px" }}>
-              Sin contratos. Sin letra chica. Sin costo.
-            </p>
           </Reveal>
         </div>
       </section>
