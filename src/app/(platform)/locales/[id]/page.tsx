@@ -168,7 +168,7 @@ export default function LocalDetailPage() {
 
       {/* Owner banner */}
       {esPropioDueno && (
-        <div style={{ background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap", zIndex: 89 }}>
+        <div className="dc-owner-banner" style={{ position: "sticky", top: "64px", zIndex: 90, background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><span style={{ fontSize: "0.9rem" }}>👁</span>Estás viendo tu perfil público</p>
           <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "6px 16px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>Editar en el panel →</Link>
         </div>
@@ -343,23 +343,6 @@ export default function LocalDetailPage() {
                 </div>
                 )}
 
-                {/* Owner: completar perfil */}
-                {esPropioDueno && (() => {
-                  const faltantes: { texto: string; href: string }[] = [];
-                  if (!tieneHorarios) faltantes.push({ texto: "Agrega tus horarios", href: "/panel/mi-local" });
-                  if (!local.galeria?.length) faltantes.push({ texto: "Sube fotos de tu local", href: "/panel/mi-local" });
-                  if (!local.tieneMenu) faltantes.push({ texto: "Publica tu menú", href: "/panel/mi-local" });
-                  if (!local.descripcion) faltantes.push({ texto: "Agrega una descripción", href: "/panel/mi-local" });
-                  if (faltantes.length === 0) return null;
-                  return (
-                    <div style={{ background: "rgba(232,168,76,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "14px", padding: "20px 24px", marginTop: "8px" }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", marginBottom: "12px" }}>🧞 Completa tu perfil para atraer más clientes</p>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {faltantes.map((f, i) => <Link key={i} href={f.href} style={{ display: "flex", alignItems: "center", gap: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(232,168,76,0.7)", textDecoration: "none" }}><span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "rgba(232,168,76,0.4)", flexShrink: 0 }} />{f.texto} →</Link>)}
-                      </div>
-                    </div>
-                  );
-                })()}
               </div>
             )}
 
@@ -502,6 +485,7 @@ export default function LocalDetailPage() {
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }
           .dc-ld-gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+          .dc-owner-banner { top: 56px !important; }
           .dc-tabs-sticky { top: 56px !important; }
           .dc-tabs-sticky--owner { top: 100px !important; }
         }
