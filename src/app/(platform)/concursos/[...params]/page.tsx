@@ -420,8 +420,8 @@ export default function ConcursoDetallePage() {
 
           {/* 1. Link de participación */}
           {!isEnded && (
-            <div style={{ background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "20px 24px", boxShadow: "0 0 40px rgba(232,168,76,0.08)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+            <div className="dc-cd-link-card" style={{ background: "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.9))", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "20px 24px", boxShadow: "0 0 40px rgba(232,168,76,0.08)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px", justifyContent: "inherit" }}>
                 <span style={{ fontSize: "1.1rem" }}>🔗</span>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#e8a84c", fontWeight: 700, margin: 0 }}>Tu link de participación</p>
               </div>
@@ -435,7 +435,7 @@ export default function ConcursoDetallePage() {
                   <div style={{ background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", padding: "10px 16px", marginBottom: "12px", wordBreak: "break-all" }}>
                     <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#e8a84c", margin: 0 }}>{refLink}</p>
                   </div>
-                  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
+                  <div className="dc-cd-link-btns" style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "8px" }}>
                     <button onClick={copyLink} style={{ background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: copied ? "#fff" : "var(--bg-primary)", padding: "10px 20px", cursor: "pointer", fontWeight: 700, opacity: copied ? 0.8 : 1 }}>
                       {copied ? "✓ Copiado" : "📋 Copiar link"}
                     </button>
@@ -719,6 +719,10 @@ export default function ConcursoDetallePage() {
         @media (max-width: 767px) {
           .dc-cd-body { padding: 20px 16px 48px; }
           .dc-asi-grid { grid-template-columns: repeat(3, 1fr) !important; }
+          .dc-cd-link-card { text-align: center; }
+          .dc-cd-link-card > div:first-child { justify-content: center; }
+          .dc-cd-link-btns { flex-direction: column; align-items: center; }
+          .dc-cd-link-btns a, .dc-cd-link-btns button { width: 100%; justify-content: center; text-align: center; }
         }
       `}</style>
     </main>
