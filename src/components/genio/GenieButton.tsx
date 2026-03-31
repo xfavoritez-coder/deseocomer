@@ -39,7 +39,8 @@ export default function GenieLampara() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => { try { const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}"); if (s?.id && s?.loggedIn) setEsLocal(true); } catch {} }, []);
 
-  const shouldHide = pathname.startsWith("/panel") || pathname.startsWith("/admin") || esLocal;
+  // Don't render on /panel routes or if local is logged in
+  if (pathname.startsWith("/panel") || esLocal) return null;
 
   const handleClick = () => {
     if (showBalloon) setShowBalloon(false);
@@ -90,11 +91,10 @@ export default function GenieLampara() {
     if (triggerCheckedRef.current) return;
     const timer = setTimeout(() => {
       triggerCheckedRef.current = true;
-      if (toastActivo) return; // Don't stack toasts
       const h = new Date().getHours();
       if (h >= 12 && h < 14) {
         const elapsed = Date.now() - mountTimeRef.current;
-        if (elapsed >= 120_000) {
+        if (elapsed >= 120_000) { // 2 minutes
           const shown = getToastShown();
           const today = new Date().toISOString().slice(0, 10);
           if (shown["lunch"] !== undefined && new Date(shown["lunch"]).toISOString().slice(0, 10) === today) return;
@@ -106,21 +106,20 @@ export default function GenieLampara() {
           });
         }
       }
-    }, 130_000);
+    }, 130_000); // Check after ~2 min
     return () => clearTimeout(timer);
-  }, [setToastActivo, toastActivo]);
+  }, [setToastActivo]);
 
   // ── Trigger 4: Friday/Saturday night ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const day = new Date().getDay();
+    const day = new Date().getDay(); // 5=Fri, 6=Sat
     const h = new Date().getHours();
     if ((day === 5 || day === 6) && h >= 18) {
       const shown = getToastShown();
-      const weekKey = `night_${new Date().toISOString().slice(0, 10).slice(0, 7)}`;
+      const weekKey = `night_${new Date().toISOString().slice(0, 10).slice(0, 7)}`; // monthly
       if (shown[weekKey]) return;
       const timer = setTimeout(() => {
-        if (toastActivo) return; // Don't stack toasts
         markToastShown(weekKey);
         setToastActivo({
           id: "night",
@@ -130,7 +129,7 @@ export default function GenieLampara() {
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [setToastActivo, toastActivo]);
+  }, [setToastActivo]);
 
   // ── Trigger 5: 3rd session without registration ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -140,7 +139,6 @@ export default function GenieLampara() {
       if (localStorage.getItem("genio_trigger5_mostrado")) return;
     } catch { return; }
     const timer = setTimeout(() => {
-      if (toastActivo) return; // Don't stack toasts
       setToastActivo({
         id: "session3",
         mensaje: "Ya nos conocemos un poco 🧞 Regístrate y recuerdo todo lo que te gusta",
@@ -148,7 +146,7 @@ export default function GenieLampara() {
       });
     }, 30000);
     return () => clearTimeout(timer);
-  }, [isLoggedIn, sessionCount, setToastActivo, toastActivo]);
+  }, [isLoggedIn, sessionCount, setToastActivo]);
 
   // ── Birthday special greeting ──
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -162,7 +160,6 @@ export default function GenieLampara() {
       const keyHoy = `genio_cumple_saludo_${hoy.toISOString().slice(0, 10)}`;
       if (localStorage.getItem(keyHoy)) return;
       const timer = setTimeout(() => {
-        if (toastActivo) return; // Don't stack toasts
         setToastActivo({
           id: "cumple_saludo",
           mensaje: "🎂 ¡Feliz cumpleaños! Hoy hay ofertas especiales para celebrar tu día 🎉",
@@ -172,9 +169,7 @@ export default function GenieLampara() {
       }, 2000);
       return () => clearTimeout(timer);
     } catch {}
-  }, [setToastActivo, toastActivo]);
-
-  if (shouldHide) return null;
+  }, [setToastActivo]);
 
   return (
     <>
