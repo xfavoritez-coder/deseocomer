@@ -17,12 +17,12 @@ function getInitials(nombre: string): string {
 }
 
 const localesMock = [
-  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 4.8, precio: "$$$",  isOpen: true,  descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" },
-  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 4.9, precio: "$$$$", isOpen: true,  descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600" },
-  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600" },
-  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 4.6, precio: "$$",   isOpen: false, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
-  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 4.5, precio: "$$",   isOpen: false, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600" },
-  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 4.7, precio: "$",    isOpen: true,  descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600" },
+  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 0, precio: "", isOpen: true, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" },
+  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 0, precio: "", isOpen: true, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600" },
+  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 0, precio: "", isOpen: true, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600" },
+  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 0, precio: "", isOpen: true, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
+  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 0, precio: "", isOpen: true, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600" },
+  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 0, precio: "", isOpen: true, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600" },
 ];
 
 export default function LocalesSection() {
@@ -34,9 +34,9 @@ export default function LocalesSection() {
       if (Array.isArray(data) && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setLocales(data.slice(0, 6).map((l: any) => ({
-          id: l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
+          id: l.slug || l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
           barrio: l.comuna ?? "Santiago", emoji: "🍽️",
-          rating: 4.5, precio: "$$", isOpen: true,
+          rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,
           descripcion: l.descripcion ?? "",
           imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
         })));
@@ -74,7 +74,7 @@ export default function LocalesSection() {
             Descubre Dónde Comer
           </h2>
           <p className="section-description">
-            Los mejores locales gastronómicos de Santiago, curados y verificados.
+            Los mejores locales gastronómicos de Santiago.
           </p>
         </div>
 
@@ -147,19 +147,13 @@ export default function LocalesSection() {
                   }}>{local.nombre}</h3>
                 </div>
 
-                {/* Línea 2: pin + barrio / precio */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+                {/* Línea 2: pin + barrio */}
+                <div style={{ marginBottom: "10px" }}>
                   <span style={{
                     fontFamily: "var(--font-lato)",
                     fontSize: "0.8rem",
                     color: "var(--color-link)",
                   }}>📍 {local.barrio}</span>
-                  <span style={{
-                    fontFamily: "var(--font-cinzel)",
-                    fontSize: "0.8rem",
-                    color: "var(--text-muted)",
-                    letterSpacing: "0.05em",
-                  }}>{local.precio}</span>
                 </div>
 
                 {/* Línea 3: descripción */}
@@ -188,32 +182,13 @@ export default function LocalesSection() {
 
                   <span style={{
                     fontFamily: "var(--font-cinzel)",
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: local.isOpen ? "#3db89e" : "#ff6b6b",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}>
-                    <span style={{
-                      width: "6px", height: "6px", borderRadius: "50%",
-                      background: local.isOpen ? "#3db89e" : "#ff6b6b",
-                      display: "inline-block",
-                      flexShrink: 0,
-                    }} />
-                    {local.isOpen ? "Abierto" : "Cerrado"}
-                  </span>
-
-                  <span style={{
-                    fontFamily: "var(--font-cinzel)",
                     fontSize: "0.75rem",
                     color: "var(--accent)",
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
                   }}>
-                    ⭐ {local.rating}
+                    {local.rating > 0 && <>⭐ {local.rating}</>}
                     <span className="dc-loc-arrow">→</span>
                   </span>
                 </div>
