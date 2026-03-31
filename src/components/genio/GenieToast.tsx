@@ -42,8 +42,14 @@ export default function GenieToast() {
 
     // Open Genio panel
     if (opt === "¿Cómo funciona?") {
+      try { localStorage.setItem("genio_concursos_ya_sabe", "1"); } catch {}
       dismissToast();
       window.location.href = "/concursos/como-funciona";
+      return;
+    }
+    if (opt === "Ya lo sé") {
+      try { localStorage.setItem("genio_concursos_ya_sabe", "1"); } catch {}
+      dismissToast();
       return;
     }
     if (opt === "Sí, ayúdame" || opt === "Buscar restaurante" || opt === "Muéstrame") {

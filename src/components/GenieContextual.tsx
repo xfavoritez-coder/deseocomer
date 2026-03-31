@@ -72,6 +72,7 @@ function getMensajeContextual(
   }
 
   if (pathname === "/concursos" || pathname.startsWith("/concursos/")) {
+    try { if (localStorage.getItem("genio_concursos_ya_sabe")) return null; } catch {}
     return {
       texto: "🏆 ¿Sabías que puedes ganar comida gratis invitando amigos?",
       opciones: ["¿Cómo funciona?", "Ya lo sé"],
