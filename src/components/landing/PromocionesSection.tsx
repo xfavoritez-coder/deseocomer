@@ -139,6 +139,13 @@ export default function PromocionesSection() {
         {/* Birthday section */}
         <BirthdayBanner esCumpleHoy={esCumple} />
 
+        {promos.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 20px" }}>
+            <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>⚡</p>
+            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--color-title)", marginBottom: "10px" }}>Próximamente</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2vw, 1rem)", color: "var(--text-muted)", lineHeight: 1.7, maxWidth: "400px", margin: "0 auto" }}>Estamos preparando promociones exclusivas con los mejores locales de Santiago. Muy pronto aquí.</p>
+          </div>
+        ) : (
         <div className="dc-ps-grid">
           {promos.map((promo) => {
             const isActiva     = mounted ? isPromocionActivaAhora(promo) : false;
@@ -395,6 +402,7 @@ export default function PromocionesSection() {
             );
           })}
         </div>
+        )}
 
         {/* Ver todas */}
         <div style={{ textAlign: "center", marginTop: "60px" }}>

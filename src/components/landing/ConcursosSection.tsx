@@ -2,38 +2,8 @@
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
 
-const concursosMock = [
-  {
-    id: 1, local: "Pizza Napoli", premio: "Pizza familiar gratis",
-    participantes: 342, horasRestantes: 18, imagen: "🍕",
-    imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
-    topRanking: [
-      { nombre: "Valentina R.", referidos: 47 },
-      { nombre: "Diego M.",     referidos: 38 },
-      { nombre: "Sofía L.",     referidos: 29 },
-    ],
-  },
-  {
-    id: 2, local: "Sushi Oasis", premio: "Menú omakase para 2",
-    participantes: 218, horasRestantes: 6, imagen: "🍣",
-    imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600",
-    topRanking: [
-      { nombre: "Matías C.",  referidos: 61 },
-      { nombre: "Isidora P.", referidos: 44 },
-      { nombre: "Tomás A.",   referidos: 31 },
-    ],
-  },
-  {
-    id: 3, local: "El Menú de Don Carlos", premio: "Almuerzo semanal gratis",
-    participantes: 589, horasRestantes: 42, imagen: "🍲",
-    imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600",
-    topRanking: [
-      { nombre: "Catalina V.", referidos: 93 },
-      { nombre: "Benjamín S.", referidos: 77 },
-      { nombre: "Antonia F.",  referidos: 65 },
-    ],
-  },
-];
+interface ConcursoHome { id: number; local: string; premio: string; participantes: number; horasRestantes: number; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
   const [concursos, setConcursos] = useState(concursosMock);
@@ -117,6 +87,14 @@ export default function ConcursosSection() {
           </p>
         </div>
 
+        {concursos.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "48px 20px" }}>
+            <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🏆</p>
+            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--color-title)", marginBottom: "10px" }}>Próximamente</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2vw, 1rem)", color: "var(--text-muted)", lineHeight: 1.7, maxWidth: "400px", margin: "0 auto 24px" }}>Estamos preparando concursos increíbles con premios reales. Vuelve pronto para participar.</p>
+            <a href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: "2px" }}>¿Cómo funcionan los concursos? →</a>
+          </div>
+        ) : (
         <div className="dc-cst-grid">
           {concursos.map((c) => (
             <a key={c.id}
@@ -247,6 +225,7 @@ export default function ConcursosSection() {
             </a>
           ))}
         </div>
+        )}
 
         <div style={{ textAlign: "center", marginTop: "60px" }}>
           <a href="/concursos" style={{
