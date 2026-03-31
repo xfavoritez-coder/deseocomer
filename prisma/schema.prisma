@@ -52,6 +52,7 @@ model Local {
   logoUrl       String?
   portadaUrl    String?
   galeria       Json?
+  tags          String[] @default([])
   tieneMenu     Boolean  @default(false)
   verificado    Boolean  @default(false)
   activo        Boolean  @default(true)

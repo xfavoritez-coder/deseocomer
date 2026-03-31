@@ -51,6 +51,7 @@ export default function MiLocalPage() {
                 portadaUrl: data.portadaUrl ?? local.portadaUrl,
                 galeria: data.galeria ?? local.galeria,
                 horarios: data.horarios ?? local.horarios,
+                tags: data.tags ?? local.tags ?? [],
                 tieneMenu: data.tieneMenu ?? local.tieneMenu,
               };
               setD(merged);
@@ -89,7 +90,8 @@ export default function MiLocalPage() {
             nombre: d.nombre, categoria: d.categoria, descripcion: d.descripcion,
             historia: d.historia, telefono: d.telefono, instagram: d.instagram,
             direccion: d.direccion, comuna: d.comuna, horarios: d.horarios,
-            logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria, tieneMenu: d.tieneMenu,
+            logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria,
+            tags: d.tags ?? [], tieneMenu: d.tieneMenu,
           }),
         });
         if (!res.ok) console.warn("[Panel] Error al guardar en BD");
@@ -120,6 +122,22 @@ export default function MiLocalPage() {
             <option value="">Selecciona...</option>
             {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
+        </div>
+        <div>
+          <label style={L}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 4)</span></label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "Japonés", "Italiano", "Sin gluten", "Café", "Postres", "Desayuno", "Brunch", "Delivery", "Para llevar", "Reservas"].map(tag => {
+              const tags = (d.tags as string[]) ?? [];
+              const selected = tags.includes(tag);
+              const maxed = tags.length >= 4 && !selected;
+              return (
+                <button key={tag} type="button" disabled={maxed} onClick={() => { const cur = (d.tags as string[]) ?? []; set("tags", selected ? cur.filter(t => t !== tag) : [...cur, tag]); }} style={{ padding: "6px 14px", borderRadius: "20px", border: selected ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: selected ? "rgba(232,168,76,0.15)" : "transparent", color: selected ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: maxed ? "default" : "pointer" }}>
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
+          {((d.tags as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.tags as string[]) ?? []).length}/4 etiquetas</p>}
         </div>
         <div>
           <label style={L}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label>

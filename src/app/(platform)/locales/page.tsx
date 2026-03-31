@@ -79,10 +79,11 @@ export default function LocalesPage() {
     .filter(l => {
       if (busqueda) {
         const q = busqueda.toLowerCase();
-        if (!l.nombre?.toLowerCase().includes(q) && !l.comuna?.toLowerCase().includes(q) && !l.categoria?.toLowerCase().includes(q)) return false;
+        if (!l.nombre?.toLowerCase().includes(q) && !l.comuna?.toLowerCase().includes(q) && !l.categoria?.toLowerCase().includes(q) && !(l.tags && l.tags.some((t: string) => t.toLowerCase().includes(q)))) return false;
       }
       if (categoriaActiva !== "Todos") {
-        if (l.categoria?.toLowerCase() !== categoriaActiva.toLowerCase()) return false;
+        const catMatch = l.categoria?.toLowerCase() === categoriaActiva.toLowerCase() || (l.tags && l.tags.some((t: string) => t.toLowerCase() === categoriaActiva.toLowerCase()));
+        if (!catMatch) return false;
       }
       if (soloAbiertos && l.horarios) {
         const ahora = new Date();

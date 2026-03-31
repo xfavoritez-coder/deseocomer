@@ -11,7 +11,7 @@ export async function GET() {
         id: true, slug: true, nombre: true, categoria: true,
         descripcion: true, comuna: true, logoUrl: true,
         portadaUrl: true, verificado: true, horarios: true,
-        createdAt: true,
+        tags: true, createdAt: true,
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
       },
     });

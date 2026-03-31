@@ -227,6 +227,15 @@ export default function LocalDetailPage() {
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
                     <p style={bodyStyle}>{local.descripcion}</p>
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {(local as any).tags?.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {(local as any).tags.map((tag: string) => (
+                          <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Concursos activos */}
