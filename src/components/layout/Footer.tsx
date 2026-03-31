@@ -32,9 +32,10 @@ export default function Footer() {
             {
               titulo: "Plataforma",
               links: [
-                { label: "Concursos",   href: "/concursos"   },
-                { label: "Promociones", href: "/promociones" },
-                { label: "Locales",     href: "/locales"     },
+                { label: "Concursos",        href: "/concursos"   },
+                { label: "¿Cómo funcionan?", href: "/concursos/como-funciona" },
+                { label: "Promociones",      href: "/promociones" },
+                { label: "Locales",          href: "/locales"     },
               ],
             },
             {
