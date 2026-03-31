@@ -4,28 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 function EyeIcon({ open }: { open: boolean }) {
-  return open ? (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
-    </svg>
-  ) : (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-      <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  );
+  return open ? (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,208,128,0.45)" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+  ) : (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,208,128,0.45)" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>);
 }
 
-const labelStyle: React.CSSProperties = {
-  fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.2em",
-  textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "8px", display: "block",
-};
-const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "14px 16px", background: "#1a1008",
-  border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px",
-  color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem",
-  outline: "none", boxSizing: "border-box",
-};
+const CIUDADES: Record<string, string> = { santiago: "Santiago", valparaiso: "Valparaíso", concepcion: "Concepción", antofagasta: "Antofagasta", la_serena: "La Serena", temuco: "Temuco", rancagua: "Rancagua", talca: "Talca", iquique: "Iquique", puerto_montt: "Puerto Montt", otra: "Otra ciudad" };
 
 export default function RegistroLocalPage() {
   const router = useRouter();
@@ -33,167 +16,88 @@ export default function RegistroLocalPage() {
   const [otraCiudad, setOtraCiudad] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistSaved, setWaitlistSaved] = useState(false);
-
-  const CIUDADES: Record<string, string> = { santiago: "Santiago", valparaiso: "Valparaíso", concepcion: "Concepción", antofagasta: "Antofagasta", la_serena: "La Serena", temuco: "Temuco", rancagua: "Rancagua", talca: "Talca", iquique: "Iquique", puerto_montt: "Puerto Montt", otra: "Otra ciudad" };
-  const ciudadLabel = form.ciudad === "otra" ? (otraCiudad || "tu ciudad") : (CIUDADES[form.ciudad] ?? form.ciudad);
-  const noEsSantiago = form.ciudad !== "santiago";
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
+  const ciudadLabel = form.ciudad === "otra" ? (otraCiudad || "tu ciudad") : (CIUDADES[form.ciudad] ?? form.ciudad);
+  const noEsSantiago = form.ciudad !== "santiago";
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    if (!form.nombreLocal.trim()) return setError("El nombre del local es obligatorio.");
-    if (!form.nombreDueno.trim()) return setError("El nombre del dueño es obligatorio.");
-    if (!form.email.trim() || !form.email.includes("@")) return setError("Ingresa un email válido.");
-    if (form.password.length < 8) return setError("La contraseña debe tener al menos 8 caracteres.");
-    if (!form.celular.trim()) return setError("El celular es obligatorio.");
-
+    e.preventDefault(); setError("");
+    if (!form.nombreLocal.trim()) return setError("Nombre del local obligatorio.");
+    if (!form.nombreDueno.trim()) return setError("Nombre del dueño obligatorio.");
+    if (!form.email.trim() || !form.email.includes("@")) return setError("Email inválido.");
+    if (form.password.length < 8) return setError("Mínimo 8 caracteres.");
+    if (!form.celular.trim()) return setError("Celular obligatorio.");
     setLoading(true);
-
     try {
-      const res = await fetch("/api/locales", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: form.nombreLocal.trim(), nombreDueno: form.nombreDueno.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.celular.trim(), ciudad: form.ciudad }),
-      });
+      const res = await fetch("/api/locales", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: form.nombreLocal.trim(), nombreDueno: form.nombreDueno.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.celular.trim(), ciudad: form.ciudad }) });
       const data = await res.json();
-
       if (!res.ok) { setLoading(false); return setError(data.error || "Error al registrarse"); }
-
       const sessionObj = { id: data.id, nombre: data.nombre, email: data.email, tipo: "local", ciudad: data.ciudad, loggedIn: true };
       localStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
       sessionStorage.setItem("deseocomer_local_session", JSON.stringify(sessionObj));
     } catch { setLoading(false); return setError("Error de conexión"); }
-
     setLoading(false);
     router.push("/panel?bienvenido=1");
   };
 
   return (
-    <main style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 20px" }}>
-      <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)", textDecoration: "none", marginBottom: "4px" }}>
-        🏮 DeseoComer
-      </Link>
-      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "32px" }}>
-        Para locales y restaurantes
-      </p>
+    <main style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textDecoration: "none", marginBottom: "24px", alignSelf: "center", maxWidth: "400px", width: "100%" }}>← Volver al inicio</Link>
+      <div style={cardS}>
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", color: "var(--oasis-bright)", textTransform: "uppercase", marginTop: "4px" }}>Para locales y restaurantes</p>
+        </div>
 
-      <div style={{ width: "100%", maxWidth: "480px", background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "40px" }}>
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", marginBottom: "28px" }}>Gratis. Sin contratos. En 2 minutos.</p>
+        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
 
-        {error && (
-          <div style={{ background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "10px", padding: "10px 14px", marginBottom: "16px" }}>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff8080" }}>⚠️ {error}</p>
-          </div>
-        )}
+        {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-          <div>
-            <label style={labelStyle}>Nombre del local</label>
-            <input style={inputStyle} type="text" placeholder="Ej: Pizza Napoli" value={form.nombreLocal} onChange={e => set("nombreLocal", e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Nombre del dueño o encargado</label>
-            <input style={inputStyle} type="text" placeholder="Tu nombre completo" value={form.nombreDueno} onChange={e => set("nombreDueno", e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Email</label>
-            <input style={inputStyle} type="email" placeholder="hola@tulocal.cl" value={form.email} onChange={e => set("email", e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Celular del dueño</label>
-            <input style={inputStyle} type="tel" placeholder="+56 9 1234 5678" value={form.celular} onChange={e => set("celular", e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Contraseña</label>
-            <div style={{ position: "relative" }}>
-              <input style={{ ...inputStyle, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} />
-              <button type="button" onClick={() => setShowPw(s => !s)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "4px", display: "flex" }}>
-                <EyeIcon open={showPw} />
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label style={labelStyle}>Ciudad</label>
-            <select style={inputStyle} value={form.ciudad} onChange={e => { set("ciudad", e.target.value); setWaitlistSaved(false); }}>
-              <option value="santiago">Santiago</option>
-              <option value="valparaiso">Valparaíso</option>
-              <option value="concepcion">Concepción</option>
-              <option value="antofagasta">Antofagasta</option>
-              <option value="la_serena">La Serena</option>
-              <option value="temuco">Temuco</option>
-              <option value="rancagua">Rancagua</option>
-              <option value="talca">Talca</option>
-              <option value="iquique">Iquique</option>
-              <option value="puerto_montt">Puerto Montt</option>
-              <option value="otra">Otra ciudad</option>
-            </select>
-          </div>
-
-          {form.ciudad === "otra" && (
-            <div>
-              <label style={labelStyle}>¿Cuál es tu ciudad?</label>
-              <input style={inputStyle} value={otraCiudad} onChange={e => setOtraCiudad(e.target.value)} placeholder="Escribe tu ciudad..." />
-            </div>
-          )}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div><label style={labelS}>Nombre del local</label><input style={inputS} type="text" placeholder="Ej: Pizza Napoli" value={form.nombreLocal} onChange={e => set("nombreLocal", e.target.value)} onFocus={fi} onBlur={fo} /></div>
+          <div><label style={labelS}>Nombre del dueño</label><input style={inputS} type="text" placeholder="Tu nombre completo" value={form.nombreDueno} onChange={e => set("nombreDueno", e.target.value)} onFocus={fi} onBlur={fo} /></div>
+          <div><label style={labelS}>Email de contacto</label><input style={inputS} type="email" placeholder="hola@tulocal.cl" value={form.email} onChange={e => set("email", e.target.value)} onFocus={fi} onBlur={fo} /></div>
+          <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><EyeIcon open={showPw} /></button></div></div>
+          <div><label style={labelS}>Teléfono</label><input style={inputS} type="tel" placeholder="+56 9 1234 5678" value={form.celular} onChange={e => set("celular", e.target.value)} onFocus={fi} onBlur={fo} /></div>
+          <div><label style={labelS}>Ciudad</label><select style={{ ...inputS, background: "var(--bg-primary)", cursor: "pointer" }} value={form.ciudad} onChange={e => { set("ciudad", e.target.value); setWaitlistSaved(false); }}>
+            {Object.entries(CIUDADES).map(([k, v]) => <option key={k} value={k} style={{ background: "#0a0812", color: "#f0ead6" }}>{v}</option>)}
+          </select></div>
+          {form.ciudad === "otra" && <div><label style={labelS}>¿Cuál ciudad?</label><input style={inputS} value={otraCiudad} onChange={e => setOtraCiudad(e.target.value)} placeholder="Tu ciudad..." onFocus={fi} onBlur={fo} /></div>}
 
           {noEsSantiago ? (
-            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "20px", textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no estamos en {ciudadLabel} 🌎</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "14px" }}>
-                Por ahora solo operamos en Santiago, pero estamos creciendo. Déjanos tu email y te avisamos cuando lleguemos a {ciudadLabel}.
-              </p>
+            <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "12px", padding: "18px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no estamos en {ciudadLabel}</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px" }}>Déjanos tu email y te avisamos cuando lleguemos.</p>
               {waitlistSaved ? (
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>✓ Te avisaremos cuando lleguemos a {ciudadLabel}. ¡Gracias!</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--oasis-bright)" }}>✓ ¡Te avisaremos!</p>
               ) : (
                 <div style={{ display: "flex", gap: "8px" }}>
-                  <input style={{ ...inputStyle, flex: 1 }} type="email" placeholder="tu@email.com" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} />
-                  <button type="button" onClick={async () => {
-                    if (!waitlistEmail.includes("@")) return;
-                    try { await fetch("/api/lista-espera", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: waitlistEmail.trim(), ciudad: ciudadLabel }) }); } catch {}
-                    setWaitlistSaved(true);
-                  }} style={{ ...inputStyle, width: "auto", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", whiteSpace: "nowrap" }}>
-                    Avisarme →
-                  </button>
+                  <input style={{ ...inputS, flex: 1 }} type="email" placeholder="tu@email.com" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} onFocus={fi} onBlur={fo} />
+                  <button type="button" onClick={async () => { if (!waitlistEmail.includes("@")) return; try { await fetch("/api/lista-espera", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: waitlistEmail.trim(), ciudad: ciudadLabel }) }); } catch {} setWaitlistSaved(true); }} style={{ ...btnS, width: "auto", padding: "10px 16px", fontSize: "0.72rem", marginTop: 0 }}>Avisarme →</button>
                 </div>
               )}
             </div>
           ) : (
-            <button type="submit" disabled={loading} style={{
-              width: "100%", padding: "16px", background: "var(--accent)", color: "var(--bg-primary)",
-              fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700,
-              border: "none", borderRadius: "12px", cursor: loading ? "wait" : "pointer",
-              opacity: loading ? 0.7 : 1, marginTop: "4px",
-            }}>
-              {loading ? "Creando cuenta..." : "Crear cuenta gratis →"}
-            </button>
+            <button type="submit" disabled={loading} style={btnS}>{loading ? "Creando..." : "Registrar mi local →"}</button>
           )}
         </form>
 
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", marginTop: "16px" }}>
-          ✓ Gratis durante el lanzamiento · ✓ Sin contratos
-        </p>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "24px 0 16px" }}>
-          <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.15)" }} />
-          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>¿Ya tienes cuenta?</span>
-          <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.15)" }} />
-        </div>
-
-        <Link href="/login-local" style={{ display: "block", textAlign: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--oasis-bright)", textDecoration: "none" }}>
-          Iniciar sesión →
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.2)" }}>¿Solo quieres comer?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
+        <Link href="/registro" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>Crear cuenta de usuario →</Link>
       </div>
-
-      <Link href="/registro" style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", textDecoration: "none", marginTop: "24px" }}>
-        ¿Eres usuario? Regístrate aquí
-      </Link>
     </main>
   );
 }
+
+const cardS: React.CSSProperties = { width: "100%", maxWidth: "400px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.15)", borderRadius: "20px", padding: "clamp(28px, 5vw, 40px) clamp(20px, 5vw, 32px)" };
+const labelS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "6px", display: "block" };
+const inputS: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
+const btnS: React.CSSProperties = { width: "100%", padding: "14px", background: "var(--accent)", border: "none", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", marginTop: "8px" };
+const eyeS: React.CSSProperties = { position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" };
+const fi = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "var(--accent)"; };
+const fo = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "rgba(232,168,76,0.15)"; };

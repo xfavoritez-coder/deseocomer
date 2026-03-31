@@ -44,99 +44,67 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", maxWidth: "420px" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px", opacity: 0.7, alignSelf: "flex-start" }}>← Volver al inicio</a>
-      <div style={{ width: "100%", background: "rgba(45,26,8,0.9)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "24px", padding: "40px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+    <main style={{ background: "var(--bg-primary)", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+      <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textDecoration: "none", marginBottom: "24px", alignSelf: "center", maxWidth: "400px", width: "100%" }}>← Volver al inicio</Link>
 
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+      <div style={cardS}>
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
-          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)" }}>DeseoComer</p>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p>
         </div>
 
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.6rem, 5vw, 2rem)", color: "var(--color-title, var(--accent))", marginBottom: "8px" }}>Entrar</h1>
-        <div style={{ marginBottom: "32px" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", margin: "0 0 6px" }}>¿No tienes cuenta?</p>
-          <Link href="/registro" style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Regístrate gratis →</Link>
-        </div>
+        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Bienvenido de vuelta</h1>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "28px" }}>¿No tienes cuenta? <Link href="/registro" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Regístrate gratis →</Link></p>
 
         {error && (
-          <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "8px", padding: "12px", marginBottom: "16px" }}>
+          <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b", marginBottom: emailNoVerificado ? "10px" : 0 }}>⚠️ {error}</p>
             {emailNoVerificado && !reenvioSent && (
-              <button onClick={async () => { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase() }) }).catch(() => {}); setReenvioSent(true); }} style={{ background: "none", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "8px", padding: "8px 14px", color: "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", cursor: "pointer", width: "100%" }}>
-                Reenviar email de verificación
-              </button>
+              <button onClick={async () => { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email.trim().toLowerCase() }) }).catch(() => {}); setReenvioSent(true); }} style={{ background: "none", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "8px", padding: "8px 14px", color: "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", cursor: "pointer", width: "100%" }}>Reenviar email de verificación</button>
             )}
             {reenvioSent && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#3db89e", marginTop: "6px" }}>✓ Email reenviado. Revisa tu bandeja.</p>}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div>
-            <label style={labelS}>Email</label>
-            <input style={inputS} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
-          </div>
-          <div>
-            <label style={labelS}>Contraseña</label>
-            <div style={{ position: "relative" }}>
-              <input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Tu contraseña" value={password} onChange={e => setPassword(e.target.value)} />
-              <button type="button" onClick={() => setShowPw(s => !s)} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "1rem" }}>
-                <OjoIcon visible={showPw} />
-              </button>
-            </div>
-          </div>
-
-          <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
-            <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} />
-            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>Recordarme</span>
-          </label>
-
-          <button type="submit" disabled={loading} style={btnS}>
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div><label style={labelS}>Email</label><input style={inputS} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} onFocus={focusIn} onBlur={focusOut} /></div>
+          <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Tu contraseña" value={password} onChange={e => setPassword(e.target.value)} onFocus={focusIn} onBlur={focusOut} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><OjoIcon visible={showPw} /></button></div></div>
+          <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>Recordarme</span></label>
+          <button type="submit" disabled={loading} style={btnS}>{loading ? "Entrando..." : "Entrar →"}</button>
         </form>
 
-        <button onClick={() => setShowReset(true)} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "16px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>
-          ¿Olvidaste tu contraseña?
-        </button>
+        <button onClick={() => setShowReset(true)} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "14px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>¿Olvidaste tu contraseña?</button>
 
         {showReset && (
-          <div style={{ marginTop: "20px", padding: "20px", background: "rgba(0,0,0,0.3)", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.15)" }}>
+          <div style={{ marginTop: "16px", padding: "16px", background: "rgba(0,0,0,0.2)", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.1)" }}>
             {resetSent ? (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)", textAlign: "center" }}>✓ Si tu email está registrado, recibirás un link en minutos.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)", textAlign: "center" }}>✓ Si tu email está registrado, recibirás un link.</p>
             ) : (
               <>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", marginBottom: "10px", letterSpacing: "0.1em" }}>Recuperar contraseña</p>
-                <input style={inputS} type="email" placeholder="tu@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} />
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "10px" }}>Recuperar contraseña</p>
+                <input style={inputS} type="email" placeholder="tu@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} onFocus={focusIn} onBlur={focusOut} />
                 <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
-                  <button onClick={async () => {
-                    if (!resetEmail.includes("@")) return;
-                    setResetLoading(true);
-                    await fetch("/api/emails/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: resetEmail.trim().toLowerCase() }) }).catch(() => {});
-                    setResetLoading(false);
-                    setResetSent(true);
-                  }} disabled={resetLoading} style={{ ...btnS, flex: 1, fontSize: "0.8rem", padding: "10px" }}>{resetLoading ? "Enviando..." : "Enviar link"}</button>
-                  <button onClick={() => { setShowReset(false); setResetSent(false); }} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem" }}>Cancelar</button>
+                  <button onClick={async () => { if (!resetEmail.includes("@")) return; setResetLoading(true); await fetch("/api/emails/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: resetEmail.trim().toLowerCase() }) }).catch(() => {}); setResetLoading(false); setResetSent(true); }} disabled={resetLoading} style={{ ...btnS, flex: 1, fontSize: "0.8rem", padding: "10px" }}>{resetLoading ? "Enviando..." : "Enviar link"}</button>
+                  <button onClick={() => { setShowReset(false); setResetSent(false); }} style={{ background: "none", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem" }}>Cancelar</button>
                 </div>
               </>
             )}
           </div>
         )}
-        {/* Separador */}
-        <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.06)", margin: "16px 0" }} />
 
-        {/* Link para locales */}
-        <Link href="/login-local" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textDecoration: "none" }}>
-          🏪 ¿Eres un local asociado? Entra aquí →
-        </Link>
-      </div>
+        {/* Separator */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.2)" }}>¿Eres un local?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
+
+        <Link href="/login-local" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>🏪 Acceso para locales asociados →</Link>
       </div>
     </main>
   );
 }
 
-const labelS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "8px", display: "block" };
-const inputS: React.CSSProperties = { width: "100%", padding: "14px 16px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" };
-const btnS: React.CSSProperties = { width: "100%", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontWeight: 700, fontSize: "1rem", letterSpacing: "0.1em", padding: "16px", borderRadius: "12px", border: "none", cursor: "pointer" };
+const cardS: React.CSSProperties = { width: "100%", maxWidth: "400px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.15)", borderRadius: "20px", padding: "clamp(28px, 5vw, 40px) clamp(20px, 5vw, 32px)" };
+const labelS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "6px", display: "block" };
+const inputS: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
+const btnS: React.CSSProperties = { width: "100%", padding: "14px", background: "var(--accent)", border: "none", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", marginTop: "8px", transition: "opacity 0.2s" };
+const eyeS: React.CSSProperties = { position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "1rem" };
+const focusIn = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "var(--accent)"; };
+const focusOut = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "rgba(232,168,76,0.15)"; };
