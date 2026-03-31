@@ -239,13 +239,13 @@ export default function LocalesPage() {
                       {/* Badges top-left */}
                       <div style={{ position: "absolute", top: "10px", left: "10px", display: "flex", flexDirection: "column", gap: "6px", zIndex: 2 }}>
                         {hasConcurso && (
-                          <span style={{ background: "rgba(13,7,3,0.85)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "4px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.1em", color: "var(--accent)", backdropFilter: "blur(4px)", whiteSpace: "nowrap" }}>
-                            🏆 Concurso activo
+                          <span style={{ background: "rgba(13,7,3,0.85)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.05em", color: "var(--accent)", backdropFilter: "blur(4px)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "0.85rem" }}>🏆</span> Concurso activo
                           </span>
                         )}
                         {hasPromo && (
-                          <span style={{ background: "rgba(13,7,3,0.85)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "20px", padding: "4px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.1em", color: "var(--oasis-bright)", backdropFilter: "blur(4px)", whiteSpace: "nowrap" }}>
-                            ⚡ Oferta hoy
+                          <span style={{ background: "rgba(13,7,3,0.85)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "20px", padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.05em", color: "var(--oasis-bright)", backdropFilter: "blur(4px)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>
+                            <span style={{ fontSize: "0.85rem" }}>⚡</span> Oferta hoy
                           </span>
                         )}
                       </div>
@@ -254,13 +254,6 @@ export default function LocalesPage() {
                       <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
                         <BotonFavorito localId={local.id} localData={{ categoria: local.categoria, comuna: local.comuna }} size="sm" />
                       </div>
-
-                      {/* Verificado badge bottom-left */}
-                      {local.verificado && (
-                        <span style={{ position: "absolute", bottom: "10px", left: "10px", background: "rgba(13,7,3,0.85)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: "20px", padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.12em", color: "#f5d080", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", gap: "4px" }}>
-                          ✓ Verificado
-                        </span>
-                      )}
                     </div>
 
                     {/* Content */}
@@ -270,39 +263,39 @@ export default function LocalesPage() {
                         {local.logoUrl ? (
                           <img src={local.logoUrl} alt="" style={{ width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
                         ) : (
-                          <div style={{ width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0, background: `hsl(${hue}, 35%, 22%)`, border: `1px solid hsl(${hue}, 40%, 38%)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.8rem", color: `hsl(${hue}, 60%, 70%)` }}>
+                          <div style={{ width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0, background: `hsl(${hue}, 35%, 22%)`, border: `1px solid hsl(${hue}, 40%, 38%)`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: `hsl(${hue}, 60%, 70%)` }}>
                             {getInitials(local.nombre)}
                           </div>
                         )}
                         <div style={{ minWidth: 0 }}>
-                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.95rem", color: "#f5d080", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.15rem", fontWeight: 700, color: "#f5d080", display: "flex", alignItems: "center", gap: "6px" }}>
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{local.nombre}</span>
-                            {local.verificado && <span style={{ fontSize: "0.65rem", color: "#e8a84c" }}>✓</span>}
+                            {local.verificado && <span style={{ fontSize: "0.7rem", color: "#e8a84c" }}>✓</span>}
                           </p>
                         </div>
                       </div>
 
                       {/* Row 2: Location + Price */}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--oasis-bright, rgba(95,240,208,0.8))" }}>
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--oasis-bright, rgba(95,240,208,0.8))" }}>
                           📍 {local.comuna}
                         </span>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
                           {local.precio}
                         </span>
                       </div>
 
                       {/* Row 3: Description (2 lines) */}
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.55, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                         {local.descripcion}
                       </p>
 
                       {/* Row 4: Footer */}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", background: "rgba(0,0,0,0.2)", padding: "4px 10px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.12)" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", background: "rgba(0,0,0,0.2)", padding: "5px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.12)" }}>
                           {local.categoria}
                         </span>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>
                           ⭐ {local.rating}
                         </span>
                       </div>
