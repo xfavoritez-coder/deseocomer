@@ -18,6 +18,19 @@ interface MenuCat { nombre: string; items: MenuItem[] }
 function load(): Record<string, unknown> { try { return JSON.parse(localStorage.getItem(DATA_KEY) ?? "{}"); } catch { return {}; } }
 function save(d: Record<string, unknown>) { localStorage.setItem(DATA_KEY, JSON.stringify(d)); }
 
+function formatearDireccion(displayName: string): string {
+  const partes = displayName.split(",");
+  if (partes.length < 2) return displayName;
+  const calle = partes[0]?.trim() ?? "";
+  const numero = partes[1]?.trim() ?? "";
+  const sector = partes[2]?.trim() ?? "";
+  const calleFormateada = calle.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+  if (numero && !isNaN(Number(numero))) {
+    return sector ? `${calleFormateada} ${numero}, ${sector}` : `${calleFormateada} ${numero}`;
+  }
+  return `${calleFormateada}, ${numero}`;
+}
+
 const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 
@@ -27,8 +40,11 @@ export default function MiLocalPage() {
   const [passActual, setPassActual] = useState("");
   const [passNueva, setPassNueva] = useState("");
   const [passConfirm, setPassConfirm] = useState("");
+  const [buscandoDireccion, setBuscandoDireccion] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [sugerencias, setSugerencias] = useState<any[]>([]);
 
-  const showToast = (msg: string, tipo: "ok" | "error" = "ok") => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 3500); };
+  const showToast = (msg: string, tipo: "ok" | "error" = "ok") => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 4000); };
 
   useEffect(() => {
     const local = load(); setD(local);
@@ -57,12 +73,56 @@ export default function MiLocalPage() {
     save(d);
     try {
       const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      if (session.id) {
-        const res = await fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: d.nombre, categoria: d.categoria, descripcion: d.descripcion, historia: d.historia, telefono: d.telefono, instagram: d.instagram, direccion: d.direccion, comuna: d.comuna, horarios: d.horarios, logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria, tags: d.tags ?? [], tieneMenu: d.tieneMenu, lat: d.lat, lng: d.lng }) });
-        if (res.ok) showToast("✓ Cambios guardados correctamente");
-        else showToast("Error al guardar", "error");
+      if (!session.id) { showToast("No hay sesión activa", "error"); return; }
+
+      // Capitalizar dirección
+      const preposiciones = ["de", "del", "la", "el", "los", "las", "y", "a", "en"];
+      const direccionFormateada = (d.direccion as string ?? "").split(" ").map((w: string) => {
+        if (preposiciones.includes(w.toLowerCase())) return w.toLowerCase();
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      }).join(" ");
+      set("direccion", direccionFormateada);
+
+      const res = await fetch(`/api/locales/${session.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: d.nombre,
+          categoria: d.categoria,
+          descripcion: d.descripcion,
+          historia: d.historia,
+          telefono: d.telefono,
+          instagram: d.instagram,
+          direccion: direccionFormateada,
+          comuna: d.comuna,
+          ciudad: d.ciudad,
+          horarios: d.horarios,
+          logoUrl: d.logoUrl,
+          portadaUrl: d.portadaUrl,
+          galeria: d.galeria,
+          tags: d.tags ?? [],
+          tieneMenu: d.tieneMenu,
+          lat: d.lat,
+          lng: d.lng,
+        }),
+      });
+
+      if (res.ok) {
+        const updated = await fetch(`/api/locales/${session.id}`).then(r => r.json()).catch(() => null);
+        if (updated) {
+          const merged = { ...d, logoUrl: updated.logoUrl ?? d.logoUrl, portadaUrl: updated.portadaUrl ?? d.portadaUrl, galeria: updated.galeria ?? d.galeria, horarios: updated.horarios ?? d.horarios, direccion: direccionFormateada };
+          setD(merged);
+          save(merged);
+        }
+        showToast("✓ Cambios guardados correctamente");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast(err.error ?? "Error al guardar. Intenta de nuevo.", "error");
       }
-    } catch { showToast("Error de conexión", "error"); }
+    } catch (err) {
+      console.error("[handleSave] Error:", err);
+      showToast("Error de conexión. Intenta de nuevo.", "error");
+    }
   };
 
   const handleCambiarPass = async () => {
@@ -78,8 +138,9 @@ export default function MiLocalPage() {
   return (
     <div style={{ maxWidth: "680px" }}>
       {toast && (
-        <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.tipo === "ok" ? "rgba(13,7,3,0.97)" : "rgba(30,5,5,0.97)", border: `1px solid ${toast.tipo === "ok" ? "rgba(61,184,158,0.5)" : "rgba(255,80,80,0.4)"}`, borderRadius: "30px", padding: "12px 24px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: toast.tipo === "ok" ? "#3db89e" : "#ff6b6b" }}>{toast.msg}</span>
+        <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.tipo === "ok" ? "rgba(13,40,35,0.98)" : "rgba(40,10,10,0.98)", border: `1px solid ${toast.tipo === "ok" ? "rgba(61,184,158,0.5)" : "rgba(255,80,80,0.4)"}`, borderRadius: "30px", padding: "14px 28px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", whiteSpace: "nowrap", animation: "dc-slideUp 0.3s ease" }}>
+          <span style={{ fontSize: "1.1rem" }}>{toast.tipo === "ok" ? "✓" : "⚠️"}</span>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.05em", color: toast.tipo === "ok" ? "#3db89e" : "#ff6b6b" }}>{toast.msg}</span>
         </div>
       )}
 
@@ -121,11 +182,81 @@ export default function MiLocalPage() {
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <div><label style={LS}>Ciudad</label><select style={IS as React.CSSProperties} value={d.ciudad as string ?? ""} onChange={e => set("ciudad", e.target.value)}><option value="">Selecciona ciudad...</option><option value="Santiago">Santiago</option><option value="Valparaíso">Valparaíso</option><option value="Concepción">Concepción</option><option value="La Serena">La Serena</option><option value="Antofagasta">Antofagasta</option><option value="Temuco">Temuco</option><option value="Otra">Otra</option></select></div>
         {(d.ciudad as string) === "Santiago" && <div><label style={LS}>Comuna</label><select style={IS as React.CSSProperties} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)}><option value="">Selecciona...</option>{COMUNAS_SANTIAGO.map(c => <option key={c} value={c}>{c}</option>)}</select></div>}
-        <div>
-          <Field label="Dirección" value={d.direccion as string ?? ""} onChange={v => set("direccion", v)} placeholder="Av. Providencia 1234" />
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "6px", marginBottom: "12px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
-          <MapaUbicacion lat={d.lat as number || -33.4489} lng={d.lng as number || -70.6693} onChange={(lat, lng) => { set("lat", lat); set("lng", lng); }} />
+
+        {/* Dirección con autocomplete */}
+        <div style={{ position: "relative" }}>
+          <label style={LS}>Dirección</label>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              style={{ ...IS, flex: 1 }}
+              value={d.direccion as string ?? ""}
+              onChange={async e => {
+                const val = e.target.value;
+                set("direccion", val);
+                if (val.length > 3) {
+                  try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val + ", Santiago, Chile")}&format=json&limit=4&addressdetails=1`);
+                    const data = await res.json();
+                    setSugerencias(data);
+                  } catch { /* ignore */ }
+                } else {
+                  setSugerencias([]);
+                }
+              }}
+              placeholder="Av. Providencia 1234"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                const dir = d.direccion as string;
+                if (!dir) return;
+                setBuscandoDireccion(true);
+                try {
+                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dir + ", Santiago, Chile")}&format=json&limit=1`);
+                  const data = await res.json();
+                  if (data[0]) {
+                    set("lat", parseFloat(data[0].lat));
+                    set("lng", parseFloat(data[0].lon));
+                    const formatted = formatearDireccion(data[0].display_name);
+                    set("direccion", formatted);
+                    setSugerencias([]);
+                  }
+                } catch { /* ignore */ }
+                setBuscandoDireccion(false);
+              }}
+              style={{ padding: "10px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.08em", color: "var(--accent)", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}
+            >
+              {buscandoDireccion ? "..." : "🔍 Buscar"}
+            </button>
+          </div>
+
+          {/* Sugerencias dropdown */}
+          {sugerencias.length > 0 && (
+            <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50, background: "#0a0812", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", overflow: "hidden", marginTop: "4px", boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+              {sugerencias.map((s: Record<string, string>, i: number) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    const formatted = formatearDireccion(s.display_name);
+                    set("direccion", formatted);
+                    set("lat", parseFloat(s.lat));
+                    set("lng", parseFloat(s.lon));
+                    setSugerencias([]);
+                  }}
+                  style={{ display: "block", width: "100%", padding: "10px 14px", background: "transparent", border: "none", borderBottom: i < sugerencias.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", textAlign: "left", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", cursor: "pointer" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(232,168,76,0.08)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+                >
+                  {formatearDireccion(s.display_name)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "-6px", marginBottom: "4px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
+        <MapaUbicacion lat={d.lat as number || -33.4489} lng={d.lng as number || -70.6693} onChange={(lat, lng) => { set("lat", lat); set("lng", lng); }} />
       </div>
 
       <SectionTitle>Horarios</SectionTitle>
@@ -176,8 +307,22 @@ export default function MiLocalPage() {
       </div>
 
       <div style={{ padding: "24px 0 40px" }}>
-        <button onClick={handleSave} style={{ width: "100%", maxWidth: "300px", padding: "14px 32px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer" }}>Guardar cambios</button>
+        <button
+          onClick={handleSave}
+          style={{ width: "100%", maxWidth: "300px", padding: "14px 32px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer", transition: "opacity 0.2s" }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+        >
+          Guardar cambios →
+        </button>
       </div>
+
+      <style>{`
+        @keyframes dc-slideUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

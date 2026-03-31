@@ -22,21 +22,40 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) { setError("Solo imágenes"); return; }
-    if (file.size > 5 * 1024 * 1024) { setError("Máximo 5MB"); return; }
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { setError("Solo se permiten imágenes"); return; }
+    if (file.size > 5 * 1024 * 1024) { setError("Máximo 5MB por imagen"); return; }
     setUploading(true);
     setError(null);
     setPreviewUrl(URL.createObjectURL(file));
 
     try {
       if (supabase) {
-        const ext = file.name.split(".").pop();
+        const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
         const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { data, error: upErr } = await supabase.storage.from("locales").upload(filename, file, { upsert: false });
-        if (upErr) throw upErr;
+
+        console.log("[SubirFoto] Subiendo:", filename);
+
+        const { data, error: upErr } = await supabase.storage.from("locales").upload(filename, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type,
+        });
+
+        if (upErr) {
+          console.error("[SubirFoto] Error Supabase:", upErr);
+          throw upErr;
+        }
+
+        console.log("[SubirFoto] Subido OK:", data.path);
+
         const { data: urlData } = supabase.storage.from("locales").getPublicUrl(data.path);
-        setPreviewUrl(urlData.publicUrl);
+
+        console.log("[SubirFoto] URL pública:", urlData.publicUrl);
+
         onUpload(urlData.publicUrl);
+        setPreviewUrl(urlData.publicUrl);
+        setError(null);
       } else {
         // Fallback: use /api/upload
         const formData = new FormData();
@@ -47,8 +66,9 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
         if (data.url) { setPreviewUrl(data.url); onUpload(data.url); }
         else throw new Error("No URL");
       }
-    } catch {
-      setError("Error al subir. Intenta de nuevo.");
+    } catch (err: unknown) {
+      console.error("[SubirFoto] Error:", err);
+      setError((err as { message?: string })?.message ?? "Error al subir. Intenta de nuevo.");
       setPreviewUrl(preview || "");
     } finally {
       setUploading(false);
