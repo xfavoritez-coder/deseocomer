@@ -1,5 +1,10 @@
 "use client";
 import { useState, useRef } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface Props {
   onUpload: (url: string) => void;
@@ -12,29 +17,38 @@ interface Props {
 
 export default function SubirFoto({ onUpload, folder = "general", label = "Subir foto", preview, circular = false, height = "120px" }: Props) {
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState(preview || "");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith("image/")) return;
+    if (!file.type.startsWith("image/")) { setError("Solo imágenes"); return; }
+    if (file.size > 5 * 1024 * 1024) { setError("Máximo 5MB"); return; }
     setUploading(true);
-
-    // Show preview immediately
-    const localPreview = URL.createObjectURL(file);
-    setPreviewUrl(localPreview);
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("folder", folder);
+    setError(null);
+    setPreviewUrl(URL.createObjectURL(file));
 
     try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (data.url) {
-        setPreviewUrl(data.url);
-        onUpload(data.url);
+      if (supabase) {
+        const ext = file.name.split(".").pop();
+        const filename = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { data, error: upErr } = await supabase.storage.from("locales").upload(filename, file, { upsert: false });
+        if (upErr) throw upErr;
+        const { data: urlData } = supabase.storage.from("locales").getPublicUrl(data.path);
+        setPreviewUrl(urlData.publicUrl);
+        onUpload(urlData.publicUrl);
+      } else {
+        // Fallback: use /api/upload
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("folder", folder);
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        if (data.url) { setPreviewUrl(data.url); onUpload(data.url); }
+        else throw new Error("No URL");
       }
     } catch {
+      setError("Error al subir. Intenta de nuevo.");
       setPreviewUrl(preview || "");
     } finally {
       setUploading(false);
@@ -42,37 +56,21 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
   };
 
   return (
-    <div>
-      <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
-
-      {previewUrl ? (
-        <div style={{ position: "relative", display: "inline-block" }}>
-          <img src={previewUrl} alt="" style={{
-            width: circular ? "80px" : "100%", height: circular ? "80px" : height,
-            objectFit: "cover", borderRadius: circular ? "50%" : "10px",
-            border: "1px solid var(--border-color)", display: "block",
-          }} />
-          <button onClick={() => inputRef.current?.click()} disabled={uploading} style={{
-            position: "absolute", bottom: circular ? "-4px" : "8px", right: circular ? "-4px" : "8px",
-            background: "var(--accent)", border: "none", borderRadius: "50%",
-            width: "28px", height: "28px", cursor: "pointer", display: "flex",
-            alignItems: "center", justifyContent: "center", fontSize: "0.7rem", color: "var(--bg-primary)",
-          }}>
-            {uploading ? "..." : "📷"}
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => inputRef.current?.click()} disabled={uploading} style={{
-          width: circular ? "80px" : "100%", height: circular ? "80px" : height,
-          borderRadius: circular ? "50%" : "10px",
-          background: "rgba(45,26,8,0.85)", border: "2px dashed rgba(232,168,76,0.3)",
-          cursor: "pointer", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: "6px",
-          color: "var(--text-muted)", fontFamily: "var(--font-lato)", fontSize: "0.8rem",
-        }}>
-          {uploading ? "Subiendo..." : <><span style={{ fontSize: "1.2rem" }}>📷</span>{label}</>}
-        </button>
-      )}
+    <div style={{ marginBottom: "4px" }}>
+      <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); e.target.value = ""; }} />
+      <div onClick={() => !uploading && inputRef.current?.click()} onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }} style={{ height, borderRadius: circular ? "50%" : "12px", border: "2px dashed rgba(232,168,76,0.25)", background: previewUrl ? "transparent" : "rgba(255,255,255,0.02)", display: "flex", alignItems: "center", justifyContent: "center", cursor: uploading ? "wait" : "pointer", overflow: "hidden", position: "relative", width: circular ? height : "100%" }}>
+        {previewUrl ? (
+          <img src={previewUrl} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        ) : uploading ? (
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)" }}>Subiendo...</span>
+        ) : (
+          <div style={{ textAlign: "center", padding: "12px" }}>
+            <div style={{ fontSize: "1.5rem", marginBottom: "6px" }}>📷</div>
+            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)" }}>{label}</span>
+          </div>
+        )}
+      </div>
+      {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "#ff6b6b", marginTop: "6px" }}>{error}</p>}
     </div>
   );
 }

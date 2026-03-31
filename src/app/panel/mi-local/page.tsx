@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import SubirFoto from "@/components/SubirFoto";
 
+const MapaUbicacion = dynamic(() => import("@/components/panel/MapaUbicacion"), { ssr: false, loading: () => <div style={{ height: "220px", borderRadius: "12px", background: "rgba(45,26,8,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>Cargando mapa...</span></div> });
+
 const DATA_KEY = "deseocomer_panel_local_data";
-const COMUNAS = ["Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura", "Lo Barnechea", "San Miguel", "Maipú", "Bellavista", "Recoleta", "La Florida", "Otra"];
+const COMUNAS_SANTIAGO = ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort();
 const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","Japonés","Italiano","Sin gluten","Café","Postres","Desayuno","Brunch","Delivery","Para llevar","Reservas"];
 
 interface HorarioDia { activo: boolean; abre: string; cierra: string }
 interface MenuItem { nombre: string; descripcion: string; precio: string; destacado: boolean }
@@ -14,97 +18,73 @@ interface MenuCat { nombre: string; items: MenuItem[] }
 function load(): Record<string, unknown> { try { return JSON.parse(localStorage.getItem(DATA_KEY) ?? "{}"); } catch { return {}; } }
 function save(d: Record<string, unknown>) { localStorage.setItem(DATA_KEY, JSON.stringify(d)); }
 
-const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
-const I: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
+const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
+const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 
 export default function MiLocalPage() {
   const [d, setD] = useState<Record<string, unknown>>({});
-  const [saved, setSaved] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "error" } | null>(null);
+  const [passActual, setPassActual] = useState("");
+  const [passNueva, setPassNueva] = useState("");
+  const [passConfirm, setPassConfirm] = useState("");
+
+  const showToast = (msg: string, tipo: "ok" | "error" = "ok") => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 3500); };
 
   useEffect(() => {
-    // Load from localStorage first
-    const local = load();
-    setD(local);
-    // Then fetch from BD and merge
+    const local = load(); setD(local);
     try {
       const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
       if (session.id) {
-        fetch(`/api/locales/${session.id}`)
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (data) {
-              const merged = {
-                ...local,
-                nombre: data.nombre ?? local.nombre,
-                categoria: data.categoria ?? local.categoria,
-                nombreDueno: data.nombreDueno ?? local.nombreDueno,
-                celularDueno: data.celularDueno ?? local.celularDueno,
-                emailDueno: data.email ?? local.emailDueno,
-                descripcion: data.descripcion ?? local.descripcion,
-                historia: data.historia ?? local.historia,
-                telefono: data.telefono ?? local.telefono,
-                instagram: data.instagram ?? local.instagram,
-                direccion: data.direccion ?? local.direccion,
-                comuna: data.comuna ?? local.comuna,
-                ciudad: data.ciudad ?? local.ciudad,
-                logoUrl: data.logoUrl ?? local.logoUrl,
-                portadaUrl: data.portadaUrl ?? local.portadaUrl,
-                galeria: data.galeria ?? local.galeria,
-                horarios: data.horarios ?? local.horarios,
-                tags: data.tags ?? local.tags ?? [],
-                tieneMenu: data.tieneMenu ?? local.tieneMenu,
-              };
-              setD(merged);
-              save(merged);
-            }
-          })
-          .catch(() => {});
+        fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
+          if (data) {
+            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng };
+            setD(merged); save(merged);
+          }
+        }).catch(() => {});
       }
     } catch {}
   }, []);
 
   const set = (k: string, v: unknown) => setD(prev => ({ ...prev, [k]: v }));
-
   const horarios: HorarioDia[] = (d.horarios as HorarioDia[]) ?? DIAS.map(() => ({ activo: true, abre: "12:00", cierra: "22:00" }));
-  const setHorario = (i: number, h: Partial<HorarioDia>) => {
-    const next = [...horarios]; next[i] = { ...next[i], ...h }; set("horarios", next);
-  };
-
+  const setHorario = (i: number, h: Partial<HorarioDia>) => { const next = [...horarios]; next[i] = { ...next[i], ...h }; set("horarios", next); };
   const tieneMenu = d.tieneMenu as boolean | undefined;
   const menuCats: MenuCat[] = (d.menuCategorias as MenuCat[]) ?? [];
   const setMenuCats = (cats: MenuCat[]) => set("menuCategorias", cats);
-
   const galeria: string[] = (d.galeria as string[]) ?? [];
 
   const handleSave = async () => {
-    // Save locally as backup
     save(d);
-    // Save to Supabase
     try {
       const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
       if (session.id) {
-        const res = await fetch(`/api/locales/${session.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nombre: d.nombre, categoria: d.categoria, descripcion: d.descripcion,
-            historia: d.historia, telefono: d.telefono, instagram: d.instagram,
-            direccion: d.direccion, comuna: d.comuna, horarios: d.horarios,
-            logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria,
-            tags: d.tags ?? [], tieneMenu: d.tieneMenu,
-          }),
-        });
-        if (!res.ok) console.warn("[Panel] Error al guardar en BD");
+        const res = await fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: d.nombre, categoria: d.categoria, descripcion: d.descripcion, historia: d.historia, telefono: d.telefono, instagram: d.instagram, direccion: d.direccion, comuna: d.comuna, horarios: d.horarios, logoUrl: d.logoUrl, portadaUrl: d.portadaUrl, galeria: d.galeria, tags: d.tags ?? [], tieneMenu: d.tieneMenu, lat: d.lat, lng: d.lng }) });
+        if (res.ok) showToast("✓ Cambios guardados correctamente");
+        else showToast("Error al guardar", "error");
       }
-    } catch { /* fallback to localStorage */ }
-    setSaved(true); setTimeout(() => setSaved(false), 2500);
+    } catch { showToast("Error de conexión", "error"); }
+  };
+
+  const handleCambiarPass = async () => {
+    if (passNueva !== passConfirm || passNueva.length < 8) return;
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      const res = await fetch("/api/auth/cambiar-password-local", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: session.id, passActual, passNueva }) });
+      if (res.ok) { showToast("✓ Contraseña actualizada"); setPassActual(""); setPassNueva(""); setPassConfirm(""); }
+      else { const err = await res.json(); showToast(err.error ?? "Error", "error"); }
+    } catch { showToast("Error de conexión", "error"); }
   };
 
   return (
     <div style={{ maxWidth: "680px" }}>
+      {toast && (
+        <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 9999, background: toast.tipo === "ok" ? "rgba(13,7,3,0.97)" : "rgba(30,5,5,0.97)", border: `1px solid ${toast.tipo === "ok" ? "rgba(61,184,158,0.5)" : "rgba(255,80,80,0.4)"}`, borderRadius: "30px", padding: "12px 24px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)", whiteSpace: "nowrap" }}>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: toast.tipo === "ok" ? "#3db89e" : "#ff6b6b" }}>{toast.msg}</span>
+        </div>
+      )}
+
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Mi Local</h1>
 
-      {/* Datos del dueño/encargado */}
       <SectionTitle>Datos del dueño o encargado</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <Field label="Nombre del dueño o encargado" value={d.nombreDueno as string ?? ""} onChange={v => set("nombreDueno", v)} placeholder="Tu nombre completo" />
@@ -112,84 +92,60 @@ export default function MiLocalPage() {
         <Field label="Email de acceso" value={d.emailDueno as string ?? ""} onChange={v => set("emailDueno", v)} placeholder="tu@email.com" />
       </div>
 
-      {/* Info básica */}
+      <SectionTitle>Seguridad</SectionTitle>
+      <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
+        <Field label="Contraseña actual" value={passActual} onChange={setPassActual} placeholder="Tu contraseña actual" type="password" />
+        <Field label="Nueva contraseña" value={passNueva} onChange={setPassNueva} placeholder="Mínimo 8 caracteres" type="password" />
+        <Field label="Confirmar nueva contraseña" value={passConfirm} onChange={setPassConfirm} placeholder="Repite la nueva contraseña" type="password" />
+        <button onClick={handleCambiarPass} disabled={!passActual || !passNueva || passNueva !== passConfirm || passNueva.length < 8} style={{ alignSelf: "flex-start", padding: "10px 24px", background: passActual && passNueva && passNueva === passConfirm && passNueva.length >= 8 ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
+        {passNueva && passConfirm && passNueva !== passConfirm && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b" }}>Las contraseñas no coinciden</p>}
+      </div>
+
       <SectionTitle>Información del local</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <Field label="Nombre del local" value={d.nombre as string ?? ""} onChange={v => set("nombre", v)} placeholder="Pizza Napoli" />
+        <div><label style={LS}>Categoría</label><select style={IS as React.CSSProperties} value={d.categoria as string ?? ""} onChange={e => set("categoria", e.target.value)}><option value="">Selecciona...</option>{CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
         <div>
-          <label style={L}>Categoría</label>
-          <select style={I as React.CSSProperties} value={d.categoria as string ?? ""} onChange={e => set("categoria", e.target.value)}>
-            <option value="">Selecciona...</option>
-            {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
-          <label style={L}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 4)</span></label>
+          <label style={LS}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 4)</span></label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "Japonés", "Italiano", "Sin gluten", "Café", "Postres", "Desayuno", "Brunch", "Delivery", "Para llevar", "Reservas"].map(tag => {
-              const tags = (d.tags as string[]) ?? [];
-              const selected = tags.includes(tag);
-              const maxed = tags.length >= 4 && !selected;
-              return (
-                <button key={tag} type="button" disabled={maxed} onClick={() => { const cur = (d.tags as string[]) ?? []; set("tags", selected ? cur.filter(t => t !== tag) : [...cur, tag]); }} style={{ padding: "6px 14px", borderRadius: "20px", border: selected ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: selected ? "rgba(232,168,76,0.15)" : "transparent", color: selected ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: maxed ? "default" : "pointer" }}>
-                  {tag}
-                </button>
-              );
-            })}
+            {TAGS.map(tag => { const tags = (d.tags as string[]) ?? []; const sel = tags.includes(tag); const maxed = tags.length >= 4 && !sel; return <button key={tag} type="button" disabled={maxed} onClick={() => { const cur = (d.tags as string[]) ?? []; set("tags", sel ? cur.filter(t => t !== tag) : [...cur, tag]); }} style={{ padding: "6px 14px", borderRadius: "20px", border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: sel ? "rgba(232,168,76,0.15)" : "transparent", color: sel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: maxed ? "default" : "pointer" }}>{tag}</button>; })}
           </div>
           {((d.tags as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.tags as string[]) ?? []).length}/4 etiquetas</p>}
         </div>
-        <div>
-          <label style={L}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label>
-          <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." />
-        </div>
-        <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789 (fijo o celular del local)" />
+        <div><label style={LS}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label><textarea style={{ ...IS, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." /></div>
+        <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789" />
         <Field label="Instagram" value={d.instagram as string ?? ""} onChange={v => set("instagram", v)} placeholder="@tunegocio" />
       </div>
 
-      {/* Ubicación */}
       <SectionTitle>Ubicación</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
-        <Field label="Dirección" value={d.direccion as string ?? ""} onChange={v => set("direccion", v)} placeholder="Av. Providencia 1234" />
+        <div><label style={LS}>Ciudad</label><select style={IS as React.CSSProperties} value={d.ciudad as string ?? ""} onChange={e => set("ciudad", e.target.value)}><option value="">Selecciona ciudad...</option><option value="Santiago">Santiago</option><option value="Valparaíso">Valparaíso</option><option value="Concepción">Concepción</option><option value="La Serena">La Serena</option><option value="Antofagasta">Antofagasta</option><option value="Temuco">Temuco</option><option value="Otra">Otra</option></select></div>
+        {(d.ciudad as string) === "Santiago" && <div><label style={LS}>Comuna</label><select style={IS as React.CSSProperties} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)}><option value="">Selecciona...</option>{COMUNAS_SANTIAGO.map(c => <option key={c} value={c}>{c}</option>)}</select></div>}
         <div>
-          <label style={L}>Comuna</label>
-          <select style={I as React.CSSProperties} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)}>
-            <option value="">Selecciona...</option>
-            {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <Field label="Dirección" value={d.direccion as string ?? ""} onChange={v => set("direccion", v)} placeholder="Av. Providencia 1234" />
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "6px", marginBottom: "12px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
+          <MapaUbicacion lat={d.lat as number || -33.4489} lng={d.lng as number || -70.6693} onChange={(lat, lng) => { set("lat", lat); set("lng", lng); }} />
         </div>
       </div>
 
-      {/* Horarios */}
       <SectionTitle>Horarios</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "32px" }}>
         {DIAS.map((dia, i) => (
           <div key={dia} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0" }}>
             <input type="checkbox" checked={horarios[i]?.activo ?? true} onChange={e => setHorario(i, { activo: e.target.checked })} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} />
             <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--text-primary)", width: "90px" }}>{dia}</span>
-            {horarios[i]?.activo ? (
-              <>
-                <input type="time" style={{ ...I, width: "auto", padding: "8px 10px" }} value={horarios[i]?.abre ?? "12:00"} onChange={e => setHorario(i, { abre: e.target.value })} />
-                <span style={{ color: "var(--text-muted)" }}>—</span>
-                <input type="time" style={{ ...I, width: "auto", padding: "8px 10px" }} value={horarios[i]?.cierra ?? "22:00"} onChange={e => setHorario(i, { cierra: e.target.value })} />
-              </>
-            ) : (
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff6b6b" }}>Cerrado</span>
-            )}
+            {horarios[i]?.activo ? (<><input type="time" style={{ ...IS, width: "auto", padding: "8px 10px" }} value={horarios[i]?.abre ?? "12:00"} onChange={e => setHorario(i, { abre: e.target.value })} /><span style={{ color: "var(--text-muted)" }}>—</span><input type="time" style={{ ...IS, width: "auto", padding: "8px 10px" }} value={horarios[i]?.cierra ?? "22:00"} onChange={e => setHorario(i, { cierra: e.target.value })} /></>) : <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#ff6b6b" }}>Cerrado</span>}
           </div>
         ))}
       </div>
 
-      {/* Fotos */}
       <SectionTitle>Fotos</SectionTitle>
       <div style={{ marginBottom: "32px" }}>
-        <label style={L}>Logo del local</label>
+        <label style={LS}>Logo del local</label>
         <SubirFoto folder="logos" circular preview={d.logoUrl as string || null} label="Subir logo" onUpload={url => set("logoUrl", url)} />
-
-        <label style={{ ...L, marginTop: "20px" }}>Foto de portada</label>
+        <label style={{ ...LS, marginTop: "20px" }}>Foto de portada</label>
         <SubirFoto folder="portadas" preview={d.portadaUrl as string || null} label="Subir portada" height="160px" onUpload={url => set("portadaUrl", url)} />
-
-        <label style={{ ...L, marginTop: "20px" }}>Galería ({galeria.length}/6)</label>
+        <label style={{ ...LS, marginTop: "20px" }}>Galería ({galeria.length}/6)</label>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px", marginBottom: "10px" }}>
           {galeria.map((url, i) => (
             <div key={i} style={{ position: "relative", height: "80px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)" }}>
@@ -198,38 +154,19 @@ export default function MiLocalPage() {
             </div>
           ))}
         </div>
-        {galeria.length < 6 && (
-          <SubirFoto folder="galeria" label="+ Agregar foto" height="80px" onUpload={url => set("galeria", [...galeria, url])} />
-        )}
+        {galeria.length < 6 && <SubirFoto folder="galeria" label="+ Agregar foto" height="80px" onUpload={url => set("galeria", [...galeria, url])} />}
       </div>
 
-      {/* Menú */}
       <SectionTitle>Menú</SectionTitle>
       <div style={{ marginBottom: "32px" }}>
-        <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}>
-          <input type="checkbox" checked={tieneMenu ?? false} onChange={e => set("tieneMenu", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} />
-          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>Mi local tiene menú con precios fijos</span>
-        </label>
-        {tieneMenu === false && (
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-            Tu menú del día se actualiza frecuentemente. Tus clientes lo entenderán.
-          </p>
-        )}
+        <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}><input type="checkbox" checked={tieneMenu ?? false} onChange={e => set("tieneMenu", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>Mi local tiene menú con precios fijos</span></label>
+        {tieneMenu === false && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>Tu menú del día se actualiza frecuentemente. Tus clientes lo entenderán.</p>}
         {tieneMenu && (
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {menuCats.map((cat, ci) => (
               <div key={ci} style={{ background: "rgba(0,0,0,0.15)", borderRadius: "12px", padding: "16px", border: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
-                  <input style={{ ...I, flex: 1, fontWeight: 700 }} value={cat.nombre} onChange={e => { const c = [...menuCats]; c[ci] = { ...c[ci], nombre: e.target.value }; setMenuCats(c); }} placeholder="Nombre categoría" />
-                  <button onClick={() => setMenuCats(menuCats.filter((_, j) => j !== ci))} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff8080", cursor: "pointer", padding: "8px 12px", fontSize: "0.7rem" }}>✕</button>
-                </div>
-                {cat.items.map((item, ii) => (
-                  <div key={ii} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px", marginBottom: "8px" }}>
-                    <input style={{ ...I, fontSize: "0.8rem" }} value={item.nombre} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, nombre: e.target.value }; setMenuCats(c); }} placeholder="Plato" />
-                    <input style={{ ...I, fontSize: "0.8rem" }} value={item.precio} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, precio: e.target.value }; setMenuCats(c); }} placeholder="$0" />
-                    <button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: c[ci].items.filter((_, j) => j !== ii) }; setMenuCats(c); }} style={{ background: "none", border: "none", color: "#ff8080", cursor: "pointer", fontSize: "0.8rem" }}>✕</button>
-                  </div>
-                ))}
+                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}><input style={{ ...IS, flex: 1, fontWeight: 700 }} value={cat.nombre} onChange={e => { const c = [...menuCats]; c[ci] = { ...c[ci], nombre: e.target.value }; setMenuCats(c); }} placeholder="Nombre categoría" /><button onClick={() => setMenuCats(menuCats.filter((_, j) => j !== ci))} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff8080", cursor: "pointer", padding: "8px 12px", fontSize: "0.7rem" }}>✕</button></div>
+                {cat.items.map((item, ii) => (<div key={ii} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px", marginBottom: "8px" }}><input style={{ ...IS, fontSize: "0.8rem" }} value={item.nombre} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, nombre: e.target.value }; setMenuCats(c); }} placeholder="Plato" /><input style={{ ...IS, fontSize: "0.8rem" }} value={item.precio} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, precio: e.target.value }; setMenuCats(c); }} placeholder="$0" /><button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: c[ci].items.filter((_, j) => j !== ii) }; setMenuCats(c); }} style={{ background: "none", border: "none", color: "#ff8080", cursor: "pointer", fontSize: "0.8rem" }}>✕</button></div>))}
                 <button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: [...c[ci].items, { nombre: "", descripcion: "", precio: "", destacado: false }] }; setMenuCats(c); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", padding: "6px 12px", cursor: "pointer" }}>+ Agregar plato</button>
               </div>
             ))}
@@ -238,16 +175,8 @@ export default function MiLocalPage() {
         )}
       </div>
 
-      {/* Save */}
       <div style={{ padding: "24px 0 40px" }}>
-        <button onClick={handleSave} style={{
-          width: "100%", maxWidth: "300px", padding: "14px 32px",
-          background: saved ? "var(--oasis-teal)" : "var(--accent)",
-          color: saved ? "#fff" : "var(--bg-primary)", fontFamily: "var(--font-cinzel)",
-          fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer",
-        }}>
-          {saved ? "✓ Guardado" : "Guardar cambios"}
-        </button>
+        <button onClick={handleSave} style={{ width: "100%", maxWidth: "300px", padding: "14px 32px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer" }}>Guardar cambios</button>
       </div>
     </div>
   );
@@ -257,6 +186,6 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
 }
 
-function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
-  return <div><label style={L}>{label}</label><input style={I} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} /></div>;
+function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+  return <div><label style={LS}>{label}</label><input type={type} style={IS} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} /></div>;
 }
