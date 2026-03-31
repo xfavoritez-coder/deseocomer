@@ -260,7 +260,7 @@ export default function ConcursoDetallePage() {
     const ok = supportUser(concursoId, user.id, targetId);
     if (ok) {
       setSupportedMap(m => ({ ...m, [targetId]: true }));
-      setSupportToast(`🤝 ¡Le diste 1 punto a ${targetName.split(" ")[0]}!`);
+      setSupportToast(`+1 punto a ${targetName.split(" ")[0]}`);
       setTimeout(() => setSupportToast(null), 4000);
       refreshRanking();
     }
@@ -318,16 +318,9 @@ export default function ConcursoDetallePage() {
 
       {/* Support toast */}
       {supportToast && (
-        <div style={{
-          position: "fixed", top: "24px", right: "24px", zIndex: 200,
-          background: "linear-gradient(135deg, #f5d080, #e8a84c)",
-          color: "#1a0e05", fontFamily: "var(--font-cinzel)",
-          fontSize: "0.75rem", letterSpacing: "0.08em",
-          padding: "12px 16px", borderRadius: "10px",
-          boxShadow: "0 8px 32px rgba(232,168,76,0.45)",
-          animation: "dc-slideUp 0.3s ease",
-        }}>
-          {supportToast}
+        <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(13,7,3,0.96)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "30px", padding: "12px 20px", display: "flex", alignItems: "center", gap: "8px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: "1rem" }}>🤝</span>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.05em", color: "#e8a84c", fontWeight: 700 }}>{supportToast}</span>
         </div>
       )}
 
