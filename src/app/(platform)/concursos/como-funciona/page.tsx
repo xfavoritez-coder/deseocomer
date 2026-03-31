@@ -61,7 +61,7 @@ export default function ComoFuncionaPage() {
             {[
               { icon: "🎉", pts: "+1", color: "#3db89e", label: "Por registrarte en el concurso", highlight: false },
               { icon: "👥", pts: "+2", color: "#e8a84c", label: "Por cada amigo que se registra con tu link", highlight: true },
-              { icon: "🤝", pts: "+1", color: "#2a7a6f", label: "Cuando apoyas a otro participante", highlight: false },
+              { icon: "🤝", pts: "+1", color: "#2a7a6f", label: "Cuando apoyas a otro participante (1 vez al día por persona)", highlight: false },
             ].map((p, i) => (
               <div key={i} style={{ background: p.highlight ? "rgba(232,168,76,0.07)" : "rgba(255,255,255,0.03)", border: p.highlight ? "1px solid rgba(232,168,76,0.3)" : "0.5px solid rgba(232,168,76,0.1)", borderRadius: "16px", padding: "clamp(16px,3vw,28px) clamp(12px,2vw,20px)", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "12px" }}>{p.icon}</div>
@@ -122,6 +122,7 @@ export default function ComoFuncionaPage() {
               { q: "¿Puedo participar en más de un concurso?", a: "Sí, puedes participar en todos los concursos activos al mismo tiempo con la misma cuenta." },
               { q: "¿Qué pasa si gano?", a: "Te contactamos por email dentro de las 24 horas siguientes al cierre del concurso para coordinar cómo retirar tu premio." },
               { q: "¿Los referidos deben ser cuentas nuevas?", a: "Sí, solo cuentan registros nuevos con email verificado. No funciona con cuentas existentes ni cuentas falsas." },
+              { q: "¿Cada cuánto puedo apoyar a un participante?", a: "Puedes darle +1 punto a cada participante una vez al día. Al día siguiente puedes volver a apoyarlo." },
               { q: "¿El premio es canjeable por efectivo?", a: "No. El premio es el producto o servicio indicado en el concurso, no es canjeable por dinero." },
             ].map((faq, i) => (
               <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "18px 20px", marginBottom: "8px" }}>
