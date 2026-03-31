@@ -72,22 +72,6 @@ function DashboardContent() {
         )}
       </div>
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px", marginBottom: "32px" }}>
-        {[
-          { icon: "👁️", label: "Visitas esta semana", value: "127" },
-          { icon: "👥", label: "Participantes concursos", value: "342" },
-          { icon: "⚡", label: "Promociones activas", value: "2" },
-          { icon: "❤️", label: "Guardado como favorito", value: "89" },
-        ].map(s => (
-          <div key={s.label} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "20px", textAlign: "center" }}>
-            <div style={{ fontSize: "1.4rem", marginBottom: "8px" }}>{s.icon}</div>
-            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", lineHeight: 1 }}>{s.value}</p>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "6px" }}>{s.label}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Quick actions */}
       <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Acciones rápidas</h3>
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
