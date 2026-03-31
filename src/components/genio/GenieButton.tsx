@@ -184,7 +184,6 @@ export default function GenieLampara() {
         const gs = {
           dia: { bg: "rgba(10,30,50,0.95)", border: "rgba(232,168,76,0.7)", shadow: "0 4px 30px rgba(0,0,0,0.4), 0 0 20px rgba(232,168,76,0.2)", color: "#f5d080" },
           noche: { bg: "rgba(13,7,3,0.97)", border: "rgba(232,168,76,0.6)", shadow: "0 4px 30px rgba(0,0,0,0.8), 0 0 25px rgba(232,168,76,0.25)", color: "#e8a84c" },
-          madrugada: { bg: "rgba(18,5,30,0.97)", border: "rgba(180,140,255,0.5)", shadow: "0 4px 30px rgba(0,0,0,0.8), 0 0 25px rgba(180,140,255,0.2)", color: "#c8a8ff" },
         };
         const s = gs[period as keyof typeof gs] ?? gs.noche;
         return (

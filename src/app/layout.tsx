@@ -45,12 +45,10 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){
-          var h=new Date().getHours(),p;
-          if(h<7)p="madrugada";else if(h<20)p="dia";else p="noche";
+          var h=new Date().getHours(),p=(h>=7&&h<20)?"dia":"noche";
           var T={
             dia:{bg:"#1a0e05",bg2:"#080d18",text:"#fff8e0",muted:"rgba(255,245,210,0.7)",accent:"#e8a84c",border:"rgba(232,168,76,0.28)",title:"#f5d080",link:"#3db89e",label:"rgba(255,245,210,0.55)",ctext:"rgba(255,245,210,0.85)"},
-            noche:{bg:"#0a0812",bg2:"#080d18",text:"#f0ead6",muted:"rgba(240,234,214,0.65)",accent:"#e8a84c",border:"rgba(232,168,76,0.22)",title:"#f5d080",link:"#3db89e",label:"rgba(240,234,214,0.5)",ctext:"rgba(240,234,214,0.82)"},
-            madrugada:{bg:"#07040f",bg2:"#0c0818",text:"#ede0ff",muted:"rgba(237,224,255,0.62)",accent:"#c8a0ff",border:"rgba(200,160,255,0.22)",title:"#e0c8ff",link:"#3db89e",label:"rgba(237,224,255,0.5)",ctext:"rgba(237,224,255,0.8)"}
+            noche:{bg:"#0a0812",bg2:"#080d18",text:"#f0ead6",muted:"rgba(240,234,214,0.65)",accent:"#e8a84c",border:"rgba(232,168,76,0.22)",title:"#f5d080",link:"#3db89e",label:"rgba(240,234,214,0.5)",ctext:"rgba(240,234,214,0.82)"}
           };
           var t=T[p],r=document.documentElement,s=r.style;
           s.setProperty("transition","none");

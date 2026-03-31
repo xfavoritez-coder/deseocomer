@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 
-export type TimePeriod = "madrugada" | "dia" | "noche";
+export type TimePeriod = "dia" | "noche";
 
 export interface TimeTheme {
   period: TimePeriod;
@@ -62,24 +62,6 @@ export const THEMES: Record<TimePeriod, Omit<TimeTheme, "period">> = {
     colorText:  "rgba(240,234,214,0.82)",
     colorHeroSubtitle: "rgba(61,184,158,0.95)",
   },
-
-  madrugada: {
-    label: "Madrugada", icon: "✨",
-    bg:          "#07040f",
-    bgSecondary: "#0c0818",
-    text:        "#ede0ff",
-    textMuted:   "rgba(237,224,255,0.62)",
-    accent:      "#c8a0ff",
-    borderColor: "rgba(200,160,255,0.22)",
-    heroGradient:   "linear-gradient(180deg, #020108 0%, #080420 30%, #120830 60%, #0a0618 85%, #15100a 100%)",
-    heroAtmosphere: "radial-gradient(ellipse at 50% 40%, rgba(124,63,168,0.28) 0%, transparent 65%)",
-    starCount: 140,
-    colorTitle: "#e0c8ff",
-    colorLink:  "#3db89e",
-    colorLabel: "rgba(237,224,255,0.5)",
-    colorText:  "rgba(237,224,255,0.8)",
-    colorHeroSubtitle: "rgba(61,184,158,0.95)",
-  },
 };
 
 export function getThemeByPeriod(period: TimePeriod): TimeTheme {
@@ -105,8 +87,7 @@ export function applyThemeVars(theme: TimeTheme) {
 }
 
 function getPeriod(hour: number): TimePeriod {
-  if (hour < 7)  return "madrugada";
-  if (hour < 20) return "dia";
+  if (hour >= 7 && hour < 20) return "dia";
   return "noche";
 }
 

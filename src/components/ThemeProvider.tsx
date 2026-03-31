@@ -4,27 +4,12 @@ import { useTimeTheme, getThemeByPeriod, applyThemeVars, THEMES } from "@/hooks/
 import type { TimePeriod } from "@/hooks/useTimeTheme";
 import { ThemeContext } from "@/contexts/ThemeContext";
 
-const PERIOD_ORDER: TimePeriod[] = ["dia", "noche", "madrugada"];
+const PERIOD_ORDER: TimePeriod[] = ["dia", "noche"];
 
 const DEV_LABELS: Record<TimePeriod, string> = {
-  dia:       "Día",
-  noche:     "Noche",
-  madrugada: "Madrugada",
+  dia:   "Día",
+  noche: "Noche",
 };
-
-const OVERLAY_BG: Record<TimePeriod, string> = {
-  madrugada: "rgba(7,4,15,0.95)",
-  dia:       "rgba(30,20,0,0.95)",
-  noche:     "rgba(6,4,16,0.95)",
-};
-
-const GREETING_DATA: Record<TimePeriod, { icon: string; title: string; subtitle?: string }> = {
-  dia:       { icon: "☀️", title: "¡Buen día!", subtitle: "¿Qué vas a comer hoy?" },
-  noche:     { icon: "🌙", title: "Buenas noches", subtitle: "La noche es perfecta para descubrir algo nuevo" },
-  madrugada: { icon: "✨", title: "Buenas madrugadas", subtitle: "Los mejores antojos no tienen hora" },
-};
-
-const SS_KEY = "dc_periodo";
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const hookTheme    = useTimeTheme();
@@ -38,57 +23,17 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
-  // ── Overlay ──────────────────────────────────────────────────────────────
-  const overlayVersionRef = useRef(0);
-  const [overlayActive,  setOverlayActive]  = useState(false);
-  const [overlayKey,     setOverlayKey]     = useState(0);
-  const [overlayContent, setOverlayContent] = useState({ icon: "", title: "", subtitle: "", bg: "rgba(0,0,0,0.95)" });
-
-  // Track whether this is a dev-panel forced change (always animate)
-  const devForcedRef = useRef(false);
-
-  // Detect period change → apply CSS vars + trigger overlay
+  // Apply CSS vars silently when theme changes — no overlay/animation
   const mountedRef = useRef(false);
-  const prevPeriodRef = useRef<TimePeriod>(activeTheme.period);
-
   useEffect(() => {
-    const isDevForced = devForcedRef.current;
-    devForcedRef.current = false;
-
-    let needsOverlay = false;
-
     if (!mountedRef.current) {
-      // Primer render: NUNCA mostrar overlay en carga/refresh/navegación
       mountedRef.current = true;
-      needsOverlay = false;
-    } else {
-      // Renders posteriores: cambio real de período (setInterval) o dev panel
-      needsOverlay = isDevForced || prevPeriodRef.current !== activeTheme.period;
     }
-
-    if (needsOverlay) {
-      const greeting = GREETING_DATA[activeTheme.period];
-      const bg  = OVERLAY_BG[activeTheme.period];
-      const ver = ++overlayVersionRef.current;
-      setOverlayContent({ icon: greeting.icon, title: greeting.title, subtitle: greeting.subtitle ?? "", bg });
-      setOverlayKey(ver);
-      setOverlayActive(true);
-      setTimeout(() => applyThemeVars(activeTheme), 500);
-      setTimeout(() => {
-        if (overlayVersionRef.current === ver) setOverlayActive(false);
-      }, 3100);
-    } else {
-      // Aplicar tema silenciosamente — sin animación
-      applyThemeVars(activeTheme);
-    }
-
-    prevPeriodRef.current = activeTheme.period;
-    sessionStorage.setItem(SS_KEY, activeTheme.period);
+    applyThemeVars(activeTheme);
   }, [activeTheme]);
 
   function handleDevSelect(period: TimePeriod) {
     if (period === (forcedPeriod ?? hookTheme.period)) return;
-    devForcedRef.current = true; // mark as dev-forced so overlay always plays
     setForcedPeriod(period);
   }
 
@@ -96,69 +41,9 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     <ThemeContext.Provider value={activeTheme}>
       {children}
 
-      {/* Period transition overlay */}
-      {overlayActive && (
-        <div
-          key={overlayKey}
-          style={{
-            position: "fixed", inset: 0, zIndex: 9998,
-            display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center", gap: "16px",
-            background: overlayContent.bg,
-            pointerEvents: "all",
-            animation: "tpOverlayShow 3s ease forwards",
-          }}
-        >
-          <span style={{
-            fontSize: "80px", lineHeight: 1, display: "block",
-            animation: "tpIconBounce 600ms cubic-bezier(0.34,1.56,0.64,1) 100ms both",
-          }}>
-            {overlayContent.icon}
-          </span>
-          <p style={{
-            fontFamily: "var(--font-cinzel-decorative, serif)", fontSize: "clamp(1.2rem, 4vw, 2rem)",
-            letterSpacing: "0.08em",
-            color: "rgba(255,255,255,0.95)", margin: 0,
-            animation: "tpLabelFade 400ms ease 300ms both",
-            textAlign: "center", padding: "0 20px",
-          }}>
-            {overlayContent.title}
-          </p>
-          {overlayContent.subtitle && (
-            <p style={{
-              fontFamily: "var(--font-cinzel, serif)", fontSize: "clamp(0.85rem, 2.5vw, 1.1rem)",
-              letterSpacing: "0.15em",
-              color: "rgba(255,255,255,0.7)", margin: 0,
-              animation: "tpLabelFade 400ms ease 500ms both",
-              textAlign: "center", padding: "0 20px",
-            }}>
-              {overlayContent.subtitle}
-            </p>
-          )}
-        </div>
-      )}
-
       {devVisible && (
         <DevPanel activePeriod={activeTheme.period} onSelect={handleDevSelect} />
       )}
-
-      <style>{`
-        @keyframes tpOverlayShow {
-          0%   { opacity: 0; }
-          16%  { opacity: 1; }
-          83%  { opacity: 1; }
-          100% { opacity: 0; }
-        }
-        @keyframes tpIconBounce {
-          0%   { transform: scale(0); }
-          55%  { transform: scale(1.2); }
-          100% { transform: scale(1); }
-        }
-        @keyframes tpLabelFade {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-      `}</style>
     </ThemeContext.Provider>
   );
 }

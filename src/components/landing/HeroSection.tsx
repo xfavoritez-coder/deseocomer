@@ -41,7 +41,7 @@ export default function HeroSection() {
   useEffect(() => { setMounted(true); }, []);
 
   const isDay  = period === "dia";
-  const hasSky = period === "madrugada" || period === "noche";
+  const hasSky = period === "noche";
 
   const btnBg    = "var(--accent)";
   const btnColor = "var(--bg-primary)";
@@ -67,7 +67,7 @@ export default function HeroSection() {
         style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}
       />
 
-      {/* ── Glow atmosférico (solo noche/madrugada) ── */}
+      {/* ── Glow atmosférico (solo noche) ── */}
       {mounted && !isDay && (
         <div style={{
           position: "absolute", inset: 0,
@@ -91,14 +91,12 @@ export default function HeroSection() {
       {mounted && hasSky && (
         <div className="dc-sky dc-sky--moon" style={{
           position: "absolute", top: "8%", right: "14%",
-          fontSize: period === "madrugada" ? "50px" : "58px",
-          filter: period === "madrugada"
-            ? "drop-shadow(0 0 18px rgba(200,180,255,0.8))"
-            : "drop-shadow(0 0 24px rgba(220,220,180,0.7))",
+          fontSize: "58px",
+          filter: "drop-shadow(0 0 24px rgba(220,220,180,0.7))",
           animation: "skyFloat 9s ease-in-out infinite",
           pointerEvents: "none", zIndex: 4,
         }}>
-          {period === "madrugada" ? "✨" : "🌙"}
+          🌙
         </div>
       )}
 
