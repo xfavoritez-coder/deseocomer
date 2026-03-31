@@ -66,6 +66,7 @@ export default function LocalDetailPage() {
   const [dbLocal, setDbLocal] = useState<Record<string, unknown> | null>(null);
   const [tab, setTab] = useState<Tab>("Información");
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [esPropioDueno, setEsPropioDueno] = useState(false);
   const { toggleFavorito, esFavorito } = useFavoritos();
 
   // If not a mock local (CUID), fetch from API
@@ -105,6 +106,11 @@ export default function LocalDetailPage() {
     lng: dbLocal.lng as number ?? -70.65,
   } : null);
 
+  // Detect owner
+  useEffect(() => {
+    try { const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}"); if (s?.id && String(s.id) === String(id)) setEsPropioDueno(true); } catch {}
+  }, [id]);
+
   // Track visit
   useEffect(() => {
     if (!local) return;
@@ -141,6 +147,14 @@ export default function LocalDetailPage() {
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
+
+      {/* Owner banner */}
+      {esPropioDueno && (
+        <div style={{ position: "fixed", top: "64px", left: 0, right: 0, zIndex: 90, background: "rgba(61,184,158,0.1)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0 }}>👁 Estás viendo tu perfil público</p>
+          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "20px", padding: "5px 14px", whiteSpace: "nowrap" }}>Editar en el panel →</Link>
+        </div>
+      )}
 
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>

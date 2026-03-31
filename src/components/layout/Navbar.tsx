@@ -13,12 +13,17 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
+  const [localSession, setLocalSession] = useState<{ id: string; nombre: string } | null>(null);
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll);
+    try {
+      const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (ls?.id && ls?.nombre && ls?.loggedIn) setLocalSession({ id: ls.id, nombre: ls.nombre });
+    } catch {}
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -38,6 +43,10 @@ export default function Navbar() {
     : "?";
 
   const displayName = user?.nombre?.split(" ")[0] ?? "";
+  const isLocalLoggedIn = !!localSession;
+  const localInitials = localSession?.nombre?.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() ?? "L";
+  const localName = localSession?.nombre?.split(" ")[0] ?? "";
+  const handleLocalLogout = () => { localStorage.removeItem("deseocomer_local_session"); sessionStorage.removeItem("deseocomer_local_session"); setLocalSession(null); setMenuOpen(false); window.location.href = "/"; };
 
   return (
     <>
@@ -50,15 +59,19 @@ export default function Navbar() {
             <Link key={label} href={href} className="dc-nav-link">{label}</Link>
           ))}
 
-          {/* Auth: show user or "Entrar" */}
+          {/* Auth */}
           {mounted && (
-            isAuthenticated && user ? (
+            isLocalLoggedIn ? (
+              <div className="dc-nav-user">
+                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{localInitials}</div>
+                <span className="dc-nav-username">{localName}</span>
+                <Link href="/panel" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(61,184,158,0.4)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "5px" }}>🏪 Mi Panel</Link>
+                <button onClick={handleLocalLogout} className="dc-nav-logout">Salir</button>
+              </div>
+            ) : isAuthenticated && user ? (
               <div className="dc-nav-user">
                 <Link href="/perfil" className="dc-nav-avatar" title={user.nombre} style={{ textDecoration: "none" }}>{initials}</Link>
                 <Link href="/perfil" className="dc-nav-username" style={{ textDecoration: "none" }}>{displayName}</Link>
-                {user.type === "local" && (
-                  <Link href="/panel/dashboard" className="dc-nav-panel">Panel</Link>
-                )}
                 <button onClick={logout} className="dc-nav-logout">Salir</button>
               </div>
             ) : (
@@ -104,7 +117,23 @@ export default function Navbar() {
 
             {/* User section */}
             <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
-              {mounted && isAuthenticated && user ? (
+              {mounted && isLocalLoggedIn ? (
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{localInitials}</div>
+                    <div><p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#3db89e", margin: 0 }}>{localName}</p><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", margin: 0 }}>Local asociado</p></div>
+                  </div>
+                  {[
+                    { href: "/panel", label: "Mi Panel", color: "#3db89e" },
+                    { href: `/locales/${localSession?.id}`, label: "Ver mi local público", color: "var(--text-primary)" },
+                    { href: "/panel/concursos", label: "Mis concursos", color: "var(--text-primary)" },
+                    { href: "/panel/promociones", label: "Mis promociones", color: "var(--text-primary)" },
+                  ].map(item => (
+                    <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: item.color, textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>{item.label}</Link>
+                  ))}
+                  <button onClick={handleLocalLogout} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#ff6b6b", cursor: "pointer", width: "100%", textAlign: "left", marginTop: "4px" }}>Cerrar sesión</button>
+                </div>
+              ) : mounted && isAuthenticated && user ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
                     <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>
