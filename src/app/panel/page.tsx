@@ -10,14 +10,15 @@ function getProfile(): Record<string, unknown> {
   try { return JSON.parse(localStorage.getItem(LOCAL_DATA_KEY) ?? "{}"); } catch { return {}; }
 }
 
-function getPerfilPct(p: Record<string, unknown>): number {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPerfilPct(p: any): number {
   let pct = 0;
   if (p.descripcion) pct += 20;
   if (p.logoUrl) pct += 15;
-  if ((p.galeria as string[] | undefined)?.length) pct += 15;
-  if ((p.horarios as unknown[] | undefined)?.length) pct += 20;
-  if (p.tieneMenu !== undefined) pct += 15;
-  if ((p.concursos as unknown[] | undefined)?.length) pct += 15;
+  if (p.galeria?.length > 0) pct += 15;
+  if (p.horarios?.length > 0 || (Array.isArray(p.horarios) && p.horarios.length > 0)) pct += 20;
+  if (p.tieneMenu) pct += 15;
+  if ((p.concursos?.length > 0) || (p._count?.concursos > 0)) pct += 15;
   return pct;
 }
 
@@ -35,8 +36,21 @@ function DashboardContent() {
     try {
       const session = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "{}");
       setLocalName(session.nombre ?? "");
+      // Try localStorage first for instant display
+      const cached = getProfile();
+      if (Object.keys(cached).length > 0) setPct(getPerfilPct(cached));
+      // Then fetch fresh data from API
+      if (session.id) {
+        fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
+          if (data) {
+            setPct(getPerfilPct(data));
+            // Update local cache for next time
+            const merged = { ...cached, ...data };
+            localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(merged));
+          }
+        }).catch(() => {});
+      }
     } catch {}
-    setPct(getPerfilPct(getProfile()));
   }, []);
 
   const now = new Date();
