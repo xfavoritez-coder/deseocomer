@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
 
-interface ConcursoHome { id: number; local: string; premio: string; participantes: number; horasRestantes: number; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+interface ConcursoHome { id: number; slug: string; local: string; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
@@ -25,9 +25,10 @@ export default function ConcursosSection() {
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setConcursos(sorted.slice(0, 3).map((c: any) => ({
-          id: c.id as number, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
+          id: c.id as number, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
           participantes: c._count?.participantes ?? 0,
-          horasRestantes: Math.max(1, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
+          horasRestantes: Math.max(0, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
+          fechaFin: c.fechaFin,
           imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
           topRanking: [],
         })));
@@ -38,14 +39,14 @@ export default function ConcursosSection() {
   useEffect(() => {
     const calcular = () => {
       const next: Record<number, {h:number,m:number,s:number}> = {};
+      const ahora = Date.now();
       concursos.forEach(c => {
-        const totalSeg = c.horasRestantes * 3600;
-        const ahora = Math.floor(Date.now() / 1000);
-        const restaSeg = totalSeg - (ahora % totalSeg);
+        const restMs = Math.max(0, new Date(c.fechaFin).getTime() - ahora);
+        const restSeg = Math.floor(restMs / 1000);
         next[c.id] = {
-          h: Math.floor(restaSeg / 3600),
-          m: Math.floor((restaSeg % 3600) / 60),
-          s: restaSeg % 60,
+          h: Math.floor(restSeg / 3600),
+          m: Math.floor((restSeg % 3600) / 60),
+          s: restSeg % 60,
         };
       });
       setTiempos(next);
@@ -53,7 +54,7 @@ export default function ConcursosSection() {
     calcular();
     const id = setInterval(calcular, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [concursos]);
 
   const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -98,7 +99,7 @@ export default function ConcursosSection() {
         <div className="dc-cst-grid">
           {concursos.map((c) => (
             <a key={c.id}
-              href={`/concursos/${c.id}`}
+              href={`/concursos/${c.slug || c.id}`}
               className="dc-cst-card"
               style={{
                 backgroundColor: "rgba(255,255,255,0.04)",

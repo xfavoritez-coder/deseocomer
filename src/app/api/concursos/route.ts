@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { localId, premio, descripcion, imagenUrl, fechaFin } = await req.json();
+    const { localId, premio, descripcion, condiciones, imagenUrl, fechaFin } = await req.json();
     if (!localId || !premio || !fechaFin) return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
 
     // Get local name for slug
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const slug = makeConcursoSlug(premio, local?.nombre ?? "local");
 
     const concurso = await prisma.concurso.create({
-      data: { localId, slug, premio, descripcion, imagenUrl, fechaFin: new Date(fechaFin) },
+      data: { localId, slug, premio, descripcion, ...(condiciones && { condiciones }), imagenUrl, fechaFin: new Date(fechaFin) },
     });
     return NextResponse.json(concurso, { status: 201 });
   } catch (error) {

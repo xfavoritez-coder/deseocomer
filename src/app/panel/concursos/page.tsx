@@ -23,12 +23,11 @@ export default function PanelConcursos() {
   const [custom, setCustom] = useState("");
   const [dur, setDur] = useState(7);
   const [imagenConcurso, setImagenConcurso] = useState("");
-  const [localName, setLocalName] = useState("");
+  const [condiciones, setCondiciones] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const s = getSession();
-    setLocalName(s.nombre ?? "");
     if (s.id) {
       fetch(`/api/locales/${s.id}`)
         .then(r => r.json())
@@ -50,18 +49,19 @@ export default function PanelConcursos() {
     try {
       const res = await fetch("/api/concursos", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localId: s.id, premio: pFinal, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null }),
+        body: JSON.stringify({ localId: s.id, premio: pFinal, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null }),
       });
       if (res.ok) {
         const nuevo = await res.json();
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setCustom(""); setImagenConcurso("");
+    setWizard(false); setStep(1); setPremio(""); setCustom(""); setImagenConcurso(""); setCondiciones("");
   };
 
-  const copyLink = (concursoId: string) => {
-    navigator.clipboard.writeText(`https://deseocomer.com/concursos/${concursoId}`).then(() => {
+  const copyLink = (c: Concurso) => {
+    const slug = c.slug || c.id;
+    navigator.clipboard.writeText(`https://deseocomer.com/concursos/${slug}`).then(() => {
       setCopied(true); setTimeout(() => setCopied(false), 2000);
     }).catch(() => {});
   };
@@ -97,7 +97,7 @@ export default function PanelConcursos() {
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "10px" }}>Link del concurso</p>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", flex: 1, wordBreak: "break-all" }}>{link}</p>
-            <button onClick={() => copyLink(detalle.id)} style={{ background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "8px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, flexShrink: 0 }}>
+            <button onClick={() => copyLink(detalle)} style={{ background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "8px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, flexShrink: 0 }}>
               {copied ? "✓" : "Copiar"}
             </button>
           </div>
@@ -143,11 +143,11 @@ export default function PanelConcursos() {
     );
   }
 
-  // ── Wizard ──
+  // ── Wizard (2 steps) ──
   if (wizard) return (
     <div style={{ maxWidth: "560px" }}>
       <button onClick={() => { setWizard(false); setStep(1); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
-      <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[1, 2, 3].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[1, 2].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
 
       {step === 1 && (<div>
         <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>¿Qué vas a regalar?</h2>
@@ -156,24 +156,28 @@ export default function PanelConcursos() {
           <button onClick={() => setPremio("custom")} style={chip(premio === "custom")}>Escribe el tuyo...</button>
         </div>
         {premio === "custom" && <input style={I} value={custom} onChange={e => setCustom(e.target.value)} placeholder="Describe el premio..." />}
+
         <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>¿Cuánto dura?</h3>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
+
         <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Foto del concurso (opcional)</h3>
         <SubirFoto folder="concursos" preview={imagenConcurso || null} label="Subir foto del premio" height="140px" onUpload={url => setImagenConcurso(url)} />
+
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Condiciones (opcional)</h3>
+        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: Deben seguir nuestra cuenta de Instagram, compartir la publicación..." maxLength={500} />
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", marginTop: "6px" }}>{condiciones.length}/500</p>
+
         <button onClick={() => pFinal.trim() && setStep(2)} disabled={!pFinal.trim()} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() ? 1 : 0.5 }}>Siguiente →</button>
       </div>)}
 
       {step === 2 && (<div>
-        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Así se verá tu concurso</h2>
-        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", overflow: "hidden", marginBottom: "24px" }}>
-          <div style={{ height: "140px", background: imagenConcurso ? "none" : "linear-gradient(135deg, rgba(45,26,8,0.8), rgba(13,7,3,0.6))", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-            {imagenConcurso ? <img src={imagenConcurso} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: "2.5rem" }}>🏆</span>}
-            <div style={{ position: "absolute", top: "8px", right: "-20px", background: "linear-gradient(135deg, #f5d080, #e8a84c)", color: "#1a0e05", fontFamily: "var(--font-cinzel)", fontSize: "0.45rem", fontWeight: 900, padding: "4px 30px", transform: "rotate(35deg)" }}>🏆 PREMIO GRATIS</div>
-          </div>
-          <div style={{ padding: "16px" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", color: "var(--oasis-bright)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "4px" }}>{localName}</p>
-            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px" }}>{pFinal}</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>👥 0 · ⏱ {dur} días</p>
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Confirmar y publicar</h2>
+        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Premio</span><p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", marginTop: "4px" }}>{pFinal}</p></div>
+            <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Duración</span><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginTop: "4px" }}>{dur} días</p></div>
+            {imagenConcurso && <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Foto</span><img src={imagenConcurso} alt="" style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "10px", marginTop: "6px" }} /></div>}
+            {condiciones && <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Condiciones</span><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "4px", lineHeight: 1.5 }}>{condiciones}</p></div>}
           </div>
         </div>
         <div style={{ display: "flex", gap: "12px" }}>
@@ -206,15 +210,19 @@ export default function PanelConcursos() {
           const ended = hrs <= 0;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} onClick={() => setDetalle(c)} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "18px 20px", display: "flex", alignItems: "center", gap: "14px", cursor: "pointer", transition: "border-color 0.2s" }}>
-              <span style={{ fontSize: "1.6rem" }}>{c.imagenUrl ? "📸" : "🏆"}</span>
-              <div style={{ flex: 1 }}>
+            <div key={c.id} onClick={() => setDetalle(c)} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "center", cursor: "pointer", transition: "border-color 0.2s" }}>
+              {c.imagenUrl ? (
+                <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", flexShrink: 0 }} />
+              ) : (
+                <div style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem" }}>🏆</div>
+              )}
+              <div style={{ flex: 1, padding: "12px 16px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
                   {parts} participantes · {ended ? <span style={{ color: "var(--text-muted)" }}>Finalizado</span> : <span style={{ color: "#3db89e" }}>{hrs}h restantes</span>}
                 </p>
               </div>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)" }}>Ver →</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Ver →</span>
             </div>
           );
         })}

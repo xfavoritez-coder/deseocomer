@@ -82,15 +82,16 @@ export default function ConcursoDetallePage() {
 
   // Build concurso/finalizado from DB data if needed
   const concurso = concursoMock ?? (dbConcurso ? {
-    ...CONCURSOS[0], // Use first mock as template for structure
     id: 0,
     slug: dbConcurso.slug as string ?? "",
     local: (dbConcurso.local as Record<string, string>)?.nombre ?? "Local",
     localId: (dbConcurso.local as Record<string, string>)?.id ?? "",
+    localSlug: (dbConcurso.local as Record<string, string>)?.slug ?? "",
     imagen: "🏆",
     imagenUrl: (dbConcurso.imagenUrl as string) ?? (dbConcurso.local as Record<string, string>)?.portadaUrl ?? "",
     premio: dbConcurso.premio as string ?? "",
     descripcionPremio: dbConcurso.descripcion as string ?? "",
+    condiciones: dbConcurso.condiciones as string ?? "",
     participantes: (dbConcurso._count as Record<string, number>)?.participantes ?? 0,
     endsAt: new Date(dbConcurso.fechaFin as string).getTime(),
     ranking: ((dbConcurso.participantes as Array<{usuario: {nombre: string}; puntos: number}>) ?? []).map(p => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 })),
@@ -129,7 +130,12 @@ export default function ConcursoDetallePage() {
     tick();
     const iid = setInterval(tick, 1000);
     return () => clearInterval(iid);
-  }, [concurso]);
+  }, [concurso?.endsAt]);
+
+  // Sync ranking when concurso loads from DB
+  useEffect(() => {
+    if (concurso?.ranking && ranking.length === 0) setRanking(concurso.ranking);
+  }, [concurso?.ranking?.length]);
 
   // Process incoming referral param
   useEffect(() => {

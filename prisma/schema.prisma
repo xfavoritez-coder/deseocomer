@@ -87,6 +87,7 @@ model Concurso {
   localId      String
   premio       String
   descripcion  String?
+  condiciones  String?
   imagenUrl    String?
   fechaInicio  DateTime @default(now())
   fechaFin     DateTime
