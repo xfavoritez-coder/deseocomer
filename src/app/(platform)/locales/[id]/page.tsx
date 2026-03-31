@@ -168,14 +168,6 @@ export default function LocalDetailPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Owner banner - fixed below navbar */}
-      {esPropioDueno && (
-        <div className="dc-owner-banner" style={{ position: "fixed", top: "64px", left: 0, right: 0, zIndex: 99, background: "rgba(13,40,35,0.98)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}><span style={{ fontSize: "0.9rem" }}>👁</span>Estás viendo tu perfil público</p>
-          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "6px 16px", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "6px" }}>Editar en el panel →</Link>
-        </div>
-      )}
-
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
         <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
@@ -218,7 +210,7 @@ export default function LocalDetailPage() {
 
 
       {/* Tabs */}
-      <div className={`dc-tabs-sticky${esPropioDueno ? " dc-tabs-sticky--owner" : ""}`} style={{ position: "sticky", top: esPropioDueno ? "108px" : "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
+      <div className="dc-tabs-sticky" style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
@@ -488,9 +480,7 @@ export default function LocalDetailPage() {
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }
           .dc-ld-gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-          .dc-owner-banner { top: 56px !important; }
           .dc-tabs-sticky { top: 56px !important; }
-          .dc-tabs-sticky--owner { top: 100px !important; }
         }
       `}</style>
     </main>
