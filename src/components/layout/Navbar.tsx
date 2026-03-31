@@ -13,7 +13,7 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
-  const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string } | null>(null);
+  const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string; logoUrl?: string } | null>(null);
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -22,7 +22,19 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll);
     try {
       const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      if (ls?.id && ls?.nombre && ls?.loggedIn) setLocalSession({ id: ls.id, slug: ls.slug, nombre: ls.nombre });
+      if (ls?.id && ls?.nombre && ls?.loggedIn) {
+        setLocalSession({ id: ls.id, slug: ls.slug, nombre: ls.nombre, logoUrl: ls.logoUrl });
+        // Fetch fresh logoUrl if not in session
+        if (!ls.logoUrl) {
+          fetch(`/api/locales/${ls.id}`).then(r => r.ok ? r.json() : null).then(data => {
+            if (data?.logoUrl) {
+              setLocalSession(prev => prev ? { ...prev, logoUrl: data.logoUrl } : prev);
+              ls.logoUrl = data.logoUrl;
+              localStorage.setItem("deseocomer_local_session", JSON.stringify(ls));
+            }
+          }).catch(() => {});
+        }
+      }
     } catch {}
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -63,7 +75,7 @@ export default function Navbar() {
           {mounted && (
             isLocalLoggedIn ? (
               <div className="dc-nav-user">
-                <Link href={`/locales/${localSession?.slug || localSession?.id}`} style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none" }}>{localInitials}</Link>
+                <Link href={`/locales/${localSession?.slug || localSession?.id}`} style={{ width: "32px", height: "32px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none", overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</Link>
                 <Link href={`/locales/${localSession?.slug || localSession?.id}`} className="dc-nav-username" style={{ textDecoration: "none" }}>{localName}</Link>
                 <Link href="/panel" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(61,184,158,0.4)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "5px" }}>🏪 Mi Panel</Link>
                 <button onClick={handleLocalLogout} className="dc-nav-logout">Salir</button>
@@ -120,7 +132,7 @@ export default function Navbar() {
               {mounted && isLocalLoggedIn ? (
                 <div>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{localInitials}</div>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</div>
                     <div><p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#3db89e", margin: 0 }}>{localName}</p><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", margin: 0 }}>Local asociado</p></div>
                   </div>
                   {[
