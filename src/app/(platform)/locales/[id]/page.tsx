@@ -108,8 +108,11 @@ export default function LocalDetailPage() {
 
   // Detect owner
   useEffect(() => {
-    try { const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}"); if (s?.id && String(s.id) === String(id)) setEsPropioDueno(true); } catch {}
-  }, [id]);
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (s?.id && (String(s.id) === String(id) || (local && s.nombre === local.nombre))) setEsPropioDueno(true);
+    } catch {}
+  }, [id, local?.nombre]);
 
   // Track visit
   useEffect(() => {
@@ -134,6 +137,10 @@ export default function LocalDetailPage() {
   const todayName = DAY_NAMES[new Date().getDay()];
   const concursosLocal = CONCURSOS.filter(c => c.local === local.nombre);
   const similares = LOCALES.filter(l => l.categoria === local.categoria && l.id !== local.id).slice(0, 3);
+  const tieneHorarios = local.horarios && local.horarios.length > 0;
+  const tieneUbicacion = !!(local.direccion || local.lat);
+  const tieneSidebar = tieneHorarios || tieneUbicacion;
+  const mostrarAbierto = tieneHorarios && local.isOpen;
 
   // Genie recommendation text
   const catScore = perfil.gustos.categorias[local.categoria.toLowerCase()] ?? 0;
@@ -150,9 +157,9 @@ export default function LocalDetailPage() {
 
       {/* Owner banner */}
       {esPropioDueno && (
-        <div style={{ position: "fixed", top: "64px", left: 0, right: 0, zIndex: 90, background: "rgba(61,184,158,0.1)", borderBottom: "1px solid rgba(61,184,158,0.25)", padding: "10px clamp(16px, 4vw, 32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0 }}>👁 Estás viendo tu perfil público</p>
-          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "20px", padding: "5px 14px", whiteSpace: "nowrap" }}>Editar en el panel →</Link>
+        <div style={{ position: "sticky", top: "64px", zIndex: 90, background: "rgba(61,184,158,0.08)", borderBottom: "1px solid rgba(61,184,158,0.2)", padding: "10px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", margin: 0, display: "flex", alignItems: "center", gap: "8px" }}>👁 Estás viendo tu perfil público</p>
+          <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", border: "1px solid rgba(61,184,158,0.35)", borderRadius: "20px", padding: "5px 14px", whiteSpace: "nowrap" }}>Editar en el panel →</Link>
         </div>
       )}
 
@@ -183,7 +190,7 @@ export default function LocalDetailPage() {
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
-                {local.isOpen && (<>
+                {mostrarAbierto && (<>
                   <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e" }} />
@@ -220,7 +227,7 @@ export default function LocalDetailPage() {
 
             {/* TAB: Información */}
             {tab === "Información" && (
-              <div className="dc-local-layout">
+              <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Descripción */}
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
@@ -256,7 +263,14 @@ export default function LocalDetailPage() {
                   )}
 
                   {/* Reseñas preview */}
-                  {local.resenas.length > 0 && (
+                  {local.resenas.length === 0 ? (
+                    <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "12px", padding: "24px", textAlign: "center" }}>
+                      <div style={{ fontSize: "2rem", marginBottom: "10px" }}>✍️</div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)", marginBottom: "6px" }}>Sin reseñas aún</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.6, marginBottom: "14px" }}>Sé el primero en compartir tu experiencia</p>
+                      {isAuthenticated && <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>}
+                    </div>
+                  ) : (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Reseñas</p>
                       <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
@@ -281,8 +295,10 @@ export default function LocalDetailPage() {
                   )}
                 </div>
 
-                {/* Sidebar: horarios + ubicación */}
+                {/* Sidebar: horarios + ubicación — only if content exists */}
+                {tieneSidebar && (
                 <div className="dc-local-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  {tieneHorarios && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
                     {local.horarios.map(h => {
@@ -295,6 +311,8 @@ export default function LocalDetailPage() {
                       );
                     })}
                   </div>
+                  )}
+                  {tieneUbicacion && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
@@ -304,7 +322,27 @@ export default function LocalDetailPage() {
                     </div>
                     <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
                   </div>
+                  )}
                 </div>
+                )}
+
+                {/* Owner: completar perfil */}
+                {esPropioDueno && (() => {
+                  const faltantes: { texto: string; href: string }[] = [];
+                  if (!tieneHorarios) faltantes.push({ texto: "Agrega tus horarios", href: "/panel/mi-local" });
+                  if (!local.galeria?.length) faltantes.push({ texto: "Sube fotos de tu local", href: "/panel/mi-local" });
+                  if (!local.tieneMenu) faltantes.push({ texto: "Publica tu menú", href: "/panel/mi-local" });
+                  if (!local.descripcion) faltantes.push({ texto: "Agrega una descripción", href: "/panel/mi-local" });
+                  if (faltantes.length === 0) return null;
+                  return (
+                    <div style={{ background: "rgba(232,168,76,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "14px", padding: "20px 24px", marginTop: "8px" }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", marginBottom: "12px" }}>🧞 Completa tu perfil para atraer más clientes</p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {faltantes.map((f, i) => <Link key={i} href={f.href} style={{ display: "flex", alignItems: "center", gap: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(232,168,76,0.7)", textDecoration: "none" }}><span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "rgba(232,168,76,0.4)", flexShrink: 0 }} />{f.texto} →</Link>)}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -435,6 +473,7 @@ export default function LocalDetailPage() {
         .dc-ld-layout { display: block; }
         .dc-ld-main { min-width: 0; }
         .dc-local-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+        .dc-local-single { max-width: 680px; }
         .dc-local-sidebar { position: sticky; top: 100px; }
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
