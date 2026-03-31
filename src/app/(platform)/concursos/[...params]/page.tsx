@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
@@ -33,7 +33,11 @@ import {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function ConcursoDetallePage() {
+export default function ConcursoDetalleWrapper() {
+  return <Suspense><ConcursoDetallePage /></Suspense>;
+}
+
+function ConcursoDetallePage() {
   const rawParams    = useParams<{ params: string[] }>();
   const searchParams = useSearchParams();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
