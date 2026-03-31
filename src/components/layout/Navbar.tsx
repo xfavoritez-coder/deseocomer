@@ -63,8 +63,8 @@ export default function Navbar() {
           {mounted && (
             isLocalLoggedIn ? (
               <div className="dc-nav-user">
-                <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{localInitials}</div>
-                <span className="dc-nav-username">{localName}</span>
+                <Link href={`/locales/${localSession?.slug || localSession?.id}`} style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none" }}>{localInitials}</Link>
+                <Link href={`/locales/${localSession?.slug || localSession?.id}`} className="dc-nav-username" style={{ textDecoration: "none" }}>{localName}</Link>
                 <Link href="/panel" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(61,184,158,0.4)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "5px" }}>🏪 Mi Panel</Link>
                 <button onClick={handleLocalLogout} className="dc-nav-logout">Salir</button>
               </div>
