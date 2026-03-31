@@ -390,7 +390,7 @@ export default function PanelConcursos() {
                   {parts} participantes · {ended ? <span style={{ color: "var(--text-muted)" }}>Finalizado</span> : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Ver →</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Editar →</span>
             </div>
           );
         })}

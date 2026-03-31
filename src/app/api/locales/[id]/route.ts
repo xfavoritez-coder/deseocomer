@@ -44,6 +44,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         nombre: body.nombre, categoria: body.categoria, descripcion: body.descripcion,
         historia: body.historia, telefono: body.telefono, instagram: body.instagram,
         direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad,
+        ...(body.nombreDueno !== undefined && { nombreDueno: body.nombreDueno }),
+        ...(body.celularDueno !== undefined && { celularDueno: body.celularDueno }),
         ...(body.sitioWeb !== undefined && { sitioWeb: body.sitioWeb }),
         lat: body.lat, lng: body.lng,
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,

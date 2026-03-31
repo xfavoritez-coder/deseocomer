@@ -57,6 +57,8 @@ model Local {
   galeria       Json?
   tags          String[] @default([])
   tieneMenu     Boolean  @default(false)
+  resetToken        String?
+  resetTokenExpira  DateTime?
   verificado    Boolean  @default(false)
   activo        Boolean  @default(true)
   createdAt     DateTime @default(now())

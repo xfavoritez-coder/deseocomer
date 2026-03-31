@@ -195,8 +195,8 @@ export default function LocalDetailPage() {
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
           <div style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>
-            <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0 }}>
-              {getInitials(local.nombre)}
+            <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: local.imagenLogo ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0, overflow: "hidden" }}>
+              {local.imagenLogo ? <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>

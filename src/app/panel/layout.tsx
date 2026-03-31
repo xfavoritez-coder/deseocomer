@@ -10,7 +10,8 @@ const SESSION_KEY = "deseocomer_local_session";
 
 const NAV = [
   { icon: "📊", label: "Dashboard", href: "/panel" },
-  { icon: "🏠", label: "Mi Local", href: "/panel/mi-local" },
+  { icon: "🏠", label: "Datos de Local", href: "/panel/mi-local" },
+  { icon: "👤", label: "Datos Personales", href: "/panel/datos-personales" },
   { icon: "🏆", label: "Concursos", href: "/panel/concursos" },
   { icon: "⚡", label: "Promociones", href: "/panel/promociones" },
 ];
@@ -23,6 +24,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [localName, setLocalName] = useState("");
   const [localId, setLocalId] = useState("");
   const [localSlug, setLocalSlug] = useState("");
+  const [localLogo, setLocalLogo] = useState("");
+  const [localComuna, setLocalComuna] = useState("");
 
   useEffect(() => {
     setMontado(true);
@@ -38,7 +41,23 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           setLocalName(data.nombre ?? "");
           setLocalId(data.id ?? "");
           setLocalSlug(data.slug ?? "");
+          setLocalLogo(data.logoUrl ?? "");
           if (!sessionData) sessionStorage.setItem(SESSION_KEY, raw);
+          // Fetch fresh data (logo, comuna)
+          if (data.id) {
+            fetch(`/api/locales/${data.id}`).then(r => r.ok ? r.json() : null).then(info => {
+              if (info) {
+                setLocalLogo(info.logoUrl ?? "");
+                setLocalComuna(info.comuna ?? info.ciudad ?? "");
+                if (info.slug && !data.slug) {
+                  data.slug = info.slug;
+                  setLocalSlug(info.slug);
+                  localStorage.setItem(SESSION_KEY, JSON.stringify(data));
+                  sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+                }
+              }
+            }).catch(() => {});
+          }
           return;
         }
       }
@@ -68,12 +87,37 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* Desktop Sidebar */}
       <aside className="dc-panel-sidebar">
-        <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "block", padding: "24px 20px 8px" }}>
+        <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "block", padding: "24px 20px 12px" }}>
           🏮 DeseoComer
         </Link>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", color: "var(--text-muted)", padding: "0 20px 10px" }}>
-          {localName || "Mi Local"}
-        </p>
+
+        {/* Local profile card */}
+        <div style={{ padding: "0 20px 14px", display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{
+            width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
+            background: localLogo ? "transparent" : "linear-gradient(135deg, rgba(232,168,76,0.25), rgba(232,168,76,0.1))",
+            border: "2px solid rgba(232,168,76,0.3)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            overflow: "hidden",
+          }}>
+            {localLogo ? (
+              <img src={localLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+            ) : (
+              <span style={{ fontSize: "1.1rem" }}>🏪</span>
+            )}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", color: "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {localName || "Mi Local"}
+            </p>
+            {localComuna && (
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "var(--text-muted)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                📍 {localComuna}
+              </p>
+            )}
+          </div>
+        </div>
+
         <a href="/" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", textTransform: "uppercase", opacity: 0.7 }}>
           ← Ver DeseoComer
         </a>

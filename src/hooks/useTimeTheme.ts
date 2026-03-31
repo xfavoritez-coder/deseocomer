@@ -110,15 +110,22 @@ function getPeriod(hour: number): TimePeriod {
   return "noche";
 }
 
+// Fixed default for SSR — the inline <script> in layout.tsx already sets correct
+// CSS vars on the client, so the visual flash is minimal. Using a fixed default
+// avoids hydration mismatch when server build time differs from client time.
+const SSR_DEFAULT: TimePeriod = "dia";
+
 export function useTimeTheme(): TimeTheme {
-  // Initialize with current period
-  const [theme, setTheme] = useState<TimeTheme>(() =>
-    getThemeByPeriod(getPeriod(new Date().getHours()))
-  );
-  const periodRef = useRef(theme.period);
+  const [theme, setTheme] = useState<TimeTheme>(getThemeByPeriod(SSR_DEFAULT));
+  const periodRef = useRef<TimePeriod>(SSR_DEFAULT);
 
   useEffect(() => {
-    applyThemeVars(theme);
+    // Set real period based on client time
+    const realPeriod = getPeriod(new Date().getHours());
+    periodRef.current = realPeriod;
+    const realTheme = getThemeByPeriod(realPeriod);
+    setTheme(realTheme);
+    applyThemeVars(realTheme);
 
     // Interval: solo actualizar cuando el período cambia realmente
     const interval = setInterval(() => {

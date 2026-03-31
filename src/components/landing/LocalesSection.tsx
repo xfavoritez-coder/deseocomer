@@ -17,12 +17,12 @@ function getInitials(nombre: string): string {
 }
 
 const localesMock = [
-  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 0, precio: "", isOpen: true, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" },
-  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 0, precio: "", isOpen: true, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600" },
-  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 0, precio: "", isOpen: true, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600" },
-  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 0, precio: "", isOpen: true, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
-  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 0, precio: "", isOpen: true, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600" },
-  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 0, precio: "", isOpen: true, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600" },
+  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 0, precio: "", isOpen: true, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", logoUrl: null as string | null },
+  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 0, precio: "", isOpen: true, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", logoUrl: null as string | null },
+  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 0, precio: "", isOpen: true, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600", logoUrl: null as string | null },
+  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 0, precio: "", isOpen: true, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", logoUrl: null as string | null },
+  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 0, precio: "", isOpen: true, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", logoUrl: null as string | null },
+  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 0, precio: "", isOpen: true, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", logoUrl: null as string | null },
 ];
 
 export default function LocalesSection() {
@@ -39,6 +39,7 @@ export default function LocalesSection() {
           rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,
           descripcion: l.descripcion ?? "",
           imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+          logoUrl: l.logoUrl ?? null,
         })));
       }
     }).catch(() => {});
@@ -131,13 +132,14 @@ export default function LocalesSection() {
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", flex: 1, minWidth: 0 }}>
                     <div style={{
                       width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0,
-                      background: `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
-                      border: `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
+                      background: local.logoUrl ? "transparent" : `hsl(${nameToHue(local.nombre)}, 38%, 26%)`,
+                      border: local.logoUrl ? "2px solid rgba(232,168,76,0.3)" : `1px solid hsl(${nameToHue(local.nombre)}, 40%, 42%)`,
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.8rem",
                       color: `hsl(${nameToHue(local.nombre)}, 65%, 72%)`,
+                      overflow: "hidden",
                     }}>
-                      {getInitials(local.nombre)}
+                      {local.logoUrl ? <img src={local.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)", color: "#f5d080", lineHeight: 1.2, margin: 0 }}>{local.nombre}</h3>

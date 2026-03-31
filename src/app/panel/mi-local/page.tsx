@@ -44,9 +44,8 @@ const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", backgroun
 export default function MiLocalPage() {
   const [d, setD] = useState<Record<string, unknown>>({});
   const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "error" } | null>(null);
-  const [passActual, setPassActual] = useState("");
-  const [passNueva, setPassNueva] = useState("");
-  const [passConfirm, setPassConfirm] = useState("");
+
+
   const [buscandoDireccion, setBuscandoDireccion] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sugerencias, setSugerencias] = useState<any[]>([]);
@@ -139,16 +138,6 @@ export default function MiLocalPage() {
     }
   };
 
-  const handleCambiarPass = async () => {
-    if (passNueva !== passConfirm || passNueva.length < 8) return;
-    try {
-      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      const res = await fetch("/api/auth/cambiar-password-local", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: session.id, passActual, passNueva }) });
-      if (res.ok) { showToast("✓ Contraseña actualizada"); setPassActual(""); setPassNueva(""); setPassConfirm(""); }
-      else { const err = await res.json(); showToast(err.error ?? "Error", "error"); }
-    } catch { showToast("Error de conexión", "error"); }
-  };
-
   return (
     <div style={{ maxWidth: "680px" }}>
       {toast && (
@@ -158,23 +147,7 @@ export default function MiLocalPage() {
         </div>
       )}
 
-      <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Mi Local</h1>
-
-      <SectionTitle>Datos del dueño o encargado</SectionTitle>
-      <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
-        <Field label="Nombre del dueño o encargado" value={d.nombreDueno as string ?? ""} onChange={v => set("nombreDueno", v)} placeholder="Tu nombre completo" />
-        <Field label="Celular del dueño" value={d.celularDueno as string ?? ""} onChange={v => set("celularDueno", v)} placeholder="+56 9 1234 5678" />
-        <Field label="Email de acceso" value={d.emailDueno as string ?? ""} onChange={v => set("emailDueno", v)} placeholder="tu@email.com" />
-      </div>
-
-      <SectionTitle>Seguridad</SectionTitle>
-      <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
-        <Field label="Contraseña actual" value={passActual} onChange={setPassActual} placeholder="Tu contraseña actual" type="password" />
-        <Field label="Nueva contraseña" value={passNueva} onChange={setPassNueva} placeholder="Mínimo 8 caracteres" type="password" />
-        <Field label="Confirmar nueva contraseña" value={passConfirm} onChange={setPassConfirm} placeholder="Repite la nueva contraseña" type="password" />
-        <button onClick={handleCambiarPass} disabled={!passActual || !passNueva || passNueva !== passConfirm || passNueva.length < 8} style={{ alignSelf: "flex-start", padding: "10px 24px", background: passActual && passNueva && passNueva === passConfirm && passNueva.length >= 8 ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
-        {passNueva && passConfirm && passNueva !== passConfirm && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b" }}>Las contraseñas no coinciden</p>}
-      </div>
+      <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Datos de Local</h1>
 
       <SectionTitle>Información del local</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -8,6 +8,7 @@ const TEXT_SHADOW = "0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.6)";
 export default function HeroSection() {
   const theme     = useTheme();
   const { period, heroGradient, heroAtmosphere, starCount, accent } = theme;
+  const [mounted, setMounted] = useState(false);
 
   const starsRef    = useRef<HTMLDivElement>(null);
   const prevPeriod  = useRef<string>("");
@@ -37,6 +38,8 @@ export default function HeroSection() {
     }
   });
 
+  useEffect(() => { setMounted(true); }, []);
+
   const isDay  = period === "dia";
   const hasSky = period === "madrugada" || period === "noche";
 
@@ -52,7 +55,7 @@ export default function HeroSection() {
       alignItems: "center",
       justifyContent: "center",
       overflow: "hidden",
-      background: heroGradient,
+      background: mounted ? heroGradient : "var(--bg-primary)",
       transition: "background 2s ease",
       marginBottom: 0,
       paddingBottom: 0,
@@ -65,7 +68,7 @@ export default function HeroSection() {
       />
 
       {/* ── Glow atmosférico (solo noche/madrugada) ── */}
-      {!isDay && (
+      {mounted && !isDay && (
         <div style={{
           position: "absolute", inset: 0,
           background: heroAtmosphere,
@@ -75,7 +78,7 @@ export default function HeroSection() {
       )}
 
       {/* ── Objetos del cielo ── */}
-      {period === "dia" && (
+      {mounted && period === "dia" && (
         <div className="dc-sky dc-sky--sun" style={{
           position: "absolute", top: "7%", left: "50%",
           transform: "translateX(-50%)",
@@ -85,7 +88,7 @@ export default function HeroSection() {
           pointerEvents: "none", zIndex: 4,
         }}>☀️</div>
       )}
-      {hasSky && (
+      {mounted && hasSky && (
         <div className="dc-sky dc-sky--moon" style={{
           position: "absolute", top: "8%", right: "14%",
           fontSize: period === "madrugada" ? "50px" : "58px",
