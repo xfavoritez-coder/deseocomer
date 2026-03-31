@@ -7,15 +7,13 @@ export async function GET() {
   try {
     const locales = await prisma.local.findMany({
       where: { activo: true },
-      select: {
-        id: true, slug: true, nombre: true, categoria: true,
-        descripcion: true, comuna: true, logoUrl: true,
-        portadaUrl: true, verificado: true, horarios: true,
-        tags: true, createdAt: true,
+      include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
       },
     });
-    return NextResponse.json(locales);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const safe = locales.map(({ password: _, ...rest }) => rest);
+    return NextResponse.json(safe);
   } catch (error) {
     console.error("[API /locales GET] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
