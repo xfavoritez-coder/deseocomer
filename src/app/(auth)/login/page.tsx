@@ -53,7 +53,7 @@ export default function LoginPage() {
           <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p>
         </div>
 
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Bienvenido de vuelta</h1>
+        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Bienvenido</h1>
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "28px" }}>¿No tienes cuenta? <Link href="/registro" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Regístrate gratis →</Link></p>
 
         {error && (
