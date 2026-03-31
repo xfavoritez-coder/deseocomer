@@ -124,6 +124,13 @@ export default function LoginPage() {
             )}
           </div>
         )}
+        {/* Separador */}
+        <div style={{ width: "100%", height: "1px", background: "rgba(255,255,255,0.06)", margin: "16px 0" }} />
+
+        {/* Link para locales */}
+        <Link href="/login-local" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textDecoration: "none" }}>
+          🏪 ¿Eres un local asociado? Entra aquí →
+        </Link>
       </div>
       </div>
     </main>
