@@ -74,11 +74,15 @@ export default function ConcursoDetallePage() {
     const param = segments[0] ?? "";
     if (!param) { setDbLoading(false); return; }
     setDbLoading(true);
-    fetch(`/api/concursos/${param}`)
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setDbConcurso(data); setDbLoading(false); })
-      .catch(() => setDbLoading(false));
-  }, [segments[0]]);
+    fetch(`/api/concursos/${encodeURIComponent(param)}`)
+      .then(r => {
+        if (!r.ok) throw new Error("Not found");
+        return r.json();
+      })
+      .then(data => { setDbConcurso(data); setDbLoading(false); })
+      .catch(() => { setDbConcurso(null); setDbLoading(false); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [segments.join("/")]);
 
   // Build concurso/finalizado from DB data if needed
   const concurso = concursoMock ?? (dbConcurso ? {
