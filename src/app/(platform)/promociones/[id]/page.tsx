@@ -97,6 +97,9 @@ export default function PromocionDetailPage() {
           <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 70%)" }} />
         )}
 
+        {/* Back link */}
+        <Link href="/promociones" style={{ position: "absolute", top: "clamp(80px, 12vw, 100px)", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
+
         {/* Sello pill */}
         {sello && (
           <div style={{ position: "absolute", top: "100px", right: "clamp(20px, 5vw, 60px)", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "6px 16px" }}>
