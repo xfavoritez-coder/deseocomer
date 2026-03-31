@@ -386,39 +386,33 @@ export default function ConcursoDetallePage() {
         );
       })()}
 
-      {/* ── Banner ── */}
-      <section className="dc-cd-banner">
-        {/* Image full width — no padding */}
-        <div style={{ position: "relative", width: "100%", height: "clamp(220px, 45vw, 420px)", overflow: "hidden", background: "rgba(45,26,8,0.8)" }}>
+      {/* ── Hero with title over photo ── */}
+      <section style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "relative", height: "clamp(240px, 45vw, 480px)", overflow: "hidden" }}>
           {c.imagenUrl ? (
-            <>
-              <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
-              <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="lg" /></div>
-            </>
+            <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
             <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>
           )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.15) 0%, rgba(10,8,18,0.92) 100%)" }} />
+          <Link href="/concursos" style={{ position: "absolute", top: "16px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Concursos</Link>
+          <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, pointerEvents: "none", lineHeight: 0 }}><SelloGratis size="sm" /></div>
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: "clamp(16px,4vw,32px)", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "#3db89e", marginBottom: "8px" }}>{c.local}</p>
+            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.2, margin: 0 }}>{c.premio}</h1>
+          </div>
         </div>
-
-        {/* Info with padding */}
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "28px clamp(20px, 5vw, 60px) 0" }}>
-          <Link href="/concursos" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "20px" }}>
-            ← Todos los concursos
-          </Link>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "#3db89e", marginBottom: "12px" }}>{c.local}</p>
-          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 3vw, 2rem)", fontWeight: 900, color: "#e8a84c", lineHeight: 1.3, marginBottom: "16px" }}>{c.premio}</h1>
-          <div style={{ width: "60px", height: "1px", marginBottom: "16px", background: "linear-gradient(90deg, #e8a84c, transparent)" }} />
-          {"descripcionPremio" in c && (
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(253,240,200,0.75)", fontWeight: 400, lineHeight: 1.65, maxWidth: "600px" }}>
+        {"descripcionPremio" in c && (c as typeof c & { descripcionPremio: string }).descripcionPremio && (
+          <div style={{ textAlign: "center", padding: "20px clamp(20px,5vw,80px) 24px", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
+            <div style={{ width: "40px", height: "1px", background: "linear-gradient(90deg, transparent, #e8a84c, transparent)", margin: "0 auto 14px" }} />
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2vw, 1rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7, maxWidth: "560px", margin: "0 auto" }}>
               {(c as typeof c & { descripcionPremio: string }).descripcionPremio}
             </p>
-          )}
-          {isEnded && "fechaFin" in c && (
-            <div style={{ display: "inline-block", marginTop: "16px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>
-              Concurso finalizado · {(c as typeof c & { fechaFin: string }).fechaFin}
-            </div>
-          )}
-        </div>
+            {isEnded && (
+              <div style={{ display: "inline-block", marginTop: "12px", background: "rgba(255,255,255,0.06)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-muted)" }}>Concurso finalizado</div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── Body: 2-col grid (main + ranking sidebar) ── */}
@@ -481,24 +475,22 @@ export default function ConcursoDetallePage() {
           {/* 3. Así se gana */}
           {!isEnded && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#e8a84c", textAlign: "center", marginBottom: "20px" }}>⚡ Así se gana</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }} className="dc-asi-grid">
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", textAlign: "center", marginBottom: "16px" }}>Así se gana</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }} className="dc-asi-grid">
                 {[
-                  { icon: "🎉", action: "Te registras por invitación", points: "+1 punto de bienvenida", color: "#3db89e" },
-                  { icon: "👥", action: "Un amigo se registra con tu link", points: "+2 puntos para ti", color: "#e8a84c" },
-                  { icon: "🤝", action: "Apoyas a un participante", points: "+1 punto para él", color: "#2a7a6f" },
+                  { icon: "🎉", pts: "+1", desc: "Al registrarte", highlight: false },
+                  { icon: "👥", pts: "+2", desc: "Por cada referido", highlight: true },
+                  { icon: "🤝", pts: "+1", desc: "Al apoyar a otro", highlight: false },
                 ].map((item, i) => (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "24px 20px", textAlign: "center" }}>
-                    <span style={{ fontSize: "2rem", display: "block", marginBottom: "12px" }}>{item.icon}</span>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.75)", margin: "0 0 12px", lineHeight: 1.5 }}>{item.action}</p>
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", fontWeight: 900, color: item.color, margin: 0 }}>{item.points}</p>
+                  <div key={i} style={{ background: item.highlight ? "rgba(232,168,76,0.08)" : "rgba(255,255,255,0.03)", border: item.highlight ? "1px solid rgba(232,168,76,0.25)" : "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "16px 8px", textAlign: "center" }}>
+                    <div style={{ fontSize: "1.5rem", marginBottom: "8px" }}>{item.icon}</div>
+                    <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)", marginBottom: "6px" }}>{item.pts}</div>
+                    <div style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.5 }}>{item.desc}</div>
                   </div>
                 ))}
               </div>
-              <div style={{ textAlign: "center", marginTop: "16px" }}>
-                <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.3)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.12)", paddingBottom: "2px" }}>
-                  ¿Tienes dudas? Ver guía completa →
-                </Link>
+              <div style={{ textAlign: "center", marginTop: "12px" }}>
+                <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.25)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.1)", paddingBottom: "1px" }}>¿Tienes dudas? Ver guía completa →</Link>
               </div>
             </div>
           )}
@@ -518,22 +510,22 @@ export default function ConcursoDetallePage() {
 
           {/* 5. Sobre el local */}
           {"descripcionLocal" in c && (() => {
-            const localColors = ["#2a7a6f", "#7c3fa8", "#c4853a", "#2d6a8f", "#8f2d5a", "#4a7a2a"];
-            const localColor = localColors[c.local.charCodeAt(0) % localColors.length];
             const localInitials = c.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
             return (
-              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "16px", padding: "24px", display: "flex", gap: "20px", alignItems: "center" }}>
+              <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "18px 20px", display: "flex", gap: "14px", alignItems: "center" }}>
                 {LOCAL_IMAGES[c.localId] ? (
-                  <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "72px", height: "72px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                  <img src={LOCAL_IMAGES[c.localId]} alt={c.local} style={{ width: "48px", height: "48px", borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
                 ) : (
-                  <div style={{ width: "72px", height: "72px", borderRadius: "50%", flexShrink: 0, background: localColor, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", fontWeight: 700, color: "#fff" }}>{localInitials}</div>
+                  <div style={{ width: "48px", height: "48px", borderRadius: "50%", flexShrink: 0, background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, color: "#fff" }}>{localInitials}</div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", fontWeight: 700, marginBottom: "4px" }}>{c.local}</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(253,240,200,0.7)", lineHeight: 1.7, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden", marginBottom: "8px" }}>
-                    {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
-                  </p>
-                  <Link href={`/locales/${c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--oasis-bright)", textDecoration: "none" }}>Ver perfil completo →</Link>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", fontWeight: 700, color: "#e8a84c", marginBottom: "3px" }}>{c.local}</p>
+                  {(c as typeof c & { descripcionLocal: string }).descripcionLocal && (
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.6, marginBottom: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                      {(c as typeof c & { descripcionLocal: string }).descripcionLocal}
+                    </p>
+                  )}
+                  <Link href={`/locales/${c.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", letterSpacing: "0.1em", color: "var(--oasis-bright)", textDecoration: "none" }}>Ver perfil completo →</Link>
                 </div>
               </div>
             );
@@ -692,23 +684,22 @@ export default function ConcursoDetallePage() {
       <Footer />
 
       <style>{`
-        .dc-cd-banner {
-          padding-top: 64px;
-          padding-bottom: 32px;
-        }
-
         .dc-cd-body {
-          max-width: 1200px; margin: 0 auto;
-          padding: 40px 60px 80px;
           display: grid;
           grid-template-columns: 1fr 320px;
-          gap: 40px; align-items: start;
+          gap: 32px;
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 32px clamp(16px, 4vw, 48px) 80px;
+          align-items: start;
         }
         .dc-cd-main {
           display: flex; flex-direction: column;
-          gap: 32px; min-width: 0;
+          gap: 20px; min-width: 0;
         }
-        .dc-cd-sidebar { min-width: 0; }
+        .dc-cd-sidebar {
+          position: sticky; top: 100px; min-width: 0;
+        }
 
         @keyframes dc-slideUp {
           from { opacity: 0; transform: translateX(-50%) translateY(16px); }
@@ -721,14 +712,14 @@ export default function ConcursoDetallePage() {
 
 
         @media (max-width: 1023px) {
-          .dc-cd-body { grid-template-columns: 1fr; padding: 32px 40px 60px; gap: 24px; }
-          .dc-cd-sidebar { order: -1; }
+          .dc-cd-body { grid-template-columns: 1fr; padding: 24px clamp(16px, 4vw, 32px) 60px; gap: 20px; }
+          .dc-cd-sidebar { position: static; order: 2; }
           .dc-cd-sidebar > div { position: static !important; }
+          .dc-cd-main { order: 1; }
         }
         @media (max-width: 767px) {
-          .dc-cd-banner { padding-top: 56px; padding-bottom: 20px; }
-          .dc-cd-body { padding: 24px 20px 48px; }
-          .dc-asi-grid { grid-template-columns: 1fr !important; }
+          .dc-cd-body { padding: 20px 16px 48px; }
+          .dc-asi-grid { grid-template-columns: repeat(3, 1fr) !important; }
         }
       `}</style>
     </main>
