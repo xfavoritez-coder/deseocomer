@@ -269,20 +269,16 @@ export default function LocalesPage() {
                           </div>
                         )}
                         <div style={{ minWidth: 0 }}>
-                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.15rem", fontWeight: 700, color: "#f5d080", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.15rem", fontWeight: 700, color: "#f5d080" }}>
                             <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{local.nombre}</span>
-                            {local.verificado && <span style={{ fontSize: "0.7rem", color: "#e8a84c" }}>✓</span>}
                           </p>
                         </div>
                       </div>
 
-                      {/* Row 2: Location + Price */}
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                      {/* Row 2: Location */}
+                      <div style={{ marginBottom: "8px" }}>
                         <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--oasis-bright, rgba(95,240,208,0.8))" }}>
                           📍 {local.comuna}
-                        </span>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-                          {local.precio}
                         </span>
                       </div>
 
@@ -296,9 +292,11 @@ export default function LocalesPage() {
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--text-muted)", background: "rgba(0,0,0,0.2)", padding: "5px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.12)" }}>
                           {local.categoria}
                         </span>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>
-                          ⭐ {local.rating}
-                        </span>
+                        {(local._count?.resenas ?? 0) > 0 && (
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>
+                            ⭐ {local.rating}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </Link>
