@@ -2,12 +2,12 @@
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
 
-interface ConcursoHome { id: number; slug: string; local: string; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+interface ConcursoHome { id: string; slug: string; local: string; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
   const [concursos, setConcursos] = useState(concursosMock);
-  const [tiempos, setTiempos] = useState<Record<number, {d:number,h:number,m:number,s:number}>>({});
+  const [tiempos, setTiempos] = useState<Record<string, {d:number,h:number,m:number,s:number}>>({});
 
   // Try fetching from API, fallback to mock
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function ConcursosSection() {
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setConcursos(sorted.slice(0, 3).map((c: any) => ({
-          id: c.id as number, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
+          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
           participantes: c._count?.participantes ?? 0,
           horasRestantes: Math.max(0, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
           fechaFin: c.fechaFin,
@@ -38,7 +38,7 @@ export default function ConcursosSection() {
 
   useEffect(() => {
     const calcular = () => {
-      const next: Record<number, {d:number,h:number,m:number,s:number}> = {};
+      const next: Record<string, {d:number,h:number,m:number,s:number}> = {};
       const ahora = Date.now();
       concursos.forEach(c => {
         const restMs = Math.max(0, new Date(c.fechaFin).getTime() - ahora);
