@@ -574,7 +574,9 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
     </div>
   );
 
-  // ── Not logged in → multi-step flow ──
+  // ── Not logged in → don't show birthday banner ──
+  if (!isAuthenticated) return null;
+
   return (
     <div style={{ ...box, position: "relative" }}>
       {paso === "banner" && closeBtn}
