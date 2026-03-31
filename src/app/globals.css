@@ -53,6 +53,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+@media (min-width: 1024px) {
+  html {
+    font-size: 17px;
+  }
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
