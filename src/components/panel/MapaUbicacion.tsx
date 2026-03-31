@@ -14,6 +14,7 @@ export default function MapaUbicacion({ lat, lng, onChange }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markerRef = useRef<any>(null);
 
+  // Initialize map once
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) return;
     import("leaflet").then(L => {
@@ -32,6 +33,18 @@ export default function MapaUbicacion({ lat, lng, onChange }: Props) {
     return () => { mapInstance.current?.remove(); mapInstance.current = null; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Update map when lat/lng change from outside (e.g. address search)
+  useEffect(() => {
+    if (!mapInstance.current || !markerRef.current) return;
+    if (!lat || !lng) return;
+    const currentPos = markerRef.current.getLatLng();
+    // Only move if position actually changed
+    if (Math.abs(currentPos.lat - lat) > 0.0001 || Math.abs(currentPos.lng - lng) > 0.0001) {
+      markerRef.current.setLatLng([lat, lng]);
+      mapInstance.current.setView([lat, lng], 16, { animate: true });
+    }
+  }, [lat, lng]);
 
   return (
     <div style={{ marginBottom: "8px" }}>
