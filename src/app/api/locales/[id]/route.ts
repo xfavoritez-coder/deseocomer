@@ -43,7 +43,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       data: {
         nombre: body.nombre, categoria: body.categoria, descripcion: body.descripcion,
         historia: body.historia, telefono: body.telefono, instagram: body.instagram,
-        direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad, sitioWeb: body.sitioWeb,
+        direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad,
+        ...(body.sitioWeb !== undefined && { sitioWeb: body.sitioWeb }),
         lat: body.lat, lng: body.lng,
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,
         galeria: body.galeria, tieneMenu: body.tieneMenu,
@@ -53,7 +54,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     const { password: _, ...safe } = local;
     return NextResponse.json(safe);
-  } catch {
+  } catch (err) {
+    console.error("[PUT /api/locales] Error:", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
