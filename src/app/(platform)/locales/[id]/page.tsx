@@ -153,7 +153,23 @@ export default function LocalDetailPage() {
   const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
   const tieneSidebar = tieneHorarios || tieneUbicacion;
-  const mostrarAbierto = tieneHorarios && local.isOpen;
+
+  // Calculate if currently open based on horarios
+  const estaAbierto = (() => {
+    if (!tieneHorarios) return false;
+    const now = new Date();
+    const hoy = local.horarios.find(h => h.dia === todayName);
+    if (!hoy || hoy.cerrado) return false;
+    const [aH, aM] = hoy.abre.split(":").map(Number);
+    const [cH, cM] = hoy.cierra.split(":").map(Number);
+    const minNow = now.getHours() * 60 + now.getMinutes();
+    const minAbre = aH * 60 + aM;
+    const minCierra = cH * 60 + cM;
+    if (minCierra > minAbre) return minNow >= minAbre && minNow < minCierra;
+    // Cierra después de medianoche (ej: 20:00 - 02:00)
+    return minNow >= minAbre || minNow < minCierra;
+  })();
+  const mostrarAbierto = tieneHorarios && estaAbierto;
 
   // Genie recommendation text
   const catScore = perfil.gustos.categorias[local.categoria.toLowerCase()] ?? 0;
@@ -195,11 +211,11 @@ export default function LocalDetailPage() {
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
-                {mostrarAbierto && (<>
+                {tieneHorarios && (<>
                   <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e" }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "#3db89e", letterSpacing: "0.1em" }}>Abierto</span>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: estaAbierto ? "#3db89e" : "#ff6b6b" }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: estaAbierto ? "#3db89e" : "#ff6b6b", letterSpacing: "0.1em" }}>{estaAbierto ? "Abierto" : "Cerrado"}</span>
                   </div>
                 </>)}
               </div>
