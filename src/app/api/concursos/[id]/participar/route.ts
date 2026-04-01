@@ -32,8 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       const local = await prisma.local.findUnique({ where: { id: concurso.localId }, select: { id: true, nombre: true, email: true, primerParticipanteNotificado: true } });
       if (local && !local.primerParticipanteNotificado) {
         const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
-        await prisma.local.update({ where: { id: local.id }, data: { primerParticipanteNotificado: true } });
-        await resend.emails.send({
+        const emailResult = await resend.emails.send({
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: local.email,
           subject: `🎉 ¡Tu concurso tiene su primer participante! — ${concurso.premio}`,
@@ -43,7 +42,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             nombreParticipante: usuario?.nombre ?? "Un usuario",
           }),
         });
-        console.log(`[Email primer participante] Enviado a ${local.email} para concurso ${concurso.premio}`);
+        console.log(`[Email primer participante] Enviado a ${local.email} para concurso ${concurso.premio}`, emailResult);
+        // Solo marcar como notificado si el email se envió correctamente
+        await prisma.local.update({ where: { id: local.id }, data: { primerParticipanteNotificado: true } });
       }
     } catch (emailErr) {
       console.error("[Email primer participante] Error:", emailErr);
