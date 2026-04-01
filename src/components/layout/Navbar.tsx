@@ -75,7 +75,7 @@ export default function Navbar() {
     <>
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
-      <nav className={`dc-nav${isHome && !scrolled ? " dc-nav--transparent" : ""}`}>
+      <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
         <Link href="/" className="dc-nav-logo">🏮 DeseoComer</Link>
 
         {/* Desktop links */}
@@ -204,9 +204,15 @@ export default function Navbar() {
           transition: background 0.3s ease, border-color 0.3s ease;
         }
         .dc-nav--transparent {
-          background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+          background: transparent;
           backdrop-filter: none;
           border-bottom: none;
+          box-shadow: none;
+        }
+        .dc-nav--solid {
+          background: color-mix(in srgb, var(--bg-primary) 97%, black);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid var(--border-color);
         }
         .dc-nav-logo {
           font-family: var(--font-cinzel-decorative); font-size: 1.1rem;
