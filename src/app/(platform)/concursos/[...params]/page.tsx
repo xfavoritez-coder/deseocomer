@@ -195,8 +195,24 @@ function ConcursoDetallePage() {
     setSupportedMap(map);
   }, [user, concursoId, ranking]);
 
-  // ── Loading ──
-  if (dbLoading) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar /><div style={{ padding: "80px 40px", textAlign: "center" }}><p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)" }}>🧞 Cargando concurso...</p></div><Footer /></main>);
+  // ── Loading skeleton ──
+  if (dbLoading) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar />
+    <div className="dc-skeleton-wrap">
+      <div className="dc-sk dc-sk-hero" />
+      <div style={{ maxWidth: 680, margin: "0 auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <div className="dc-sk" style={{ height: 14, width: "40%", margin: "0 auto" }} />
+        <div className="dc-sk" style={{ height: 24, width: "70%", margin: "0 auto" }} />
+        <div className="dc-sk" style={{ height: 80, borderRadius: 12 }} />
+        <div className="dc-sk" style={{ height: 120, borderRadius: 12 }} />
+        <div className="dc-sk" style={{ height: 160, borderRadius: 12 }} />
+      </div>
+    </div>
+    <style>{`
+      .dc-sk { background: linear-gradient(90deg, rgba(232,168,76,0.06) 25%, rgba(232,168,76,0.12) 50%, rgba(232,168,76,0.06) 75%); background-size: 200% 100%; animation: dcShimmer 1.5s ease-in-out infinite; border-radius: 8px; }
+      .dc-sk-hero { height: 280px; border-radius: 0; }
+      @keyframes dcShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    `}</style>
+  <Footer /></main>);
 
   // ── 404 ──
   if (!concurso && !finalizado) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar /><div style={{ padding: "80px 40px", textAlign: "center" }}><p style={{ fontSize: "4rem", marginBottom: "20px" }}>🏆</p><h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", marginBottom: "24px" }}>Concurso no encontrado</h2><Link href="/concursos" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>← Volver a concursos</Link></div><Footer /></main>);
