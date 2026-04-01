@@ -18,13 +18,12 @@ interface MenuCat { nombre: string; items: MenuItem[] }
 function load(): Record<string, unknown> { try { return JSON.parse(localStorage.getItem(DATA_KEY) ?? "{}"); } catch { return {}; } }
 function save(d: Record<string, unknown>) { localStorage.setItem(DATA_KEY, JSON.stringify(d)); }
 
-function formatearDireccion(displayName: string): string {
+function formatearDireccion(displayName: string, addressObj?: Record<string, string>): string {
   const partes = displayName.split(",").map(p => p.trim());
   if (partes.length < 2) return displayName;
 
   let calle = partes[0];
   let numero = partes[1];
-  const sector = partes[2] ?? "";
 
   // Nominatim a veces devuelve "68, Dardignac, ..." (número primero)
   if (!isNaN(Number(calle)) && isNaN(Number(numero))) {
@@ -32,10 +31,14 @@ function formatearDireccion(displayName: string): string {
   }
 
   const calleFormateada = calle.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+
+  // Buscar comuna del addressObj de Nominatim
+  const comuna = addressObj?.city_district || addressObj?.suburb || addressObj?.town || addressObj?.city || "";
+
   if (numero && !isNaN(Number(numero))) {
-    return sector ? `${calleFormateada} ${numero}, ${sector}` : `${calleFormateada} ${numero}`;
+    return comuna ? `${calleFormateada} ${numero}, ${comuna}` : `${calleFormateada} ${numero}`;
   }
-  return `${calleFormateada}, ${numero}`;
+  return comuna ? `${calleFormateada}, ${numero}, ${comuna}` : `${calleFormateada}, ${numero}`;
 }
 
 const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
@@ -48,6 +51,7 @@ export default function MiLocalPage() {
   const [saved, setSaved] = useState(false);
 
   const [buscandoDireccion, setBuscandoDireccion] = useState(false);
+  const [busquedaMsg, setBusquedaMsg] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sugerencias, setSugerencias] = useState<any[]>([]);
 
@@ -189,7 +193,8 @@ export default function MiLocalPage() {
                 set("direccion", val);
                 if (val.length > 3) {
                   try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val + ", Santiago, Chile")}&format=json&limit=4&addressdetails=1`);
+                    const ciudad = (d.ciudad as string) || "Santiago";
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val + ", " + ciudad + ", Chile")}&format=json&limit=4&addressdetails=1`);
                     const data = await res.json();
                     setSugerencias(data);
                   } catch { /* ignore */ }
@@ -204,19 +209,23 @@ export default function MiLocalPage() {
               onClick={async () => {
                 const dir = d.direccion as string;
                 if (!dir) return;
-                setBuscandoDireccion(true);
+                setBuscandoDireccion(true); setBusquedaMsg("");
                 try {
-                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dir + ", Santiago, Chile")}&format=json&limit=1`);
+                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dir + ", Santiago, Chile")}&format=json&limit=1&addressdetails=1`);
                   const data = await res.json();
                   if (data[0]) {
                     set("lat", parseFloat(data[0].lat));
                     set("lng", parseFloat(data[0].lon));
-                    const formatted = formatearDireccion(data[0].display_name);
+                    const formatted = formatearDireccion(data[0].display_name, data[0].address);
                     set("direccion", formatted);
                     setSugerencias([]);
+                    setBusquedaMsg("✓ Dirección encontrada");
+                  } else {
+                    setBusquedaMsg("No se encontró la dirección. Intenta ser más específico.");
                   }
-                } catch { /* ignore */ }
+                } catch { setBusquedaMsg("Error al buscar. Intenta de nuevo."); }
                 setBuscandoDireccion(false);
+                setTimeout(() => setBusquedaMsg(""), 4000);
               }}
               style={{ padding: "10px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.08em", color: "var(--accent)", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}
             >
@@ -227,12 +236,13 @@ export default function MiLocalPage() {
           {/* Sugerencias dropdown */}
           {sugerencias.length > 0 && (
             <div style={{ position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50, background: "#0a0812", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", overflow: "hidden", marginTop: "4px", boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
-              {sugerencias.map((s: Record<string, string>, i: number) => (
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {sugerencias.map((s: any, i: number) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => {
-                    const formatted = formatearDireccion(s.display_name);
+                    const formatted = formatearDireccion(s.display_name, s.address);
                     set("direccion", formatted);
                     set("lat", parseFloat(s.lat));
                     set("lng", parseFloat(s.lon));
@@ -242,14 +252,15 @@ export default function MiLocalPage() {
                   onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(232,168,76,0.08)"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
                 >
-                  {formatearDireccion(s.display_name)}
+                  {formatearDireccion(s.display_name, s.address)}
                 </button>
               ))}
             </div>
           )}
         </div>
 
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "-6px", marginBottom: "4px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
+        {busquedaMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: busquedaMsg.startsWith("✓") ? "#3db89e" : "#ff8080", marginTop: "6px", marginBottom: "4px" }}>{busquedaMsg}</p>}
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: busquedaMsg ? "2px" : "-6px", marginBottom: "4px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
         <MapaUbicacion lat={d.lat as number || -33.4489} lng={d.lng as number || -70.6693} onChange={(lat, lng) => { set("lat", lat); set("lng", lng); }} />
       </div>
 
