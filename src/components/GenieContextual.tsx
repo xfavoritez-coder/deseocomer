@@ -106,7 +106,7 @@ export default function GenieContextual() {
 
   useEffect(() => {
     if (toastActivo) return;
-    if (pathname.startsWith("/panel") || pathname.startsWith("/admin")) return;
+    if (pathname.startsWith("/panel") || pathname.startsWith("/admin") || pathname.startsWith("/login") || pathname.startsWith("/registro") || pathname.startsWith("/reset-password") || pathname.startsWith("/verificar-email") || pathname.startsWith("/login-local")) return;
     if (pathname === "/") return;
     if (pathname.startsWith("/concursos/como-funciona")) return;
     if (yaVisto(pathname)) return;
