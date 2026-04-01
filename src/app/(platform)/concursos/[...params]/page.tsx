@@ -332,7 +332,7 @@ function ConcursoDetallePage() {
           <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
             <div style={{ width: '40px', height: '1px', background: 'rgba(232,168,76,0.4)', margin: '10px auto' }} />
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4 }}>{c.descripcionPremio}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>
           </>}
         </div>
       </section>
@@ -410,6 +410,16 @@ function ConcursoDetallePage() {
                     <div style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* 6.5 Descripción completa del premio (si fue truncada en hero) */}
+          {c.descripcionPremio && c.descripcionPremio.length > 120 && (
+            <div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Descripción del premio</p>
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 14px" }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", lineHeight: 1.45, margin: 0 }}>{c.descripcionPremio}</p>
               </div>
             </div>
           )}
