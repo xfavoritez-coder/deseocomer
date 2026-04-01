@@ -16,6 +16,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const local = await prisma.local.findUnique({ where: { id }, select: { nombre: true, email: true, activo: true, id: true } });
     if (!local) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
+    if (accion === "reenviar-activacion") {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
+      await resend.emails.send({
+        from: `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`,
+        to: [local.email],
+        subject: "Activa tu local en DeseoComer",
+        html: `<div style="background:#1a0e05;font-family:Georgia,serif;padding:40px;max-width:560px;margin:0 auto"><div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px"><h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡Tu local fue activado!</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Hola ${local.nombre}, tu local ya está visible en DeseoComer. Ingresa a tu panel para completar tu perfil y empezar a publicar.</p><div style="text-align:center"><a href="${appUrl}/login-local" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ir a mi panel →</a></div></div></div>`,
+      }).catch(err => console.error("[Email reenviar-activacion]", err));
+      return NextResponse.json({ ok: true });
+    }
+
     if (accion === "aprobar") {
       await prisma.local.update({ where: { id }, data: { activo: true } });
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
