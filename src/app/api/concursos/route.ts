@@ -9,7 +9,14 @@ export async function GET(req: NextRequest) {
     const offset = parseInt(searchParams.get("offset") ?? "0");
 
     const concursos = await prisma.concurso.findMany({
-      where: { activo: true },
+      where: {
+        activo: true,
+        local: {
+          activo: true,
+          direccion: { not: "" },
+          categoria: { not: null },
+        },
+      },
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true } },
         _count: { select: { participantes: true } },
