@@ -26,6 +26,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [localSlug, setLocalSlug] = useState("");
   const [localLogo, setLocalLogo] = useState("");
   const [localComuna, setLocalComuna] = useState("");
+  const [faltantes, setFaltantes] = useState<string[]>([]);
 
   useEffect(() => {
     setMontado(true);
@@ -49,6 +50,15 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               if (info) {
                 setLocalLogo(info.logoUrl ?? "");
                 setLocalComuna(info.comuna ?? info.ciudad ?? "");
+                // Check completeness
+                const missing: string[] = [];
+                if (!info.ciudad) missing.push("Ciudad");
+                if (!info.comuna) missing.push("Comuna");
+                if (!info.direccion) missing.push("Dirección");
+                if (!info.categoria) missing.push("Categoría");
+                const hrs = info.horarios as { activo: boolean }[] | null;
+                if (!hrs || !Array.isArray(hrs) || !hrs.some(h => h.activo)) missing.push("Horario");
+                setFaltantes(missing);
                 if (info.slug && !data.slug) {
                   data.slug = info.slug;
                   setLocalSlug(info.slug);
@@ -112,7 +122,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             </p>
             {localComuna && (
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "var(--text-muted)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                📍 {localComuna}
+                {localComuna}
               </p>
             )}
           </div>
@@ -159,6 +169,19 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
       {/* Main content */}
       <main className="dc-panel-main">
+        {faltantes.length > 0 && (
+          <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "14px", padding: "16px 20px", marginBottom: "24px", display: "flex", alignItems: "flex-start", gap: "12px" }}>
+            <span style={{ fontSize: "1.3rem", flexShrink: 0, marginTop: "2px" }}>⚠️</span>
+            <div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700, marginBottom: "6px" }}>Tu local aún no está visible en DeseoComer</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "8px" }}>Completa los siguientes datos para activar tu local en la plataforma:</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
+                {faltantes.map(f => <span key={f} style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: "6px", padding: "3px 10px", color: "#ff8080" }}>{f}</span>)}
+              </div>
+              <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "underline" }}>Ir a Datos de Local →</Link>
+            </div>
+          </div>
+        )}
         {children}
       </main>
 

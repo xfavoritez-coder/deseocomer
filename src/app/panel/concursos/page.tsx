@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import SubirFoto from "@/components/SubirFoto";
 
 const SESSION_KEY = "deseocomer_local_session";
-const PREMIOS = ["Pizza familiar", "Menú para 2", "Postre gratis", "Happy hour para 4", "Café por un mes"];
+
+
 const DURACIONES = [{ l: "3 días", v: 3 }, { l: "7 días", v: 7 }, { l: "14 días", v: 14 }, { l: "30 días", v: 30 }];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,12 +21,14 @@ export default function PanelConcursos() {
   const [detalle, setDetalle] = useState<Concurso | null>(null);
   const [step, setStep] = useState(1);
   const [premio, setPremio] = useState("");
-  const [custom, setCustom] = useState("");
+
+
   const [dur, setDur] = useState(7);
   const [imagenConcurso, setImagenConcurso] = useState("");
   const [descripcionPremio, setDescripcionPremio] = useState("");
   const [condiciones, setCondiciones] = useState("");
   const [copied, setCopied] = useState(false);
+  const [confirmPublish, setConfirmPublish] = useState(false);
   const [reportModal, setReportModal] = useState<{ id: string; nombre: string } | null>(null);
   const [reportToast, setReportToast] = useState(false);
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set());
@@ -53,8 +56,9 @@ export default function PanelConcursos() {
     } else setLoading(false);
   }, []);
 
-  const pFinal = premio === "custom" ? custom : premio;
+  const pFinal = premio;
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "10px 18px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: sel ? 700 : 400 });
+  const labelReq = (text: string, required = true): React.ReactNode => <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>{text}{required && <span style={{ color: "#ff6b6b", marginLeft: "4px" }}>*</span>}</h3>;
 
   const publish = async () => {
     const s = getSession();
@@ -70,7 +74,7 @@ export default function PanelConcursos() {
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setCustom(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones("");
+    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false);
   };
 
   const copyLink = (c: Concurso) => {
@@ -312,42 +316,85 @@ export default function PanelConcursos() {
 
       {step === 1 && (<div>
         <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>¿Qué vas a regalar?</h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "16px" }}>
-          {PREMIOS.map(p => <button key={p} onClick={() => setPremio(p)} style={chip(premio === p)}>{p}</button>)}
-          <button onClick={() => setPremio("custom")} style={chip(premio === "custom")}>Escribe el tuyo...</button>
-        </div>
-        {premio === "custom" && <input style={I} value={custom} onChange={e => setCustom(e.target.value)} placeholder="Describe el premio..." />}
 
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Descripción del premio (opcional)</h3>
+        {labelReq("Premio")}
+        <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, café por un mes, etc" />
+
+        {labelReq("Descripción del premio")}
         <input style={I} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
 
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>¿Cuánto dura?</h3>
+        {labelReq("Duración")}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
 
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Foto del concurso (opcional)</h3>
+        {labelReq("Foto del concurso")}
         <SubirFoto folder="concursos" preview={imagenConcurso || null} label="Subir foto del premio" height="140px" onUpload={url => setImagenConcurso(url)} />
 
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>Condiciones (opcional)</h3>
-        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: Deben seguir nuestra cuenta de Instagram, compartir la publicación..." maxLength={500} />
+        {labelReq("Condiciones", false)}
+        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: solo para retiro en local, días de canje, etc" maxLength={500} />
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", marginTop: "6px" }}>{condiciones.length}/500</p>
 
-        <button onClick={() => pFinal.trim() && setStep(2)} disabled={!pFinal.trim()} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() ? 1 : 0.5 }}>Siguiente →</button>
+        <button onClick={() => pFinal.trim() && descripcionPremio.trim() && imagenConcurso && setStep(2)} disabled={!pFinal.trim() || !descripcionPremio.trim() || !imagenConcurso} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() && descripcionPremio.trim() && imagenConcurso ? 1 : 0.5 }}>Siguiente →</button>
       </div>)}
 
       {step === 2 && (<div>
-        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Confirmar y publicar</h2>
-        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", marginBottom: "24px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Premio</span><p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", marginTop: "4px" }}>{pFinal}</p></div>
-            <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Duración</span><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginTop: "4px" }}>{dur} días</p></div>
-            {imagenConcurso && <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Foto</span><img src={imagenConcurso} alt="" style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "10px", marginTop: "6px" }} /></div>}
-            {condiciones && <div><span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)" }}>Condiciones</span><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "4px", lineHeight: 1.5 }}>{condiciones}</p></div>}
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Previa del concurso</h2>
+        {/* Card preview estilo home */}
+        <div style={{ background: "rgba(20,12,35,0.95)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", overflow: "hidden", marginBottom: "24px" }}>
+          {imagenConcurso && (
+            <div style={{ position: "relative", height: "180px" }}>
+              <img src={imagenConcurso} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.6)", borderRadius: "20px", padding: "4px 12px" }}>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e", animation: "dcPulse 1.8s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", color: "#3db89e", textTransform: "uppercase" }}>Activo</span>
+              </div>
+            </div>
+          )}
+          <div style={{ padding: "20px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "#f5d080", lineHeight: 1.2, marginBottom: "8px" }}>🏆 {pFinal}</p>
+            {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px" }}>{descripcionPremio}</p>}
+            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Termina en</p>
+              <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                {[{ v: dur, l: "días" }, { v: 0, l: "hrs" }, { v: 0, l: "min" }].map((t, i) => (
+                  <div key={i} style={{ textAlign: "center" }}>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)" }}>{t.v}</span>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "var(--text-muted)", marginTop: "2px" }}>{t.l}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 0 participantes</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.08em", color: "var(--accent)" }}>Participar →</span>
+            </div>
           </div>
         </div>
+        {condiciones && (
+          <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "14px", marginBottom: "24px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Condiciones</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{condiciones}</p>
+          </div>
+        )}
         <div style={{ display: "flex", gap: "12px" }}>
           <button onClick={() => setStep(1)} style={{ ...B, background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)", flex: 1 }}>← Editar</button>
-          <button onClick={publish} style={{ ...B, flex: 2 }}>Publicar 🚀</button>
+          <button onClick={() => setConfirmPublish(true)} style={{ ...B, flex: 2 }}>Publicar</button>
         </div>
+
+        {/* Modal de confirmación */}
+        {confirmPublish && (<>
+          <div onClick={() => setConfirmPublish(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)" }} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: "400px", zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "32px 24px", textAlign: "center" }}>
+            <p style={{ fontSize: "2.5rem", marginBottom: "12px" }}>🏆</p>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", marginBottom: "14px" }}>¿Publicar concurso?</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>Tu concurso <strong style={{ color: "var(--accent)" }}>{pFinal}</strong> será visible para todos los usuarios de DeseoComer.</p>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={() => setConfirmPublish(false)} style={{ flex: 1, padding: "12px", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", color: "#e8a84c", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", cursor: "pointer" }}>Cancelar</button>
+              <button onClick={publish} style={{ flex: 1, padding: "12px", background: "#e8a84c", border: "none", borderRadius: "10px", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>Publicar</button>
+            </div>
+          </div>
+        </>)}
+
+        <style>{`@keyframes dcPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }`}</style>
       </div>)}
     </div>
   );

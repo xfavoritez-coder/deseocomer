@@ -44,7 +44,8 @@ const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", backgroun
 export default function MiLocalPage() {
   const [d, setD] = useState<Record<string, unknown>>({});
   const [toast, setToast] = useState<{ msg: string; tipo: "ok" | "error" } | null>(null);
-
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const [buscandoDireccion, setBuscandoDireccion] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,21 +74,21 @@ export default function MiLocalPage() {
   const tieneMenu = d.tieneMenu as boolean | undefined;
   const menuCats: MenuCat[] = (d.menuCategorias as MenuCat[]) ?? [];
   const setMenuCats = (cats: MenuCat[]) => set("menuCategorias", cats);
-  const galeria: string[] = (d.galeria as string[]) ?? [];
+
+
 
   const handleSave = async () => {
+    setSaving(true);
     save(d);
     try {
       const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-      if (!session.id) { showToast("No hay sesión activa", "error"); return; }
+      if (!session.id) { showToast("No hay sesión activa", "error"); setSaving(false); return; }
 
-      // Capitalizar dirección
       const preposiciones = ["de", "del", "la", "el", "los", "las", "y", "a", "en"];
       const direccionFormateada = (d.direccion as string ?? "").split(" ").map((w: string) => {
         if (preposiciones.includes(w.toLowerCase())) return w.toLowerCase();
         return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
       }).join(" ");
-      set("direccion", direccionFormateada);
 
       const res = await fetch(`/api/locales/${session.id}`, {
         method: "PUT",
@@ -106,7 +107,6 @@ export default function MiLocalPage() {
           horarios: d.horarios,
           logoUrl: d.logoUrl,
           portadaUrl: d.portadaUrl,
-          galeria: d.galeria,
           tags: d.tags ?? [],
           tieneMenu: d.tieneMenu,
           lat: d.lat,
@@ -116,25 +116,23 @@ export default function MiLocalPage() {
 
       if (res.ok) {
         const updated = await fetch(`/api/locales/${session.id}`).then(r => r.json()).catch(() => null);
-        if (updated) {
-          const merged = { ...d, logoUrl: updated.logoUrl ?? d.logoUrl, portadaUrl: updated.portadaUrl ?? d.portadaUrl, galeria: updated.galeria ?? d.galeria, horarios: updated.horarios ?? d.horarios, direccion: direccionFormateada };
-          setD(merged);
-          save(merged);
-          // Update session with slug if it was generated
-          if (updated.slug && !session.slug) {
-            session.slug = updated.slug;
-            localStorage.setItem("deseocomer_local_session", JSON.stringify(session));
-            sessionStorage.setItem("deseocomer_local_session", JSON.stringify(session));
-          }
+        if (updated?.slug && !session.slug) {
+          session.slug = updated.slug;
+          localStorage.setItem("deseocomer_local_session", JSON.stringify(session));
+          sessionStorage.setItem("deseocomer_local_session", JSON.stringify(session));
         }
-        showToast("✓ Cambios guardados correctamente");
+        setSaving(false);
+        setSaved(true);
+        setTimeout(() => window.location.reload(), 1200);
       } else {
         const err = await res.json().catch(() => ({}));
         showToast(err.error ?? "Error al guardar. Intenta de nuevo.", "error");
+        setSaving(false);
       }
     } catch (err) {
       console.error("[handleSave] Error:", err);
       showToast("Error de conexión. Intenta de nuevo.", "error");
+      setSaving(false);
     }
   };
 
@@ -148,6 +146,14 @@ export default function MiLocalPage() {
       )}
 
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Datos de Local</h1>
+
+      <SectionTitle>Fotos</SectionTitle>
+      <div style={{ marginBottom: "32px" }}>
+        <label style={LS}>Logo del local</label>
+        <SubirFoto folder="logos" circular preview={d.logoUrl as string || null} label="Subir logo" onUpload={url => set("logoUrl", url)} />
+        <label style={{ ...LS, marginTop: "20px" }}>Foto de portada</label>
+        <SubirFoto folder="portadas" preview={d.portadaUrl as string || null} label="Subir portada" height="160px" onUpload={url => set("portadaUrl", url)} />
+      </div>
 
       <SectionTitle>Información del local</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
@@ -258,24 +264,6 @@ export default function MiLocalPage() {
         ))}
       </div>
 
-      <SectionTitle>Fotos</SectionTitle>
-      <div style={{ marginBottom: "32px" }}>
-        <label style={LS}>Logo del local</label>
-        <SubirFoto folder="logos" circular preview={d.logoUrl as string || null} label="Subir logo" onUpload={url => set("logoUrl", url)} />
-        <label style={{ ...LS, marginTop: "20px" }}>Foto de portada</label>
-        <SubirFoto folder="portadas" preview={d.portadaUrl as string || null} label="Subir portada" height="160px" onUpload={url => set("portadaUrl", url)} />
-        <label style={{ ...LS, marginTop: "20px" }}>Galería ({galeria.length}/6)</label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: "8px", marginBottom: "10px" }}>
-          {galeria.map((url, i) => (
-            <div key={i} style={{ position: "relative", height: "80px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)" }}>
-              <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              <button onClick={() => set("galeria", galeria.filter((_, j) => j !== i))} style={{ position: "absolute", top: "4px", right: "4px", background: "rgba(0,0,0,0.7)", border: "none", color: "#ff8080", fontSize: "0.7rem", borderRadius: "50%", width: "20px", height: "20px", cursor: "pointer" }}>✕</button>
-            </div>
-          ))}
-        </div>
-        {galeria.length < 6 && <SubirFoto folder="galeria" label="+ Agregar foto" height="80px" onUpload={url => set("galeria", [...galeria, url])} />}
-      </div>
-
       <SectionTitle>Menú</SectionTitle>
       <div style={{ marginBottom: "32px" }}>
         <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}><input type="checkbox" checked={tieneMenu ?? false} onChange={e => set("tieneMenu", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>Mi local tiene menú con precios fijos</span></label>
@@ -297,11 +285,10 @@ export default function MiLocalPage() {
       <div style={{ padding: "24px 0 40px" }}>
         <button
           onClick={handleSave}
-          style={{ width: "100%", maxWidth: "300px", padding: "14px 32px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: "pointer", transition: "opacity 0.2s" }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+          disabled={saving || saved}
+          style={{ width: "100%", maxWidth: "300px", padding: "14px 32px", background: saved ? "#3db89e" : "var(--accent)", color: saved ? "#fff" : "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, border: "none", borderRadius: "12px", cursor: saving || saved ? "default" : "pointer", transition: "all 0.3s", opacity: saving ? 0.7 : 1 }}
         >
-          Guardar cambios →
+          {saving ? "Guardando..." : saved ? "✓ Guardado" : "Guardar cambios"}
         </button>
       </div>
 

@@ -6,13 +6,25 @@ import { makeLocalSlug } from "@/lib/slugify";
 export async function GET() {
   try {
     const locales = await prisma.local.findMany({
-      where: { activo: true },
+      where: {
+        activo: true,
+        ciudad: { not: "" },
+        comuna: { not: "" },
+        direccion: { not: "" },
+        categoria: { not: "" },
+      },
       include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
       },
     });
+    // Filter out locals without at least 1 active day in horarios
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const complete = locales.filter(l => {
+      if (!l.horarios || !Array.isArray(l.horarios)) return false;
+      return (l.horarios as { activo: boolean }[]).some(h => h.activo);
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const safe = locales.map(({ password: _, ...rest }) => rest);
+    const safe = complete.map(({ password: _, ...rest }) => rest);
     return NextResponse.json(safe);
   } catch (error) {
     console.error("[API /locales GET] Error:", error);

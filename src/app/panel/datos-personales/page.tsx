@@ -113,7 +113,7 @@ export default function DatosPersonalesPage() {
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>El email no se puede cambiar desde aquí</p>
         </div>
       </div>
-      <button onClick={handleSavePersonal} style={{ padding: "12px 28px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, border: "none", borderRadius: "10px", cursor: "pointer", marginBottom: "40px", transition: "opacity 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }} onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>Guardar datos personales →</button>
+      <button onClick={handleSavePersonal} style={{ padding: "12px 28px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, border: "none", borderRadius: "10px", cursor: "pointer", marginBottom: "40px", transition: "opacity 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }} onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>Guardar datos</button>
 
       <SectionTitle>Cambiar contraseña</SectionTitle>
 
