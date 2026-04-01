@@ -259,14 +259,22 @@ function ConcursoDetallePage() {
     <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden" }}>
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080" }}>Ranking en tiempo real</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "rgba(120,140,220,0.8)" }}>Ranking en tiempo real</span>
         <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>↻ cada 30 seg</span>
       </div>
       {ranking.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "20px 14px" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, marginBottom: 8 }}>🏆</p>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080", fontWeight: 700, marginBottom: 4 }}>¡El primer lugar te espera!</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4 }}>Nadie se ha unido aún. Únete ahora y empieza con ventaja.</p>
+        <div style={{ padding: "20px 14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "center", marginBottom: 6 }}>
+            <span style={{ fontSize: 20 }}>🏆</span>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080", fontWeight: 700, margin: 0 }}>¡El primer lugar te espera!</p>
+          </div>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4, textAlign: "center", marginBottom: isAuthenticated && !isParticipating && !isEnded ? 12 : 0 }}>Nadie se ha unido aún. Únete ahora y empieza con ventaja.</p>
+          {isAuthenticated && !isParticipating && !isEnded && (
+            <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.2)", border: "1px solid rgba(61,100,210,0.4)", borderRadius: 8, padding: "10px 16px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirme al concurso →"}</button>
+          )}
+          {!isAuthenticated && !isEnded && (
+            <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", textDecoration: "none", marginTop: 8, letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
+          )}
         </div>
       ) : ranking.map((r, i) => {
         const isMe = isAuthenticated && user && r.nombre.startsWith(user.nombre.split(" ")[0]);
@@ -293,6 +301,12 @@ function ConcursoDetallePage() {
           </div>
         );
       })}
+      {isAuthenticated && !isParticipating && !isEnded && (
+        <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.12)", border: "none", borderTop: "1px solid rgba(61,100,210,0.15)", padding: "12px 14px", fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirme al concurso →"}</button>
+      )}
+      {!isAuthenticated && !isEnded && (
+        <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", borderTop: "1px solid rgba(61,100,210,0.1)", padding: "10px 14px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.6)", textDecoration: "none", letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
+      )}
     </div>
   );
 
