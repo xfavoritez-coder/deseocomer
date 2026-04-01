@@ -8,8 +8,10 @@ type S = any;
 export default function AdminDashboard() {
   const [stats, setStats] = useState<S>(null);
 
-  useEffect(() => { adminFetch("/api/admin/stats").then(r => r.json()).then(setStats).catch(() => {}); }, []);
+  const [error, setError] = useState(false);
+  useEffect(() => { adminFetch("/api/admin/stats").then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(setStats).catch(() => setError(true)); }, []);
 
+  if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ fontSize: "2rem", marginBottom: "12px" }}>⚠️</p><p style={{ color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.9rem" }}>Error al cargar datos. Vuelve a iniciar sesión.</p><a href="/admin/login" style={{ color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.8rem" }}>Ir al login →</a></div>;
   if (!stats) return <p style={{ color: "rgba(240,234,214,0.5)", fontFamily: "Georgia" }}>Cargando...</p>;
 
   const cards = [

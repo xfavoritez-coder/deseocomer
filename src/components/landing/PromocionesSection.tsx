@@ -504,7 +504,7 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
     background: "var(--accent)", color: "var(--bg-primary)", border: "none",
     borderRadius: "10px", padding: "12px 24px", fontFamily: "var(--font-cinzel)",
     fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase",
-    fontWeight: 700, cursor: "pointer", width: "100%",
+    fontWeight: 700, cursor: "pointer",
   };
 
   const handleCerrarBanner = () => {

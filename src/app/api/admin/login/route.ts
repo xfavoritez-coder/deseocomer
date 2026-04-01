@@ -6,7 +6,8 @@ export async function POST(req: NextRequest) {
     if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Credenciales incorrectas" }, { status: 401 });
     }
-    return NextResponse.json({ ok: true, token: Buffer.from(`${email}:${Date.now()}`).toString("base64") });
+    // Return password as token since adminAuth validates against ADMIN_PASSWORD
+    return NextResponse.json({ ok: true, token: password });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
