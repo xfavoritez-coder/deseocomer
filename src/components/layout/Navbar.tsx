@@ -10,7 +10,6 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string; logoUrl?: string } | null>(null);
@@ -18,8 +17,6 @@ export default function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll);
     try {
       const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
       if (ls?.id && ls?.nombre && ls?.loggedIn) {
@@ -39,7 +36,6 @@ export default function Navbar() {
         }).catch(() => {});
       }
     } catch {}
-    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -65,7 +61,9 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`dc-nav${scrolled ? " dc-nav--scrolled" : ""}`}>
+      {/* Spacer to push content below fixed navbar */}
+      <div className="dc-nav-spacer" />
+      <nav className="dc-nav">
         <Link href="/" className="dc-nav-logo">🏮 DeseoComer</Link>
 
         {/* Desktop links */}
@@ -188,10 +186,6 @@ export default function Navbar() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 20px 60px;
           display: flex; justify-content: space-between; align-items: center;
-          background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
-          transition: background 0.3s ease, border-color 0.3s ease;
-        }
-        .dc-nav--scrolled {
           background: color-mix(in srgb, var(--bg-primary) 97%, black);
           backdrop-filter: blur(10px);
           border-bottom: 1px solid var(--border-color);
@@ -278,10 +272,13 @@ export default function Navbar() {
           to   { transform: translateX(0);    opacity: 1; }
         }
 
+        .dc-nav-spacer { height: 68px; }
+
         @media (max-width: 767px) {
           .dc-nav { padding: 14px 20px; }
           .dc-nav-links { display: none; }
           .dc-hamburger { display: flex; }
+          .dc-nav-spacer { height: 56px; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
           .dc-nav { padding: 18px 32px; }

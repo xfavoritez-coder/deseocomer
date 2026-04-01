@@ -48,7 +48,7 @@ export default function HeroSection() {
 
   return (
     <section style={{
-      minHeight: "100vh",
+      minHeight: "calc(100vh - 68px)",
       position: "relative",
       display: "flex",
       flexDirection: "column",
