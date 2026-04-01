@@ -77,6 +77,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = () => {
     sessionStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem("deseocomer_local_session");
+    localStorage.removeItem("deseocomer_session");
+    localStorage.removeItem("deseocomer_user_birthday");
     router.push("/login-local");
   };
 

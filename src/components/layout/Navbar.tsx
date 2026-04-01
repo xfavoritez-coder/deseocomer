@@ -69,7 +69,7 @@ export default function Navbar() {
   const isLocalLoggedIn = !!localSession;
   const localInitials = localSession?.nombre?.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase() ?? "L";
   const localName = localSession?.nombre?.split(" ")[0] ?? "";
-  const handleLocalLogout = () => { localStorage.removeItem("deseocomer_local_session"); sessionStorage.removeItem("deseocomer_local_session"); setLocalSession(null); setMenuOpen(false); window.location.href = "/"; };
+  const handleLocalLogout = () => { localStorage.removeItem("deseocomer_local_session"); sessionStorage.removeItem("deseocomer_local_session"); localStorage.removeItem("deseocomer_session"); localStorage.removeItem("deseocomer_user_birthday"); setLocalSession(null); setMenuOpen(false); window.location.href = "/"; };
 
   return (
     <>

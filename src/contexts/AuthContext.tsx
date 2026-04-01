@@ -112,6 +112,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         type: "user",
       };
 
+      // Cerrar sesión de local si existe
+      localStorage.removeItem("deseocomer_local_session");
+      sessionStorage.removeItem("deseocomer_local_session");
+
       setUser(authUser);
       localStorage.setItem(SESSION_KEY, JSON.stringify({
         id: data.data.id,
@@ -185,6 +189,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("deseocomer_user_birthday");
+    localStorage.removeItem("deseocomer_local_session");
+    sessionStorage.removeItem("deseocomer_local_session");
   }, []);
 
   return (
