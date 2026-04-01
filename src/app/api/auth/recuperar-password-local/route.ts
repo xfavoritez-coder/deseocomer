@@ -14,8 +14,9 @@ export async function POST(req: NextRequest) {
     // --- ENVIAR CÓDIGO ---
     if (action === "enviar") {
       // Support lookup by id or email
+      const isEmail = localId.includes("@");
       const local = await prisma.local.findFirst({
-        where: { OR: [{ id: localId }, { email: localId }] },
+        where: isEmail ? { email: localId } : { id: localId },
         select: { id: true, email: true, nombreDueno: true, nombre: true },
       });
       if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
@@ -64,8 +65,9 @@ export async function POST(req: NextRequest) {
       if (!codigo || !passNueva) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
       if (passNueva.length < 8) return NextResponse.json({ error: "Mínimo 8 caracteres" }, { status: 400 });
 
+      const isEmail = localId.includes("@");
       const local = await prisma.local.findFirst({
-        where: { OR: [{ id: localId }, { email: localId }] },
+        where: isEmail ? { email: localId } : { id: localId },
         select: { id: true, resetToken: true, resetTokenExpira: true },
       });
       if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
