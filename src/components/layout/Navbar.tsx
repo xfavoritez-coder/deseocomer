@@ -206,7 +206,7 @@ export default function Navbar() {
         .dc-nav--transparent {
           background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
           backdrop-filter: none;
-          border-bottom: 1px solid transparent;
+          border-bottom: none;
         }
         .dc-nav-logo {
           font-family: var(--font-cinzel-decorative); font-size: 1.1rem;
