@@ -10,6 +10,10 @@ export async function GET(req: NextRequest) {
     const usuario = await prisma.usuario.findFirst({ where: { tokenVerificacion: token } });
     if (!usuario) return NextResponse.json({ error: "Token inválido o ya usado" }, { status: 400 });
 
+    // Reject tokens older than 48 hours
+    const tokenAge = Date.now() - new Date(usuario.createdAt).getTime();
+    if (tokenAge > 48 * 60 * 60 * 1000) return NextResponse.json({ error: "Este enlace ha expirado. Solicita uno nuevo." }, { status: 400 });
+
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, tokenVerificacion: null } });
 
     // Mover puntos pendientes a reales en concursos activos

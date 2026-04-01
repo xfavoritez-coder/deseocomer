@@ -15,7 +15,7 @@ function getPerfilPct(p: any): number {
   let pct = 0;
   if (p.descripcion) pct += 20;
   if (p.logoUrl) pct += 15;
-  if (p.galeria?.length > 0) pct += 15;
+  if (p.portadaUrl) pct += 15;
   if (p.horarios?.length > 0 || (Array.isArray(p.horarios) && p.horarios.length > 0)) pct += 20;
   if (p.tieneMenu) pct += 15;
   if ((p.concursos?.length > 0) || (p._count?.concursos > 0)) pct += 15;
@@ -31,20 +31,24 @@ function DashboardContent() {
   const bienvenido = params.get("bienvenido") === "1";
   const [localName, setLocalName] = useState("");
   const [pct, setPct] = useState(0);
+  const [stats, setStats] = useState({ favoritos: 0, resenas: 0, concursos: 0, promociones: 0 });
 
   useEffect(() => {
     try {
       const session = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "{}");
       setLocalName(session.nombre ?? "");
-      // Try localStorage first for instant display
       const cached = getProfile();
       if (Object.keys(cached).length > 0) setPct(getPerfilPct(cached));
-      // Then fetch fresh data from API
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
             setPct(getPerfilPct(data));
-            // Update local cache for next time
+            setStats({
+              favoritos: data._count?.favoritos ?? 0,
+              resenas: data._count?.resenas ?? 0,
+              concursos: data._count?.concursos ?? data.concursos?.length ?? 0,
+              promociones: data._count?.promociones ?? data.promociones?.length ?? 0,
+            });
             const merged = { ...cached, ...data };
             localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(merged));
           }
@@ -66,9 +70,25 @@ function DashboardContent() {
       {bienvenido && (
         <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "14px", padding: "20px 24px", marginBottom: "28px" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--oasis-bright)", marginBottom: "6px", fontWeight: 700 }}>🎉 ¡Bienvenido a DeseoComer!</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Mi Local</Link> para empezar a publicar concursos y promociones.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Datos de Local</Link> para empezar a publicar concursos y promociones.</p>
         </div>
       )}
+
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "12px", marginBottom: "24px" }}>
+        {[
+          { label: "Favoritos", value: stats.favoritos, icon: "❤️" },
+          { label: "Reseñas", value: stats.resenas, icon: "⭐" },
+          { label: "Concursos", value: stats.concursos, icon: "🏆" },
+          { label: "Promociones", value: stats.promociones, icon: "⚡" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
+            <p style={{ fontSize: "1.4rem", marginBottom: "4px" }}>{s.icon}</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.2rem", color: "var(--accent)", fontWeight: 700 }}>{s.value}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
 
       {/* Profile progress */}
       <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px 24px", marginBottom: "24px" }}>
@@ -81,7 +101,7 @@ function DashboardContent() {
         </div>
         {pct < 60 && (
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#e8a84c", marginTop: "10px" }}>
-            ⚠️ Completa tu perfil para aparecer en el explorador de locales
+            Completa tu perfil para aparecer en el explorador de locales
           </p>
         )}
       </div>

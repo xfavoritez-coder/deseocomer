@@ -350,6 +350,10 @@ export default function PanelConcursos() {
             </div>
           )}
           <div style={{ padding: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.3), rgba(232,168,76,0.1))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.3)" }}>{(getSession().nombre ?? "L").charAt(0).toUpperCase()}</div>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--text-muted)" }}>{getSession().nombre ?? "Tu local"}</span>
+            </div>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "#f5d080", lineHeight: 1.2, marginBottom: "8px" }}>🏆 {pFinal}</p>
             {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px" }}>{descripcionPremio}</p>}
             <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}>

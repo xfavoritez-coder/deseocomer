@@ -116,7 +116,7 @@ export default function LocalesSection() {
         ) : (
         <div className="dc-loc-grid">
           {localesFiltrados.map(local => (
-            <Link key={local.id} href={`/locales/${local.id}`} className="dc-loc-card" style={{
+            <Link key={local.id} href={`/locales/${local.id}`} className="dc-loc-card" aria-label={`Ver local ${local.nombre}`} style={{
               backgroundColor: "rgba(255,255,255,0.04)",
               borderRadius: "20px",
               textDecoration: "none",

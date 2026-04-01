@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { makeConcursoSlug } from "@/lib/slugify";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const limit = Math.min(parseInt(searchParams.get("limit") ?? "50"), 100);
+    const offset = parseInt(searchParams.get("offset") ?? "0");
+
     const concursos = await prisma.concurso.findMany({
       where: { activo: true },
       include: {
@@ -11,6 +15,8 @@ export async function GET() {
         _count: { select: { participantes: true } },
       },
       orderBy: { fechaFin: "asc" },
+      take: limit,
+      skip: offset,
     });
     return NextResponse.json(concursos);
   } catch {

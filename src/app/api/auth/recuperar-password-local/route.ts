@@ -13,13 +13,17 @@ export async function POST(req: NextRequest) {
 
     // --- ENVIAR CÓDIGO ---
     if (action === "enviar") {
-      const local = await prisma.local.findUnique({ where: { id: localId }, select: { email: true, nombreDueno: true, nombre: true } });
+      // Support lookup by id or email
+      const local = await prisma.local.findFirst({
+        where: { OR: [{ id: localId }, { email: localId }] },
+        select: { id: true, email: true, nombreDueno: true, nombre: true },
+      });
       if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
 
       const code = crypto.randomInt(100000, 999999).toString();
       const expira = new Date(Date.now() + 600000); // 10 min
 
-      await prisma.local.update({ where: { id: localId }, data: { resetToken: code, resetTokenExpira: expira } });
+      await prisma.local.update({ where: { id: local.id }, data: { resetToken: code, resetTokenExpira: expira } });
 
       const nombre = local.nombreDueno || local.nombre;
       await resend.emails.send({
@@ -60,7 +64,10 @@ export async function POST(req: NextRequest) {
       if (!codigo || !passNueva) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
       if (passNueva.length < 8) return NextResponse.json({ error: "Mínimo 8 caracteres" }, { status: 400 });
 
-      const local = await prisma.local.findUnique({ where: { id: localId }, select: { resetToken: true, resetTokenExpira: true } });
+      const local = await prisma.local.findFirst({
+        where: { OR: [{ id: localId }, { email: localId }] },
+        select: { id: true, resetToken: true, resetTokenExpira: true },
+      });
       if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
       if (!local.resetToken || !local.resetTokenExpira || local.resetToken !== codigo) {
         return NextResponse.json({ error: "Código incorrecto" }, { status: 401 });
@@ -70,7 +77,7 @@ export async function POST(req: NextRequest) {
       }
 
       const hash = await bcrypt.hash(passNueva, 10);
-      await prisma.local.update({ where: { id: localId }, data: { password: hash, resetToken: null, resetTokenExpira: null } });
+      await prisma.local.update({ where: { id: local.id }, data: { password: hash, resetToken: null, resetTokenExpira: null } });
       return NextResponse.json({ ok: true });
     }
 

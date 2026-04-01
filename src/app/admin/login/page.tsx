@@ -17,7 +17,7 @@ export default function AdminLogin() {
       const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
       const data = await res.json();
       if (!res.ok) { setError(data.error); setLoading(false); return; }
-      sessionStorage.setItem("admin_session", JSON.stringify({ loggedIn: true, token: data.token, key: password }));
+      sessionStorage.setItem("admin_session", JSON.stringify({ loggedIn: true, token: data.token }));
       router.push("/admin");
     } catch { setError("Error de conexión"); }
     setLoading(false);
