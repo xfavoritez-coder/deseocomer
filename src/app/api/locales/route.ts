@@ -15,6 +15,8 @@ export async function GET() {
       },
       include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
+        promociones: { where: { activa: true }, select: { id: true, titulo: true, descripcion: true, horaInicio: true, horaFin: true }, take: 3 },
+        concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 3 },
       },
     });
     // Filter out locals without at least 1 active day in horarios

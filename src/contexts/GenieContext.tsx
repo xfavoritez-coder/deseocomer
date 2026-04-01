@@ -27,12 +27,19 @@ interface GeniePerfil {
 
 export interface LocalRecomendado {
   id: string;
+  slug?: string;
   nombre: string;
   categoria: string;
   comuna: string;
   rating: number;
   descuento: number;
   foto: string | null;
+  logoUrl?: string | null;
+  portadaUrl?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  promociones?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  concursos?: any[];
 }
 
 interface GenieContextType {
@@ -43,7 +50,7 @@ interface GenieContextType {
   setToastActivo: (t: { mensaje: string; opciones: string[]; id: string } | null) => void;
   addInteraccion: (tipo: string, datos: Record<string, string | number>) => void;
   addRespuestaGenio: (pregunta: string, respuesta: string) => void;
-  getRecomendacion: (categoria?: string, comuna?: string) => LocalRecomendado;
+  getRecomendacion: (categoria?: string, comuna?: string, excludeIds?: string[]) => LocalRecomendado;
   isLoggedIn: boolean;
   userName: string | null;
   sessionCount: number;
@@ -121,10 +128,16 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     fetch("/api/locales").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
         setLocalesDB(data.map((l: Record<string, unknown>) => ({
-          id: String(l.id), nombre: l.nombre as string,
+          id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
           categoria: ((l.categoria as string) ?? "general").toLowerCase(),
           comuna: (l.comuna as string) ?? "Santiago", rating: 4.5, descuento: 0,
           foto: (l.portadaUrl as string) ?? null,
+          logoUrl: (l.logoUrl as string) ?? null,
+          portadaUrl: (l.portadaUrl as string) ?? null,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          promociones: (l.promociones as any[]) ?? [],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          concursos: (l.concursos as any[]) ?? [],
         })));
       }
     }).catch(() => {});
@@ -237,8 +250,9 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     });
   }, [updatePerfil]);
 
-  const getRecomendacion = useCallback((categoria?: string, comuna?: string): LocalRecomendado => {
+  const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[]): LocalRecomendado => {
     let candidates = [...localesDB];
+    if (excludeIds?.length) candidates = candidates.filter(l => !excludeIds.includes(l.id));
 
     // Filter by category if specified
     if (categoria && categoria !== "sorprendeme") {
