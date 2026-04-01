@@ -127,20 +127,36 @@ function ConcursoDetallePage() {
     if (user.id === refUserId) return;
     if (hasVisited(concursoId, refUserId)) return;
     refProcessed.current = true;
-    incrementRef(concursoId, refUserId); markVisited(concursoId, refUserId);
+    markVisited(concursoId, refUserId);
+    // Call API to create participation and credit referral points in DB
+    fetch(`/api/concursos/${slug}/participar`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuarioId: user.id, referidoPor: refUserId }),
+    }).then(() => {
+      // Reload ranking from DB
+      fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
+        if (data) {
+          const newRanking = (data.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 }));
+          setRanking(newRanking);
+        }
+      }).catch(() => {});
+    }).catch(() => {});
     setRefToast(true); setTimeout(() => setRefToast(false), 4000);
   }, [authLoading, isAuthenticated, user, concursoId, refUserId]);
 
   const refreshRanking = useCallback(() => {
-    if (!concurso || !user) return;
-    const myCount = getRefCount(concursoId, user.id); setMyRefs(myCount);
-    if (myCount === 0) { setRanking(concurso!.ranking); return; }
-    const firstName = user!.nombre.split(" ")[0];
-    const lastInit = user!.nombre.split(" ")[1]?.[0] ?? "";
-    const myEntry: RankingEntry = { nombre: `${firstName} ${lastInit}.`, referidos: myCount };
-    const base = concurso!.ranking.filter((r: RankingEntry) => r.nombre !== myEntry.nombre);
-    setRanking([...base, myEntry].sort((a, b) => b.referidos - a.referidos));
-  }, [concurso, concursoId, user]);
+    if (!slug) return;
+    fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
+      if (data) {
+        const newRanking = (data.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 }));
+        setRanking(newRanking);
+        if (user) {
+          const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
+          setMyRefs(me?.puntos ?? 0);
+        }
+      }
+    }).catch(() => {});
+  }, [slug, user]);
 
   useEffect(() => { refreshRanking(); const iid = setInterval(refreshRanking, 30_000); return () => clearInterval(iid); }, [refreshRanking]);
   useEffect(() => { if (user) setMyRefs(getRefCount(concursoId, user.id)); }, [user, concursoId]);
@@ -243,7 +259,7 @@ function ConcursoDetallePage() {
       <Navbar />
 
       {/* Toasts */}
-      {refToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>✓ ¡Referido contabilizado!</div>}
+      {refToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>🎉 ¡Ya estás participando! Le diste 2 puntos a {refNameFromUrl || "tu amigo"} y ganaste 1.</div>}
       {newRefToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "linear-gradient(135deg, #e8a84c, #f5c97a)", color: "#1a1008", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(232,168,76,0.45)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>🎉 ¡Nuevo referido! Ya tienes {newRefCount}.</div>}
 
       {/* Referral modal */}
@@ -254,8 +270,9 @@ function ConcursoDetallePage() {
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: 480, zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 20, boxShadow: "0 0 60px rgba(0,0,0,0.8)", padding: "36px 28px", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.15rem", fontWeight: 800, color: "#f5d080", marginBottom: 16, lineHeight: 1.4 }}>🏮 ¡{dn} te invitó a ganar!</p>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "var(--text-primary)", lineHeight: 1.7, marginBottom: 24 }}><strong style={{ color: "var(--accent)" }}>{dn}</strong> participa en <strong style={{ color: "var(--accent)" }}>{c.premio}</strong>. Regístrate gratis y ambos pueden ganar.</p>
-            <Link href={`/registro?ref=${refUserId}&concurso=${concursoId}`} style={{ display: "block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 28px", borderRadius: 14, textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em" }}>🎉 Registrarme y sumarle un punto</Link>
-            <button onClick={handleDismissRefBanner} style={{ marginTop: 12, background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", padding: "8px 16px" }}>Cerrar</button>
+            <Link href={`/registro?ref=${refUserId}&concurso=${concursoId}`} style={{ display: "block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 28px", borderRadius: 14, textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "10px" }}>🎉 Registrarme y sumarle un punto</Link>
+            <Link href={`/login?next=/concursos/${c.slug || slug}/${encodeURIComponent(refNameFromUrl || "")}/${refUserId}`} style={{ display: "block", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", color: "var(--accent)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", padding: "12px 28px", borderRadius: 14, textDecoration: "none", textAlign: "center", letterSpacing: "0.08em" }}>Ya tengo cuenta · Iniciar sesión</Link>
+            <button onClick={handleDismissRefBanner} style={{ marginTop: 12, background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", padding: "8px 16px" }}>Cerrar y ver el concurso</button>
           </div>
         </>);
       })()}

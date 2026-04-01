@@ -59,12 +59,23 @@ function RegistroContent() {
       if (pending && res.userId && pending.refCode !== res.userId) {
         const em = form.email.trim().toLowerCase();
         if (!hasEmailCounted(pending.concursoId, pending.refCode, em)) {
-          markEmailCounted(pending.concursoId, pending.refCode, em); incrementRef(pending.concursoId, pending.refCode, 2); incrementRef(pending.concursoId, res.userId, 1);
+          markEmailCounted(pending.concursoId, pending.refCode, em);
+          // Call API to create DB participation records
+          try {
+            await fetch(`/api/concursos/${pending.concursoId}/participar`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ usuarioId: res.userId, referidoPor: pending.refCode }),
+            });
+          } catch {}
           const fn = getRefUserName(pending.refCode); msg = fn ? `✅ Le sumaste 2 puntos a ${fn} y ganaste 1 punto.` : "✅ Le sumaste 2 puntos a tu amigo y ganaste 1 punto.";
           redirectTo = `/concursos/${pending.concursoId}`;
         } clearPendingRef();
       }
-      setRefMsg(msg); setSuccess(true); setTimeout(() => router.push(redirectTo), msg ? 2200 : 1500);
+      setRefMsg(msg); setSuccess(true);
+      // Show verification message
+      if (!msg) msg = "Revisa tu email para verificar tu cuenta.";
+      setRefMsg(msg);
+      setTimeout(() => router.push(redirectTo), 2500);
     } else { setError(res.error ?? "Error al crear la cuenta."); }
   };
 
