@@ -204,10 +204,10 @@ export default function Navbar() {
           transition: background 0.3s ease, border-color 0.3s ease;
         }
         .dc-nav--transparent {
-          background: transparent;
-          backdrop-filter: none;
-          border-bottom: none;
-          box-shadow: none;
+          background: transparent !important;
+          backdrop-filter: none !important;
+          border-bottom: none !important;
+          box-shadow: none !important;
         }
         .dc-nav--solid {
           background: color-mix(in srgb, var(--bg-primary) 97%, black);
