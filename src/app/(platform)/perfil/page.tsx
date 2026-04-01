@@ -216,12 +216,12 @@ function TabFavoritos() {
 // ─── Tab: Concursos ──────────────────────────────────────────────────────────
 
 function TabConcursos({ userId, userName }: { userId: string; userName: string }) {
-  const [refCounts, setRefCounts] = useState<Array<{ concursoId: number; count: number }>>([]);
-  const [copied, setCopied] = useState<number | null>(null);
+  const [refCounts, setRefCounts] = useState<Array<{ concursoId: string | number; count: number }>>([]);
+  const [copied, setCopied] = useState<string | number | null>(null);
 
   useEffect(() => { setRefCounts(getAllRefCounts(userId)); }, [userId]);
 
-  const copyLink = async (concursoId: number) => {
+  const copyLink = async (concursoId: string | number) => {
     const c = CONCURSOS.find(x => x.id === concursoId);
     const slug = c?.slug ?? String(concursoId);
     const nombre = encodeURIComponent(userName.split(" ")[0].toLowerCase());

@@ -8,9 +8,8 @@ export async function GET(req: NextRequest) {
 
     const upper = code.toUpperCase();
 
-    // Search for user whose ID ends with this code (last 6 chars)
+    // Search all users (not just verified) - the referrer may not have verified yet
     const usuarios = await prisma.usuario.findMany({
-      where: { emailVerificado: true },
       select: { id: true, nombre: true },
     });
 

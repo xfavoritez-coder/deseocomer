@@ -8,12 +8,12 @@ const USERS_KEY          = "dc_users";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export interface PendingRef { refCode: string; concursoId: number }
+export interface PendingRef { refCode: string; concursoId: string | number }
 interface StoredUser         { id: string; nombre: string }
 
 // ─── Pending referral ────────────────────────────────────────────────────────
 
-export function savePendingRef(refCode: string, concursoId: number): void {
+export function savePendingRef(refCode: string, concursoId: string | number): void {
   try { localStorage.setItem(PENDING_KEY, JSON.stringify({ refCode, concursoId })); }
   catch { /* noop */ }
 }
@@ -31,14 +31,14 @@ export function clearPendingRef(): void {
 
 // ─── Ref counts ──────────────────────────────────────────────────────────────
 
-export function getRefCount(concursoId: number, userId: string): number {
+export function getRefCount(concursoId: string | number, userId: string): number {
   try {
     const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
     return store[`${concursoId}_${userId}`] ?? 0;
   } catch { return 0; }
 }
 
-export function incrementRef(concursoId: number, userId: string, amount = 1): void {
+export function incrementRef(concursoId: string | number, userId: string, amount = 1): void {
   try {
     const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
     const key = `${concursoId}_${userId}`;
@@ -47,10 +47,10 @@ export function incrementRef(concursoId: number, userId: string, amount = 1): vo
   } catch { /* noop */ }
 }
 
-export function getAllRefCounts(userId: string): Array<{ concursoId: number; count: number }> {
+export function getAllRefCounts(userId: string): Array<{ concursoId: string | number; count: number }> {
   try {
     const store = JSON.parse(localStorage.getItem(REFS_KEY) ?? "{}") as Record<string, number>;
-    const result: Array<{ concursoId: number; count: number }> = [];
+    const result: Array<{ concursoId: string | number; count: number }> = [];
     for (const [key, count] of Object.entries(store)) {
       const idx = key.indexOf("_");
       if (idx === -1) continue;
@@ -64,14 +64,14 @@ export function getAllRefCounts(userId: string): Array<{ concursoId: number; cou
 
 // ─── Visit tracking (device-level, for authenticated same-tab dedup) ─────────
 
-export function hasVisited(concursoId: number, refUserId: string): boolean {
+export function hasVisited(concursoId: string | number, refUserId: string): boolean {
   try {
     const list = JSON.parse(localStorage.getItem(VISITED_KEY) ?? "[]") as string[];
     return list.includes(`${concursoId}_${refUserId}`);
   } catch { return false; }
 }
 
-export function markVisited(concursoId: number, refUserId: string): void {
+export function markVisited(concursoId: string | number, refUserId: string): void {
   try {
     const list = JSON.parse(localStorage.getItem(VISITED_KEY) ?? "[]") as string[];
     const entry = `${concursoId}_${refUserId}`;
@@ -84,14 +84,14 @@ export function markVisited(concursoId: number, refUserId: string): void {
 
 // ─── Email deduplication ─────────────────────────────────────────────────────
 
-export function hasEmailCounted(concursoId: number, refUserId: string, email: string): boolean {
+export function hasEmailCounted(concursoId: string | number, refUserId: string, email: string): boolean {
   try {
     const store = JSON.parse(localStorage.getItem(EMAIL_KEY) ?? "{}") as Record<string, string[]>;
     return (store[`${concursoId}_${refUserId}`] ?? []).includes(email.toLowerCase());
   } catch { return false; }
 }
 
-export function markEmailCounted(concursoId: number, refUserId: string, email: string): void {
+export function markEmailCounted(concursoId: string | number, refUserId: string, email: string): void {
   try {
     const store = JSON.parse(localStorage.getItem(EMAIL_KEY) ?? "{}") as Record<string, string[]>;
     const key = `${concursoId}_${refUserId}`;
@@ -132,7 +132,7 @@ function todayStr(): string {
 }
 
 /** Check if user already supported this target today in this concurso */
-export function hasSupportedToday(concursoId: number, supporterId: string, targetId: string): boolean {
+export function hasSupportedToday(concursoId: string | number, supporterId: string, targetId: string): boolean {
   try {
     const store = JSON.parse(localStorage.getItem(SUPPORT_KEY) ?? "{}") as Record<string, boolean>;
     return !!store[`${concursoId}_${supporterId}_${targetId}_${todayStr()}`];
@@ -140,7 +140,7 @@ export function hasSupportedToday(concursoId: number, supporterId: string, targe
 }
 
 /** Record a support action and give +1 point to the target */
-export function supportUser(concursoId: number, supporterId: string, targetId: string): boolean {
+export function supportUser(concursoId: string | number, supporterId: string, targetId: string): boolean {
   if (supporterId === targetId) return false;
   if (hasSupportedToday(concursoId, supporterId, targetId)) return false;
   try {
