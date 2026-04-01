@@ -21,12 +21,17 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showReset, setShowReset] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetSent, setResetSent] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
   const [emailNoVerificado, setEmailNoVerificado] = useState(false);
   const [reenvioSent, setReenvioSent] = useState(false);
+  const [recovery, setRecovery] = useState(false);
+  const [recEmail, setRecEmail] = useState("");
+  const [recCode, setRecCode] = useState("");
+  const [recPass, setRecPass] = useState("");
+  const [recConfirm, setRecConfirm] = useState("");
+  const [recStep, setRecStep] = useState<"email" | "code">("email");
+  const [recMsg, setRecMsg] = useState("");
+  const [recError, setRecError] = useState("");
+  const [recLoading, setRecLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,24 +78,48 @@ export default function LoginPage() {
           <button type="submit" disabled={loading} style={btnS}>{loading ? "Entrando..." : "Entrar →"}</button>
         </form>
 
-        <button onClick={() => setShowReset(true)} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "14px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>¿Olvidaste tu contraseña?</button>
+        <button onClick={() => { setRecovery(true); setRecStep("email"); setRecEmail(""); setRecCode(""); setRecPass(""); setRecConfirm(""); setRecMsg(""); setRecError(""); }} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "14px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>¿Olvidaste tu contraseña?</button>
 
-        {showReset && (
-          <div style={{ marginTop: "16px", padding: "16px", background: "rgba(0,0,0,0.2)", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.1)" }}>
-            {resetSent ? (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)", textAlign: "center" }}>✓ Si tu email está registrado, recibirás un link.</p>
-            ) : (
-              <>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "10px" }}>Recuperar contraseña</p>
-                <input style={inputS} type="email" placeholder="tu@email.com" value={resetEmail} onChange={e => setResetEmail(e.target.value)} onFocus={focusIn} onBlur={focusOut} />
-                <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
-                  <button onClick={async () => { if (!resetEmail.includes("@")) return; setResetLoading(true); await fetch("/api/emails/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: resetEmail.trim().toLowerCase() }) }).catch(() => {}); setResetLoading(false); setResetSent(true); }} disabled={resetLoading} style={{ ...btnS, flex: 1, fontSize: "0.8rem", padding: "10px" }}>{resetLoading ? "Enviando..." : "Enviar link"}</button>
-                  <button onClick={() => { setShowReset(false); setResetSent(false); }} style={{ background: "none", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", padding: "10px 14px", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem" }}>Cancelar</button>
-                </div>
-              </>
-            )}
+        {recovery && (<>
+          <div onClick={() => setRecovery(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)" }} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: "400px", zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", padding: "32px 24px" }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: "16px", textAlign: "center" }}>Recuperar contraseña</h3>
+            {recMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#3db89e", marginBottom: "12px", textAlign: "center" }}>{recMsg}</p>}
+            {recError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff6b6b", marginBottom: "12px", textAlign: "center" }}>{recError}</p>}
+
+            {recStep === "email" && (<div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Ingresa el email con el que te registraste. Te enviaremos un código de verificación.</p>
+              <input style={inputS} type="email" placeholder="tu@email.com" value={recEmail} onChange={e => setRecEmail(e.target.value)} />
+              <button disabled={recLoading || !recEmail.trim()} onClick={async () => {
+                setRecLoading(true); setRecError(""); setRecMsg("");
+                try {
+                  const res = await fetch("/api/auth/recuperar-password-usuario", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: recEmail.trim().toLowerCase(), action: "enviar" }) });
+                  if (res.ok) { setRecStep("code"); setRecMsg("Código enviado a tu email"); }
+                  else { const d = await res.json(); setRecError(d.error === "No encontramos una cuenta con ese email" ? d.error : d.error ?? "Error al enviar"); }
+                } catch { setRecError("Error de conexión"); }
+                setRecLoading(false);
+              }} style={btnS}>{recLoading ? "Enviando..." : "Enviar código"}</button>
+            </div>)}
+
+            {recStep === "code" && (<div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <input style={inputS} placeholder="Código de 6 dígitos" value={recCode} onChange={e => setRecCode(e.target.value)} maxLength={6} />
+              <input style={inputS} type="password" placeholder="Nueva contraseña (mín. 8 caracteres)" value={recPass} onChange={e => setRecPass(e.target.value)} />
+              <input style={inputS} type="password" placeholder="Confirmar contraseña" value={recConfirm} onChange={e => setRecConfirm(e.target.value)} />
+              {recPass && recConfirm && recPass !== recConfirm && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b" }}>Las contraseñas no coinciden</p>}
+              <button disabled={recLoading || recCode.length !== 6 || recPass.length < 8 || recPass !== recConfirm} onClick={async () => {
+                setRecLoading(true); setRecError(""); setRecMsg("");
+                try {
+                  const res = await fetch("/api/auth/recuperar-password-usuario", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: recEmail.trim().toLowerCase(), action: "verificar", codigo: recCode, passNueva: recPass }) });
+                  if (res.ok) { setRecMsg("Contraseña actualizada. Ya puedes iniciar sesión."); setTimeout(() => setRecovery(false), 2000); }
+                  else { const d = await res.json(); setRecError(d.error ?? "Error"); }
+                } catch { setRecError("Error de conexión"); }
+                setRecLoading(false);
+              }} style={btnS}>{recLoading ? "Verificando..." : "Cambiar contraseña"}</button>
+            </div>)}
+
+            <button onClick={() => setRecovery(false)} style={{ display: "block", width: "100%", textAlign: "center", marginTop: "14px", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer" }}>Cancelar</button>
           </div>
-        )}
+        </>)}
 
         {/* Separator */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.2)" }}>¿Eres un local?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
