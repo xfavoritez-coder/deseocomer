@@ -290,7 +290,7 @@ function ConcursoDetallePage() {
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
         {/* Back */}
-        <Link href="/concursos" style={{ position: "absolute", top: "12px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
+        <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: "0 clamp(14px,4vw,32px) clamp(14px,3vw,20px)", textAlign: "center" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 6 }}>

@@ -98,7 +98,7 @@ export default function PromocionDetailPage() {
         )}
 
         {/* Back link */}
-        <Link href="/promociones" style={{ position: "absolute", top: "clamp(80px, 12vw, 100px)", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
+        <Link href="/promociones" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
 
         {/* Sello pill */}
         {sello && (
