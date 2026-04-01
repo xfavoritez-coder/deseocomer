@@ -42,16 +42,23 @@ function ConcursoDetallePage() {
   const segments = rawParams.params ?? [];
   const slug = segments[0] ?? "";
 
-  let refUserId: string | null = null;
-  let refNameFromUrl: string | null = null;
-  if (segments.length >= 3) {
-    refNameFromUrl = decodeURIComponent(segments[1] ?? "");
-    const resolvedUser = findUserByRefCode((segments[2] ?? "").toUpperCase());
-    refUserId = resolvedUser?.id ?? null;
-  } else {
-    refUserId = searchParams.get("ref");
-    refNameFromUrl = searchParams.get("refName");
-  }
+  const [refUserId, setRefUserId] = useState<string | null>(null);
+  const [refNameFromUrl, setRefNameFromUrl] = useState<string | null>(null);
+  const refCodeRaw = segments.length >= 3 ? segments[2] : searchParams.get("ref");
+  const refNameRaw = segments.length >= 3 ? decodeURIComponent(segments[1] ?? "") : searchParams.get("refName");
+
+  // Resolve refCode to userId via API
+  useEffect(() => {
+    if (!refCodeRaw) return;
+    setRefNameFromUrl(refNameRaw);
+    // Try localStorage first (fast)
+    const local = findUserByRefCode(refCodeRaw.toUpperCase());
+    if (local) { setRefUserId(local.id); return; }
+    // Fallback: resolve via API
+    fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(refCodeRaw)}`).then(r => r.ok ? r.json() : null).then(data => {
+      if (data?.id) setRefUserId(data.id);
+    }).catch(() => {});
+  }, [refCodeRaw]);
 
   const found = findConcurso(slug);
   const concursoId = found.concurso?.id ?? found.finalizado?.id ?? 0;
