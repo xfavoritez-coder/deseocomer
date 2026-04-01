@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/layout/Navbar";
 import GeniePanelLocal from "@/components/panel/GeniePanelLocal";
 
 const PANEL_KEY = "deseocomer_local_auth";
@@ -25,6 +24,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [localId, setLocalId] = useState("");
   const [localSlug, setLocalSlug] = useState("");
   const [localLogo, setLocalLogo] = useState("");
+  const [mobileMenu, setMobileMenu] = useState(false);
   const [localComuna, setLocalComuna] = useState("");
   const [faltantes, setFaltantes] = useState<string[]>([]);
 
@@ -92,8 +92,27 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
-      {/* Navbar for mobile (hidden on desktop via sidebar) */}
-      <div className="dc-panel-navbar"><Navbar /></div>
+      {/* Mobile top bar */}
+      <div className="dc-panel-mobilebar">
+        <Link href="/panel" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>🏮 DeseoComer</Link>
+        <button onClick={() => setMobileMenu(o => !o)} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontSize: "1.1rem", cursor: "pointer" }}>{mobileMenu ? "✕" : "☰"}</button>
+      </div>
+      {mobileMenu && (<>
+        <div onClick={() => setMobileMenu(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 998 }} />
+        <div className="dc-panel-mobilemenu">
+          {NAV.map(n => (
+            <Link key={n.href} href={n.href} onClick={() => setMobileMenu(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", textDecoration: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: isActive(n.href) ? "var(--accent)" : "var(--text-muted)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+              <span>{n.icon}</span> {n.label}
+            </Link>
+          ))}
+          <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" onClick={() => setMobileMenu(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", textDecoration: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-muted)", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+            <span>👁️</span> Ver mi local
+          </a>
+          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", width: "100%", textAlign: "left", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer" }}>
+            <span>🚪</span> Cerrar sesión
+          </button>
+        </div>
+      </>)}
 
       {/* Desktop Sidebar */}
       <aside className="dc-panel-sidebar">
@@ -198,9 +217,20 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         .dc-panel-main {
           flex: 1; margin-left: 240px; padding: 32px 40px; min-height: 100vh;
         }
-        .dc-panel-navbar { display: none; }
+        .dc-panel-mobilebar {
+          display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+          padding: 14px 20px; background: color-mix(in srgb, var(--bg-primary) 97%, black);
+          border-bottom: 1px solid var(--border-color);
+          justify-content: space-between; align-items: center;
+        }
+        .dc-panel-mobilemenu {
+          position: fixed; top: 68px; right: 0; width: min(300px, 80vw); bottom: 0;
+          background: rgba(13,7,3,0.98); border-left: 1px solid rgba(232,168,76,0.15);
+          z-index: 999; overflow-y: auto; animation: dcDrawerIn 0.2s ease;
+        }
+        @keyframes dcDrawerIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @media (max-width: 767px) {
-          .dc-panel-navbar { display: block; }
+          .dc-panel-mobilebar { display: flex; }
           .dc-panel-sidebar { display: none; }
           .dc-panel-main { margin-left: 0; padding: 80px 16px 32px; }
         }

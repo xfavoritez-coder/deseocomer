@@ -84,7 +84,7 @@ export default function PanelPromociones() {
   return (<div>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Promociones</h1>
-      <button onClick={() => setShowForm(true)} style={B}>+ Nueva promoción</button>
+      <button onClick={() => setShowForm(true)} style={B}>+ Promoción</button>
     </div>
     {promos.length === 0 ? (
       <div style={{ textAlign: "center", padding: "60px 20px" }}>
