@@ -30,7 +30,7 @@ function RegistroContent() {
   const [refMsg, setRefMsg] = useState("");
   const [emailBlockedMsg, setEmailBlockedMsg] = useState("");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
-  useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, Number(concursoId)); }, [refCode, concursoId]);
+  useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
 
   const BLOCKED_DOMAINS = ["tempmail.com", "guerrillamail.com", "mailinator.com", "throwaway.email", "yopmail.com", "10minutemail.com", "trashmail.com", "fakeinbox.com", "sharklasers.com", "guerrillamailblock.com", "grr.la", "dispostable.com", "maildrop.cc", "temp-mail.org"];
   const checkDisposableEmail = (email: string) => {
