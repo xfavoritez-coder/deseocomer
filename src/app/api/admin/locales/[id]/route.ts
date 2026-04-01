@@ -40,12 +40,58 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: true, accion: "rechazado" });
     }
 
+    if (accion === "cambiar-password") {
+      const bcrypt = await import("bcryptjs");
+      if (!body.nuevaPassword || body.nuevaPassword.length < 8) return NextResponse.json({ error: "Mínimo 8 caracteres" }, { status: 400 });
+      const hash = await bcrypt.hash(body.nuevaPassword, 10);
+      await prisma.local.update({ where: { id }, data: { password: hash } });
+      return NextResponse.json({ ok: true, accion: "password-cambiada" });
+    }
+
+    if (accion === "editar") {
+      const updated = await prisma.local.update({
+        where: { id },
+        data: {
+          ...(body.nombre !== undefined && { nombre: body.nombre }),
+          ...(body.nombreDueno !== undefined && { nombreDueno: body.nombreDueno }),
+          ...(body.celularDueno !== undefined && { celularDueno: body.celularDueno }),
+          ...(body.categoria !== undefined && { categoria: body.categoria }),
+          ...(body.ciudad !== undefined && { ciudad: body.ciudad }),
+          ...(body.comuna !== undefined && { comuna: body.comuna }),
+          ...(body.direccion !== undefined && { direccion: body.direccion }),
+          ...(body.telefono !== undefined && { telefono: body.telefono }),
+        },
+      });
+      const { password: _, ...safe } = updated;
+      return NextResponse.json({ ok: true, data: safe });
+    }
+
     // Fallback: update genérico (toggle activo/verificado)
     const { activo, verificado } = body;
     const updated = await prisma.local.update({ where: { id }, data: { ...(activo !== undefined && { activo }), ...(verificado !== undefined && { verificado }) } });
     return NextResponse.json(updated);
   } catch (error) {
     console.error("[Admin locales PUT]", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+  try {
+    const { id } = await params;
+    // Delete related records first
+    await prisma.participanteConcurso.deleteMany({ where: { concurso: { localId: id } } });
+    await prisma.concurso.deleteMany({ where: { localId: id } });
+    await prisma.promocion.deleteMany({ where: { localId: id } });
+    await prisma.favorito.deleteMany({ where: { localId: id } });
+    await prisma.resena.deleteMany({ where: { localId: id } });
+    await prisma.menuItem.deleteMany({ where: { localId: id } });
+    await prisma.local.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[Admin locales DELETE]", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
