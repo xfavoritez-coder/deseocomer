@@ -60,14 +60,29 @@ function RegistroContent() {
         const em = form.email.trim().toLowerCase();
         if (!hasEmailCounted(pending.concursoId, pending.refCode, em)) {
           markEmailCounted(pending.concursoId, pending.refCode, em);
-          // Call API to create DB participation records
+          // Resolve refCode to real userId
+          let referidorId = pending.refCode;
+          try {
+            const refRes = await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`);
+            if (refRes.ok) { const refData = await refRes.json(); referidorId = refData.id; }
+          } catch {}
+          // Ensure referrer is participating first
           try {
             await fetch(`/api/concursos/${pending.concursoId}/participar`, {
               method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ usuarioId: res.userId, referidoPor: pending.refCode }),
+              body: JSON.stringify({ usuarioId: referidorId }),
             });
           } catch {}
-          const fn = getRefUserName(pending.refCode); msg = fn ? `✅ Le sumaste 2 puntos a ${fn} y ganaste 1 punto.` : "✅ Le sumaste 2 puntos a tu amigo y ganaste 1 punto.";
+          // Create new user's participation with referral
+          try {
+            await fetch(`/api/concursos/${pending.concursoId}/participar`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ usuarioId: res.userId, referidoPor: referidorId }),
+            });
+          } catch {}
+          const fn = getRefUserName(pending.refCode);
+          const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
+          msg = refName ? `✅ Le sumaste 2 puntos a ${refName} y ganaste 1 punto.` : "✅ Le sumaste 2 puntos a tu amigo y ganaste 1 punto.";
           redirectTo = `/concursos/${pending.concursoId}`;
         } clearPendingRef();
       }
