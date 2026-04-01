@@ -184,7 +184,11 @@ export default function AdminLocales() {
               <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.nombre}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{l.email}</p>
             </div>
-            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: l.activo ? "#3db89e" : "#ff8080", flexShrink: 0 }}>{l.activo ? "✓" : "⏳"}</span>
+            {l.activo ? (
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>✓</span>
+            ) : (
+              <button onClick={async (e) => { e.stopPropagation(); setLoading(true); try { const res = await adminFetch(`/api/admin/locales/${l.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "aprobar" }) }); if (res.ok) { setLocales(p => p.map(x => x.id === l.id ? { ...x, activo: true } : x)); show("✓ " + l.nombre + " activado"); } } catch {} setLoading(false); }} style={{ padding: "4px 10px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.65rem", fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Activar</button>
+            )}
           </div>
         ))}
       </div>

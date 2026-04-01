@@ -25,9 +25,19 @@ export default function AdminDashboard() {
     { icon: "📅", label: "Total concursos", value: stats.totalConcursos },
   ];
 
+  const pendientes = (stats.totalLocales ?? 0) - (stats.localesActivos ?? 0);
+
   return (
     <div>
       <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c", marginBottom: "24px" }}>Dashboard</h1>
+
+      {pendientes > 0 && (
+        <div style={{ background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.25)", borderRadius: "12px", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "1.2rem" }}>🔔</span>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#ff8080", flex: 1, margin: 0 }}>Tienes <strong>{pendientes} {pendientes === 1 ? "local pendiente" : "locales pendientes"}</strong> de aprobación</p>
+          <a href="/admin/locales" style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#0a0812", background: "#e8a84c", padding: "8px 16px", borderRadius: "8px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar ahora →</a>
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px", marginBottom: "32px" }}>
         {cards.map(c => (
           <div key={c.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "18px", textAlign: "center" }}>
