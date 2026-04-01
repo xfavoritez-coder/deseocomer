@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 const NAV_LINKS = [
@@ -10,6 +11,9 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const [scrolled,  setScrolled]  = useState(false);
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string; logoUrl?: string } | null>(null);
@@ -38,6 +42,14 @@ export default function Navbar() {
     } catch {}
   }, []);
 
+  // Scroll listener only on home for transparent→solid transition
+  useEffect(() => {
+    if (!isHome) { setScrolled(false); return; }
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
+
   useEffect(() => {
     const onResize = () => { if (window.innerWidth >= 768) setMenuOpen(false); };
     window.addEventListener("resize", onResize);
@@ -61,9 +73,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Spacer to push content below fixed navbar */}
-      <div className="dc-nav-spacer" />
-      <nav className="dc-nav">
+      {/* Spacer to push content below fixed navbar (not on home) */}
+      {!isHome && <div className="dc-nav-spacer" />}
+      <nav className={`dc-nav${isHome && !scrolled ? " dc-nav--transparent" : ""}`}>
         <Link href="/" className="dc-nav-logo">🏮 DeseoComer</Link>
 
         {/* Desktop links */}
@@ -189,6 +201,12 @@ export default function Navbar() {
           background: color-mix(in srgb, var(--bg-primary) 97%, black);
           backdrop-filter: blur(10px);
           border-bottom: 1px solid var(--border-color);
+          transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .dc-nav--transparent {
+          background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+          backdrop-filter: none;
+          border-bottom: 1px solid transparent;
         }
         .dc-nav-logo {
           font-family: var(--font-cinzel-decorative); font-size: 1.1rem;
