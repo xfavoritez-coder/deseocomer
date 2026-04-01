@@ -156,7 +156,7 @@ export default function ConcursosPage() {
                     </div>
                     {/* Título */}
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 16 }}>🏆</span>{c.premio}</p>
-                    {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12 }}>{c.descripcionPremio}</p>}
+                    {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>}
 
                     {/* Countdown */}
                     {t && !t.ended && (
