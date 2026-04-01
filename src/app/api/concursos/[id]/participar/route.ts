@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
-import { PrimerParticipanteEmail } from "@/emails/PrimerParticipanteEmail";
-import * as React from "react";
+import { primerParticipanteHtml } from "@/emails/PrimerParticipanteEmail";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: local.email,
           subject: `🎉 ¡Tu concurso tiene su primer participante! — ${concurso.premio}`,
-          react: React.createElement(PrimerParticipanteEmail, {
+          html: primerParticipanteHtml({
             nombreLocal: local.nombre,
             premioConcurso: concurso.premio,
             nombreParticipante: usuario?.nombre ?? "Un usuario",
