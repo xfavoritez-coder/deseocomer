@@ -28,13 +28,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     // Email al local: primer participante (una sola vez por cuenta de local)
-    const totalParticipantes = await prisma.participanteConcurso.count({ where: { concursoId: concurso.id } });
-    if (totalParticipantes === 1) {
+    try {
       const local = await prisma.local.findUnique({ where: { id: concurso.localId }, select: { id: true, nombre: true, email: true, primerParticipanteNotificado: true } });
       if (local && !local.primerParticipanteNotificado) {
         const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
-        prisma.local.update({ where: { id: local.id }, data: { primerParticipanteNotificado: true } }).catch(() => {});
-        resend.emails.send({
+        await prisma.local.update({ where: { id: local.id }, data: { primerParticipanteNotificado: true } });
+        await resend.emails.send({
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: local.email,
           subject: `🎉 ¡Tu concurso tiene su primer participante! — ${concurso.premio}`,
@@ -43,8 +42,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             premioConcurso: concurso.premio,
             nombreParticipante: usuario?.nombre ?? "Un usuario",
           }),
-        }).catch(err => console.error("[Email primer participante]", err));
+        });
+        console.log(`[Email primer participante] Enviado a ${local.email} para concurso ${concurso.premio}`);
       }
+    } catch (emailErr) {
+      console.error("[Email primer participante] Error:", emailErr);
     }
 
     // Acreditar +2 al referidor si existe
