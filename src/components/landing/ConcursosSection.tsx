@@ -183,7 +183,7 @@ export default function ConcursosSection() {
 
       <style>{`
         .dc-cst-section { padding: 100px 60px 80px; }
-        .dc-cst-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 28px; }
+        .dc-cst-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
         .dc-cst-img { height: 180px; }
         .dc-cst-premio { font-size: 24px; }
@@ -195,13 +195,15 @@ export default function ConcursosSection() {
           50% { opacity: 0.15; }
         }
 
-        @media (min-width: 768px) {
-          .dc-cst-card { display: flex !important; flex-direction: row !important; }
-          .dc-cst-img { width: 280px; height: auto; min-height: 220px; flex-shrink: 0; }
-          .dc-cst-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-          .dc-cst-premio { font-size: 30px; }
+        @media (min-width: 640px) {
+          .dc-cst-grid { grid-template-columns: repeat(2, 1fr); }
+          .dc-cst-premio { font-size: 26px; }
           .dc-cst-desc { display: -webkit-box !important; }
           .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
+        }
+        @media (min-width: 1024px) {
+          .dc-cst-grid { grid-template-columns: repeat(3, 1fr); }
+          .dc-cst-premio { font-size: 24px; }
         }
         @media (max-width: 767px) {
           .dc-cst-section { padding: 72px 20px 48px; }
@@ -209,9 +211,8 @@ export default function ConcursosSection() {
           .dc-cst-grid::-webkit-scrollbar { display: none; }
           .dc-cst-card { flex-shrink: 0 !important; width: 300px !important; }
         }
-        @media (min-width: 768px) and (max-width: 1279px) {
+        @media (min-width: 768px) and (max-width: 1023px) {
           .dc-cst-section { padding: 100px 40px; }
-          .dc-cst-grid { grid-template-columns: 1fr; }
         }
       `}</style>
     </section>
