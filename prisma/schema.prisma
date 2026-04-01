@@ -98,6 +98,10 @@ model Concurso {
   activo            Boolean  @default(true)
   cancelado         Boolean  @default(false)
   motivoCancelacion String   @default("")
+  premioEntregado   Boolean  @default(false)
+  premioEntregadoAt DateTime?
+  recordatorio48h   Boolean  @default(false)
+  recordatorio7d    Boolean  @default(false)
   createdAt         DateTime @default(now())
 
   local         Local    @relation(fields: [localId], references: [id])

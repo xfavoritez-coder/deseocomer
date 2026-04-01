@@ -246,14 +246,34 @@ export default function PanelConcursos() {
             </div>
           )}
 
-          {terminado && participantes > 0 && (
-            <div style={{ marginTop: "16px", padding: "16px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "10px", textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700, marginBottom: "4px" }}>🏆 Ganador</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "var(--text-primary)" }}>
-                {(detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0]?.usuario?.nombre ?? "Sin participantes"}
-              </p>
-            </div>
-          )}
+          {terminado && participantes > 0 && (() => {
+            const ganador = (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0];
+            const ganadorNombre = ganador?.usuario?.nombre ?? "Sin participantes";
+            const entregado = detalle.premioEntregado;
+            return (
+              <div style={{ marginTop: "16px", padding: "20px", background: entregado ? "rgba(61,184,158,0.08)" : "rgba(232,168,76,0.08)", border: `1px solid ${entregado ? "rgba(61,184,158,0.3)" : "rgba(232,168,76,0.25)"}`, borderRadius: "12px", textAlign: "center" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: entregado ? "#3db89e" : "var(--accent)", fontWeight: 700, marginBottom: "4px" }}>{entregado ? "✓ Premio entregado" : "🏆 Ganador"}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", color: "var(--text-primary)", marginBottom: entregado ? "0" : "14px" }}>{ganadorNombre}</p>
+                {entregado && detalle.premioEntregadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>Confirmado el {new Date(detalle.premioEntregadoAt).toLocaleDateString("es-CL")}</p>}
+                {!entregado && (
+                  <button onClick={async () => {
+                    const s = getSession();
+                    try {
+                      const res = await fetch(`/api/concursos/${detalle.id}/confirmar-entrega`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id }) });
+                      if (res.ok) {
+                        setDetalle({ ...detalle, premioEntregado: true, premioEntregadoAt: new Date().toISOString() });
+                        setConcursos(prev => prev.map(c => c.id === detalle.id ? { ...c, premioEntregado: true } : c));
+                        setActionToast("✓ Entrega del premio confirmada");
+                        setTimeout(() => setActionToast(""), 3000);
+                      } else { const d = await res.json(); setActionToast(d.error ?? "Error"); setTimeout(() => setActionToast(""), 3000); }
+                    } catch { setActionToast("Error de conexión"); setTimeout(() => setActionToast(""), 3000); }
+                  }} style={{ padding: "12px 28px", background: "#3db89e", color: "#fff", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>
+                    Confirmar entrega del premio a {ganadorNombre.split(" ")[0]}
+                  </button>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* Formulario de edición (solo sin participantes) */}
@@ -438,7 +458,7 @@ export default function PanelConcursos() {
               <div style={{ flex: 1, padding: "12px 16px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                  {parts} participantes · {ended ? <span style={{ color: "var(--text-muted)" }}>Finalizado</span> : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
+                  {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Detalle →</span>
