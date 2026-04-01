@@ -6,6 +6,17 @@ export default function GenieToast() {
   const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen } = useGenie();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const DISMISSED_KEY = "genio_toasts_dismissed";
+
+  const isDismissedForever = (id: string): boolean => {
+    try { const d = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "{}"); return !!d[id]; } catch { return false; }
+  };
+
+  const dismissForever = (id: string) => {
+    try { const d = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "{}"); d[id] = true; localStorage.setItem(DISMISSED_KEY, JSON.stringify(d)); } catch {}
+    setToastActivo(null);
+  };
+
   const dismissToast = () => setToastActivo(null);
 
   const [mostrandoFecha, setMostrandoFecha] = useState(false);
@@ -23,7 +34,17 @@ export default function GenieToast() {
     setGuardado(false);
   }, [toastActivo?.id]);
 
-  // No auto-dismiss — toast stays until user closes it
+  // Auto-dismiss after 8 seconds for automatic toasts
+  useEffect(() => {
+    if (!toastActivo || mostrandoFecha || guardado) return;
+    const t = setTimeout(() => setToastActivo(null), 8000);
+    return () => clearTimeout(t);
+  }, [toastActivo?.id, mostrandoFecha, guardado]);
+
+  // Skip if user dismissed this toast forever
+  useEffect(() => {
+    if (toastActivo && isDismissedForever(toastActivo.id)) setToastActivo(null);
+  }, [toastActivo?.id]);
 
   // Auto-close after save confirmation
   useEffect(() => {
@@ -235,6 +256,12 @@ export default function GenieToast() {
               </button>
             ))}
           </div>
+          <button onClick={() => dismissForever(toastActivo.id)} style={{
+            background: "none", border: "none", cursor: "pointer",
+            fontFamily: "var(--font-lato)", fontSize: "0.65rem",
+            color: "rgba(240,234,214,0.15)", marginTop: "10px",
+            padding: 0, display: "block",
+          }}>No mostrar más</button>
         </>
       )}
 

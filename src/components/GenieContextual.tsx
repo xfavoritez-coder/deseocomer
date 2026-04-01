@@ -110,6 +110,7 @@ export default function GenieContextual() {
     if (pathname === "/") return;
     if (pathname.startsWith("/concursos/como-funciona")) return;
     if (yaVisto(pathname)) return;
+    try { const d = JSON.parse(localStorage.getItem("genio_toasts_dismissed") ?? "{}"); if (d["contextual_" + pathname]) return; } catch {}
 
     const timer = setTimeout(() => {
       if (toastRef.current) return;

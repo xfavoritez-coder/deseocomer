@@ -9,10 +9,15 @@ import GenieToast from "./GenieToast";
 // ─── Toast triggers ──────────────────────────────────────────────────────────
 
 const TOAST_SHOWN_KEY = "dc_genio_toast_shown";
+const DISMISSED_KEY = "genio_toasts_dismissed";
 
 function getToastShown(): Record<string, number> {
   try { return JSON.parse(localStorage.getItem(TOAST_SHOWN_KEY) ?? "{}"); }
   catch { return {}; }
+}
+
+function isDismissed(id: string): boolean {
+  try { return !!JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "{}")[id]; } catch { return false; }
 }
 
 function markToastShown(id: string) {
@@ -98,6 +103,7 @@ export default function GenieLampara() {
           const shown = getToastShown();
           const today = new Date().toISOString().slice(0, 10);
           if (shown["lunch"] !== undefined && new Date(shown["lunch"]).toISOString().slice(0, 10) === today) return;
+          if (isDismissed("lunch")) return;
           markToastShown("lunch");
           setToastActivo({
             id: "lunch",
@@ -119,6 +125,7 @@ export default function GenieLampara() {
       const shown = getToastShown();
       const weekKey = `night_${new Date().toISOString().slice(0, 10).slice(0, 7)}`; // monthly
       if (shown[weekKey]) return;
+      if (isDismissed("night")) return;
       const timer = setTimeout(() => {
         markToastShown(weekKey);
         setToastActivo({
@@ -138,6 +145,7 @@ export default function GenieLampara() {
     try {
       if (localStorage.getItem("genio_trigger5_mostrado")) return;
     } catch { return; }
+    if (isDismissed("session3")) return;
     const timer = setTimeout(() => {
       setToastActivo({
         id: "session3",
@@ -159,6 +167,7 @@ export default function GenieLampara() {
       if (!esCumple) return;
       const keyHoy = `genio_cumple_saludo_${hoy.toISOString().slice(0, 10)}`;
       if (localStorage.getItem(keyHoy)) return;
+      if (isDismissed("cumple_saludo")) return;
       const timer = setTimeout(() => {
         setToastActivo({
           id: "cumple_saludo",
