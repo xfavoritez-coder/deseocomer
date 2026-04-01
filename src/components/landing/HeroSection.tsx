@@ -50,6 +50,8 @@ export default function HeroSection() {
     <section style={{
       minHeight: "100vh",
       position: "relative",
+      marginTop: "-1px",
+      paddingTop: "1px",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
