@@ -73,7 +73,7 @@ export default function MiLocalPage() {
   }, []);
 
   const set = (k: string, v: unknown) => setD(prev => ({ ...prev, [k]: v }));
-  const horarios: HorarioDia[] = (d.horarios as HorarioDia[]) ?? DIAS.map(() => ({ activo: true, abre: "12:00", cierra: "22:00" }));
+  const horarios: HorarioDia[] = (d.horarios as HorarioDia[]) ?? DIAS.map(() => ({ activo: false, abre: "12:00", cierra: "22:00" }));
   const setHorario = (i: number, h: Partial<HorarioDia>) => { const next = [...horarios]; next[i] = { ...next[i], ...h }; set("horarios", next); };
   const tieneMenu = d.tieneMenu as boolean | undefined;
   const menuCats: MenuCat[] = (d.menuCategorias as MenuCat[]) ?? [];
