@@ -78,15 +78,9 @@ export default function LoginLocalPage() {
               <button disabled={recLoading || !recEmail.trim()} onClick={async () => {
                 setRecLoading(true); setRecError(""); setRecMsg("");
                 try {
-                  const local = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: recEmail.trim().toLowerCase(), password: "___check___", tipo: "local" }) }).then(r => r.json());
-                  const localId = local?.data?.id;
-                  if (!localId) {
-                    const lookup = await fetch(`/api/locales`).then(r => r.json());
-                    const found = Array.isArray(lookup) && lookup.find((l: {email?: string}) => l.email === recEmail.trim().toLowerCase());
-                    if (!found) { setRecError("No encontramos un local con ese email"); setRecLoading(false); return; }
-                  }
-                  const res = await fetch("/api/auth/recuperar-password-local", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: localId || recEmail.trim().toLowerCase(), action: "enviar" }) });
-                  if (res.ok) { setRecStep("code"); setRecMsg("Código enviado a tu email"); } else { const d = await res.json(); setRecError(d.error ?? "Error al enviar"); }
+                  const res = await fetch("/api/auth/recuperar-password-local", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: recEmail.trim().toLowerCase(), action: "enviar" }) });
+                  if (res.ok) { setRecStep("code"); setRecMsg("Código enviado a tu email"); }
+                  else { const d = await res.json(); setRecError(d.error === "Local no encontrado" ? "No encontramos un local con ese email" : d.error ?? "Error al enviar"); }
                 } catch { setRecError("Error de conexión"); }
                 setRecLoading(false);
               }} style={btnS}>{recLoading ? "Enviando..." : "Enviar código"}</button>
