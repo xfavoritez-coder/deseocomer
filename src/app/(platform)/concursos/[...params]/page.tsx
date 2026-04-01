@@ -270,7 +270,7 @@ function ConcursoDetallePage() {
           </div>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4, textAlign: "center", marginBottom: isAuthenticated && !isParticipating && !isEnded ? 12 : 0 }}>Nadie se ha unido aún. Únete ahora y empieza con ventaja.</p>
           {isAuthenticated && !isParticipating && !isEnded && (
-            <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.2)", border: "1px solid rgba(61,100,210,0.4)", borderRadius: 8, padding: "10px 16px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirme al concurso →"}</button>
+            <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.2)", border: "1px solid rgba(61,100,210,0.4)", borderRadius: 8, padding: "10px 16px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirse al concurso →"}</button>
           )}
           {!isAuthenticated && !isEnded && (
             <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", textDecoration: "none", marginTop: 8, letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
@@ -301,12 +301,6 @@ function ConcursoDetallePage() {
           </div>
         );
       })}
-      {isAuthenticated && !isParticipating && !isEnded && (
-        <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.12)", border: "none", borderTop: "1px solid rgba(61,100,210,0.15)", padding: "12px 14px", fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirme al concurso →"}</button>
-      )}
-      {!isAuthenticated && !isEnded && (
-        <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", borderTop: "1px solid rgba(61,100,210,0.1)", padding: "10px 14px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.6)", textDecoration: "none", letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
-      )}
     </div>
   );
 
@@ -417,7 +411,7 @@ function ConcursoDetallePage() {
                 </div>
               ) : isAuthenticated && !isParticipating && !isEnded ? (
                 <div style={{ marginTop: 16 }}>
-                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "🎉 Unirme a este concurso"}</button>
+                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "🎉 Entrar a concurso"}</button>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Únete gratis y comienza a sumar puntos para ganar</p>
                 </div>
               ) : !isAuthenticated && !isEnded ? (
