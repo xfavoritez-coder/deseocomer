@@ -239,7 +239,7 @@ export default function ConcursosPage() {
           .dc-cp-filters { justify-content: flex-start; }
         }
         @media (min-width: 1024px) {
-          .dc-cp-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+          .dc-cp-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
         }
       `}</style>
     </main>
