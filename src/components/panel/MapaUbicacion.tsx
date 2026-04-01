@@ -49,7 +49,7 @@ export default function MapaUbicacion({ lat, lng, onChange }: Props) {
   return (
     <div style={{ marginBottom: "8px" }}>
       <div ref={mapRef} style={{ height: "220px", borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(232,168,76,0.2)" }} />
-      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "rgba(240,234,214,0.25)", marginTop: "6px" }}>📍 Click en el mapa o arrastra el pin para ajustar la ubicación</p>
+      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.25)", marginTop: "6px" }}>📍 Click en el mapa o arrastra el pin para ajustar la ubicación</p>
     </div>
   );
 }

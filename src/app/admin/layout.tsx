@@ -57,12 +57,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Link href="/admin" style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#e8a84c", textDecoration: "none", padding: "20px 16px 16px", borderBottom: "1px solid rgba(232,168,76,0.1)", display: "block" }}>🧞 Admin</Link>
         <nav style={{ flex: 1, padding: "8px 0" }}>
           {NAV.map(n => (
-            <Link key={n.href} href={n.href} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", textDecoration: "none", fontFamily: "Georgia", fontSize: "0.75rem", color: isActive(n.href) ? "#e8a84c" : "rgba(240,234,214,0.5)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderLeft: isActive(n.href) ? "3px solid #e8a84c" : "3px solid transparent" }}>
+            <Link key={n.href} href={n.href} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 16px", textDecoration: "none", fontFamily: "Georgia", fontSize: "0.82rem", color: isActive(n.href) ? "#e8a84c" : "rgba(240,234,214,0.5)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderLeft: isActive(n.href) ? "3px solid #e8a84c" : "3px solid transparent" }}>
               <span>{n.icon}</span>{n.label}
             </Link>
           ))}
         </nav>
-        <button onClick={handleLogout} style={{ padding: "14px 16px", background: "none", border: "none", borderTop: "1px solid rgba(232,168,76,0.1)", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.7rem", cursor: "pointer", textAlign: "left" }}>🚪 Cerrar sesión</button>
+        <button onClick={handleLogout} style={{ padding: "14px 16px", background: "none", border: "none", borderTop: "1px solid rgba(232,168,76,0.1)", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer", textAlign: "left" }}>🚪 Cerrar sesión</button>
       </aside>
 
       <main className="adm-main">{children}</main>

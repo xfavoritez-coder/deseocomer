@@ -41,7 +41,7 @@ function formatearDireccion(displayName: string, addressObj?: Record<string, str
   return comuna ? `${calleFormateada}, ${numero}, ${comuna}` : `${calleFormateada}, ${numero}`;
 }
 
-const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
+const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 
 export default function MiLocalPage() {
@@ -164,11 +164,11 @@ export default function MiLocalPage() {
         <Field label="Nombre del local" value={d.nombre as string ?? ""} onChange={v => set("nombre", v)} placeholder="Pizza Napoli" />
         <div><label style={LS}>Categoría</label><select style={IS as React.CSSProperties} value={d.categoria as string ?? ""} onChange={e => set("categoria", e.target.value)}><option value="">Selecciona...</option>{CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
         <div>
-          <label style={LS}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 4)</span></label>
+          <label style={LS}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 4)</span></label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {TAGS.map(tag => { const tags = (d.tags as string[]) ?? []; const sel = tags.includes(tag); const maxed = tags.length >= 4 && !sel; return <button key={tag} type="button" disabled={maxed} onClick={() => { const cur = (d.tags as string[]) ?? []; set("tags", sel ? cur.filter(t => t !== tag) : [...cur, tag]); }} style={{ padding: "6px 14px", borderRadius: "20px", border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: sel ? "rgba(232,168,76,0.15)" : "transparent", color: sel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: maxed ? "default" : "pointer" }}>{tag}</button>; })}
           </div>
-          {((d.tags as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.tags as string[]) ?? []).length}/4 etiquetas</p>}
+          {((d.tags as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.tags as string[]) ?? []).length}/4 etiquetas</p>}
         </div>
         <div><label style={LS}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label><textarea style={{ ...IS, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." /></div>
         <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789" />
@@ -227,7 +227,7 @@ export default function MiLocalPage() {
                 setBuscandoDireccion(false);
                 setTimeout(() => setBusquedaMsg(""), 4000);
               }}
-              style={{ padding: "10px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.08em", color: "var(--accent)", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}
+              style={{ padding: "10px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.08em", color: "var(--accent)", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}
             >
               {buscandoDireccion ? "..." : "🔍 Buscar"}
             </button>
@@ -260,7 +260,7 @@ export default function MiLocalPage() {
         </div>
 
         {busquedaMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: busquedaMsg.startsWith("✓") ? "#3db89e" : "#ff8080", marginTop: "6px", marginBottom: "4px" }}>{busquedaMsg}</p>}
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: busquedaMsg ? "2px" : "-6px", marginBottom: "4px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: busquedaMsg ? "2px" : "-6px", marginBottom: "4px" }}>Mueve el pin en el mapa para marcar la ubicación exacta</p>
         <MapaUbicacion lat={d.lat as number || -33.4489} lng={d.lng as number || -70.6693} onChange={(lat, lng) => { set("lat", lat); set("lng", lng); }} />
       </div>
 
@@ -283,12 +283,12 @@ export default function MiLocalPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             {menuCats.map((cat, ci) => (
               <div key={ci} style={{ background: "rgba(0,0,0,0.15)", borderRadius: "12px", padding: "16px", border: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}><input style={{ ...IS, flex: 1, fontWeight: 700 }} value={cat.nombre} onChange={e => { const c = [...menuCats]; c[ci] = { ...c[ci], nombre: e.target.value }; setMenuCats(c); }} placeholder="Nombre categoría" /><button onClick={() => setMenuCats(menuCats.filter((_, j) => j !== ci))} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff8080", cursor: "pointer", padding: "8px 12px", fontSize: "0.7rem" }}>✕</button></div>
+                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}><input style={{ ...IS, flex: 1, fontWeight: 700 }} value={cat.nombre} onChange={e => { const c = [...menuCats]; c[ci] = { ...c[ci], nombre: e.target.value }; setMenuCats(c); }} placeholder="Nombre categoría" /><button onClick={() => setMenuCats(menuCats.filter((_, j) => j !== ci))} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff8080", cursor: "pointer", padding: "8px 12px", fontSize: "0.78rem" }}>✕</button></div>
                 {cat.items.map((item, ii) => (<div key={ii} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px", marginBottom: "8px" }}><input style={{ ...IS, fontSize: "0.8rem" }} value={item.nombre} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, nombre: e.target.value }; setMenuCats(c); }} placeholder="Plato" /><input style={{ ...IS, fontSize: "0.8rem" }} value={item.precio} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, precio: e.target.value }; setMenuCats(c); }} placeholder="$0" /><button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: c[ci].items.filter((_, j) => j !== ii) }; setMenuCats(c); }} style={{ background: "none", border: "none", color: "#ff8080", cursor: "pointer", fontSize: "0.8rem" }}>✕</button></div>))}
-                <button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: [...c[ci].items, { nombre: "", descripcion: "", precio: "", destacado: false }] }; setMenuCats(c); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", padding: "6px 12px", cursor: "pointer" }}>+ Agregar plato</button>
+                <button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: [...c[ci].items, { nombre: "", descripcion: "", precio: "", destacado: false }] }; setMenuCats(c); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--oasis-bright)", background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", padding: "6px 12px", cursor: "pointer" }}>+ Agregar plato</button>
               </div>
             ))}
-            <button onClick={() => setMenuCats([...menuCats, { nombre: "", items: [] }])} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", padding: "10px 16px", cursor: "pointer" }}>+ Agregar categoría</button>
+            <button onClick={() => setMenuCats([...menuCats, { nombre: "", items: [] }])} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)", background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", padding: "10px 16px", cursor: "pointer" }}>+ Agregar categoría</button>
           </div>
         )}
       </div>
@@ -314,7 +314,7 @@ export default function MiLocalPage() {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
+  return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
 }
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {

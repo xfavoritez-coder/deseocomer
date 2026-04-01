@@ -96,7 +96,7 @@ export default function PromocionesPage() {
           ].map(({ key, label, color }) => {
             const isActive = key === "activas" ? filtroActivas : filtrosTipo.includes(key);
             return (
-              <button key={key} onClick={() => { if (key === "activas") setFiltroActivas(!filtroActivas); else toggleTipo(key); }} style={{ padding: "8px 16px", borderRadius: "20px", border: isActive ? `1px solid ${color}` : "1px solid rgba(232,168,76,0.2)", background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : "transparent", color: isActive ? color : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: "5px", transition: "all 0.2s" }}>
+              <button key={key} onClick={() => { if (key === "activas") setFiltroActivas(!filtroActivas); else toggleTipo(key); }} style={{ padding: "8px 16px", borderRadius: "20px", border: isActive ? `1px solid ${color}` : "1px solid rgba(232,168,76,0.2)", background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : "transparent", color: isActive ? color : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: "5px", transition: "all 0.2s" }}>
                 {key === "activas" && isActive && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: color, display: "inline-block", animation: "dc-ps-blink 1.5s infinite" }} />}
                 {label}
               </button>
@@ -107,7 +107,7 @@ export default function PromocionesPage() {
         {/* Fila 3 — Limpiar */}
         {(filtrosTipo.length > 0 || filtroActivas || busqueda) && (
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
           </div>
         )}
       </div>
@@ -129,7 +129,7 @@ export default function PromocionesPage() {
                   )}
                   <div style={{ padding: "14px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "4px" }}>{promo.titulo}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.6)" }}>{promo.local} · {promo.comuna}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)" }}>{promo.local} · {promo.comuna}</p>
                   </div>
                 </Link>
               ))}
@@ -147,7 +147,7 @@ export default function PromocionesPage() {
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", lineHeight: 1.6, maxWidth: "300px", margin: "0 auto 20px" }}>
               {busqueda ? `No encontramos promociones para "${busqueda}". Puedes buscar por local, tipo o comuna` : "No hay promociones con estos filtros"}
             </p>
-            <button onClick={() => { setBusqueda(""); setFiltrosTipo([]); setFiltroActivas(false); }} style={{ padding: "10px 20px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "var(--accent)", cursor: "pointer", textTransform: "uppercase" }}>
+            <button onClick={() => { setBusqueda(""); setFiltrosTipo([]); setFiltroActivas(false); }} style={{ padding: "10px 20px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", cursor: "pointer", textTransform: "uppercase" }}>
               Limpiar filtros
             </button>
           </div>
@@ -171,7 +171,7 @@ export default function PromocionesPage() {
                       <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                       {sello && (
                         <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "5px 12px" }}>
-                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
                         </div>
                       )}
                     </div>
@@ -180,7 +180,7 @@ export default function PromocionesPage() {
                     {activa && (
                       <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 10px", borderRadius: "20px", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.35)", marginBottom: "8px" }}>
                         <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "var(--oasis-bright)", display: "inline-block", animation: "dc-ps-blink 1.5s infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
                       </div>
                     )}
                     <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.95rem", color: "#f5d080", marginBottom: "4px" }}>{promo.titulo}</p>

@@ -134,7 +134,7 @@ export default function LocalesPage() {
           {CATEGORIAS.map(cat => {
             const active = categoriaActiva === cat;
             return (
-              <button key={cat} onClick={() => setCategoriaActiva(cat)} style={{ padding: "8px 16px", borderRadius: "20px", border: active ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: active ? "rgba(232,168,76,0.15)" : "transparent", color: active ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
+              <button key={cat} onClick={() => setCategoriaActiva(cat)} style={{ padding: "8px 16px", borderRadius: "20px", border: active ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: active ? "rgba(232,168,76,0.15)" : "transparent", color: active ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", textTransform: "uppercase", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
                 {cat}
               </button>
             );
@@ -143,23 +143,23 @@ export default function LocalesPage() {
 
         {/* Fila 2 — Estado + Ordenamiento */}
         <div className="dc-filtros-fila">
-          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloAbiertos ? "1px solid #3db89e" : "1px solid rgba(232,168,76,0.2)", background: soloAbiertos ? "rgba(61,184,158,0.12)" : "transparent", color: soloAbiertos ? "#3db89e" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloAbiertos ? "1px solid #3db89e" : "1px solid rgba(232,168,76,0.2)", background: soloAbiertos ? "rgba(61,184,158,0.12)" : "transparent", color: soloAbiertos ? "#3db89e" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             {soloAbiertos && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#3db89e", display: "inline-block" }} />}
             Abierto ahora
           </button>
-          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConConcursos ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConConcursos ? "rgba(232,168,76,0.12)" : "transparent", color: soloConConcursos ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConConcursos ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConConcursos ? "rgba(232,168,76,0.12)" : "transparent", color: soloConConcursos ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             🏆 Con concursos
           </button>
-          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             ⚡ Con promociones
           </button>
-          <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+          <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
             <option value="nuevo" style={{ background: "#0a0812", color: "#f0ead6" }}>🆕 Más nuevos</option>
             <option value="favoritos" style={{ background: "#0a0812", color: "#f0ead6" }}>❤️ Más guardados</option>
           </select>
           {hayFiltros && (
-            <button onClick={limpiarFiltros} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
+            <button onClick={limpiarFiltros} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>
               ✕ Limpiar
             </button>
           )}
@@ -191,7 +191,7 @@ export default function LocalesPage() {
                 <p style={{ fontSize: "3rem", marginBottom: "12px" }}>🔍</p>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px" }}>Sin resultados</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Prueba con otros filtros o búsqueda</p>
-                <button onClick={limpiarFiltros} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", padding: "12px 28px", borderRadius: "30px", border: "1px solid var(--accent)", background: "transparent", color: "var(--accent)", cursor: "pointer" }}>
+                <button onClick={limpiarFiltros} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", padding: "12px 28px", borderRadius: "30px", border: "1px solid var(--accent)", background: "transparent", color: "var(--accent)", cursor: "pointer" }}>
                   Limpiar filtros
                 </button>
               </>
@@ -200,7 +200,7 @@ export default function LocalesPage() {
                 <p style={{ fontSize: "3rem", marginBottom: "12px" }}>🍽️</p>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "6px" }}>Pronto habrá locales aquí</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Estamos incorporando los primeros locales</p>
-                <Link href="/solo-locales" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.3)", paddingBottom: "2px" }}>
+                <Link href="/solo-locales" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.3)", paddingBottom: "2px" }}>
                   ¿Tienes un local? →
                 </Link>
               </>
@@ -208,7 +208,7 @@ export default function LocalesPage() {
           </div>
         ) : (
           <>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "20px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "20px" }}>
               {localesFiltrados.length} local{localesFiltrados.length !== 1 ? "es" : ""} encontrado{localesFiltrados.length !== 1 ? "s" : ""}
             </p>
             <div className="dc-loc-grid">
@@ -270,10 +270,10 @@ export default function LocalesPage() {
                           <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px" }}>
                             <span style={{ color: "var(--accent)" }}>★</span>
                             <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating?.toFixed ? local.rating.toFixed(1) : local.rating}</span>
-                            <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
+                            <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
                           </div>
                         ) : (
-                          <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
+                          <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
                         )}
                       </div>
 

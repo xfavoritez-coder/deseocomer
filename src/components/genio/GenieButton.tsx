@@ -199,7 +199,7 @@ export default function GenieLampara() {
             borderRadius: "12px", padding: "10px 18px", whiteSpace: "nowrap",
             animation: balloonExiting ? "genieBalloonOut 0.3s ease forwards" : "genieBalloonIn 0.4s ease both",
           }}>
-            <button onClick={(e) => { e.stopPropagation(); setShowBalloon(false); try { localStorage.setItem("deseocomer_genio_ultimo_recordatorio", String(Date.now())); } catch {} }} style={{ position: "absolute", top: "-8px", right: "-8px", width: "20px", height: "20px", borderRadius: "50%", background: "rgba(232,168,76,0.9)", border: "none", color: "#1a0e05", fontSize: "0.55rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, zIndex: 2 }}>✕</button>
+            <button onClick={(e) => { e.stopPropagation(); setShowBalloon(false); try { localStorage.setItem("deseocomer_genio_ultimo_recordatorio", String(Date.now())); } catch {} }} style={{ position: "absolute", top: "-8px", right: "-8px", width: "20px", height: "20px", borderRadius: "50%", background: "rgba(232,168,76,0.9)", border: "none", color: "#1a0e05", fontSize: "0.68rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, zIndex: 2 }}>✕</button>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", fontWeight: 700, letterSpacing: "0.03em", color: s.color, margin: 0 }}>
               ✨ Pregúntame qué comer
             </p>

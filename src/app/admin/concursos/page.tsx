@@ -104,10 +104,10 @@ export default function AdminConcursos() {
                 <td style={TD}>{c.local?.nombre ?? "—"}</td>
                 <td style={{ ...TD, textAlign: "center" }}>{c._count?.participantes ?? 0}</td>
                 {/* Badge sospechosos se muestra al abrir detalle */}
-                <td style={{ ...TD, fontSize: "0.75rem" }}>{new Date(c.fechaInicio ?? c.createdAt).toLocaleDateString("es-CL")}</td>
-                <td style={{ ...TD, fontSize: "0.75rem" }}>{new Date(c.fechaFin).toLocaleDateString("es-CL")}</td>
-                <td style={TD}><span style={{ color, fontSize: "0.75rem", fontWeight: 700 }}>{status}</span></td>
-                <td style={TD} onClick={e => e.stopPropagation()}>{c.activo && !ended && <button onClick={() => cerrar(c.id)} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.65rem", padding: "4px 10px", cursor: "pointer" }}>Cerrar</button>}</td>
+                <td style={{ ...TD, fontSize: "0.82rem" }}>{new Date(c.fechaInicio ?? c.createdAt).toLocaleDateString("es-CL")}</td>
+                <td style={{ ...TD, fontSize: "0.82rem" }}>{new Date(c.fechaFin).toLocaleDateString("es-CL")}</td>
+                <td style={TD}><span style={{ color, fontSize: "0.82rem", fontWeight: 700 }}>{status}</span></td>
+                <td style={TD} onClick={e => e.stopPropagation()}>{c.activo && !ended && <button onClick={() => cerrar(c.id)} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.75rem", padding: "4px 10px", cursor: "pointer" }}>Cerrar</button>}</td>
               </tr>
             );
           })}
@@ -132,7 +132,7 @@ export default function AdminConcursos() {
 
             {/* Participantes con sistema antifraude */}
             <div style={{ marginTop: "24px" }}>
-              <SectionTitle>Participantes {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length > 0 && <span style={{ background: "rgba(232,168,76,0.2)", color: "#e8a84c", borderRadius: "10px", padding: "2px 8px", fontSize: "0.6rem", marginLeft: "8px" }}>⚠️ {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length} sospechosos</span>}</SectionTitle>
+              <SectionTitle>Participantes {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length > 0 && <span style={{ background: "rgba(232,168,76,0.2)", color: "#e8a84c", borderRadius: "10px", padding: "2px 8px", fontSize: "0.72rem", marginLeft: "8px" }}>⚠️ {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length} sospechosos</span>}</SectionTitle>
               {loadingParticipantes ? (
                 <p style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>Cargando...</p>
               ) : participantesAdmin.length > 0 ? (
@@ -143,24 +143,24 @@ export default function AdminConcursos() {
                         <span style={{ fontSize: "0.85rem", width: "24px" }}>{i < 3 ? ["🥇", "🥈", "🥉"][i] : `${i + 1}.`}</span>
                         <div>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6" }}>{p.nombre}</span>
-                          <p style={{ fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.3)", margin: 0 }}>{p.email}</p>
+                          <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", margin: 0 }}>{p.email}</p>
                         </div>
                       </div>
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "#e8a84c" }}>{p.puntos} pts</span>
-                        <span style={{ fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.3)" }}>{p.referidos} refs</span>
+                        <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)" }}>{p.referidos} refs</span>
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: "6px", marginTop: "6px", alignItems: "center", flexWrap: "wrap" }}>
-                      {p.estado === "sospechoso" && <span style={{ background: "rgba(232,168,76,0.2)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.6rem", color: "#e8a84c" }}>⚠️ Revisar</span>}
-                      {p.estado === "descalificado" && <span style={{ background: "rgba(255,80,80,0.15)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.6rem", color: "#ff6b6b" }}>Descalificado</span>}
-                      {p.estado === "revisado" && <span style={{ background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.6rem", color: "#3db89e" }}>✓ Revisado</span>}
-                      {p.flags.map((f, fi) => <span key={fi} style={{ fontFamily: "Georgia", fontSize: "0.55rem", color: "rgba(232,168,76,0.6)", background: "rgba(232,168,76,0.08)", borderRadius: "4px", padding: "1px 6px" }}>{f}</span>)}
+                      {p.estado === "sospechoso" && <span style={{ background: "rgba(232,168,76,0.2)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.72rem", color: "#e8a84c" }}>⚠️ Revisar</span>}
+                      {p.estado === "descalificado" && <span style={{ background: "rgba(255,80,80,0.15)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>Descalificado</span>}
+                      {p.estado === "revisado" && <span style={{ background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "6px", padding: "2px 8px", fontFamily: "Georgia", fontSize: "0.72rem", color: "#3db89e" }}>✓ Revisado</span>}
+                      {p.flags.map((f, fi) => <span key={fi} style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(232,168,76,0.6)", background: "rgba(232,168,76,0.08)", borderRadius: "4px", padding: "1px 6px" }}>{f}</span>)}
                       {p.estado !== "revisado" && p.estado !== "descalificado" && (
-                        <button onClick={() => cambiarEstado(p.id, "revisado")} style={{ background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.6rem", padding: "2px 8px", cursor: "pointer" }}>✓ OK</button>
+                        <button onClick={() => cambiarEstado(p.id, "revisado")} style={{ background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", cursor: "pointer" }}>✓ OK</button>
                       )}
                       {p.estado !== "descalificado" && (
-                        <button onClick={() => cambiarEstado(p.id, "descalificado")} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.6rem", padding: "2px 8px", cursor: "pointer" }}>✗ Descalificar</button>
+                        <button onClick={() => cambiarEstado(p.id, "descalificado")} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", cursor: "pointer" }}>✗ Descalificar</button>
                       )}
                     </div>
                   </div>
@@ -174,27 +174,27 @@ export default function AdminConcursos() {
             {editando && (
               <div style={{ marginTop: "24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", padding: "16px" }}>
                 <SectionTitle>Editar concurso</SectionTitle>
-                {editError && <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#ff6b6b", marginBottom: "10px" }}>⚠️ {editError}</p>}
+                {editError && <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#ff6b6b", marginBottom: "10px" }}>⚠️ {editError}</p>}
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div>
-                    <label style={{ fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Premio</label>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Premio</label>
                     <input style={EDIT_INPUT} value={editPremio} onChange={e => setEditPremio(e.target.value)} />
                   </div>
                   <div>
-                    <label style={{ fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Descripción</label>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Descripción</label>
                     <input style={EDIT_INPUT} value={editDescripcion} onChange={e => setEditDescripcion(e.target.value)} placeholder="Opcional" />
                   </div>
                   <div>
-                    <label style={{ fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Fecha de cierre</label>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Fecha de cierre</label>
                     <input style={EDIT_INPUT} type="datetime-local" value={editFechaFin} onChange={e => setEditFechaFin(e.target.value)} />
                   </div>
                   <div>
-                    <label style={{ fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>
                     <textarea style={{ ...EDIT_INPUT, resize: "vertical", minHeight: "50px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Opcional" />
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <button onClick={() => setEditando(false)} style={{ flex: 1, background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.7rem", padding: "8px", cursor: "pointer" }}>Cancelar</button>
-                    <button onClick={guardarEdicion} disabled={!editPremio.trim()} style={{ flex: 2, background: "#e8a84c", border: "none", borderRadius: "6px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.7rem", fontWeight: 700, padding: "8px", cursor: "pointer", opacity: editPremio.trim() ? 1 : 0.5 }}>Guardar</button>
+                    <button onClick={() => setEditando(false)} style={{ flex: 1, background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>Cancelar</button>
+                    <button onClick={guardarEdicion} disabled={!editPremio.trim()} style={{ flex: 2, background: "#e8a84c", border: "none", borderRadius: "6px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.78rem", fontWeight: 700, padding: "8px", cursor: "pointer", opacity: editPremio.trim() ? 1 : 0.5 }}>Guardar</button>
                   </div>
                 </div>
               </div>
@@ -203,12 +203,12 @@ export default function AdminConcursos() {
             {/* Acciones */}
             <div style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "10px" }}>
               {!editando && (
-                <button onClick={iniciarEdicion} style={{ background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.75rem", padding: "10px", cursor: "pointer", width: "100%" }}>✏️ Editar concurso</button>
+                <button onClick={iniciarEdicion} style={{ background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", cursor: "pointer", width: "100%" }}>✏️ Editar concurso</button>
               )}
               {sel.activo && new Date(sel.fechaFin) > new Date() && (
-                <button onClick={() => cerrar(sel.id)} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.75rem", padding: "10px", cursor: "pointer", width: "100%" }}>Cerrar concurso</button>
+                <button onClick={() => cerrar(sel.id)} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", cursor: "pointer", width: "100%" }}>Cerrar concurso</button>
               )}
-              <a href={`/concursos/${sel.slug || sel.id}`} target="_blank" rel="noopener" style={{ display: "block", textAlign: "center", fontFamily: "Georgia", fontSize: "0.75rem", padding: "10px", borderRadius: "8px", border: "1px solid rgba(232,168,76,0.2)", color: "#e8a84c", textDecoration: "none" }}>Ver concurso público →</a>
+              <a href={`/concursos/${sel.slug || sel.id}`} target="_blank" rel="noopener" style={{ display: "block", textAlign: "center", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", borderRadius: "8px", border: "1px solid rgba(232,168,76,0.2)", color: "#e8a84c", textDecoration: "none" }}>Ver concurso público →</a>
             </div>
           </div>
           <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
@@ -219,7 +219,7 @@ export default function AdminConcursos() {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ fontFamily: "Georgia", fontSize: "0.65rem", letterSpacing: "0.2em", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", marginBottom: "12px" }}>{children}</h3>;
+  return <h3 style={{ fontFamily: "Georgia", fontSize: "0.75rem", letterSpacing: "0.2em", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", marginBottom: "12px" }}>{children}</h3>;
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
@@ -230,7 +230,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "8px 10px", textAlign: "left" };
+const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "8px 10px", textAlign: "left" };
 const TD: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", padding: "10px" };
 const PANEL: React.CSSProperties = { position: "fixed", top: 0, right: 0, width: "min(420px, 100vw)", height: "100vh", background: "rgba(10,8,18,0.98)", borderLeft: "1px solid rgba(232,168,76,0.2)", zIndex: 1000, overflowY: "auto", padding: "24px", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)", animation: "slideIn 0.2s ease" };
 const BACK: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontSize: "0.85rem", cursor: "pointer", marginBottom: "20px", padding: 0, fontFamily: "Georgia" };

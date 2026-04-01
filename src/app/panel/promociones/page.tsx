@@ -9,7 +9,7 @@ function loadPromos(): Promo[] { try { return (JSON.parse(localStorage.getItem(D
 function savePromos(p: Promo[]) { try { const d = JSON.parse(localStorage.getItem(DATA_KEY) ?? "{}"); d.promociones = p; localStorage.setItem(DATA_KEY, JSON.stringify(d)); } catch {} }
 
 const I: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
-const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
+const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
@@ -43,11 +43,11 @@ export default function PanelPromociones() {
     setShowForm(false); setForm({ tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00" });
   };
 
-  const chip = (sel: boolean): React.CSSProperties => ({ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: sel ? 700 : 400 });
+  const chip = (sel: boolean): React.CSSProperties => ({ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: sel ? 700 : 400 });
 
   if (showForm) return (
     <div style={{ maxWidth: "560px" }}>
-      <button onClick={() => setShowForm(false)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
+      <button onClick={() => setShowForm(false)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
       <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "24px" }}>Nueva promoción</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <div>
@@ -67,7 +67,7 @@ export default function PanelPromociones() {
                 background: form.dias[i] ? "var(--accent)" : "transparent",
                 border: form.dias[i] ? "none" : "1px solid var(--border-color)",
                 color: form.dias[i] ? "var(--bg-primary)" : "var(--text-muted)",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, cursor: "pointer",
+                fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, cursor: "pointer",
               }}>{d}</button>
             ))}
           </div>
@@ -100,7 +100,7 @@ export default function PanelPromociones() {
             <span style={{ fontSize: "1.6rem" }}>⚡</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{p.titulo}</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{p.tipo}{p.descuento ? ` · ${p.descuento}%` : ""} · {p.horaInicio}-{p.horaFin}</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{p.tipo}{p.descuento ? ` · ${p.descuento}%` : ""} · {p.horaInicio}-{p.horaFin}</p>
             </div>
           </div>
         ))}

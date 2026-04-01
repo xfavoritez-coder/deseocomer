@@ -64,7 +64,7 @@ export default function SoloLocalesPage() {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%)" }} />
         <div style={{ position: "relative", maxWidth: "700px", margin: "0 auto" }}>
           <Reveal>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "20px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "20px" }}>
               Para restaurantes y locales
             </p>
           </Reveal>
@@ -163,7 +163,7 @@ export default function SoloLocalesPage() {
                     </div>
                     <div>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>{t.nombre}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)" }}>{t.local}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>{t.local}</p>
                     </div>
                   </div>
                 </div>

@@ -59,8 +59,9 @@ model Local {
   tieneMenu     Boolean  @default(false)
   resetToken        String?
   resetTokenExpira  DateTime?
-  verificado    Boolean  @default(false)
-  activo        Boolean  @default(true)
+  verificado                    Boolean  @default(false)
+  activo                        Boolean  @default(true)
+  primerParticipanteNotificado  Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

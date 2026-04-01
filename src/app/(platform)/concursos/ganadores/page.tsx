@@ -30,10 +30,10 @@ export default function GanadoresPage() {
       {/* Hero */}
       <section className="dc-gan-hero">
         <div style={{ maxWidth: "680px", margin: "0 auto" }}>
-          <Link href="/concursos" style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "24px" }}>
+          <Link href="/concursos" style={{ display: "block", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", textDecoration: "none", marginBottom: "24px" }}>
             ← Todos los concursos
           </Link>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#3db89e", marginBottom: "14px" }}>Historial de premios</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#3db89e", marginBottom: "14px" }}>Historial de premios</p>
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 6vw, 3.5rem)", fontWeight: 900, color: "#e8a84c", marginBottom: "14px", lineHeight: 1.15 }}>🏆 Ganadores</h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.85rem, 2vw, 1.05rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7, maxWidth: "480px", margin: "0 auto 32px" }}>
             Estas personas ganaron comida gratis compartiendo DeseoComer con sus amigos
@@ -61,7 +61,7 @@ export default function GanadoresPage() {
         {/* Podio top 3 */}
         {top3.length > 0 && (
           <div style={{ marginBottom: "40px" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "20px", textAlign: "center" }}>Últimos ganadores</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "20px", textAlign: "center" }}>Últimos ganadores</p>
             <div className="dc-gan-podio">
               {[top3[1], top3[0], top3[2]].map((c, i) => {
                 if (!c) return null;
@@ -85,7 +85,7 @@ export default function GanadoresPage() {
         {/* Separador */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
           <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.1)" }} />
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", whiteSpace: "nowrap" }}>Historial completo</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", whiteSpace: "nowrap" }}>Historial completo</p>
           <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.1)" }} />
         </div>
 
@@ -99,14 +99,14 @@ export default function GanadoresPage() {
                 {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} /> : emojiPorCategoria(c.premio + " " + c.local)}
               </div>
               <div style={{ padding: "10px 12px", flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#3db89e", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#3db89e", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.78rem", color: "#f5d080", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
-                  <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.nombre.charAt(0)}</div>
+                  <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.nombre.charAt(0)}</div>
                   <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador.nombre}</span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "#e8a84c" }}>{c.ganador.referidos} referidos · {c.participantes} participantes</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "#e8a84c" }}>{c.ganador.referidos} referidos · {c.participantes} participantes</p>
               </div>
             </div>
           ))}

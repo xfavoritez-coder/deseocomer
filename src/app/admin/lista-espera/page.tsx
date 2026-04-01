@@ -36,7 +36,7 @@ export default function AdminListaEspera() {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c" }}>Lista de Espera ({data.lista.length})</h1>
-        {data.lista.length > 0 && <button onClick={exportCSV} style={{ background: "#e8a84c", color: "#0a0812", border: "none", borderRadius: "8px", padding: "8px 16px", fontFamily: "Georgia", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer" }}>📥 Exportar CSV</button>}
+        {data.lista.length > 0 && <button onClick={exportCSV} style={{ background: "#e8a84c", color: "#0a0812", border: "none", borderRadius: "8px", padding: "8px 16px", fontFamily: "Georgia", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer" }}>📥 Exportar CSV</button>}
       </div>
       {ciudades.length === 0 ? (
         <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.5)", textAlign: "center", padding: "40px" }}>No hay registros en la lista de espera</p>
@@ -46,7 +46,7 @@ export default function AdminListaEspera() {
             <div key={ciudad} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "16px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
                 <span style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#e8a84c", fontWeight: 700, textTransform: "capitalize" }}>📍 {ciudad}</span>
-                <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)" }}>{emails.length} email{emails.length !== 1 ? "s" : ""}</span>
+                <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)" }}>{emails.length} email{emails.length !== 1 ? "s" : ""}</span>
               </div>
               {emails.map((email: string, i: number) => (
                 <p key={i} style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "#f0ead6", padding: "4px 0" }}>{email}</p>
@@ -62,7 +62,7 @@ export default function AdminListaEspera() {
       {/* Lista espera por comuna */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <h2 style={{ fontFamily: "Georgia", fontSize: "1.2rem", color: "#e8a84c" }}>Lista de Espera por Comuna ({listaComunas.length})</h2>
-        {listaComunas.length > 0 && <button onClick={exportComunasCSV} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "8px", padding: "8px 16px", fontFamily: "Georgia", fontSize: "0.7rem", color: "#e8a84c", cursor: "pointer" }}>📥 CSV comunas</button>}
+        {listaComunas.length > 0 && <button onClick={exportComunasCSV} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "8px", padding: "8px 16px", fontFamily: "Georgia", fontSize: "0.78rem", color: "#e8a84c", cursor: "pointer" }}>📥 CSV comunas</button>}
       </div>
 
       {rankingComunas.length === 0 ? (
@@ -79,11 +79,11 @@ export default function AdminListaEspera() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {item.emails.slice(0, 5).map((e: any, i: number) => (
-                  <span key={i} style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", background: "rgba(255,255,255,0.04)", padding: "3px 10px", borderRadius: "20px" }}>
+                  <span key={i} style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", background: "rgba(255,255,255,0.04)", padding: "3px 10px", borderRadius: "20px" }}>
                     {e.nombre ? `${e.nombre} (${e.email})` : e.email}
                   </span>
                 ))}
-                {item.emails.length > 5 && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", padding: "3px 10px" }}>+{item.emails.length - 5} más</span>}
+                {item.emails.length > 5 && <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", padding: "3px 10px" }}>+{item.emails.length - 5} más</span>}
               </div>
             </div>
           ))}

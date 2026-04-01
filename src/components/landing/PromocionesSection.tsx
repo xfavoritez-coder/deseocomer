@@ -116,7 +116,7 @@ export default function PromocionesSection() {
               alignItems: "center",
               gap: "8px",
               fontFamily: "var(--font-cinzel)",
-              fontSize: "0.65rem",
+              fontSize: "0.75rem",
               letterSpacing: "0.15em",
               textTransform: "uppercase",
               padding: "8px 20px",
@@ -204,7 +204,7 @@ export default function PromocionesSection() {
                     <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     {badge && (
                       <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${badge.color}`, borderRadius: "20px", padding: "5px 12px" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: badge.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{badge.text}</span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: badge.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{badge.text}</span>
                       </div>
                     )}
                   </div>
@@ -219,7 +219,7 @@ export default function PromocionesSection() {
                   <div>
                     <p style={{
                       fontFamily: "var(--font-cinzel)",
-                      fontSize: "0.6rem",
+                      fontSize: "0.72rem",
                       letterSpacing: "0.2em",
                       textTransform: "uppercase",
                       color: "var(--text-muted)",
@@ -282,7 +282,7 @@ export default function PromocionesSection() {
                       {promo.porcentajeDescuento && (
                         <span style={{
                           fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.6rem",
+                          fontSize: "0.72rem",
                           fontWeight: 700,
                           padding: "2px 8px",
                           borderRadius: "20px",
@@ -315,7 +315,7 @@ export default function PromocionesSection() {
                       </p>
                       <p style={{
                         fontFamily: "var(--font-lato)",
-                        fontSize: "0.6rem",
+                        fontSize: "0.72rem",
                         color: "var(--text-muted)",
                         textTransform: "uppercase",
                         letterSpacing: "0.1em",
@@ -334,7 +334,7 @@ export default function PromocionesSection() {
                       </p>
                       <p style={{
                         fontFamily: "var(--font-lato)",
-                        fontSize: "0.6rem",
+                        fontSize: "0.72rem",
                         color: "var(--text-muted)",
                         textTransform: "uppercase",
                         letterSpacing: "0.1em",
@@ -351,7 +351,7 @@ export default function PromocionesSection() {
                         key={idx}
                         style={{
                           fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.5rem",
+                          fontSize: "0.65rem",
                           width: "22px", height: "22px",
                           display: "flex",
                           alignItems: "center",
@@ -600,7 +600,7 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
             <input style={{ ...inp, textAlign: "left", width: "100%" }} placeholder="Tu nombre" value={nombre} onChange={e => setNombre(e.target.value)} />
             <input style={{ ...inp, textAlign: "left", width: "100%" }} type="email" placeholder="tu@email.com" value={email} onChange={e => setEmail(e.target.value)} />
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Fecha de cumpleaños</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Fecha de cumpleaños</p>
               <div style={{ display: "flex", gap: "8px" }}>
                 <input style={{ ...inp, width: "60px" }} placeholder="DD" maxLength={2} value={dia} onChange={e => setDia(e.target.value.replace(/\D/g, ""))} />
                 <input style={{ ...inp, width: "60px" }} placeholder="MM" maxLength={2} value={mes} onChange={e => setMes(e.target.value.replace(/\D/g, ""))} />

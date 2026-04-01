@@ -29,7 +29,7 @@ export default function AdminLogin() {
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <p style={{ fontSize: "2rem", marginBottom: "6px" }}>🧞</p>
           <h1 style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c" }}>Panel Maestro</h1>
-          <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", marginTop: "4px" }}>Acceso exclusivo DeseoComer</p>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginTop: "4px" }}>Acceso exclusivo DeseoComer</p>
         </div>
         {error && <p style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "8px", padding: "10px", fontFamily: "Georgia", fontSize: "0.8rem", color: "#ff6b6b", marginBottom: "16px", textAlign: "center" }}>{error}</p>}
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>

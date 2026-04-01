@@ -75,7 +75,7 @@ function DevPanel({
           minWidth: "168px",
         }}>
           <p style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.55rem",
+            fontFamily: "var(--font-cinzel)", fontSize: "0.68rem",
             letterSpacing: "0.25em", textTransform: "uppercase",
             color: "rgba(232,168,76,0.5)", textAlign: "center",
             padding: "0 4px 8px",
@@ -102,7 +102,7 @@ function DevPanel({
               >
                 <span style={{ fontSize: "1.1rem" }}>{t.icon}</span>
                 <span style={{
-                  fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+                  fontFamily: "var(--font-cinzel)", fontSize: "0.78rem",
                   letterSpacing: "0.1em", textTransform: "uppercase",
                   color: isActive ? t.accent : "rgba(255,255,255,0.6)",
                   fontWeight: isActive ? 700 : 400,

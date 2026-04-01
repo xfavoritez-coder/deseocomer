@@ -61,7 +61,7 @@ export default function AdminLocales() {
       </div>
 
       <div style={{ marginBottom: "20px" }}>
-        <span style={{ fontSize: "0.72rem", fontWeight: 700, color: sel.activo ? "#3db89e" : "#ff8080", background: sel.activo ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.activo ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.activo ? "✓ Activo" : "⏳ Pendiente"}</span>
+        <span style={{ fontSize: "0.8rem", fontWeight: 700, color: sel.activo ? "#3db89e" : "#ff8080", background: sel.activo ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.activo ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.activo ? "✓ Activo" : "⏳ Pendiente"}</span>
       </div>
 
       {/* Info cards */}
@@ -82,7 +82,7 @@ export default function AdminLocales() {
             <div key={String(label)} style={{ textAlign: "center", padding: "10px", background: "rgba(255,255,255,0.03)", borderRadius: "8px" }}>
               <p style={{ fontSize: "1rem", margin: "0 0 2px" }}>{icon}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#e8a84c", margin: 0 }}>{val}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{label}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{label}</p>
             </div>
           ))}
         </div>
@@ -133,7 +133,7 @@ export default function AdminLocales() {
       {deleteConfirm && (
         <div style={{ ...cardS, borderColor: "rgba(255,80,80,0.3)", textAlign: "center" }}>
           <p style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#ff6b6b", fontWeight: 700, marginBottom: "6px" }}>¿Eliminar {sel.nombre}?</p>
-          <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", marginBottom: "14px" }}>Se borran todos sus datos. No se puede deshacer.</p>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginBottom: "14px" }}>Se borran todos sus datos. No se puede deshacer.</p>
           <div style={{ display: "flex", gap: "8px" }}>
             <button onClick={async () => { setLoading(true); try { const r = await adminFetch(`/api/admin/locales/${sel.id}`, { method: "DELETE" }); if (r.ok) { setLocales(p => p.filter(l => l.id !== sel.id)); setSel(null); show("Eliminado"); } } catch {} setLoading(false); }} disabled={loading} style={{ ...btnPrimaryS, background: "#ff6b6b" }}>{loading ? "..." : "Eliminar"}</button>
             <button onClick={() => setDeleteConfirm(false)} style={btnSecS}>Cancelar</button>
@@ -163,15 +163,15 @@ export default function AdminLocales() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "8px" }}>
         <h1 style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c", margin: 0 }}>Locales ({locales.length})</h1>
         <div style={{ display: "flex", gap: "6px" }}>
-          <span style={{ fontSize: "0.72rem", color: "#ff8080", background: "rgba(255,100,100,0.1)", border: "1px solid rgba(255,100,100,0.2)", borderRadius: "6px", padding: "4px 10px" }}>{pendientes} pend.</span>
-          <span style={{ fontSize: "0.72rem", color: "#3db89e", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: "6px", padding: "4px 10px" }}>{activos} act.</span>
+          <span style={{ fontSize: "0.8rem", color: "#ff8080", background: "rgba(255,100,100,0.1)", border: "1px solid rgba(255,100,100,0.2)", borderRadius: "6px", padding: "4px 10px" }}>{pendientes} pend.</span>
+          <span style={{ fontSize: "0.8rem", color: "#3db89e", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: "6px", padding: "4px 10px" }}>{activos} act.</span>
         </div>
       </div>
 
       <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
         <input style={{ ...inputS, flex: 1, minWidth: "150px" }} placeholder="Buscar..." value={busq} onChange={e => setBusq(e.target.value)} />
         {["todos", "pendientes", "activos"].map(f => (
-          <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.7rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? "#e8a84c" : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f}</button>
+          <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.78rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? "#e8a84c" : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f}</button>
         ))}
       </div>
 
@@ -182,12 +182,12 @@ export default function AdminLocales() {
             <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: l.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden", border: "1px solid rgba(232,168,76,0.2)" }}>{l.logoUrl ? <img src={l.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : l.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.nombre}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{l.email}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{l.email}</p>
             </div>
             {l.activo ? (
-              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>✓</span>
+              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>✓</span>
             ) : (
-              <button onClick={async (e) => { e.stopPropagation(); setLoading(true); try { const res = await adminFetch(`/api/admin/locales/${l.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "aprobar" }) }); if (res.ok) { setLocales(p => p.map(x => x.id === l.id ? { ...x, activo: true } : x)); show("✓ " + l.nombre + " activado"); } } catch {} setLoading(false); }} style={{ padding: "4px 10px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.65rem", fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Activar</button>
+              <button onClick={async (e) => { e.stopPropagation(); setLoading(true); try { const res = await adminFetch(`/api/admin/locales/${l.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "aprobar" }) }); if (res.ok) { setLocales(p => p.map(x => x.id === l.id ? { ...x, activo: true } : x)); show("✓ " + l.nombre + " activado"); } } catch {} setLoading(false); }} style={{ padding: "4px 10px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Activar</button>
             )}
           </div>
         ))}
@@ -203,9 +203,9 @@ function Row({ label, value }: { label: string; value: string }) {
 const toastS: React.CSSProperties = { position: "fixed", top: "16px", right: "16px", background: "rgba(13,7,3,0.97)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "10px", padding: "10px 18px", fontFamily: "Georgia", fontSize: "0.8rem", color: "#e8a84c", zIndex: 9999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" };
 const backS: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, marginBottom: "16px" };
 const cardS: React.CSSProperties = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", marginBottom: "12px" };
-const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "10px", margin: "0 0 10px" };
+const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "10px", margin: "0 0 10px" };
 const inputS: React.CSSProperties = { width: "100%", padding: "10px 12px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" };
-const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" };
+const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" };
 const btnPrimaryS: React.CSSProperties = { flex: 1, padding: "10px", background: "#e8a84c", border: "none", borderRadius: "8px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" };
 const btnSecS: React.CSSProperties = { flex: 1, padding: "10px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.8rem", cursor: "pointer" };
 const btnOutlineS: React.CSSProperties = { display: "block", width: "100%", padding: "10px", background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer", textAlign: "left" };

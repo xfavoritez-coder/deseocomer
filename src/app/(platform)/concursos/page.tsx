@@ -90,7 +90,7 @@ export default function ConcursosPage() {
             Participa gratis, sube en el ranking y gana comida de los mejores restaurantes.
           </p>
           <div style={{ marginTop: 12 }}>
-            <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: 2 }}>
+            <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: 2 }}>
               ¿No sabes cómo funciona? Aprende aquí →
             </Link>
           </div>
@@ -142,7 +142,7 @@ export default function ConcursosPage() {
                     {soon && (
                       <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(224,85,85,0.15)", border: "1px solid rgba(224,85,85,0.5)", borderRadius: 6, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: urg, animation: "dc-pd 0.8s ease-in-out infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: urg }}>¡Termina pronto!</span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: urg }}>¡Termina pronto!</span>
                       </div>
                     )}
 
@@ -153,12 +153,12 @@ export default function ConcursosPage() {
                     {/* Local */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                       {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
-                        : <div style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c" }}>{localInitial}</div>}
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.local}</span>
+                        : <div style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitial}</div>}
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.local}</span>
                     </div>
                     {/* Título */}
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 16 }}>🏆</span>{c.premio}</p>
-                    {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12 }}>{c.descripcionPremio}</p>}
+                    {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12 }}>{c.descripcionPremio}</p>}
 
                     {/* Countdown */}
                     {t && !t.ended && (
@@ -170,7 +170,7 @@ export default function ConcursosPage() {
                           <div key={l} style={{ display: "flex", alignItems: "center", gap: 2 }}>
                             <div style={{ textAlign: "center" }}>
                               <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, fontWeight: 700, color: soon ? urg : "rgba(240,234,214,0.9)", lineHeight: 1, minWidth: 32 }}>{pad2(v)}</div>
-                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 8, color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 1 }}>{l}</div>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 1 }}>{l}</div>
                             </div>
                             {i < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: soon ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)", marginBottom: 10 }}>:</span>}
                           </div>
@@ -180,8 +180,8 @@ export default function ConcursosPage() {
 
                     {/* Participantes */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>Participantes</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.participantes}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>Participantes</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.participantes}</span>
                     </div>
 
                     {/* Top 3 */}
@@ -195,9 +195,9 @@ export default function ConcursosPage() {
                           ][i] ?? { bg: "rgba(255,255,255,0.03)", c: "rgba(240,234,214,0.3)", bd: "rgba(255,255,255,0.06)" };
                           return (
                             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < c.ranking.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
-                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: posC.bg, border: `1px solid ${posC.bd}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 700, color: posC.c, flexShrink: 0 }}>{i + 1}</div>
-                              <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.6)" }}>{r.nombre}</span>
-                              <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} refs</span>
+                              <div style={{ width: 18, height: 18, borderRadius: "50%", background: posC.bg, border: `1px solid ${posC.bd}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: posC.c, flexShrink: 0 }}>{i + 1}</div>
+                              <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.6)" }}>{r.nombre}</span>
+                              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} refs</span>
                             </div>
                           );
                         })}
@@ -207,7 +207,7 @@ export default function ConcursosPage() {
                     {/* CTA */}
                     <button onClick={e => { e.stopPropagation(); router.push(`/concursos/${c.slug}`); }} style={{
                       width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
-                      fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, textTransform: "uppercase",
+                      fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase",
                       letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                       background: soon ? urg : "#e8a84c", border: "none", color: soon ? "#fff" : "#0a0812",
                     }}>

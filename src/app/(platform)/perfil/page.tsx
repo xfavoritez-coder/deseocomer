@@ -101,7 +101,7 @@ export default function PerfilPage() {
             {isBirthdayMonth && (
               <span style={{
                 display: "inline-block", marginTop: "6px",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.65rem",
+                fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
                 letterSpacing: "0.1em", color: "var(--sand-gold, #e8a84c)",
                 border: "1px solid var(--sand-gold, #e8a84c)",
                 borderRadius: "20px", padding: "3px 10px",
@@ -204,7 +204,7 @@ function TabFavoritos() {
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--accent)" }}>{l.nombre}</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)" }}>{l.categoria} · {l.comuna}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>{l.categoria} · {l.comuna}</p>
           </div>
         </Link>
       ))}
@@ -252,7 +252,7 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
               }}>
                 {info?.premio ?? `Concurso #${concursoId}`}
               </Link>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
                 {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
                   {isActive ? "Activo" : "Finalizado"}
                 </span>
@@ -260,13 +260,13 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
             </div>
             <div style={{ textAlign: "center", flexShrink: 0 }}>
               <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{count}</p>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
             </div>
             {isActive && (
               <button onClick={() => copyLink(concursoId)} style={{
                 background: "none", border: "1px solid var(--border-color)",
                 borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", color: "var(--accent)",
+                fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
               }}>
                 {copied === concursoId ? "✓" : "📋"}
               </button>
@@ -299,11 +299,11 @@ function TabHistorial() {
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-primary)" }}>
               {v.nombre}
             </p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
               {v.categoria} · {v.comuna}
             </p>
           </div>
-          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", flexShrink: 0 }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", flexShrink: 0 }}>
             {timeAgo(v.timestamp)}
           </span>
         </div>
@@ -342,10 +342,10 @@ function TabLogros() {
           <div style={{ fontSize: "2rem", marginBottom: "8px", filter: b.unlocked ? "none" : "grayscale(1)" }}>
             {b.unlocked ? b.icon : "🔒"}
           </div>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: b.unlocked ? "var(--accent)" : "var(--text-muted)", marginBottom: "4px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: b.unlocked ? "var(--accent)" : "var(--text-muted)", marginBottom: "4px" }}>
             {b.name}
           </p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
             {b.unlocked ? b.desc : `Falta: ${b.desc.toLowerCase()}`}
           </p>
         </div>
@@ -377,7 +377,7 @@ function TabGenio() {
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* Categorías */}
       <div>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
           Tus categorías favoritas
         </p>
         {topCats.length === 0 ? (
@@ -386,7 +386,7 @@ function TabGenio() {
           <div key={cat} style={{ marginBottom: "8px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
               <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-primary)", textTransform: "capitalize" }}>{cat}</span>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--oasis-bright)" }}>{score}</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--oasis-bright)" }}>{score}</span>
             </div>
             <div style={{ height: "6px", borderRadius: "3px", background: "rgba(0,0,0,0.3)" }}>
               <div style={{ height: "100%", borderRadius: "3px", background: "var(--oasis-bright)", width: `${(score / maxCatScore) * 100}%`, transition: "width 0.5s" }} />
@@ -397,7 +397,7 @@ function TabGenio() {
 
       {/* Comunas */}
       <div>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
           Tus zonas habituales
         </p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
@@ -405,7 +405,7 @@ function TabGenio() {
             ? <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>Sin datos aún</p>
             : topComunas.map(([c]) => (
               <span key={c} style={{
-                fontFamily: "var(--font-lato)", fontSize: "0.75rem",
+                fontFamily: "var(--font-lato)", fontSize: "0.82rem",
                 background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)",
                 borderRadius: "20px", padding: "4px 12px", color: "rgba(245,208,128,0.85)",
                 textTransform: "capitalize",
@@ -429,7 +429,7 @@ function TabGenio() {
       {/* Respuestas */}
       {perfil.respuestasGenio.length > 0 && (
         <div>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
             Respuestas que me diste
           </p>
           {perfil.respuestasGenio.slice(-5).reverse().map((r, i) => (
@@ -444,7 +444,7 @@ function TabGenio() {
         alignSelf: "flex-start", marginTop: "12px",
         background: "none", border: "1px solid rgba(255,80,80,0.3)",
         borderRadius: "10px", padding: "8px 16px", cursor: "pointer",
-        fontFamily: "var(--font-cinzel)", fontSize: "0.7rem",
+        fontFamily: "var(--font-cinzel)", fontSize: "0.78rem",
         color: "#ff8080", letterSpacing: "0.08em",
       }}>
         Resetear mis preferencias
@@ -496,21 +496,21 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "480px" }}>
       <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Nombre completo</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Nombre completo</span>
         <input style={S} value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Email</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Email</span>
         <input style={{ ...S, opacity: 0.5 }} value={form.email} disabled />
       </label>
       <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Teléfono (opcional)</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Teléfono (opcional)</span>
         <input style={S} value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} placeholder="+56 9 1234 5678" />
       </label>
 
       {/* Birthday */}
       <div>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "6px" }}>Fecha de nacimiento</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "6px" }}>Fecha de nacimiento</span>
         <div style={{ display: "flex", gap: "8px" }}>
           <select style={{ ...S, flex: 1 }} value={form.cumpleDia} onChange={e => setForm(f => ({ ...f, cumpleDia: Number(e.target.value) }))}>
             <option value={0}>Día</option>
@@ -532,7 +532,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
 
       {/* Notifications */}
       <div style={{ marginTop: "8px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "10px" }}>Notificaciones</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "10px" }}>Notificaciones</span>
         {[
           { key: "notifConcursos" as const, label: "Notificarme concursos nuevos" },
           { key: "notifPromos" as const, label: "Alertas de promociones en mi zona" },
@@ -559,17 +559,17 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
 
       {/* Danger zone */}
       <div style={{ marginTop: "32px", paddingTop: "20px", borderTop: "1px solid rgba(255,80,80,0.2)" }}>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#ff8080", marginBottom: "12px" }}>Zona de peligro</p>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#ff8080", marginBottom: "12px" }}>Zona de peligro</p>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <button onClick={() => { logout(); router.push("/"); }} style={{
             background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "10px",
             padding: "8px 16px", cursor: "pointer", fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem", color: "#ff8080",
+            fontSize: "0.78rem", color: "#ff8080",
           }}>Cerrar sesión</button>
           <button onClick={() => alert("Esta función estará disponible pronto")} style={{
             background: "none", border: "1px solid rgba(255,80,80,0.15)", borderRadius: "10px",
             padding: "8px 16px", cursor: "pointer", fontFamily: "var(--font-cinzel)",
-            fontSize: "0.7rem", color: "rgba(255,80,80,0.5)",
+            fontSize: "0.78rem", color: "rgba(255,80,80,0.5)",
           }}>Eliminar mi cuenta</button>
         </div>
       </div>

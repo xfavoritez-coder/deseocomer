@@ -58,7 +58,7 @@ export default function Footer() {
             <div key={col.titulo}>
               <p style={{
                 fontFamily: "var(--font-cinzel)",
-                fontSize: "0.65rem",
+                fontSize: "0.75rem",
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
                 color: "var(--oasis-bright)",
@@ -72,7 +72,7 @@ export default function Footer() {
                   style={{
                     display: "block",
                     fontFamily: "var(--font-lato)",
-                    fontSize: "0.9rem",
+                    fontSize: "0.95rem",
                     color: "var(--text-muted)",
                     textDecoration: "none",
                     marginBottom: "10px",
@@ -104,14 +104,14 @@ export default function Footer() {
         }}>
           <p style={{
             fontFamily: "var(--font-lato)",
-            fontSize: "0.8rem",
+            fontSize: "0.85rem",
             color: "var(--text-muted)",
           }}>
             © {new Date().getFullYear()} DeseoComer.com · Santiago de Chile
           </p>
           <p style={{
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.65rem",
+            fontSize: "0.75rem",
             letterSpacing: "0.15em",
             color: "var(--text-muted)",
           }}>

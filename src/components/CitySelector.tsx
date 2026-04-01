@@ -67,7 +67,7 @@ export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
       <div style={{ padding: "12px 4px", borderBottom: "1px solid var(--border-color)" }}>
         <label style={{
           fontFamily: "var(--font-cinzel)",
-          fontSize: "0.65rem",
+          fontSize: "0.75rem",
           letterSpacing: "0.2em",
           textTransform: "uppercase",
           color: "var(--text-muted)",
@@ -118,7 +118,7 @@ export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
         onClick={() => setOpen(o => !o)}
         style={{
           fontFamily: "var(--font-cinzel)",
-          fontSize: "0.75rem",
+          fontSize: "0.82rem",
           letterSpacing: "0.08em",
           color: "var(--sand-light, var(--text-primary))",
           background: "none",
@@ -150,7 +150,7 @@ export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
               width: "100%",
               textAlign: "left",
               fontFamily: "var(--font-cinzel)",
-              fontSize: "0.75rem",
+              fontSize: "0.82rem",
               letterSpacing: "0.05em",
               padding: "10px 20px",
               background: c === city ? "color-mix(in srgb, var(--accent) 12%, transparent)" : "transparent",
@@ -165,7 +165,7 @@ export default function CitySelector({ mobile = false }: { mobile?: boolean }) {
             width: "100%",
             textAlign: "left",
             fontFamily: "var(--font-cinzel)",
-            fontSize: "0.75rem",
+            fontSize: "0.82rem",
             letterSpacing: "0.05em",
             padding: "10px 20px",
             background: "transparent",

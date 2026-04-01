@@ -12,7 +12,7 @@ export default function PrivacidadPage() {
       <Navbar />
       <section style={{ maxWidth: "800px", margin: "0 auto", padding: "120px 20px 80px" }}>
         {/* Breadcrumb */}
-        <Link href="/" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", textDecoration: "none", display: "inline-block", marginBottom: "32px" }}>← Volver</Link>
+        <Link href="/" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", textDecoration: "none", display: "inline-block", marginBottom: "32px" }}>← Volver</Link>
 
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
@@ -59,7 +59,7 @@ export default function PrivacidadPage() {
 
         {/* Scroll to top */}
         <div style={{ textAlign: "center", marginTop: "40px" }}>
-          <a href="#" onClick={e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>↑ Volver arriba</a>
+          <a href="#" onClick={e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>↑ Volver arriba</a>
         </div>
       </section>
       <Footer />

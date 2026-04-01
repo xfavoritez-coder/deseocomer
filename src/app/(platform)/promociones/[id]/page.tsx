@@ -100,7 +100,7 @@ export default function PromocionDetailPage() {
           <p style={{ fontSize: "4rem" }}>🔍</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)" }}>Promoción no encontrada</h2>
           <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-muted)" }}>Esta promoción no existe o ya no está disponible.</p>
-          <Link href="/promociones" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", padding: "12px 28px", borderRadius: "30px", textDecoration: "none", fontWeight: 700 }}>
+          <Link href="/promociones" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.15em", textTransform: "uppercase", background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", padding: "12px 28px", borderRadius: "30px", textDecoration: "none", fontWeight: 700 }}>
             Ver todas las promociones
           </Link>
         </div>
@@ -127,7 +127,7 @@ export default function PromocionDetailPage() {
         )}
 
         {/* Back link */}
-        <Link href="/promociones" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
+        <Link href="/promociones" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
 
         {/* Sello pill */}
         {sello && (
@@ -150,7 +150,7 @@ export default function PromocionDetailPage() {
           {mounted && isActiva && (
             <div style={{ marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 16px", borderRadius: "20px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", backdropFilter: "blur(4px)" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--oasis-bright)", display: "inline-block", animation: "dc-pd-blink 1.5s infinite" }} />
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
             </div>
           )}
         </div>
@@ -175,7 +175,7 @@ export default function PromocionDetailPage() {
                 <div style={{ marginTop: "24px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", textAlign: "center" }}>
                   {promo.precioOriginal && (
                     <div style={{ marginBottom: "4px" }}>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>antes</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "2px" }}>antes</span>
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", color: "rgba(240,234,214,0.3)", textDecoration: "line-through" }}>${promo.precioOriginal.toLocaleString("es-CL")}</span>
                     </div>
                   )}
@@ -185,7 +185,7 @@ export default function PromocionDetailPage() {
                     </div>
                   )}
                   {promo.porcentajeDescuento && (
-                    <div style={{ display: "inline-block", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "20px", padding: "4px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#3db89e", letterSpacing: "0.5px" }}>
+                    <div style={{ display: "inline-block", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "20px", padding: "4px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#3db89e", letterSpacing: "0.5px" }}>
                       {promo.precioOriginal && promo.precioDescuento ? `Ahorras $${(promo.precioOriginal - promo.precioDescuento).toLocaleString("es-CL")}` : `-${promo.porcentajeDescuento}% de descuento`}
                     </div>
                   )}
@@ -205,11 +205,11 @@ export default function PromocionDetailPage() {
               <div style={{ textAlign: "center", marginBottom: "20px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", color: "#f5d080" }}>{promo.horaInicio} – {promo.horaFin}</p>
               </div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
               <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
                 {DIAS_SHORT.map((dia, idx) => {
                   const active = promo.diasSemana.includes(idx);
-                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
+                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
                 })}
               </div>
             </div>
@@ -240,13 +240,13 @@ export default function PromocionDetailPage() {
                   <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", padding: "14px 24px", background: "rgba(0,0,0,0.3)", borderRadius: "12px", border: "2px dashed rgba(95,240,208,0.35)", textShadow: "0 0 20px rgba(95,240,208,0.3)", flex: 1, textAlign: "center", minWidth: "180px" }}>
                     {promo.codigoCupon}
                   </div>
-                  <button onClick={copiarCodigo} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", padding: "14px 24px", borderRadius: "12px", border: "none", background: copiado ? "linear-gradient(135deg, #2a7a6f, #3db89e)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+                  <button onClick={copiarCodigo} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", padding: "14px 24px", borderRadius: "12px", border: "none", background: copiado ? "linear-gradient(135deg, #2a7a6f, #3db89e)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", transition: "all 0.2s", whiteSpace: "nowrap" }}>
                     {copiado ? "\u2713 Copiado" : "Copiar"}
                   </button>
                 </div>
                 {promo.limiteUsos && (
                   <div style={{ marginTop: "16px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "6px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "6px" }}>
                       <span>{promo.usosActuales ?? 0} usados</span>
                       <span>{promo.limiteUsos} máximo</span>
                     </div>
@@ -285,7 +285,7 @@ export default function PromocionDetailPage() {
             {/* Sobre el local */}
             {(promo.descripcionLocal || promo.localId) && (
               <div className="dc-pd-card">
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>Publicado por</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>Publicado por</p>
                 <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: promo.descripcionLocal ? "14px" : 0 }}>
                   <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
                     {promo.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
@@ -298,7 +298,7 @@ export default function PromocionDetailPage() {
                 {promo.descripcionLocal && (
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{promo.descripcionLocal}</p>
                 )}
-                <Link href={`/locales/${promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>
+                <Link href={`/locales/${promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>
                   Ver perfil completo {"\u2192"}
                 </Link>
               </div>
@@ -312,11 +312,11 @@ export default function PromocionDetailPage() {
               <div style={{ textAlign: "center", marginBottom: "20px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem", color: "#f5d080" }}>{promo.horaInicio} – {promo.horaFin}</p>
               </div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "10px" }}>Días válidos</p>
               <div style={{ display: "flex", gap: "6px", justifyContent: "center" }}>
                 {DIAS_SHORT.map((dia, idx) => {
                   const active = promo.diasSemana.includes(idx);
-                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
+                  return <div key={idx} style={{ width: "36px", height: "36px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: active ? "1.5px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: active ? "rgba(232,168,76,0.12)" : "transparent", color: active ? "#f5d080" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: active ? 700 : 400 }}>{dia}</div>;
                 })}
               </div>
             </div>
@@ -326,7 +326,7 @@ export default function PromocionDetailPage() {
         {/* ── Related promotions horizontal scroll ── */}
         {relacionadas.length > 0 && (
           <div style={{ marginTop: "60px", maxWidth: "1000px", margin: "60px auto 0" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", marginBottom: "8px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", marginBottom: "8px" }}>
               También te puede interesar
             </p>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "#f5d080", marginBottom: "24px" }}>
@@ -343,7 +343,7 @@ export default function PromocionDetailPage() {
                         <img src={rel.imagenUrl} alt={rel.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         {relSello && (
                           <div style={{ position: "absolute", top: "8px", right: "8px", pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${relSello.color}`, borderRadius: "16px", padding: "3px 10px" }}>
-                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", fontWeight: 700, color: relSello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{relSello.text}</span>
+                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, color: relSello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{relSello.text}</span>
                           </div>
                         )}
                         {relActiva && (
@@ -356,7 +356,7 @@ export default function PromocionDetailPage() {
                     )}
                     <div style={{ padding: "14px" }}>
                       <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f5d080", marginBottom: "4px", lineHeight: 1.3 }}>{rel.titulo}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.55)" }}>{rel.local} · {rel.comuna}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.55)" }}>{rel.local} · {rel.comuna}</p>
                     </div>
                   </Link>
                 );

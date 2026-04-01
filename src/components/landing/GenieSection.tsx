@@ -51,7 +51,7 @@ export default function GenieSection() {
 
         <p style={{
           fontFamily: "var(--font-cinzel)",
-          fontSize: "0.7rem",
+          fontSize: "0.78rem",
           letterSpacing: "0.4em",
           textTransform: "uppercase",
           color: "var(--oasis-bright)",
@@ -172,7 +172,7 @@ export default function GenieSection() {
               onClick={() => { setRespuesta(null); setSeleccion(null); }}
               style={{
                 fontFamily: "var(--font-cinzel)",
-                fontSize: "0.75rem",
+                fontSize: "0.82rem",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 border: "1px solid var(--border-color)",
@@ -187,7 +187,7 @@ export default function GenieSection() {
             </button>
             <a href="/locales" style={{
               fontFamily: "var(--font-cinzel)",
-              fontSize: "0.75rem",
+              fontSize: "0.82rem",
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",

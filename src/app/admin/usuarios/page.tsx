@@ -49,7 +49,7 @@ export default function AdminUsuarios() {
       </div>
 
       <div style={{ marginBottom: "20px" }}>
-        <span style={{ fontSize: "0.72rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
+        <span style={{ fontSize: "0.8rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
       </div>
 
       <div style={cardS}>
@@ -64,7 +64,7 @@ export default function AdminUsuarios() {
             <div key={String(label)} style={{ textAlign: "center", padding: "10px", background: "rgba(255,255,255,0.03)", borderRadius: "8px" }}>
               <p style={{ fontSize: "1rem", margin: "0 0 2px" }}>{icon}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#e8a84c", margin: 0 }}>{val}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{label}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{label}</p>
             </div>
           ))}
         </div>
@@ -100,7 +100,7 @@ export default function AdminUsuarios() {
       {deleteConfirm && (
         <div style={{ ...cardS, borderColor: "rgba(255,80,80,0.3)", textAlign: "center" }}>
           <p style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#ff6b6b", fontWeight: 700, marginBottom: "6px" }}>¿Eliminar {sel.nombre}?</p>
-          <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", marginBottom: "14px" }}>Se borran todos sus datos. No se puede deshacer.</p>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginBottom: "14px" }}>Se borran todos sus datos. No se puede deshacer.</p>
           <div style={{ display: "flex", gap: "8px" }}>
             <button onClick={async () => { setLoading(true); try { const r = await adminFetch(`/api/admin/usuarios/${sel.id}`, { method: "DELETE" }); if (r.ok) { setUsuarios(p => p.filter(u => u.id !== sel.id)); setSel(null); show("Eliminado"); } } catch {} setLoading(false); }} disabled={loading} style={{ ...btnPrimaryS, background: "#ff6b6b" }}>{loading ? "..." : "Eliminar"}</button>
             <button onClick={() => setDeleteConfirm(false)} style={btnSecS}>Cancelar</button>
@@ -140,11 +140,11 @@ export default function AdminUsuarios() {
             <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{u.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{u.email}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{u.email}</p>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <span style={{ fontSize: "0.6rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.6rem", color: "rgba(240,234,214,0.3)", margin: "2px 0 0" }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
+              <span style={{ fontSize: "0.72rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", margin: "2px 0 0" }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
             </div>
           </div>
         ))}
@@ -160,9 +160,9 @@ function Row({ label, value }: { label: string; value: string }) {
 const toastS: React.CSSProperties = { position: "fixed", top: "16px", right: "16px", background: "rgba(13,7,3,0.97)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "10px", padding: "10px 18px", fontFamily: "Georgia", fontSize: "0.8rem", color: "#e8a84c", zIndex: 9999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" };
 const backS: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, marginBottom: "16px" };
 const cardS: React.CSSProperties = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", marginBottom: "12px" };
-const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", margin: "0 0 10px" };
+const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", margin: "0 0 10px" };
 const inputS: React.CSSProperties = { width: "100%", padding: "10px 12px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" };
-const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" };
+const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" };
 const btnPrimaryS: React.CSSProperties = { flex: 1, padding: "10px", background: "#e8a84c", border: "none", borderRadius: "8px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" };
 const btnSecS: React.CSSProperties = { flex: 1, padding: "10px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.8rem", cursor: "pointer" };
 const btnOutlineS: React.CSSProperties = { display: "block", width: "100%", padding: "10px", background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer", textAlign: "left" };

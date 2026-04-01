@@ -95,7 +95,7 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
           </div>
         )}
       </div>
-      {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "#ff6b6b", marginTop: "6px" }}>{error}</p>}
+      {error && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff6b6b", marginTop: "6px" }}>{error}</p>}
     </div>
   );
 }

@@ -67,7 +67,7 @@ export default function CTASection() {
                 <div style={{ fontSize: "2rem", marginBottom: "12px" }}>{b.icono}</div>
                 <p style={{
                   fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.75rem",
+                  fontSize: "0.82rem",
                   color: "var(--accent)",
                   letterSpacing: "0.05em",
                   marginBottom: "8px",

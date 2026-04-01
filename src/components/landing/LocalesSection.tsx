@@ -89,7 +89,7 @@ export default function LocalesSection() {
                 className="dc-filter-btn"
                 style={{
                   fontFamily: "var(--font-cinzel)",
-                  fontSize: "0.7rem",
+                  fontSize: "0.78rem",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
                   borderRadius: "30px",
@@ -156,7 +156,7 @@ export default function LocalesSection() {
                       <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating.toFixed ? local.rating.toFixed(1) : local.rating}</span>
                     </div>
                   ) : (
-                    <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
+                    <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
                   )}
                 </div>
 

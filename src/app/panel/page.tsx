@@ -85,7 +85,7 @@ function DashboardContent() {
           <div key={s.label} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "14px", padding: "16px", textAlign: "center" }}>
             <p style={{ fontSize: "1.4rem", marginBottom: "4px" }}>{s.icon}</p>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.2rem", color: "var(--accent)", fontWeight: 700 }}>{s.value}</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{s.label}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "2px" }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -93,8 +93,8 @@ function DashboardContent() {
       {/* Profile progress */}
       <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px 24px", marginBottom: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-primary)" }}>Tu perfil está {pct}% completo</span>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)" }}>{pct}%</span>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-primary)" }}>Tu perfil está {pct}% completo</span>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>{pct}%</span>
         </div>
         <div style={{ height: "8px", borderRadius: "4px", background: "rgba(0,0,0,0.3)" }}>
           <div style={{ height: "100%", borderRadius: "4px", background: "var(--accent)", width: `${pct}%`, transition: "width 0.5s" }} />
@@ -107,7 +107,7 @@ function DashboardContent() {
       </div>
 
       {/* Quick actions */}
-      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Acciones rápidas</h3>
+      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Acciones rápidas</h3>
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
         <Link href="/panel/concursos" style={actionBtn}>🏆 Nuevo concurso</Link>
         <Link href="/panel/promociones" style={actionBtn}>⚡ Nueva promoción</Link>

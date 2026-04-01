@@ -58,7 +58,7 @@ export default function PanelConcursos() {
 
   const pFinal = premio;
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "10px 18px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: sel ? 700 : 400 });
-  const labelReq = (text: string, required = true): React.ReactNode => <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>{text}{required && <span style={{ color: "#ff6b6b", marginLeft: "4px" }}>*</span>}</h3>;
+  const labelReq = (text: string, required = true): React.ReactNode => <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-primary)", margin: "28px 0 16px" }}>{text}{required && <span style={{ color: "#ff6b6b", marginLeft: "4px" }}>*</span>}</h3>;
 
   const publish = async () => {
     const s = getSession();
@@ -156,9 +156,9 @@ export default function PanelConcursos() {
     return (
       <div style={{ maxWidth: "600px" }}>
         {/* Action toast */}
-        {actionToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(61,184,158,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>{actionToast}</div>}
+        {actionToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(61,184,158,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>{actionToast}</div>}
         {/* Report toast */}
-        {reportToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(232,168,76,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>Reporte enviado. Revisaremos este participante antes del cierre.</div>}
+        {reportToast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(232,168,76,0.95)", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>Reporte enviado. Revisaremos este participante antes del cierre.</div>}
 
         {/* Report modal */}
         {reportModal && (<>
@@ -187,17 +187,17 @@ export default function PanelConcursos() {
           </div>
         </>)}
 
-        <button onClick={() => { setDetalle(null); setEditando(false); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
+        <button onClick={() => { setDetalle(null); setEditando(false); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
 
         {/* Header */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", overflow: "hidden", marginBottom: "20px" }}>
           {detalle.imagenUrl && <img src={detalle.imagenUrl} alt="" style={{ width: "100%", height: "160px", objectFit: "cover" }} />}
           <div style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.12em", textTransform: "uppercase", padding: "3px 10px", borderRadius: "20px", background: terminado ? "rgba(255,255,255,0.06)" : "rgba(61,184,158,0.12)", border: terminado ? "1px solid var(--border-color)" : "1px solid rgba(61,184,158,0.4)", color: terminado ? "var(--text-muted)" : "#3db89e" }}>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", padding: "3px 10px", borderRadius: "20px", background: terminado ? "rgba(255,255,255,0.06)" : "rgba(61,184,158,0.12)", border: terminado ? "1px solid var(--border-color)" : "1px solid rgba(61,184,158,0.4)", color: terminado ? "var(--text-muted)" : "#3db89e" }}>
                 {terminado ? "Finalizado" : "Activo"}
               </span>
-              {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{tiempoDetalle} restantes</span>}
+              {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{tiempoDetalle} restantes</span>}
             </div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "4px" }}>{detalle.premio}</h2>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 {participantes} participantes</p>
@@ -206,10 +206,10 @@ export default function PanelConcursos() {
 
         {/* Link para compartir */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "10px" }}>Link del concurso</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "10px" }}>Link del concurso</p>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", flex: 1, wordBreak: "break-all" }}>{link}</p>
-            <button onClick={() => copyLink(detalle)} style={{ background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "8px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, flexShrink: 0 }}>
+            <button onClick={() => copyLink(detalle)} style={{ background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "8px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, flexShrink: 0 }}>
               {copied ? "✓" : "Copiar"}
             </button>
           </div>
@@ -217,7 +217,7 @@ export default function PanelConcursos() {
 
         {/* Ranking / Participantes */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
             {terminado ? "🏆 Resultado final" : "📊 Ranking actual"}
           </p>
           {participantes === 0 ? (
@@ -233,7 +233,7 @@ export default function PanelConcursos() {
                   </span>
                   <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", flex: 1 }}>
                     {p.usuario?.nombre ?? "Participante"}
-                    {reportedIds.has(p.id) && <span style={{ marginLeft: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "4px", padding: "1px 6px", color: "#e8a84c" }}>En revisión</span>}
+                    {reportedIds.has(p.id) && <span style={{ marginLeft: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "4px", padding: "1px 6px", color: "#e8a84c" }}>En revisión</span>}
                   </span>
                   <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)" }}>
                     {p.puntos ?? 0} pts
@@ -254,7 +254,7 @@ export default function PanelConcursos() {
               <div style={{ marginTop: "16px", padding: "20px", background: entregado ? "rgba(61,184,158,0.08)" : "rgba(232,168,76,0.08)", border: `1px solid ${entregado ? "rgba(61,184,158,0.3)" : "rgba(232,168,76,0.25)"}`, borderRadius: "12px", textAlign: "center" }}>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: entregado ? "#3db89e" : "var(--accent)", fontWeight: 700, marginBottom: "4px" }}>{entregado ? "✓ Premio entregado" : "🏆 Ganador"}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", color: "var(--text-primary)", marginBottom: entregado ? "0" : "14px" }}>{ganadorNombre}</p>
-                {entregado && detalle.premioEntregadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>Confirmado el {new Date(detalle.premioEntregadoAt).toLocaleDateString("es-CL")}</p>}
+                {entregado && detalle.premioEntregadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "4px" }}>Confirmado el {new Date(detalle.premioEntregadoAt).toLocaleDateString("es-CL")}</p>}
                 {!entregado && (
                   <button onClick={async () => {
                     const s = getSession();
@@ -279,27 +279,27 @@ export default function PanelConcursos() {
         {/* Formulario de edición (solo sin participantes) */}
         {editando && sinParticipantes && (
           <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "14px", padding: "20px", marginBottom: "20px" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Editar concurso</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Editar concurso</p>
             {editError && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "10px", marginBottom: "12px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff6b6b" }}>⚠️ {editError}</p></div>}
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               <div>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Premio</label>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Premio</label>
                 <input style={I} value={editPremio} onChange={e => setEditPremio(e.target.value)} />
               </div>
               <div>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Descripción del premio</label>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Descripción del premio</label>
                 <input style={I} value={editDescripcion} onChange={e => setEditDescripcion(e.target.value)} placeholder="Descripción (opcional)" />
               </div>
               <div>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Fecha de cierre</label>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Fecha de cierre</label>
                 <input style={I} type="datetime-local" value={editFechaFin} onChange={e => setEditFechaFin(e.target.value)} />
               </div>
               <div>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Condiciones</label>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Condiciones</label>
                 <textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Condiciones (opcional)" maxLength={500} />
               </div>
               <div>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Foto del concurso</label>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Foto del concurso</label>
                 <SubirFoto folder="concursos" preview={editImagen || null} label="Cambiar foto" height="120px" onUpload={url => setEditImagen(url)} />
               </div>
               <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
@@ -331,7 +331,7 @@ export default function PanelConcursos() {
   // ── Wizard (2 steps) ──
   if (wizard) return (
     <div style={{ maxWidth: "560px" }}>
-      <button onClick={() => { setWizard(false); setStep(1); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
+      <button onClick={() => { setWizard(false); setStep(1); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
       <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[1, 2].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
 
       {step === 1 && (<div>
@@ -351,7 +351,7 @@ export default function PanelConcursos() {
 
         {labelReq("Condiciones", false)}
         <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: solo para retiro en local, días de canje, etc" maxLength={500} />
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", marginTop: "6px" }}>{condiciones.length}/500</p>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.3)", marginTop: "6px" }}>{condiciones.length}/500</p>
 
         <button onClick={() => pFinal.trim() && descripcionPremio.trim() && imagenConcurso && setStep(2)} disabled={!pFinal.trim() || !descripcionPremio.trim() || !imagenConcurso} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() && descripcionPremio.trim() && imagenConcurso ? 1 : 0.5 }}>Siguiente →</button>
       </div>)}
@@ -365,24 +365,24 @@ export default function PanelConcursos() {
               <img src={imagenConcurso} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.6)", borderRadius: "20px", padding: "4px 12px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e", animation: "dcPulse 1.8s ease-in-out infinite" }} />
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", color: "#3db89e", textTransform: "uppercase" }}>Activo</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", color: "#3db89e", textTransform: "uppercase" }}>Activo</span>
               </div>
             </div>
           )}
           <div style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.3), rgba(232,168,76,0.1))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.3)" }}>{(getSession().nombre ?? "L").charAt(0).toUpperCase()}</div>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--text-muted)" }}>{getSession().nombre ?? "Tu local"}</span>
+              <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.3), rgba(232,168,76,0.1))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.3)" }}>{(getSession().nombre ?? "L").charAt(0).toUpperCase()}</div>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{getSession().nombre ?? "Tu local"}</span>
             </div>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "#f5d080", lineHeight: 1.2, marginBottom: "8px" }}>🏆 {pFinal}</p>
             {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px" }}>{descripcionPremio}</p>}
             <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Termina en</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Termina en</p>
               <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                 {[{ v: dur, l: "días" }, { v: 0, l: "hrs" }, { v: 0, l: "min" }].map((t, i) => (
                   <div key={i} style={{ textAlign: "center" }}>
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)" }}>{t.v}</span>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "var(--text-muted)", marginTop: "2px" }}>{t.l}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "2px" }}>{t.l}</p>
                   </div>
                 ))}
               </div>
@@ -395,7 +395,7 @@ export default function PanelConcursos() {
         </div>
         {condiciones && (
           <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "14px", marginBottom: "24px" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Condiciones</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Condiciones</p>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{condiciones}</p>
           </div>
         )}
@@ -457,11 +457,11 @@ export default function PanelConcursos() {
               )}
               <div style={{ flex: 1, padding: "12px 16px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
                   {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Detalle →</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Detalle →</span>
             </div>
           );
         })}

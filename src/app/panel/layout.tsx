@@ -136,18 +136,18 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             )}
           </div>
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.05em", color: "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, letterSpacing: "0.05em", color: "var(--text-primary)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {localName || "Mi Local"}
             </p>
             {localComuna && (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "var(--text-muted)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {localComuna}
               </p>
             )}
           </div>
         </div>
 
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", textTransform: "uppercase", opacity: 0.7 }}>
+        <a href="/" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", textTransform: "uppercase", opacity: 0.7 }}>
           ← Ver DeseoComer
         </a>
 
@@ -156,7 +156,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
             <Link key={n.href} href={n.href} style={{
               display: "flex", alignItems: "center", gap: "10px",
               padding: "12px 20px", textDecoration: "none",
-              fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.08em",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em",
               color: isActive(n.href) ? "var(--accent)" : "var(--text-muted)",
               background: isActive(n.href) ? "rgba(232,168,76,0.12)" : "transparent",
               borderLeft: isActive(n.href) ? "3px solid var(--accent)" : "3px solid transparent",
@@ -168,7 +168,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" style={{
             display: "flex", alignItems: "center", gap: "10px",
             padding: "12px 20px", textDecoration: "none",
-            fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.08em",
+            fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em",
             color: "var(--text-muted)",
           }}>
             <span style={{ fontSize: "1rem" }}>👁️</span> Ver mi local
@@ -178,7 +178,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         <button onClick={handleLogout} style={{
           display: "flex", alignItems: "center", gap: "10px",
           padding: "16px 20px", width: "100%", textAlign: "left",
-          fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.08em",
+          fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em",
           color: "#ff8080", background: "none", border: "none",
           borderTop: "1px solid rgba(232,168,76,0.1)", cursor: "pointer",
         }}>
@@ -195,9 +195,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700, marginBottom: "6px" }}>Tu local aún no está visible en DeseoComer</p>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "8px" }}>Completa los siguientes datos para activar tu local en la plataforma:</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
-                {faltantes.map(f => <span key={f} style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: "6px", padding: "3px 10px", color: "#ff8080" }}>{f}</span>)}
+                {faltantes.map(f => <span key={f} style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: "6px", padding: "3px 10px", color: "#ff8080" }}>{f}</span>)}
               </div>
-              <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "underline" }}>Ir a Datos de Local →</Link>
+              <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "underline" }}>Ir a Datos de Local →</Link>
             </div>
           </div>
         )}

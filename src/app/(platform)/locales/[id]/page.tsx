@@ -211,7 +211,7 @@ export default function LocalDetailPage() {
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
         <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.1) 0%, rgba(10,8,18,0.95) 100%)" }} />
-        <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Locales</Link>
+        <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Locales</Link>
         <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "20px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {esFavorito(String(local.id)) ? "❤️" : "🤍"}
         </button>
@@ -225,20 +225,20 @@ export default function LocalDetailPage() {
                 <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
                 {local.rating > 0 && (
                   <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }}>
-                    <span style={{ fontSize: "0.75rem", color: "#e8a84c" }}>★</span>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
+                    <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
                   </div>
                 )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
                 {tieneHorarios && (<>
                   <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                     <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: estaAbierto ? "#3db89e" : "#ff6b6b" }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: estaAbierto ? "#3db89e" : "#ff6b6b", letterSpacing: "0.1em" }}>{estaAbierto ? "Abierto" : "Cerrado"}</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: estaAbierto ? "#3db89e" : "#ff6b6b", letterSpacing: "0.1em" }}>{estaAbierto ? "Abierto" : "Cerrado"}</span>
                   </div>
                 </>)}
               </div>
@@ -258,9 +258,9 @@ export default function LocalDetailPage() {
           { key: "Concursos" as Tab, label: "Concursos", count: concursosLocal.length > 0 ? concursosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c" },
           { key: "Promociones" as Tab, label: "Promociones", count: null, countColor: "", countBg: "" },
         ].map(t => (
-          <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
+          <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
             {t.label}
-            {t.count !== null && <span style={{ background: tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)", color: tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)", fontSize: "0.6rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
+            {t.count !== null && <span style={{ background: tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)", color: tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)", fontSize: "0.72rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
           </button>
         ))}
       </div>
@@ -276,7 +276,7 @@ export default function LocalDetailPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Descripción */}
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
                     <p style={bodyStyle}>{local.descripcion}</p>
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -284,7 +284,7 @@ export default function LocalDetailPage() {
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {(local as any).tags.map((tag: string) => (
-                          <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
+                          <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
                         ))}
                       </div>
                     )}
@@ -293,13 +293,13 @@ export default function LocalDetailPage() {
                   {/* Concursos activos */}
                   {concursosLocal.length > 0 && (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concursos activos</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concursos activos</p>
                       {concursosLocal.map(c => (
                         <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", marginBottom: "8px", textDecoration: "none" }}>
                           <span style={{ fontSize: "1.5rem" }}>🏆</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{c.premio}</p>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{c.participantes} participantes</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{c.participantes} participantes</p>
                           </div>
                           <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "0.9rem", flexShrink: 0 }}>→</span>
                         </Link>
@@ -314,32 +314,32 @@ export default function LocalDetailPage() {
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)", marginBottom: "6px" }}>Sin reseñas aún</p>
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.6, marginBottom: "16px" }}>Sé el primero en compartir tu experiencia</p>
                       {isAuthenticated ? (
-                        <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "10px 24px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>
+                        <button onClick={() => setTab("Reseñas")} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", border: "none", borderRadius: "20px", padding: "10px 24px", cursor: "pointer", fontWeight: 700 }}>Escribir reseña →</button>
                       ) : !esLocal ? (
-                        <Link href={`/login?next=/locales/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "var(--accent)", borderRadius: "20px", padding: "10px 24px", textDecoration: "none", fontWeight: 700 }}>Inicia sesión para comentar →</Link>
+                        <Link href={`/login?next=/locales/${id}`} style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "var(--accent)", borderRadius: "20px", padding: "10px 24px", textDecoration: "none", fontWeight: 700 }}>Inicia sesión para comentar →</Link>
                       ) : null}
                     </div>
                   ) : (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Reseñas</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Reseñas</p>
                       <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
                         <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "3rem", fontWeight: 700, color: "#e8a84c", lineHeight: 1 }}>{local.rating?.toFixed(1) ?? "—"}</div>
                         <div>
                           <div style={{ color: "#e8a84c", fontSize: "1rem", marginBottom: "4px", letterSpacing: "2px" }}>{"★".repeat(Math.round(local.rating ?? 0))}</div>
-                          <div style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)" }}>Basado en {local.totalResenas} reseñas</div>
+                          <div style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)" }}>Basado en {local.totalResenas} reseñas</div>
                         </div>
                       </div>
                       {local.resenas.slice(0, 2).map(r => (
                         <div key={r.id} style={{ paddingBottom: "12px", marginBottom: "12px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: getColor(r.usuario), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{getInitials(r.usuario)}</div>
-                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-primary)" }}>{r.usuario}</span>
-                            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "var(--text-muted)" }}>{"★".repeat(r.rating)} · {timeAgo(r.fecha)}</span>
+                            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: getColor(r.usuario), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>{getInitials(r.usuario)}</div>
+                            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-primary)" }}>{r.usuario}</span>
+                            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{"★".repeat(r.rating)} · {timeAgo(r.fecha)}</span>
                           </div>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.5, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{r.comentario}</p>
                         </div>
                       ))}
-                      <button onClick={() => setTab("Reseñas")} style={{ background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", cursor: "pointer", padding: 0 }}>Ver todas las reseñas →</button>
+                      <button onClick={() => setTab("Reseñas")} style={{ background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", cursor: "pointer", padding: 0 }}>Ver todas las reseñas →</button>
                     </div>
                   )}
                 </div>
@@ -349,7 +349,7 @@ export default function LocalDetailPage() {
                 <div className="dc-local-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {tieneHorarios && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
                     {local.horarios.map(h => {
                       const esHoy = h.dia === todayName;
                       return (
@@ -363,7 +363,7 @@ export default function LocalDetailPage() {
                   )}
                   {tieneUbicacion && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
                       {local.direccion && <p style={bodyStyle}>📍 {local.direccion}{local.barrio ? `, ${local.barrio}` : ""}</p>}
                       {local.telefono && <p style={bodyStyle}>📞 {local.telefono}</p>}
@@ -387,7 +387,7 @@ export default function LocalDetailPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
                   {local.menu.map(cat => (
                     <div key={cat.categoria}>
-                      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>
+                      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>
                         {cat.categoria}
                       </h3>
                       <div className="dc-ld-menu-grid">
@@ -396,7 +396,7 @@ export default function LocalDetailPage() {
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                               <div>
                                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "4px" }}>
-                                  {item.nombre} {item.destacado && <span style={{ fontSize: "0.7rem" }}>⭐</span>}
+                                  {item.nombre} {item.destacado && <span style={{ fontSize: "0.78rem" }}>⭐</span>}
                                 </p>
                                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{item.descripcion}</p>
                               </div>
@@ -446,7 +446,7 @@ export default function LocalDetailPage() {
                       <span style={{ fontSize: "2rem" }}>{c.imagen}</span>
                       <div>
                         <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--oasis-bright)" }}>{c.participantes} participantes</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>{c.participantes} participantes</p>
                       </div>
                     </Link>
                   ))}
@@ -467,7 +467,7 @@ export default function LocalDetailPage() {
         {/* Similares */}
         {similares.length > 0 && (
           <div style={{ marginTop: "48px", paddingTop: "32px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", marginBottom: "6px" }}>También te puede gustar</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", marginBottom: "6px" }}>También te puede gustar</p>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--accent)", marginBottom: "20px" }}>Locales similares</h3>
             <div style={{ display: "flex", gap: "14px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "8px" }}>
               {similares.map(s => (
@@ -478,10 +478,10 @@ export default function LocalDetailPage() {
                     </div>
                     <div style={{ padding: "12px 14px" }}>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.nombre}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)", marginBottom: "8px" }}>{s.barrio}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", marginBottom: "8px" }}>{s.barrio}</p>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", background: "rgba(255,255,255,0.05)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "20px", padding: "2px 8px" }}>{s.categoria}</span>
-                        {s.rating > 0 && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#e8a84c" }}>★ {s.rating}</span>}
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", background: "rgba(255,255,255,0.05)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "20px", padding: "2px 8px" }}>{s.categoria}</span>
+                        {s.rating > 0 && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#e8a84c" }}>★ {s.rating}</span>}
                       </div>
                     </div>
                   </div>
@@ -534,7 +534,7 @@ const bodyStyle: React.CSSProperties = { fontFamily: "var(--font-lato)", fontSiz
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>
+      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>
         {title}
       </h3>
       {children}
@@ -586,12 +586,12 @@ function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean;
       <div style={{ display: "flex", alignItems: "center", gap: "24px", marginBottom: "24px", flexWrap: "wrap" }}>
         <div style={{ textAlign: "center" }}>
           <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "3rem", color: "var(--accent)", lineHeight: 1 }}>{local.rating}</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{local.totalResenas} reseñas</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{local.totalResenas} reseñas</p>
         </div>
         <div style={{ flex: 1, minWidth: "150px" }}>
           {dist.map(d => (
             <div key={d.stars} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", width: "14px" }}>{d.stars}</span>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", width: "14px" }}>{d.stars}</span>
               <div style={{ flex: 1, height: "6px", borderRadius: "3px", background: "rgba(0,0,0,0.3)" }}>
                 <div style={{ height: "100%", borderRadius: "3px", background: "var(--accent)", width: `${(d.count / maxCount) * 100}%` }} />
               </div>
@@ -600,7 +600,7 @@ function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean;
         </div>
         {isAuth && !writing && (
           <button onClick={() => setWriting(true)} style={{
-            fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase",
+            fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase",
             background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700,
             border: "none", borderRadius: "10px", padding: "10px 20px", cursor: "pointer",
           }}>Escribir reseña</button>
@@ -610,7 +610,7 @@ function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean;
       {!isAuth && !esLocal && (
         <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "16px 20px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>¿Visitaste este local? Comparte tu experiencia</p>
-          <Link href="/login" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", borderRadius: "20px", padding: "8px 18px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Iniciar sesión →</Link>
+          <Link href="/login" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "var(--accent)", color: "var(--bg-primary)", borderRadius: "20px", padding: "8px 18px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Iniciar sesión →</Link>
         </div>
       )}
 
@@ -628,10 +628,10 @@ function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean;
             style={{ width: "100%", background: "#1a1008", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "12px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", resize: "vertical", outline: "none", boxSizing: "border-box" }} />
           <div style={{ display: "flex", gap: "8px", marginTop: "12px" }}>
             <button onClick={handlePublish} disabled={stars === 0 || comment.length < 20} style={{
-              fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", background: stars > 0 && comment.length >= 20 ? "var(--accent)" : "rgba(232,168,76,0.2)",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", background: stars > 0 && comment.length >= 20 ? "var(--accent)" : "rgba(232,168,76,0.2)",
               color: stars > 0 && comment.length >= 20 ? "var(--bg-primary)" : "var(--text-muted)", border: "none", borderRadius: "8px", padding: "8px 16px", cursor: stars > 0 && comment.length >= 20 ? "pointer" : "default", fontWeight: 700,
             }}>Publicar</button>
-            <button onClick={() => setWriting(false)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "8px 16px", color: "var(--text-muted)", cursor: "pointer" }}>Cancelar</button>
+            <button onClick={() => setWriting(false)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "8px 16px", color: "var(--text-muted)", cursor: "pointer" }}>Cancelar</button>
           </div>
         </div>
       )}
@@ -641,21 +641,21 @@ function ResenasTab({ local, isAuth, esLocal }: { local: Local; isAuth: boolean;
         {resenas.map(r => (
           <div key={r.id} style={{ paddingBottom: "16px", borderBottom: "1px solid var(--border-color)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: getColor(r.usuario), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: getColor(r.usuario), display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
                 {getInitials(r.usuario)}
               </div>
               <div>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--text-primary)" }}>{r.usuario}</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)" }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>
                   {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)} · {timeAgo(r.fecha)}
                 </p>
               </div>
             </div>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", lineHeight: 1.6, marginBottom: "8px" }}>{r.comentario}</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)" }}>👍 {r.likes}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>👍 {r.likes}</p>
             {r.respuestaLocal && (
               <div style={{ marginTop: "12px", marginLeft: "20px", padding: "12px 16px", background: "rgba(45,26,8,0.6)", borderRadius: "10px", borderLeft: "2px solid var(--accent)" }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--accent)", marginBottom: "4px" }}>💬 Respuesta del local · {r.fechaRespuesta && timeAgo(r.fechaRespuesta)}</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", marginBottom: "4px" }}>💬 Respuesta del local · {r.fechaRespuesta && timeAgo(r.fechaRespuesta)}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{r.respuestaLocal}</p>
               </div>
             )}

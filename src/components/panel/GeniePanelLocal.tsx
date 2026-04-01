@@ -123,7 +123,7 @@ export default function GeniePanelLocal() {
           <button onClick={() => setGloboVisible(false)} style={{ position: "absolute", top: "8px", right: "10px", background: "none", border: "none", color: "rgba(245,208,128,0.4)", fontSize: "0.85rem", cursor: "pointer" }}>✕</button>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(245,208,128,0.9)", lineHeight: 1.5, margin: "0 0 12px", paddingRight: "16px" }}>{mensaje.texto}</p>
           {mensaje.accion && (
-            <Link href={mensaje.accion.href} onClick={() => setGloboVisible(false)} style={{ display: "inline-block", padding: "8px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "none" }}>
+            <Link href={mensaje.accion.href} onClick={() => setGloboVisible(false)} style={{ display: "inline-block", padding: "8px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "none" }}>
               {mensaje.accion.label} →
             </Link>
           )}
@@ -138,7 +138,7 @@ export default function GeniePanelLocal() {
               <span style={{ fontSize: "1.3rem" }}>🧞</span>
               <div>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", margin: 0 }}>El Genio</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", margin: 0 }}>Tu asistente de DeseoComer</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", margin: 0 }}>Tu asistente de DeseoComer</p>
               </div>
             </div>
             <button onClick={() => setVisible(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: "0.9rem", cursor: "pointer" }}>✕</button>
@@ -148,7 +148,7 @@ export default function GeniePanelLocal() {
             <div style={{ padding: "16px 20px" }}>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(245,208,128,0.9)", lineHeight: 1.6, margin: "0 0 12px" }}>{mensaje.texto}</p>
               {mensaje.accion && (
-                <Link href={mensaje.accion.href} onClick={() => setVisible(false)} style={{ display: "block", padding: "12px 16px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700 }}>
+                <Link href={mensaje.accion.href} onClick={() => setVisible(false)} style={{ display: "block", padding: "12px 16px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.1em", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700 }}>
                   {mensaje.accion.label} →
                 </Link>
               )}
@@ -156,7 +156,7 @@ export default function GeniePanelLocal() {
           )}
 
           <div style={{ padding: "12px 20px 16px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.2em", color: "var(--color-label, rgba(240,234,214,0.4))", textTransform: "uppercase", margin: "0 0 10px" }}>Accesos rápidos</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.2em", color: "var(--color-label, rgba(240,234,214,0.4))", textTransform: "uppercase", margin: "0 0 10px" }}>Accesos rápidos</p>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
               {[
                 { icon: "🏆", label: "Crear concurso", href: "/panel/concursos" },

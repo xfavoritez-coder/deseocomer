@@ -24,7 +24,7 @@ export default function ContactoPage() {
   };
 
   const inputStyle: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
-  const labelStyle: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "6px", display: "block" };
+  const labelStyle: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "6px", display: "block" };
   const canSend = nombre && email && mensaje && !enviando;
 
   return (
@@ -33,7 +33,7 @@ export default function ContactoPage() {
 
       {/* Hero */}
       <section style={{ padding: "120px clamp(20px,5vw,80px) 48px", textAlign: "center", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
-        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "14px" }}>Estamos aquí</p>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "14px" }}>Estamos aquí</p>
         <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3rem)", fontWeight: 900, color: "var(--accent)", marginBottom: "16px", lineHeight: 1.2 }}>¿En qué podemos<br />ayudarte? 🧞</h1>
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "rgba(240,234,214,0.5)", lineHeight: 1.7, maxWidth: "400px", margin: "0 auto" }}>Respondemos todos los mensajes dentro de las 24 horas hábiles siguientes.</p>
       </section>
@@ -45,7 +45,7 @@ export default function ContactoPage() {
             <div style={{ fontSize: "3rem", marginBottom: "16px" }}>✨</div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "12px" }}>¡Mensaje enviado!</h2>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.7, marginBottom: "28px" }}>Te responderemos a <strong style={{ color: "var(--accent)" }}>{email}</strong> dentro de las próximas 24 horas hábiles.</p>
-            <Link href="/" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none", borderBottom: "1px solid rgba(61,184,158,0.3)", paddingBottom: "2px" }}>Volver al inicio →</Link>
+            <Link href="/" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none", borderBottom: "1px solid rgba(61,184,158,0.3)", paddingBottom: "2px" }}>Volver al inicio →</Link>
           </div>
         ) : (
           <>
@@ -79,7 +79,7 @@ export default function ContactoPage() {
             {/* Separator */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
               <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.08)" }} />
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.25)", whiteSpace: "nowrap" }}>O escríbenos directamente</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.25)", whiteSpace: "nowrap" }}>O escríbenos directamente</p>
               <div style={{ flex: 1, height: "1px", background: "rgba(232,168,76,0.08)" }} />
             </div>
 

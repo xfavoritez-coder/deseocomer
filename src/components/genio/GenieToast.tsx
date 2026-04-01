@@ -181,7 +181,7 @@ export default function GenieToast() {
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent, #e8a84c)", marginBottom: "4px" }}>
             ¡Guardado!
           </p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.6)" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.6)" }}>
             Te avisaré cuando haya ofertas de cumpleaños
           </p>
         </div>
@@ -195,7 +195,7 @@ export default function GenieToast() {
             ¿Cuándo es tu cumpleaños?
           </p>
           <p style={{
-            fontFamily: "var(--font-lato)", fontSize: "0.75rem",
+            fontFamily: "var(--font-lato)", fontSize: "0.82rem",
             color: "rgba(245,208,128,0.5)", marginBottom: "14px", lineHeight: 1.4,
           }}>
             Así te aviso cuando hay ofertas especiales para celebrar 🎂
@@ -224,7 +224,7 @@ export default function GenieToast() {
               width: "100%", padding: "10px",
               background: isValidDate ? "var(--accent, #e8a84c)" : "rgba(232,168,76,0.2)",
               border: "none", borderRadius: "10px",
-              fontFamily: "var(--font-cinzel)", fontSize: "0.75rem",
+              fontFamily: "var(--font-cinzel)", fontSize: "0.82rem",
               letterSpacing: "0.08em", textTransform: "uppercase",
               color: isValidDate ? "#1a0e05" : "rgba(245,208,128,0.4)",
               fontWeight: 700, cursor: isValidDate ? "pointer" : "default",
@@ -249,7 +249,7 @@ export default function GenieToast() {
                 background: "rgba(232,168,76,0.12)",
                 border: "1px solid rgba(232,168,76,0.25)",
                 borderRadius: "16px", padding: "6px 12px", cursor: "pointer",
-                fontFamily: "var(--font-lato)", fontSize: "0.75rem",
+                fontFamily: "var(--font-lato)", fontSize: "0.82rem",
                 color: "rgba(245,208,128,0.85)",
               }}>
                 {opt}
@@ -258,7 +258,7 @@ export default function GenieToast() {
           </div>
           <button onClick={() => dismissForever(toastActivo.id)} style={{
             background: "none", border: "none", cursor: "pointer",
-            fontFamily: "var(--font-lato)", fontSize: "0.65rem",
+            fontFamily: "var(--font-lato)", fontSize: "0.75rem",
             color: "rgba(240,234,214,0.15)", marginTop: "10px",
             padding: 0, display: "block",
           }}>No mostrar más</button>

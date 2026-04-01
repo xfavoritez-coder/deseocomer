@@ -118,6 +118,8 @@ function ConcursoDetallePage() {
   const [refBannerDismissed, setRefBannerDismissed] = useState(false);
   const [tooltipActivo, setTooltipActivo] = useState<string | null>(null);
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
+  const [isParticipating, setIsParticipating] = useState(false);
+  const [joinLoading, setJoinLoading] = useState(false);
   const refProcessed = useRef(false);
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
@@ -162,6 +164,7 @@ function ConcursoDetallePage() {
         if (user) {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
+          setIsParticipating(!!me);
         }
       }
     }).catch(() => {});
@@ -236,19 +239,35 @@ function ConcursoDetallePage() {
     }
     refreshRanking();
   };
+  const handleJoin = async () => {
+    if (!user || joinLoading) return;
+    setJoinLoading(true);
+    try {
+      await fetch(`/api/concursos/${slug}/participar`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuarioId: user.id }),
+      });
+      setIsParticipating(true);
+      refreshRanking();
+    } catch {} finally { setJoinLoading(false); }
+  };
   const localInitials = c.local?.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase() ?? "L";
   const userInitials = user?.nombre?.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase() ?? "?";
 
   // Ranking block (shared between mobile + desktop sidebar)
   const rankingBlock = (
     <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden" }}>
-      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
+      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#f5d080" }}>Ranking en tiempo real</span>
-        <span style={{ fontFamily: "var(--font-lato)", fontSize: 9, color: "rgba(240,234,214,0.3)" }}>↻ cada 30 seg</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080" }}>Ranking en tiempo real</span>
+        <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>↻ cada 30 seg</span>
       </div>
       {ranking.length === 0 ? (
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", fontStyle: "italic", textAlign: "center", padding: 20 }}>Sé el primero en participar</p>
+        <div style={{ textAlign: "center", padding: "20px 14px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, marginBottom: 8 }}>🏆</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080", fontWeight: 700, marginBottom: 4 }}>¡El primer lugar te espera!</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4 }}>Nadie se ha unido aún. Únete ahora y empieza con ventaja.</p>
+        </div>
       ) : ranking.map((r, i) => {
         const isMe = isAuthenticated && user && r.nombre.startsWith(user.nombre.split(" ")[0]);
         const posColors = [
@@ -261,16 +280,16 @@ function ConcursoDetallePage() {
         const alreadySupported = supportedMap[supportKey];
         return (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
-            <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.7)" }}>{r.nombre}</span>
-            {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 700 }}>tú</span>}
-            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 9, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+            <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
+            <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)" }}>{r.nombre}</span>
+            {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
             {isAuthenticated && !isMe && (
               <button onClick={() => handleSupport(r.nombre, supportKey, rAny.usuarioId || "")} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
               </button>
             )}
-            {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 14, background: "rgba(13,7,3,0.96)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-lato)", fontSize: 11, color: "#3db89e", whiteSpace: "nowrap", zIndex: 10 }}>¡+1 punto a {r.nombre}!</div>}
+            {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 14, background: "rgba(13,7,3,0.96)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-lato)", fontSize: 13, color: "#3db89e", whiteSpace: "nowrap", zIndex: 10 }}>¡+1 punto a {r.nombre}!</div>}
           </div>
         );
       })}
@@ -327,12 +346,12 @@ function ConcursoDetallePage() {
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
             {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.45)" }} />
               : <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.45)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitials[0]}</div>}
-            <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)" }}>{c.local}</span>
+            <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)" }}>{c.local}</span>
           </div>
           <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
             <div style={{ width: '40px', height: '1px', background: 'rgba(232,168,76,0.4)', margin: '10px auto' }} />
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>
+            <p className="dc-cd-hero-desc" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>
           </>}
         </div>
       </section>
@@ -344,7 +363,7 @@ function ConcursoDetallePage() {
           {/* 3. Countdown */}
           {!isEnded && timer && (
             <div style={{ marginTop: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 8 }}>⏳ termina en</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 8 }}>⏳ termina en</p>
               <div style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.18)"}`, borderRadius: 12, padding: 14, display: "flex", justifyContent: "center", gap: 6 }}>
                 {[
                   ...(timer.dias > 0 ? [{ v: timer.dias, l: "días" }] : []),
@@ -353,7 +372,7 @@ function ConcursoDetallePage() {
                   <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                     <div className="dc-cd-timer-unit" style={{ textAlign: "center" }}>
                       <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 30, fontWeight: 700, color: soon ? urgColor : "rgba(240,234,214,0.9)", lineHeight: 1, minWidth: 40 }}>{pad2(v)}</div>
-                      <div className="dc-cd-timer-label" style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 2 }}>{l}</div>
+                      <div className="dc-cd-timer-label" style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.35)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 2 }}>{l}</div>
                     </div>
                     {i < arr.length - 1 && <span className="dc-cd-timer-sep" style={{ fontFamily: "var(--font-cinzel)", fontSize: 22, color: soon ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)", marginBottom: 14 }}>:</span>}
                   </div>
@@ -365,31 +384,36 @@ function ConcursoDetallePage() {
           {/* 4. Link de participación */}
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>Comparte este link y suma puntos para ganar</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>{isAuthenticated && isParticipating ? "Comparte este link y suma puntos para ganar" : "Únete gratis y compite por el premio"}</p>
 
-              {isAuthenticated && refLink ? (
+              {isAuthenticated && isParticipating && refLink ? (
                 <div style={{ marginTop: 14 }}>
                   {/* Link field */}
                   <div style={{ background: "rgba(10,8,18,0.6)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: 8, padding: "9px 12px", display: "flex", alignItems: "center", gap: 8 }}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(232,168,76,0.4)" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-                    <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{refLink}</span>
-                    <button onClick={copyLink} style={{ background: "rgba(232,168,76,0.18)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 6, padding: "4px 10px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>{copied ? "✓ Copiado" : "Copiar"}</button>
+                    <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{refLink}</span>
+                    <button onClick={copyLink} style={{ background: "rgba(232,168,76,0.18)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 6, padding: "4px 10px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>{copied ? "✓ Copiado" : "Copiar"}</button>
                   </div>
                   {/* WhatsApp */}
-                  <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Participa en este concurso y gana: ${refLink}`)}`, "_blank")} style={{ width: "100%", marginTop: 8, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.3)", borderRadius: 10, padding: 13, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "#25d366", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Participa en este concurso y gana: ${refLink}`)}`, "_blank")} style={{ width: "100%", marginTop: 8, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.3)", borderRadius: 10, padding: 13, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#25d366", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
                     Compartir por WhatsApp
                   </button>
                 </div>
-              ) : !isEnded ? (
+              ) : isAuthenticated && !isParticipating && !isEnded ? (
+                <div style={{ marginTop: 16 }}>
+                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "🎉 Unirme a este concurso"}</button>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Únete gratis y comienza a sumar puntos para ganar</p>
+                </div>
+              ) : !isAuthenticated && !isEnded ? (
                 <div style={{ marginTop: 16 }}>
                   <Link className="dc-cd-cta-btn" href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, textDecoration: "none", textAlign: "center", letterSpacing: "0.06em" }}>Iniciar sesión para participar</Link>
                 </div>
               ) : null}
             </div>
             <div style={{ borderTop: "1px solid rgba(232,168,76,0.1)", padding: "10px 20px", textAlign: "center" }}>
-              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
+              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
             </div>
           </div>
 
@@ -401,13 +425,13 @@ function ConcursoDetallePage() {
           {/* 6. Cómo se gana */}
           {!isEnded && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-                {[{ n: "PASO 1", pts: "+1", label: "Al unirte" }, { n: "PASO 2", pts: "+2", label: "Por referido" }, { n: "PASO 3", pts: "+1", label: "Al apoyar" }].map(s => (
-                  <div key={s.n} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
-                    <div style={{ fontFamily: "var(--font-lato)", fontSize: 9, color: "rgba(240,234,214,0.28)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>{s.n}</div>
-                    <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
-                    <div style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido" }, { icon: "❤️", pts: "+1", label: "Al apoyar" }, { icon: "👤", pts: "+1", label: "Registro directo" }].map(s => (
+                  <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
+                    <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
+                    <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
+                    <div style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -417,21 +441,21 @@ function ConcursoDetallePage() {
           {/* 6.5 Descripción completa del premio (si fue truncada en hero) */}
           {c.descripcionPremio && c.descripcionPremio.length > 120 && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Descripción del premio</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Descripción del premio</p>
               <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 14px" }}>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", lineHeight: 1.45, margin: 0 }}>{c.descripcionPremio}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", lineHeight: 1.45, margin: 0 }}>{c.descripcionPremio}</p>
               </div>
             </div>
           )}
 
           {/* 7. Reglas y condiciones */}
           <div>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Reglas del concurso</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Reglas del concurso</p>
             <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 14px" }}>
               {allRules.map((rule, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderBottom: i < allRules.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
                   <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(232,168,76,0.35)", marginTop: 6, flexShrink: 0 }} />
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", lineHeight: 1.45 }}>{rule}</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", lineHeight: 1.45 }}>{rule}</span>
                 </div>
               ))}
             </div>
@@ -442,8 +466,8 @@ function ConcursoDetallePage() {
             {c.localLogoUrl ? <img src={c.localLogoUrl} alt={c.local} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.3)", flexShrink: 0 }} />
               : <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "2px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{localInitials}</div>}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>{c.local}</p>
-              <Link href={`/locales/${c.localSlug || c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "#3db89e", textDecoration: "none" }}>Ver perfil completo →</Link>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>{c.local}</p>
+              <Link href={`/locales/${c.localSlug || c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "#3db89e", textDecoration: "none" }}>Ver perfil completo →</Link>
             </div>
           </div>
         </div>
@@ -472,6 +496,7 @@ function ConcursoDetallePage() {
           .dc-cd-timer-label { font-size: 10px !important; color: rgba(240,234,214,0.28) !important; letter-spacing: 0.1em !important; margin-top: 6px !important; }
           .dc-cd-timer-sep { font-size: 24px !important; color: rgba(240,234,214,0.2) !important; align-self: center; padding-bottom: 12px; margin-bottom: 0 !important; }
           .dc-cd-cta-btn { max-width: 320px !important; margin-left: auto !important; margin-right: auto !important; }
+          .dc-cd-hero-desc { max-width: 500px; margin-left: auto; margin-right: auto; }
         }
         @keyframes dc-pd { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes dc-slideUp { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }

@@ -74,7 +74,7 @@ export default function ConcursosSection() {
             <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🏆</p>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--color-title)", marginBottom: "10px" }}>Próximamente</p>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem, 2vw, 1rem)", color: "var(--text-muted)", lineHeight: 1.7, maxWidth: "400px", margin: "0 auto 24px" }}>Estamos preparando concursos increíbles con premios reales. Vuelve pronto para participar.</p>
-            <a href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: "2px" }}>¿Cómo funcionan los concursos? →</a>
+            <a href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", textDecoration: "none", borderBottom: "1px solid rgba(240,234,214,0.15)", paddingBottom: "2px" }}>¿Cómo funcionan los concursos? →</a>
           </div>
         ) : (
         <div className="dc-cst-grid">
@@ -103,7 +103,7 @@ export default function ConcursosSection() {
                   {/* Badge */}
                   <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.55rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
@@ -111,20 +111,20 @@ export default function ConcursosSection() {
                 <div className="dc-cst-content" style={{ padding: "16px 20px 18px" }}>
                   {/* Local */}
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.5)", background: c.localLogoUrl ? "transparent" : "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "13px", fontWeight: 700, color: "#e8a84c", flexShrink: 0, overflow: "hidden" }}>{c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : c.local?.[0] ?? "L"}</div>
-                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)" }}>{c.local}</span>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.5)", background: c.localLogoUrl ? "transparent" : "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#e8a84c", flexShrink: 0, overflow: "hidden" }}>{c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : c.local?.[0] ?? "L"}</div>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "13px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)" }}>{c.local}</span>
                   </div>
                   {/* Premio */}
                   <p className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.15, fontWeight: 700, letterSpacing: "0.03em", display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 16 }}>🏆</span>{c.premio}</p>
                   {/* Descripcion - desktop only */}
-                  <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
+                  <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
 
                   {/* Countdown box */}
                   {!ended && (
                     <div style={{ background: "rgba(10,8,18,0.6)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: "12px", padding: "10px 14px", marginBottom: "14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
                         <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.5rem", letterSpacing: "0.15em", textTransform: "uppercase", color: esUrgente ? urgColor : "var(--oasis-bright)" }}>Termina en</span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: esUrgente ? urgColor : "var(--oasis-bright)" }}>Termina en</span>
                       </div>
                       <div style={{ display: "flex", justifyContent: "center", gap: "6px" }}>
                         {[
@@ -136,7 +136,7 @@ export default function ConcursosSection() {
                           <div key={label} style={{ display: "flex", alignItems: "center", gap: "3px" }}>
                             <div style={{ textAlign: "center" }}>
                               <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, lineHeight: 1, color: numColor, minWidth: "32px" }}>{pad(val)}</div>
-                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginTop: "2px" }}>{label}</div>
                             </div>
                             {idx < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: sepColor, marginBottom: "12px" }}>:</span>}
                           </div>
@@ -146,7 +146,7 @@ export default function ConcursosSection() {
                   )}
                   {ended && (
                     <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
                     </div>
                   )}
 
@@ -157,7 +157,7 @@ export default function ConcursosSection() {
                     </span>
                     {!ended && (
                       <span className="dc-cst-btn" style={{
-                        fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
+                        fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
                         border: `1px solid ${esUrgente ? urgColor : "var(--accent)"}`,
                         color: esUrgente ? urgColor : "var(--accent)",

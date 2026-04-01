@@ -30,7 +30,7 @@ export default function ComoFuncionaPage() {
 
         {/* Cómo funciona */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El proceso</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El proceso</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(32px,5vw,56px)", lineHeight: 1.3 }}>¿Cómo funciona?</h2>
 
           <div className="cf-pasos">
@@ -54,7 +54,7 @@ export default function ComoFuncionaPage() {
 
         {/* Sistema de puntos */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El sistema</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El sistema</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>¿Cómo se ganan puntos?</h2>
 
           <div className="cf-puntos">
@@ -80,7 +80,7 @@ export default function ComoFuncionaPage() {
 
         {/* Premios reales */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Premios reales</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Premios reales</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>Esto es lo que han ganado otros</h2>
 
           <div className="cf-premios">
@@ -92,9 +92,9 @@ export default function ComoFuncionaPage() {
                   <div style={{ height: "120px", background: "rgba(45,26,8,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2.5rem" }}>🏆</div>
                 )}
                 <div style={{ padding: "14px 16px" }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.58rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3db89e", marginBottom: "4px" }}>{c.local}</p>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3db89e", marginBottom: "4px" }}>{c.local}</p>
                   <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.88rem", color: "#f5d080", marginBottom: "8px", lineHeight: 1.3 }}>{c.premio}</p>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.35)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.35)" }}>
                     <span>Ganó: {c.ganador.nombre}</span>
                     <span>{c.ganador.referidos} refs</span>
                   </div>
@@ -104,7 +104,7 @@ export default function ComoFuncionaPage() {
           </div>
 
           <div style={{ textAlign: "center", marginTop: "24px" }}>
-            <Link href="/concursos/ganadores" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.2)", paddingBottom: "3px" }}>
+            <Link href="/concursos/ganadores" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(232,168,76,0.6)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.2)", paddingBottom: "3px" }}>
               Ver historial completo de ganadores →
             </Link>
           </div>
@@ -112,7 +112,7 @@ export default function ComoFuncionaPage() {
 
         {/* FAQ */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Preguntas frecuentes</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Preguntas frecuentes</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>Lo que todos preguntan</h2>
 
           <div style={{ maxWidth: "680px", margin: "0 auto" }}>
@@ -135,7 +135,7 @@ export default function ComoFuncionaPage() {
 
         {/* Integridad del concurso */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Transparencia</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Transparencia</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "8px", lineHeight: 1.3 }}>Integridad del concurso</h2>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem,1.5vw,1rem)", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.7 }}>¿Cómo protegemos la honestidad del juego?</p>
 

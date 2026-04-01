@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
+const LS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const IS: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 
 type PassMode = "normal" | "enviando" | "codigo" | "nuevo";
@@ -110,7 +110,7 @@ export default function DatosPersonalesPage() {
         <div>
           <label style={LS}>Email de acceso</label>
           <input type="text" style={{ ...IS, opacity: 0.6, cursor: "not-allowed" }} value={emailDueno} readOnly />
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>El email no se puede cambiar desde aquí</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>El email no se puede cambiar desde aquí</p>
         </div>
       </div>
       <button onClick={handleSavePersonal} style={{ padding: "12px 28px", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, border: "none", borderRadius: "10px", cursor: "pointer", marginBottom: "40px", transition: "opacity 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }} onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>Guardar datos</button>
@@ -123,7 +123,7 @@ export default function DatosPersonalesPage() {
           <Field label="Nueva contraseña" value={passNueva} onChange={setPassNueva} placeholder="Mínimo 8 caracteres" type="password" />
           <Field label="Confirmar nueva contraseña" value={passConfirm} onChange={setPassConfirm} placeholder="Repite la nueva contraseña" type="password" />
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
-            <button onClick={handleCambiarPass} disabled={!passActual || !passNueva || passNueva !== passConfirm || passNueva.length < 8} style={{ padding: "10px 24px", background: passActual && passNueva && passNueva === passConfirm && passNueva.length >= 8 ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
+            <button onClick={handleCambiarPass} disabled={!passActual || !passNueva || passNueva !== passConfirm || passNueva.length < 8} style={{ padding: "10px 24px", background: passActual && passNueva && passNueva === passConfirm && passNueva.length >= 8 ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
             <button onClick={handleEnviarCodigo} type="button" style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--accent)", cursor: "pointer", textDecoration: "underline", padding: 0 }}>¿Olvidaste tu contraseña?</button>
           </div>
           {passNueva && passConfirm && passNueva !== passConfirm && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b" }}>Las contraseñas no coinciden</p>}
@@ -145,7 +145,7 @@ export default function DatosPersonalesPage() {
           <Field label="Nueva contraseña" value={recPassNueva} onChange={setRecPassNueva} placeholder="Mínimo 8 caracteres" type="password" />
           <Field label="Confirmar nueva contraseña" value={recPassConfirm} onChange={setRecPassConfirm} placeholder="Repite la nueva contraseña" type="password" />
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <button onClick={handleVerificarCodigo} disabled={!codigo || codigo.length !== 6 || !recPassNueva || recPassNueva.length < 8 || recPassNueva !== recPassConfirm} style={{ padding: "10px 24px", background: codigo.length === 6 && recPassNueva.length >= 8 && recPassNueva === recPassConfirm ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
+            <button onClick={handleVerificarCodigo} disabled={!codigo || codigo.length !== 6 || !recPassNueva || recPassNueva.length < 8 || recPassNueva !== recPassConfirm} style={{ padding: "10px 24px", background: codigo.length === 6 && recPassNueva.length >= 8 && recPassNueva === recPassConfirm ? "rgba(61,184,158,0.15)" : "rgba(255,255,255,0.04)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "#3db89e", cursor: "pointer" }}>Cambiar contraseña</button>
             <button onClick={cancelRecovery} type="button" style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8080", cursor: "pointer" }}>Cancelar</button>
           </div>
           {recPassNueva && recPassConfirm && recPassNueva !== recPassConfirm && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b" }}>Las contraseñas no coinciden</p>}
@@ -163,7 +163,7 @@ export default function DatosPersonalesPage() {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
+  return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
 }
 
 function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {

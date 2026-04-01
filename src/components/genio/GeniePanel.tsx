@@ -59,7 +59,7 @@ function getInitials(name: string): string {
   return name.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
 
-const VOLVER: React.CSSProperties = { background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", color: "rgba(245,208,128,0.4)", cursor: "pointer", padding: "0 0 10px", textTransform: "uppercase", display: "block" };
+const VOLVER: React.CSSProperties = { background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", color: "rgba(245,208,128,0.4)", cursor: "pointer", padding: "0 0 10px", textTransform: "uppercase", display: "block" };
 const PREGUNTA: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(245,208,128,0.9)", marginBottom: "14px", lineHeight: 1.5 };
 const CHIP: React.CSSProperties = { background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" };
 
@@ -143,11 +143,11 @@ export default function GeniePanel() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", maxHeight: "180px", overflowY: "auto" }}>
                 {COMUNAS.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase())).map(c => (
                   <button key={c} onClick={() => handleComuna(c)} style={{ background: COMUNAS_CON_COBERTURA.includes(c) ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.04)", border: COMUNAS_CON_COBERTURA.includes(c) ? "1px solid rgba(232,168,76,0.25)" : "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: COMUNAS_CON_COBERTURA.includes(c) ? "rgba(245,208,128,0.85)" : "rgba(245,208,128,0.45)" }}>
-                    {c}{COMUNAS_CON_COBERTURA.includes(c) && <span style={{ marginLeft: "4px", fontSize: "0.6rem", color: "#3db89e" }}>●</span>}
+                    {c}{COMUNAS_CON_COBERTURA.includes(c) && <span style={{ marginLeft: "4px", fontSize: "0.72rem", color: "#3db89e" }}>●</span>}
                   </button>
                 ))}
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "rgba(245,208,128,0.3)", marginTop: "8px" }}>● Disponible en DeseoComer</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.3)", marginTop: "8px" }}>● Disponible en DeseoComer</p>
             </div>
           )}
 
@@ -165,7 +165,7 @@ export default function GeniePanel() {
                     if (!emailSinCobertura.includes("@")) return;
                     await fetch("/api/lista-espera-comuna", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: emailSinCobertura, nombre: nombreSinCobertura || null, comuna }) }).catch(() => {});
                     setEmailGuardado(true);
-                  }} disabled={!emailSinCobertura.includes("@")} style={{ width: "100%", padding: "10px", background: emailSinCobertura.includes("@") ? "var(--accent)" : "rgba(232,168,76,0.2)", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, color: emailSinCobertura.includes("@") ? "#1a0e05" : "rgba(245,208,128,0.4)", fontWeight: 700, cursor: emailSinCobertura.includes("@") ? "pointer" : "default" }}>
+                  }} disabled={!emailSinCobertura.includes("@")} style={{ width: "100%", padding: "10px", background: emailSinCobertura.includes("@") ? "var(--accent)" : "rgba(232,168,76,0.2)", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, color: emailSinCobertura.includes("@") ? "#1a0e05" : "rgba(245,208,128,0.4)", fontWeight: 700, cursor: emailSinCobertura.includes("@") ? "pointer" : "default" }}>
                     Avisarme cuando lleguen →
                   </button>
                 </>
@@ -174,7 +174,7 @@ export default function GeniePanel() {
                   <div style={{ fontSize: "2rem", marginBottom: "8px" }}>✨</div>
                   <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "6px" }}>¡Anotado{nombreSinCobertura ? `, ${nombreSinCobertura.split(" ")[0]}` : ""}!</p>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(245,208,128,0.5)", marginBottom: "16px", lineHeight: 1.5 }}>Te avisaremos cuando lleguemos a {comuna} 🧞</p>
-                  <button onClick={() => { setEmailGuardado(false); setEmailSinCobertura(""); setNombreSinCobertura(""); setStepActual(2); }} style={{ padding: "8px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.85)", cursor: "pointer" }}>← Buscar en otra zona</button>
+                  <button onClick={() => { setEmailGuardado(false); setEmailSinCobertura(""); setNombreSinCobertura(""); setStepActual(2); }} style={{ padding: "8px 16px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.85)", cursor: "pointer" }}>← Buscar en otra zona</button>
                 </div>
               )}
             </div>
@@ -205,13 +205,13 @@ export default function GeniePanel() {
             {/* Header */}
             <div style={{ padding: "12px 16px 10px", borderBottom: "1px solid rgba(232,168,76,0.08)", display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "18px" }}>🧞</span>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "10px", color: "rgba(240,234,214,0.4)", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, flex: 1 }}>Tu sugerencia está lista</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "12px", color: "rgba(240,234,214,0.4)", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, flex: 1 }}>Tu sugerencia está lista</span>
               <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", fontSize: "18px", color: "rgba(240,234,214,0.25)", cursor: "pointer", padding: 0, lineHeight: 1 }}>×</button>
             </div>
 
             {/* Frase del genio */}
             <div style={{ padding: "12px 16px 10px", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "13px", color: "#f5d080", lineHeight: 1.5, margin: 0 }}>{getFrase(ocasion, categoria, comuna)}</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "14px", color: "#f5d080", lineHeight: 1.5, margin: 0 }}>{getFrase(ocasion, categoria, comuna)}</p>
             </div>
 
             {/* Imagen del local */}
@@ -223,17 +223,17 @@ export default function GeniePanel() {
               )}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0) 30%, rgba(10,8,18,0.82) 100%)" }} />
               <div style={{ position: "absolute", bottom: "10px", left: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: r.logoUrl ? "transparent" : "rgba(20,12,35,0.9)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", fontSize: "9px", fontWeight: 700, color: "#e8a84c" }}>
+                <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: r.logoUrl ? "transparent" : "rgba(20,12,35,0.9)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", fontSize: "11px", fontWeight: 700, color: "#e8a84c" }}>
                   {r.logoUrl ? <img src={r.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : getInitials(r.nombre)}
                 </div>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.65)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>{r.nombre}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "13px", color: "rgba(240,234,214,0.65)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>{r.nombre}</span>
               </div>
             </div>
 
             {/* Body */}
             <div style={{ padding: "12px 16px" }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "15px", fontWeight: 700, color: "#f5d080", textTransform: "uppercase", marginBottom: "4px" }}>{r.nombre}</p>
-              <div style={{ display: "flex", gap: "6px", fontSize: "11px", marginBottom: "12px", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "6px", fontSize: "13px", marginBottom: "12px", alignItems: "center" }}>
                 <span style={{ color: "rgba(240,234,214,0.4)" }}>{r.comuna}</span>
                 <span style={{ color: "rgba(240,234,214,0.18)" }}>·</span>
                 <span style={{ color: "#3db89e" }}>{r.categoria}</span>
@@ -247,8 +247,8 @@ export default function GeniePanel() {
                     <Link href={`/promociones/${promoActiva.id}`} onClick={() => setIsOpen(false)} style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.22)", borderRadius: "8px", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
                       <span style={{ fontSize: "14px" }}>🏷️</span>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", color: "#3db89e", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>Promoción activa</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "11px", color: "rgba(240,234,214,0.45)", margin: "2px 0 0" }}>{promoActiva.titulo}</p>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "#3db89e", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>Promoción activa</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", margin: "2px 0 0" }}>{promoActiva.titulo}</p>
                       </div>
                       <span style={{ color: "rgba(240,234,214,0.2)" }}>→</span>
                     </Link>
@@ -257,8 +257,8 @@ export default function GeniePanel() {
                     <Link href={`/concursos/${concursoActivo.slug || concursoActivo.id}`} onClick={() => setIsOpen(false)} style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "8px", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
                       <span style={{ fontSize: "14px" }}>🏆</span>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "9px", color: "#e8a84c", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>Concurso activo</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "11px", color: "rgba(240,234,214,0.45)", margin: "2px 0 0" }}>Gana {concursoActivo.premio} · {diasRestantes} días restantes</p>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "#e8a84c", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>Concurso activo</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "rgba(240,234,214,0.45)", margin: "2px 0 0" }}>Gana {concursoActivo.premio} · {diasRestantes} días restantes</p>
                       </div>
                       <span style={{ color: "rgba(240,234,214,0.2)" }}>→</span>
                     </Link>
@@ -268,17 +268,17 @@ export default function GeniePanel() {
 
               {/* Buttons */}
               <div style={{ display: "flex", gap: "8px" }}>
-                <Link href={`/locales/${r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "12px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local →</Link>
-                <button onClick={handleOtra} style={{ padding: "11px 14px", background: "transparent", border: "1px solid rgba(232,168,76,0.22)", borderRadius: "10px", fontSize: "12px", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Otra sugerencia</button>
+                <Link href={`/locales/${r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local →</Link>
+                <button onClick={handleOtra} style={{ padding: "11px 14px", background: "transparent", border: "1px solid rgba(232,168,76,0.22)", borderRadius: "10px", fontSize: "14px", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Otra sugerencia</button>
               </div>
 
               {/* Reg CTA */}
               {showRegCta && !isLoggedIn && (
                 <div style={{ marginTop: "14px", paddingTop: "14px", borderTop: "1px solid rgba(232,168,76,0.1)", textAlign: "center" }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.5)", marginBottom: "10px", lineHeight: 1.5 }}>{sessionCount >= 3 ? `Llevas ${sessionCount} visitas. ¿Te quedas? 🧞` : "Regístrate y mis recomendaciones mejoran"}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.5)", marginBottom: "10px", lineHeight: 1.5 }}>{sessionCount >= 3 ? `Llevas ${sessionCount} visitas. ¿Te quedas? 🧞` : "Regístrate y mis recomendaciones mejoran"}</p>
                   <div style={{ display: "flex", gap: "8px" }}>
-                    <Link href="/registro" onClick={() => setIsOpen(false)} style={{ flex: 1, textAlign: "center", padding: "9px", background: "#e8a84c", borderRadius: "8px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#1a0e05", textDecoration: "none", fontWeight: 700 }}>Registrarme</Link>
-                    <button onClick={() => { setShowRegCta(false); setRegDismissed(true); sessionStorage.setItem("genio_registro_descartado", "true"); }} style={{ flex: 1, padding: "9px", background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "rgba(245,208,128,0.4)", cursor: "pointer" }}>Ahora no</button>
+                    <Link href="/registro" onClick={() => setIsOpen(false)} style={{ flex: 1, textAlign: "center", padding: "9px", background: "#e8a84c", borderRadius: "8px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#1a0e05", textDecoration: "none", fontWeight: 700 }}>Registrarme</Link>
+                    <button onClick={() => { setShowRegCta(false); setRegDismissed(true); sessionStorage.setItem("genio_registro_descartado", "true"); }} style={{ flex: 1, padding: "9px", background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(245,208,128,0.4)", cursor: "pointer" }}>Ahora no</button>
                   </div>
                 </div>
               )}

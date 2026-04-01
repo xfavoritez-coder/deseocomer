@@ -88,9 +88,9 @@ export default function Navbar() {
           {mounted && (
             isLocalLoggedIn ? (
               <div className="dc-nav-user">
-                <Link href={`/locales/${localSession?.slug || localSession?.id}`} style={{ width: "32px", height: "32px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none", overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</Link>
+                <Link href={`/locales/${localSession?.slug || localSession?.id}`} style={{ width: "32px", height: "32px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#fff", flexShrink: 0, textDecoration: "none", overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</Link>
                 <Link href={`/locales/${localSession?.slug || localSession?.id}`} className="dc-nav-username" style={{ textDecoration: "none" }}>{localName}</Link>
-                <Link href="/panel" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(61,184,158,0.4)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "5px" }}>🏪 Mi Panel</Link>
+                <Link href="/panel" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#3db89e", textDecoration: "none", padding: "6px 14px", borderRadius: "20px", border: "1px solid rgba(61,184,158,0.4)", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: "5px" }}>🏪 Mi Panel</Link>
                 <button onClick={handleLocalLogout} className="dc-nav-logout">Salir</button>
               </div>
             ) : isAuthenticated && user ? (
@@ -230,13 +230,13 @@ export default function Navbar() {
           z-index: 1;
         }
         .dc-nav-link {
-          font-family: var(--font-cinzel); font-size: 0.75rem;
+          font-family: var(--font-cinzel); font-size: 0.82rem;
           letter-spacing: 0.15em; text-transform: uppercase;
           color: var(--text-primary); text-decoration: none; white-space: nowrap;
           font-weight: 500;
         }
         .dc-nav-cta {
-          font-family: var(--font-cinzel); font-size: 0.75rem;
+          font-family: var(--font-cinzel); font-size: 0.82rem;
           letter-spacing: 0.1em; text-transform: uppercase;
           background: linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright));
           color: var(--bg-primary); padding: 10px 24px; border-radius: 30px;
@@ -253,18 +253,18 @@ export default function Navbar() {
           background: color-mix(in srgb, var(--accent) 25%, var(--bg-secondary));
           border: 1px solid var(--accent);
           display: flex; align-items: center; justify-content: center;
-          font-family: var(--font-cinzel); font-size: 0.65rem;
+          font-family: var(--font-cinzel); font-size: 0.7rem;
           font-weight: 700; color: var(--accent);
           flex-shrink: 0;
         }
         .dc-nav-avatar--lg { width: 40px; height: 40px; font-size: 0.75rem; }
         .dc-nav-username {
-          font-family: var(--font-cinzel); font-size: 0.7rem;
+          font-family: var(--font-cinzel); font-size: 0.78rem;
           letter-spacing: 0.1em; text-transform: uppercase;
           color: var(--text-primary); white-space: nowrap;
         }
         .dc-nav-panel {
-          font-family: var(--font-cinzel); font-size: 0.65rem;
+          font-family: var(--font-cinzel); font-size: 0.75rem;
           letter-spacing: 0.1em; text-transform: uppercase;
           color: var(--oasis-bright); text-decoration: none;
           padding: 6px 12px; border-radius: 20px;
@@ -272,7 +272,7 @@ export default function Navbar() {
           white-space: nowrap;
         }
         .dc-nav-logout {
-          font-family: var(--font-cinzel); font-size: 0.65rem;
+          font-family: var(--font-cinzel); font-size: 0.75rem;
           letter-spacing: 0.1em; text-transform: uppercase;
           background: none; border: 1px solid var(--border-color);
           color: var(--text-muted); padding: 6px 14px;
