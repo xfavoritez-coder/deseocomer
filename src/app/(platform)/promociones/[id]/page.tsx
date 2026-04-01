@@ -35,6 +35,15 @@ export default function PromocionDetailPage() {
     (p) => p.id !== id && p.activa && !p.esCumpleanos && (p.localId === promo?.localId || p.categoria === promo?.categoria)
   ).slice(0, 6);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [dbPromo, setDbPromo] = useState<any>(null);
+  const [dbLoading, setDbLoading] = useState(!promo);
+
+  useEffect(() => {
+    if (promo) { setDbLoading(false); return; }
+    fetch(`/api/promociones/${params.id}`).then(r => r.ok ? r.json() : null).then(data => { if (data) setDbPromo(data); setDbLoading(false); }).catch(() => setDbLoading(false));
+  }, [params.id, promo]);
+
   const [mounted, setMounted] = useState(false);
   const [isActiva, setIsActiva] = useState(false);
   const [isUltimas, setIsUltimas] = useState(false);
@@ -63,11 +72,31 @@ export default function PromocionDetailPage() {
     });
   };
 
+  if (dbLoading) {
+    return (
+      <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
+        <Navbar />
+        <div className="dc-sk dc-sk-hero" />
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+          <div className="dc-sk" style={{ height: 24, width: "50%", margin: "0 auto" }} />
+          <div className="dc-sk" style={{ height: 100, borderRadius: 12 }} />
+          <div className="dc-sk" style={{ height: 60, borderRadius: 12 }} />
+        </div>
+        <style>{`
+          .dc-sk { background: linear-gradient(90deg, rgba(232,168,76,0.06) 25%, rgba(232,168,76,0.12) 50%, rgba(232,168,76,0.06) 75%); background-size: 200% 100%; animation: dcShimmer 1.5s ease-in-out infinite; border-radius: 8px; }
+          .dc-sk-hero { height: 240px; border-radius: 0; }
+          @keyframes dcShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        `}</style>
+        <Footer />
+      </main>
+    );
+  }
+
   if (!promo) {
     return (
       <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
         <Navbar />
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", gap: "20px", padding: "120px 40px", textAlign: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", gap: "20px", padding: "80px 40px", textAlign: "center" }}>
           <p style={{ fontSize: "4rem" }}>🔍</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)" }}>Promoción no encontrada</h2>
           <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-muted)" }}>Esta promoción no existe o ya no está disponible.</p>

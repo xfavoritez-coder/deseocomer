@@ -76,6 +76,7 @@ export default function LocalDetailPage() {
   const [esLocal, setEsLocal] = useState(false);
   const mockLocal = getLocalById(Number(id));
   const [dbLocal, setDbLocal] = useState<Record<string, unknown> | null>(null);
+  const [dbLoading, setDbLoading] = useState(!mockLocal);
   const [tab, setTab] = useState<Tab>("Información");
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [esPropioDueno, setEsPropioDueno] = useState(false);
@@ -83,11 +84,11 @@ export default function LocalDetailPage() {
 
   // If not a mock local (CUID), fetch from API
   useEffect(() => {
-    if (mockLocal) return;
+    if (mockLocal) { setDbLoading(false); return; }
     fetch(`/api/locales/${id}`)
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) setDbLocal(data); })
-      .catch(() => {});
+      .then(data => { if (data) setDbLocal(data); setDbLoading(false); })
+      .catch(() => { setDbLoading(false); });
   }, [id, mockLocal]);
 
   // Build a unified local object
@@ -134,11 +135,32 @@ export default function LocalDetailPage() {
     addInteraccion("local_visitado", { id: String(id), nombre: local.nombre, categoria: local.categoria, comuna: local.barrio });
   }, [id, local?.nombre]);
 
+  if (dbLoading) {
+    return (
+      <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
+        <Navbar />
+        <div className="dc-sk dc-sk-hero" />
+        <div style={{ maxWidth: 700, margin: "0 auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", gap: 14, alignItems: "center" }}><div className="dc-sk" style={{ width: 56, height: 56, borderRadius: "50%" }} /><div style={{ flex: 1 }}><div className="dc-sk" style={{ height: 20, width: "60%", marginBottom: 8 }} /><div className="dc-sk" style={{ height: 12, width: "40%" }} /></div></div>
+          <div className="dc-sk" style={{ height: 100, borderRadius: 12 }} />
+          <div className="dc-sk" style={{ height: 160, borderRadius: 12 }} />
+          <div className="dc-sk" style={{ height: 120, borderRadius: 12 }} />
+        </div>
+        <style>{`
+          .dc-sk { background: linear-gradient(90deg, rgba(232,168,76,0.06) 25%, rgba(232,168,76,0.12) 50%, rgba(232,168,76,0.06) 75%); background-size: 200% 100%; animation: dcShimmer 1.5s ease-in-out infinite; border-radius: 8px; }
+          .dc-sk-hero { height: 280px; border-radius: 0; }
+          @keyframes dcShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        `}</style>
+        <Footer />
+      </main>
+    );
+  }
+
   if (!local) {
     return (
       <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
         <Navbar />
-        <div style={{ padding: "160px 40px", textAlign: "center" }}>
+        <div style={{ padding: "80px 40px", textAlign: "center" }}>
           <p style={{ fontSize: "3rem", marginBottom: "16px" }}>🔍</p>
           <p style={{ fontFamily: "var(--font-cinzel)", color: "var(--accent)", fontSize: "1.2rem" }}>Local no encontrado</p>
           <Link href="/locales" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)", textDecoration: "none", marginTop: "16px", display: "inline-block" }}>← Volver a locales</Link>
