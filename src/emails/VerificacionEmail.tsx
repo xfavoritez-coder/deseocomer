@@ -13,7 +13,6 @@ export function VerificacionEmail({ nombre, verificationUrl }: Props) {
             <h1 style={{ color: "#e8a84c", fontSize: "20px", letterSpacing: "0.3em", textTransform: "uppercase", margin: 0 }}>DeseoComer</h1>
           </div>
           <div style={{ backgroundColor: "#2d1a08", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.25)", padding: "40px 32px" }}>
-            <p style={{ fontSize: "32px", margin: "0 0 16px" }}>📧</p>
             <h2 style={{ color: "#e8a84c", fontSize: "22px", marginTop: 0, marginBottom: "16px" }}>Confirma tu email, {nombre}</h2>
             <p style={{ color: "#c0a060", fontSize: "16px", lineHeight: "1.7", marginBottom: "32px" }}>Para activar tu cuenta y participar en concursos, confirma tu dirección de email:</p>
             <div style={{ textAlign: "center", marginBottom: "32px" }}>
