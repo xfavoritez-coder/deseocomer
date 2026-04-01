@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { GenieProvider } from "@/contexts/GenieContext";
 import GenieLampara from "@/components/genio/GenieButton";
 import GenieContextual from "@/components/GenieContextual";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -62,15 +63,17 @@ export default function RootLayout({
         })()` }} />
       </head>
       <body className={`${cinzelDecorative.variable} ${cinzel.variable} ${lato.variable}`} suppressHydrationWarning>
-        <ThemeProvider>
-          <AuthProvider>
-            <GenieProvider>
-              {children}
-              <GenieLampara />
-              <GenieContextual />
-            </GenieProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider>
+            <AuthProvider>
+              <GenieProvider>
+                {children}
+                <GenieLampara />
+                <GenieContextual />
+              </GenieProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
