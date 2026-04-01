@@ -66,14 +66,7 @@ function RegistroContent() {
             const refRes = await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`);
             if (refRes.ok) { const refData = await refRes.json(); referidorId = refData.id; }
           } catch {}
-          // Ensure referrer is participating first
-          try {
-            await fetch(`/api/concursos/${pending.concursoId}/participar`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ usuarioId: referidorId }),
-            });
-          } catch {}
-          // Create new user's participation with referral
+          // Create new user's participation with referral (referrer must already be participating)
           try {
             await fetch(`/api/concursos/${pending.concursoId}/participar`, {
               method: "POST", headers: { "Content-Type": "application/json" },

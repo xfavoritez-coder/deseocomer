@@ -145,7 +145,7 @@ function ConcursoDetallePage() {
       // Reload ranking from DB
       fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
         if (data) {
-          const newRanking = (data.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 }));
+          const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
           setRanking(newRanking);
         }
       }).catch(() => {});
@@ -157,7 +157,7 @@ function ConcursoDetallePage() {
     if (!slug) return;
     fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
       if (data) {
-        const newRanking = (data.participantes ?? []).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0 }));
+        const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
         setRanking(newRanking);
         if (user) {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
@@ -191,7 +191,7 @@ function ConcursoDetallePage() {
   useEffect(() => {
     if (!user) return;
     const map: Record<string, boolean> = {};
-    for (const r of ranking) { const key = `mock_${r.nombre}`; map[key] = hasSupportedToday(concursoId, user.id, key); }
+    for (const r of ranking) { const key = (r as {usuarioId?: string}).usuarioId || `mock_${r.nombre}`; map[key] = hasSupportedToday(concursoId, user.id, key); }
     setSupportedMap(map);
   }, [user, concursoId, ranking]);
 
@@ -209,7 +209,17 @@ function ConcursoDetallePage() {
     ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
     : null;
   const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {} };
-  const handleSupport = (targetName: string, targetId: string) => { if (!user) return; const ok = supportUser(concursoId, user.id, targetId); if (ok) { setSupportedMap(m => ({ ...m, [targetId]: true })); setTooltipActivo(targetId); setTimeout(() => setTooltipActivo(null), 2000); refreshRanking(); } };
+  const handleSupport = async (targetName: string, targetId: string, targetUsuarioId: string) => {
+    if (!user) return;
+    const ok = supportUser(concursoId, user.id, targetId);
+    if (!ok) return;
+    setSupportedMap(m => ({ ...m, [targetId]: true })); setTooltipActivo(targetId); setTimeout(() => setTooltipActivo(null), 2000);
+    // Call API to persist the +1 in DB
+    if (targetUsuarioId) {
+      try { await fetch(`/api/concursos/${slug}/apoyar`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ supporterId: user.id, targetUsuarioId }) }); } catch {}
+    }
+    refreshRanking();
+  };
   const localInitials = c.local?.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase() ?? "L";
   const userInitials = user?.nombre?.split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase() ?? "?";
 
@@ -230,7 +240,8 @@ function ConcursoDetallePage() {
           { bg: "rgba(180,180,180,0.08)", color: "rgba(220,220,220,0.6)", border: "rgba(180,180,180,0.15)" },
           { bg: "rgba(180,100,50,0.12)", color: "rgba(200,140,80,0.7)", border: "rgba(180,100,50,0.2)" },
         ][i] ?? { bg: "rgba(255,255,255,0.03)", color: "rgba(240,234,214,0.3)", border: "rgba(255,255,255,0.06)" };
-        const supportKey = `mock_${r.nombre}`;
+        const rAny = r as { usuarioId?: string };
+        const supportKey = rAny.usuarioId || `mock_${r.nombre}`;
         const alreadySupported = supportedMap[supportKey];
         return (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
@@ -239,7 +250,7 @@ function ConcursoDetallePage() {
             {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 700 }}>tú</span>}
             <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 9, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
             {isAuthenticated && !isMe && (
-              <button onClick={() => handleSupport(r.nombre, supportKey)} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
+              <button onClick={() => handleSupport(r.nombre, supportKey, rAny.usuarioId || "")} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
               </button>
             )}
@@ -302,7 +313,7 @@ function ConcursoDetallePage() {
               : <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.45)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitials[0]}</div>}
             <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)" }}>{c.local}</span>
           </div>
-          <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><span style={{ fontSize: 20 }}>🏆</span>{c.premio}</h1>
+          <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
             <div style={{ width: '40px', height: '1px', background: 'rgba(232,168,76,0.4)', margin: '10px auto' }} />
             <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4 }}>{c.descripcionPremio}</p>
@@ -338,8 +349,8 @@ function ConcursoDetallePage() {
           {/* 4. Link de participación */}
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Link de participación</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>Participa gratis, suma puntos y gana</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>Comparte este link y suma puntos para ganar</p>
 
               {isAuthenticated && refLink ? (
                 <div style={{ marginTop: 14 }}>
