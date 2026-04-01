@@ -4,7 +4,7 @@ import SelloGratis from "@/components/SelloGratis";
 
 
 
-interface ConcursoHome { id: string; slug: string; local: string; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
@@ -25,7 +25,7 @@ export default function ConcursosSection() {
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setConcursos(sorted.slice(0, 3).map((c: any) => ({
-          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", premio: c.premio ?? "",
+          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", localLogoUrl: c.local?.logoUrl ?? null, premio: c.premio ?? "",
           participantes: c._count?.participantes ?? 0,
           horasRestantes: Math.max(0, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
           fechaFin: c.fechaFin,
@@ -111,7 +111,7 @@ export default function ConcursosSection() {
                 <div className="dc-cst-content" style={{ padding: "16px 20px 18px" }}>
                   {/* Local */}
                   <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.5)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "13px", fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{c.local?.[0] ?? "L"}</div>
+                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.5)", background: c.localLogoUrl ? "transparent" : "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "13px", fontWeight: 700, color: "#e8a84c", flexShrink: 0, overflow: "hidden" }}>{c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : c.local?.[0] ?? "L"}</div>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "11px", fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)" }}>{c.local}</span>
                   </div>
                   {/* Premio */}
