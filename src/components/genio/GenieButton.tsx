@@ -39,8 +39,8 @@ export default function GenieLampara() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => { try { const s = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}"); if (s?.id && s?.loggedIn) setEsLocal(true); } catch {} }, []);
 
-  // Don't render on /panel routes or if local is logged in
-  if (pathname.startsWith("/panel") || esLocal) return null;
+  // Don't render on /panel, /admin routes or if local is logged in
+  if (pathname.startsWith("/panel") || pathname.startsWith("/admin") || esLocal) return null;
 
   const handleClick = () => {
     if (showBalloon) setShowBalloon(false);

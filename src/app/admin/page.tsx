@@ -38,22 +38,31 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+      <div className="adm-tables">
         <div>
           <h3 style={TH}>Últimos usuarios</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
             <thead><tr>{["Nombre", "Email", "Ciudad", "Fecha"].map(h => <th key={h} style={THC}>{h}</th>)}</tr></thead>
             <tbody>{(stats.ultimosUsuarios ?? []).map((u: S) => <tr key={u.id} style={TR}><td style={TD}>{u.nombre}</td><td style={TD}>{u.email}</td><td style={TD}>{u.ciudad}</td><td style={TD}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</td></tr>)}</tbody>
           </table>
+          </div>
         </div>
         <div>
           <h3 style={TH}>Últimos locales</h3>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
             <thead><tr>{["Nombre", "Email", "Ciudad", "Estado"].map(h => <th key={h} style={THC}>{h}</th>)}</tr></thead>
             <tbody>{(stats.ultimosLocales ?? []).map((l: S) => <tr key={l.id} style={TR}><td style={TD}>{l.nombre}</td><td style={TD}>{l.email}</td><td style={TD}>{l.ciudad}</td><td style={TD}><span style={{ color: l.activo ? "#3db89e" : "#ff6b6b", fontSize: "0.75rem" }}>{l.activo ? "Activo" : "Inactivo"}</span>{l.verificado && " ✓"}</td></tr>)}</tbody>
           </table>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        .adm-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 767px) { .adm-tables { grid-template-columns: 1fr; } }
+      `}</style>
     </div>
   );
 }
