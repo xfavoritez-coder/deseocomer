@@ -127,8 +127,6 @@ export default function ConcursosPage() {
                   background: "rgba(15,10,28,0.98)", border: `1px solid ${soon ? "rgba(224,85,85,0.45)" : "rgba(232,168,76,0.2)"}`,
                   borderRadius: 20, overflow: "hidden", cursor: "pointer", transition: "transform 0.2s, border-color 0.2s",
                 }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-5px)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)"; }}
                 >
                   {/* Image */}
                   <div style={{ position: "relative", height: 200, overflow: "hidden" }}>
