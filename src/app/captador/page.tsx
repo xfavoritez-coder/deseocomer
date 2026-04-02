@@ -190,7 +190,7 @@ export default function CaptadorPanel() {
 const GUION = `Hola, soy de DeseoComer, una plataforma gastronómica nueva en Santiago donde la gente busca dónde comer. Registrar tu local es gratis y apareces en la plataforma de inmediato. Lo más potente es que puedes publicar concursos — tus clientes y personas nuevas invitan a sus amigos a ganar un premio, y tú consigues visibilidad con el nombre de tu local siendo visto por muchas personas nuevas sin pagar publicidad. Es gratis, toma 5 minutos, y mientras más temprano te registres mejor posicionado quedas porque recién estamos creciendo.`;
 
 const OBJECIONES = [
-  { q: "¿Cuánto cuesta?", a: "Es completamente gratis. Siempre." },
+  { q: "¿Cuánto cuesta?", a: "Es completamente gratis." },
   { q: "¿Para qué me sirve?", a: "Para que más gente te encuentre cuando busca dónde comer en tu comuna." },
   { q: "No tengo tiempo.", a: "Te registro yo mismo ahora, solo necesito tu nombre, correo y teléfono. En 5 minutos listo." },
   { q: "Ya tengo Instagram.", a: "Acá la gente está buscando activamente dónde comer, no scrolleando. Es más directo para conseguir clientes nuevos." },
@@ -221,10 +221,10 @@ function TipsCaptar() {
         <p style={{ fontSize: 9, color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Si te ponen objeciones:</p>
         {OBJECIONES.map((o, i) => (
           <div key={o.q} style={{ marginBottom: i < OBJECIONES.length - 1 ? 10 : 0 }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(240,234,214,0.5)", marginBottom: 3 }}>{o.q}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: "rgba(240,234,214,0.55)", marginBottom: 4 }}>{o.q}</p>
             <div style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
-              <span style={{ color: "#e8a84c", fontSize: 12, flexShrink: 0 }}>→</span>
-              <span style={{ fontSize: 12, color: "rgba(240,234,214,0.6)", lineHeight: 1.4 }}>{o.a}</span>
+              <span style={{ color: "#e8a84c", fontSize: 14, flexShrink: 0 }}>→</span>
+              <span style={{ fontSize: 14, color: "rgba(240,234,214,0.6)", lineHeight: 1.5 }}>{o.a}</span>
             </div>
           </div>
         ))}
