@@ -74,6 +74,7 @@ function ConcursoDetallePage() {
   const [ranking, setRanking] = useState<RankingEntry[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [concursoData, setConcursoData] = useState<any>(null);
+  const [supportError, setSupportError] = useState("");
   const finalizado = finalizadoMock;
 
   useEffect(() => {
@@ -228,7 +229,6 @@ function ConcursoDetallePage() {
     ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
     : null;
   const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {} };
-  const [supportError, setSupportError] = useState("");
   const handleSupport = async (targetName: string, targetId: string, targetUsuarioId: string) => {
     if (!user) return;
     const ok = supportUser(concursoId, user.id, targetId);
