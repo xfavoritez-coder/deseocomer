@@ -150,7 +150,7 @@ export default function MiLocalPage() {
         </div>
       )}
 
-      <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Datos de Local</h1>
+      <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "28px" }}>Datos Local</h1>
 
       <SectionTitle>Fotos</SectionTitle>
       <div style={{ marginBottom: "32px" }}>

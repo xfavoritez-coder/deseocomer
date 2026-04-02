@@ -79,7 +79,7 @@ function DashboardContent() {
       {bienvenido && (
         <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "14px", padding: "20px 24px", marginBottom: "28px" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--oasis-bright)", marginBottom: "6px", fontWeight: 700 }}>🎉 ¡Bienvenido a DeseoComer!</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Datos de Local</Link> para empezar a publicar concursos y promociones.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Datos Local</Link> para empezar a publicar concursos y promociones.</p>
         </div>
       )}
 

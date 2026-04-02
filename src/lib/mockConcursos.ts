@@ -402,7 +402,7 @@ export function getTimeLeft(endsAt: number) {
 }
 
 export function isSoonEnding(endsAt: number) {
-  return endsAt - Date.now() < 6 * 3_600_000;
+  return endsAt - Date.now() <= 24 * 3_600_000;
 }
 
 export function pad2(n: number) {

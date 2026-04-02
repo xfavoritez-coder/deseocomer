@@ -1,4 +1,4 @@
-import { ImageResponse } from "@vercel/og";
+import { ImageResponse } from "next/og";
 import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
@@ -21,39 +21,16 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  // Load fonts from Google Fonts CSS API
-  const [cinzelCss, latoCss] = await Promise.all([
-    fetch(
-      "https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap",
-      { headers: { "User-Agent": "Mozilla/5.0" } }
-    ).then((r) => r.text()),
-    fetch(
-      "https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap",
-      { headers: { "User-Agent": "Mozilla/5.0" } }
-    ).then((r) => r.text()),
+  // Load fonts directly from Google Fonts
+  const [cinzelBold, latoBold] = await Promise.all([
+    fetch("https://fonts.gstatic.com/s/cinzel/v23/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYrvDE5ZdqU.woff2").then((r) => r.arrayBuffer()),
+    fetch("https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2").then((r) => r.arrayBuffer()),
   ]);
 
-  // Extract font URLs from CSS
-  const extractFontUrl = (css: string) => {
-    const match = css.match(/src:\s*url\(([^)]+)\)/);
-    return match?.[1] ?? null;
-  };
-
-  const cinzelUrl = extractFontUrl(cinzelCss);
-  const latoUrl = extractFontUrl(latoCss);
-
-  const [cinzelData, latoData] = await Promise.all([
-    cinzelUrl
-      ? fetch(cinzelUrl).then((r) => r.arrayBuffer())
-      : Promise.resolve(null),
-    latoUrl
-      ? fetch(latoUrl).then((r) => r.arrayBuffer())
-      : Promise.resolve(null),
-  ]);
-
-  const fonts: { name: string; data: ArrayBuffer; weight: 700 }[] = [];
-  if (cinzelData) fonts.push({ name: "Cinzel", data: cinzelData, weight: 700 });
-  if (latoData) fonts.push({ name: "Lato", data: latoData, weight: 700 });
+  const fonts = [
+    { name: "Cinzel", data: cinzelBold, weight: 700 as const },
+    { name: "Lato", data: latoBold, weight: 700 as const },
+  ];
 
   return new ImageResponse(
     (

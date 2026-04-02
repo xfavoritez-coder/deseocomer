@@ -158,7 +158,7 @@ export default function PanelPromociones() {
   );
 
   return (<div>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "12px", paddingTop: "4px" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Promociones</h1>
       <button onClick={() => { setEditId(null); setForm({ ...emptyForm }); setShowForm(true); }} style={B}>+ Promoción</button>
     </div>
@@ -184,32 +184,34 @@ export default function PanelPromociones() {
     ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {promos.map(p => (
-          <div key={p.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "stretch", opacity: p.activa ? 1 : 0.5, transition: "opacity 0.2s" }}>
-            {p.imagenUrl ? (
-              <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
-                <img src={p.imagenUrl} alt="" style={{ width: 90, minHeight: 80, objectFit: "cover", display: "block" }} />
-              </a>
-            ) : (
-              <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ width: 90, minHeight: 80, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", flexShrink: 0, textDecoration: "none" }}>⚡</a>
-            )}
-            <div style={{ flex: 1, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ flex: 1 }}>
+          <div key={p.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", opacity: p.activa ? 1 : 0.5, transition: "opacity 0.2s" }}>
+            {/* Top row: image + info */}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {p.imagenUrl ? (
+                <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                  <img src={p.imagenUrl} alt="" style={{ width: 80, height: 80, objectFit: "cover", display: "block" }} />
+                </a>
+              ) : (
+                <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ width: 80, height: 80, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", flexShrink: 0, textDecoration: "none" }}>⚡</a>
+              )}
+              <div style={{ flex: 1, padding: "12px 16px", minWidth: 0 }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                   <span style={{ background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "#e8a84c", fontWeight: 700, letterSpacing: "0.05em" }}>{p.porcentajeDescuento ? `Descuento` : p.tipo}</span>
                   <span style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)" }}>{p.horaInicio} - {p.horaFin}</span>
                 </div>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, flexShrink: 0 }}>
+            </div>
+            {/* Bottom row: toggle + actions */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 14px 12px", justifyContent: "flex-end" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginRight: "auto" }}>
                 <button onClick={() => toggleActiva(p)} aria-label={p.activa ? "Desactivar" : "Activar"} style={{ position: "relative", width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer", background: p.activa ? "rgba(61,184,158,0.7)" : "rgba(255,255,255,0.12)", transition: "background 0.2s", padding: 0 }}>
                   <span style={{ position: "absolute", top: 2, left: p.activa ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: p.activa ? "#fff" : "rgba(255,255,255,0.4)", transition: "left 0.2s" }} />
                 </button>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.62rem", color: p.activa ? "rgba(61,184,158,0.9)" : "var(--text-muted)", letterSpacing: "0.05em" }}>{p.activa ? "Activa" : "Inactiva"}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: p.activa ? "rgba(61,184,158,0.9)" : "var(--text-muted)", letterSpacing: "0.05em" }}>{p.activa ? "Activa" : "Inactiva"}</span>
               </div>
-              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                <button onClick={() => startEdit(p)} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
-                <button onClick={() => deletePromo(p.id)} style={{ background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "#ff8080", cursor: "pointer" }}>Eliminar</button>
-              </div>
+              <button onClick={() => startEdit(p)} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
+              <button onClick={() => deletePromo(p.id)} style={{ background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "#ff8080", cursor: "pointer" }}>Eliminar</button>
             </div>
           </div>
         ))}

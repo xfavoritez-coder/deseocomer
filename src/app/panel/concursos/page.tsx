@@ -440,7 +440,7 @@ export default function PanelConcursos() {
 
   // ── List ──
   return (<div>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "12px", paddingTop: "4px" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
       <button onClick={() => setWizard(true)} style={B}>+ Concurso</button>
     </div>
@@ -454,7 +454,7 @@ export default function PanelConcursos() {
         <button onClick={() => setWizard(true)} style={B}>Crear mi primer concurso</button>
       </div>
     ) : (
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div className="dc-panel-concursos-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {concursos.map(c => {
           const restMs = Math.max(0, new Date(c.fechaFin).getTime() - Date.now());
           const ended = restMs <= 0;
@@ -464,24 +464,26 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "center", transition: "border-color 0.2s" }}>
-              {c.imagenUrl ? (
-                <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
-                  <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", display: "block" }} />
-                </a>
-              ) : (
-                <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", textDecoration: "none" }}>🏆</a>
-              )}
-              <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer", minWidth: 0, overflow: "hidden" }}>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                  {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
-                </p>
+            <div key={c.id} className="dc-panel-concurso-card" style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", transition: "border-color 0.2s" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {c.imagenUrl ? (
+                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                    <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", display: "block" }} />
+                  </a>
+                ) : (
+                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", textDecoration: "none" }}>🏆</a>
+                )}
+                <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer", minWidth: 0, overflow: "hidden" }}>
+                  <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                    {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
+                  </p>
+                </div>
               </div>
-              <div style={{ display: "flex", gap: 6, flexShrink: 0, padding: "0 12px 0 0" }}>
-                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
-                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
-                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
+              <div className="dc-panel-concurso-actions" style={{ display: "flex", gap: 6, padding: "0 12px 12px", justifyContent: "flex-end" }}>
+                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
+                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
+                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
             </div>
           );

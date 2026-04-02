@@ -4,7 +4,7 @@ import SelloGratis from "@/components/SelloGratis";
 
 
 
-interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; descripcion: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
@@ -26,9 +26,9 @@ export default function ConcursosSection() {
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setConcursos(sorted.slice(0, 3).map((c: any) => ({
-          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", localLogoUrl: c.local?.logoUrl ?? null, premio: c.premio ?? "",
+          id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", localLogoUrl: c.local?.logoUrl ?? null, premio: c.premio ?? "", descripcion: c.descripcion ?? "",
           participantes: c._count?.participantes ?? 0,
-          horasRestantes: Math.max(0, Math.floor((new Date(c.fechaFin).getTime() - ahora) / 3600000)),
+          horasRestantes: Math.max(0, (new Date(c.fechaFin).getTime() - ahora) / 3600000),
           fechaFin: c.fechaFin,
           imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
           topRanking: [],
@@ -95,12 +95,13 @@ export default function ConcursosSection() {
           {concursos.map((c) => {
             const t = tiempos[c.id] ?? { d: 0, h: 0, m: 0, s: 0 };
             const totalSeg = t.d * 86400 + t.h * 3600 + t.m * 60 + t.s;
-            const ended = totalSeg <= 0;
-            const esUrgente = !ended && c.horasRestantes < 6;
+            const msRestantes = new Date(c.fechaFin).getTime() - Date.now();
+            const ended = msRestantes <= 0;
+            const esUrgente = !ended && msRestantes <= 24 * 3600000;
             const urgColor = "#e05555";
             const numColor = esUrgente ? urgColor : "rgba(240,234,214,0.9)";
             const sepColor = esUrgente ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)";
-            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina pronto!" : "Activo";
+            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina hoy!" : "Activo";
             const badgeDot = ended ? "var(--text-muted)" : esUrgente ? urgColor : "#3db89e";
 
             return (
@@ -115,9 +116,9 @@ export default function ConcursosSection() {
                   <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
                   {/* Badge */}
-                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: esUrgente ? "rgba(224,85,85,0.95)" : "rgba(10,8,18,0.75)", border: esUrgente ? "none" : "1px solid rgba(232,168,76,0.35)", borderRadius: "20px", padding: esUrgente ? "5px 12px" : "4px 10px 4px 6px", display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                    <span style={{ width: esUrgente ? "6px" : "7px", height: esUrgente ? "6px" : "7px", borderRadius: "50%", background: esUrgente ? "#fff" : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: esUrgente ? "11px" : "0.68rem", fontWeight: esUrgente ? 800 : 700, letterSpacing: "0.06em", color: esUrgente ? "#ffffff" : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
+                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
@@ -131,7 +132,7 @@ export default function ConcursosSection() {
                   {/* Premio */}
                   <div className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.15, fontWeight: 700, letterSpacing: "0.03em", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}><span style={{ fontSize: 16 }}>🏆 </span>{c.premio}</div>
                   {/* Descripcion - desktop only */}
-                  <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes.</p>
+                  <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.descripcion || "Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes."}</p>
 
                   {/* Countdown box */}
                   {!ended && (
@@ -170,7 +171,7 @@ export default function ConcursosSection() {
                       👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}
                     </span>
                     {!ended && (
-                      <span className="dc-cst-btn" style={{
+                      <span className={esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
                         fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
                         border: `1px solid ${esUrgente ? urgColor : "var(--accent)"}`,
@@ -218,6 +219,7 @@ export default function ConcursosSection() {
           .dc-cst-premio { font-size: 26px; }
           .dc-cst-desc { display: -webkit-box !important; }
           .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
+          .dc-cst-btn-urgent { background: #e05555 !important; color: #fff !important; border-color: #e05555 !important; }
         }
         @media (min-width: 1024px) {
           .dc-cst-grid { grid-template-columns: repeat(3, 1fr); }

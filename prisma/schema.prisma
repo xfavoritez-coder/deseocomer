@@ -230,3 +230,9 @@ model ListaEsperaComuna {
   notificado  Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
+
+model ConfigSite {
+  id    String @id @default("main")
+  clave String @unique
+  valor String
+}

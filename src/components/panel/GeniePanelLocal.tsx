@@ -138,7 +138,7 @@ export default function GeniePanelLocal() {
               Entendido
             </button>
           </div>
-          <button onClick={() => { markShown(mensaje.id); setGloboVisible(false); }} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.15)", padding: 0 }}>No mostrar más</button>
+          <button onClick={() => { markShown(mensaje.id); setGloboVisible(false); }} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", padding: "4px 0 0", textDecoration: "underline", textUnderlineOffset: "3px" }}>No mostrar más</button>
           <div style={{ position: "absolute", bottom: "-8px", right: "22px", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `8px solid ${tipoColor(mensaje.tipo)}60` }} />
         </div>
       )}

@@ -9,10 +9,11 @@ const SESSION_KEY = "deseocomer_local_session";
 
 const NAV = [
   { icon: "📊", label: "Dashboard", href: "/panel" },
-  { icon: "🏠", label: "Datos de Local", href: "/panel/mi-local" },
-  { icon: "👤", label: "Datos Personales", href: "/panel/datos-personales" },
   { icon: "🏆", label: "Concursos", href: "/panel/concursos" },
   { icon: "⚡", label: "Promociones", href: "/panel/promociones" },
+  { icon: "🏠", label: "Datos Local", href: "/panel/mi-local" },
+  { icon: "👤", label: "Datos Personales", href: "/panel/datos-personales" },
+  { icon: "✉️", label: "Contacto", href: "/panel/contacto" },
 ];
 
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
@@ -108,9 +109,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <span>{n.icon}</span> {n.label}
             </Link>
           ))}
-          <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" onClick={() => setMobileMenu(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", textDecoration: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-muted)", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
-            <span>👁️</span> Ver mi local
-          </a>
           <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", width: "100%", textAlign: "left", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer" }}>
             <span>🚪</span> Cerrar sesión
           </button>
@@ -123,8 +121,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           🏮 DeseoComer
         </Link>
 
-        {/* Local profile card */}
-        <div style={{ padding: "0 20px 14px", display: "flex", alignItems: "center", gap: "12px" }}>
+        {/* Local profile card — links to public page */}
+        <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" style={{ padding: "0 20px 14px", display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" }}>
           <div style={{
             width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
             background: localLogo ? "transparent" : "linear-gradient(135deg, rgba(232,168,76,0.25), rgba(232,168,76,0.1))",
@@ -143,12 +141,12 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               {localName || "Mi Local"}
             </p>
             {localComuna && (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", margin: "2px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {localComuna}
               </p>
             )}
           </div>
-        </div>
+        </a>
 
         <a href="/" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderBottom: "1px solid rgba(232,168,76,0.1)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "var(--text-muted)", textDecoration: "none", textTransform: "uppercase", opacity: 0.7 }}>
           ← Ver DeseoComer
@@ -168,14 +166,6 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <span style={{ fontSize: "1rem" }}>{n.icon}</span> {n.label}
             </Link>
           ))}
-          <a href={localSlug ? `/locales/${localSlug}` : localId ? `/locales/${localId}` : "/locales"} target="_blank" rel="noopener" style={{
-            display: "flex", alignItems: "center", gap: "10px",
-            padding: "12px 20px", textDecoration: "none",
-            fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.08em",
-            color: "var(--text-muted)",
-          }}>
-            <span style={{ fontSize: "1rem" }}>👁️</span> Ver mi local
-          </a>
         </nav>
 
         <button onClick={handleLogout} style={{
@@ -200,7 +190,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "10px" }}>
                 {faltantes.map(f => <span key={f} style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: "6px", padding: "3px 10px", color: "#ff8080" }}>{f}</span>)}
               </div>
-              <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "underline" }}>Ir a Datos de Local →</Link>
+              <Link href="/panel/mi-local" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "underline" }}>Ir a Datos Local →</Link>
             </div>
           </div>
         )}

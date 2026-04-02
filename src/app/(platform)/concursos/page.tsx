@@ -37,6 +37,7 @@ export default function ConcursosPage() {
           descripcionPremio: c.descripcion ?? "",
           participantes: c._count?.participantes ?? 0,
           endsAt: new Date(c.fechaFin).getTime(),
+          createdAt: c.createdAt ?? c.fechaInicio ?? null,
           ranking: (c.participantes ?? []).slice(0, 3).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", refs: p.puntos ?? 0 })),
         })));
       }
@@ -70,7 +71,7 @@ export default function ConcursosPage() {
     let score = 0;
     if (horasRestantes <= 24) score += 10000;
     else if (horasRestantes <= 72) score += 5000;
-    if (horasDesdeCreacion <= 48) score += 2000;
+    if (horasDesdeCreacion <= 24) score += 2000;
     const participantesRecientes = ((c as unknown as Record<string, unknown>).participantesRecientes as number) ?? 0;
     score += participantesRecientes * 100;
     score += Math.min(c.participantes, 50) * 2;
@@ -157,8 +158,7 @@ export default function ConcursosPage() {
               const createdAt = (c as unknown as Record<string, unknown>).createdAt;
               const horasDesdeCreacion = createdAt ? (Date.now() - new Date(createdAt as string).getTime()) / 3600000 : 999;
               const esTerminaHoy = horasRestantes <= 24;
-              const esTerminaProonto = !esTerminaHoy && horasRestantes <= 72;
-              const esNuevo = !esTerminaHoy && !esTerminaProonto && horasDesdeCreacion <= 48;
+              const esNuevo = !esTerminaHoy && horasDesdeCreacion <= 24;
 
               return (
                 <div key={c.id} className="dc-cp-card" onClick={() => router.push(`/concursos/${c.slug}`)} style={{
@@ -175,20 +175,14 @@ export default function ConcursosPage() {
 
                     {/* Badge */}
                     {esTerminaHoy && (
-                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(224,85,85,0.15)", border: "1px solid rgba(224,85,85,0.5)", borderRadius: 6, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: urg, animation: "dc-pd 0.8s ease-in-out infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: urg }}>¡Termina hoy!</span>
-                      </div>
-                    )}
-                    {esTerminaProonto && (
-                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(224,85,85,0.95)", borderRadius: 20, padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: 5, border: "none" }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: "dc-pd 0.8s ease-in-out infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 800, color: "#ffffff", letterSpacing: "0.06em", textTransform: "uppercase" }}>Termina pronto</span>
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(224,85,85,0.5)", borderRadius: 20, padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#e05555", animation: "dc-pd 0.8s ease-in-out infinite" }} />
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#e05555", textTransform: "uppercase" }}>¡Termina hoy!</span>
                       </div>
                     )}
                     {esNuevo && (
-                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 6, padding: "4px 10px" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#3db89e" }}>Nuevo 🔥</span>
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(61,184,158,0.5)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#3db89e", textTransform: "uppercase" }}>Nuevo</span>
                       </div>
                     )}
 

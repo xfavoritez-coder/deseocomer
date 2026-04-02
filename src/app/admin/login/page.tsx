@@ -24,7 +24,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px" }}>
+    <div style={{ minHeight: "100vh", background: "#0a0812", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "20px 24px" }}>
       <div style={{ maxWidth: "380px", width: "100%", background: "rgba(45,26,8,0.9)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "36px" }}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
           <p style={{ fontSize: "2rem", marginBottom: "6px" }}>🧞</p>
