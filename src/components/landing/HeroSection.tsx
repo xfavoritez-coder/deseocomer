@@ -59,7 +59,7 @@ export default function HeroSection() {
       overflow: "hidden",
       background: mounted ? heroGradient : "var(--bg-primary)",
       transition: "background 2s ease",
-      marginBottom: 0,
+      marginBottom: "-1px",
       paddingBottom: 0,
     }}>
 
