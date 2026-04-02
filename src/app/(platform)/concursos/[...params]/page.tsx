@@ -359,10 +359,10 @@ function ConcursoDetallePage() {
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: "0 clamp(14px,4vw,32px) clamp(14px,3vw,20px)", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-            {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.45)" }} />
-              : <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.45)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitials[0]}</div>}
-            <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)" }}>{c.local}</span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(10,8,18,0.6)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 14px 6px 6px", border: "1px solid rgba(232,168,76,0.2)" }}>
+            {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
+              : <div style={{ width: 30, height: 30, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "rgba(232,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c" }}>{localInitials[0]}</div>}
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#f0ead6" }}>{c.local}</span>
           </div>
           <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
