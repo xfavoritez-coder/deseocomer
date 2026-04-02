@@ -11,15 +11,23 @@ function getProfile(): Record<string, unknown> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface PerfilCheck { label: string; done: boolean }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPerfilChecks(p: any): PerfilCheck[] {
+  return [
+    { label: "Descripción del local", done: !!p.descripcion },
+    { label: "Logo", done: !!p.logoUrl },
+    { label: "Foto de portada", done: !!p.portadaUrl },
+    { label: "Dirección", done: !!p.direccion },
+    { label: "Horarios", done: p.horarios?.length > 0 || (Array.isArray(p.horarios) && p.horarios.length > 0) },
+    { label: "Categoría", done: !!p.categoria },
+  ];
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getPerfilPct(p: any): number {
-  let pct = 0;
-  if (p.descripcion) pct += 20;
-  if (p.logoUrl) pct += 15;
-  if (p.portadaUrl) pct += 15;
-  if (p.horarios?.length > 0 || (Array.isArray(p.horarios) && p.horarios.length > 0)) pct += 20;
-  if (p.tieneMenu) pct += 15;
-  if ((p.concursos?.length > 0) || (p._count?.concursos > 0)) pct += 15;
-  return pct;
+  const checks = getPerfilChecks(p);
+  const done = checks.filter(c => c.done).length;
+  return Math.round((done / checks.length) * 100);
 }
 
 export default function PanelDashboard() {
@@ -31,6 +39,7 @@ function DashboardContent() {
   const bienvenido = params.get("bienvenido") === "1";
   const [localName, setLocalName] = useState("");
   const [pct, setPct] = useState(0);
+  const [checks, setChecks] = useState<PerfilCheck[]>([]);
   const [stats, setStats] = useState({ favoritos: 0, resenas: 0, concursos: 0, promociones: 0 });
 
   useEffect(() => {
@@ -38,11 +47,11 @@ function DashboardContent() {
       const session = JSON.parse(localStorage.getItem(SESSION_KEY) ?? "{}");
       setLocalName(session.nombre ?? "");
       const cached = getProfile();
-      if (Object.keys(cached).length > 0) setPct(getPerfilPct(cached));
+      if (Object.keys(cached).length > 0) { setPct(getPerfilPct(cached)); setChecks(getPerfilChecks(cached)); }
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
-            setPct(getPerfilPct(data));
+            setPct(getPerfilPct(data)); setChecks(getPerfilChecks(data));
             setStats({
               favoritos: data._count?.favoritos ?? 0,
               resenas: data._count?.resenas ?? 0,
@@ -99,10 +108,19 @@ function DashboardContent() {
         <div style={{ height: "8px", borderRadius: "4px", background: "rgba(0,0,0,0.3)" }}>
           <div style={{ height: "100%", borderRadius: "4px", background: "var(--accent)", width: `${pct}%`, transition: "width 0.5s" }} />
         </div>
-        {pct < 60 && (
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "#e8a84c", marginTop: "10px" }}>
-            Completa tu perfil para aparecer en el explorador de locales
-          </p>
+        {pct < 100 && checks.length > 0 && (
+          <div style={{ marginTop: "14px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Te falta:</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              {checks.filter(c => !c.done).map(c => (
+                <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ width: 16, height: 16, borderRadius: "50%", border: "1px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "rgba(232,168,76,0.4)", flexShrink: 0 }}>○</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{c.label}</span>
+                </div>
+              ))}
+            </div>
+            <Link href="/panel/mi-local" style={{ display: "inline-block", marginTop: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", textDecoration: "none", letterSpacing: "0.05em" }}>Completar ahora →</Link>
+          </div>
         )}
       </div>
 
