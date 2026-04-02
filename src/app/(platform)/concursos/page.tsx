@@ -151,7 +151,6 @@ export default function ConcursosPage() {
                   <div style={{ position: "relative", height: 200, overflow: "hidden" }}>
                     {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                       : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a0f2e, #2d1a08)" }} />}
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0) 30%, rgba(10,8,18,0.75) 100%)" }} />
 
                     <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, lineHeight: 0 }}><SelloGratis size="sm" /></div>
 

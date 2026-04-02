@@ -114,7 +114,7 @@ export default function Footer() {
             fontSize: "0.85rem",
             color: "var(--text-muted)",
           }}>
-            © {new Date().getFullYear()} DeseoComer.com · Santiago de Chile
+            © {new Date().getFullYear()} DeseoComer.com
           </p>
           <p style={{
             fontFamily: "var(--font-cinzel)",
