@@ -181,9 +181,9 @@ export default function ConcursosPage() {
                       </div>
                     )}
                     {esTerminaProonto && (
-                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(232,116,76,0.12)", border: "1px solid rgba(232,116,76,0.4)", borderRadius: 6, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#e8744c", animation: "dc-pd 1.2s ease-in-out infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8744c" }}>Termina pronto</span>
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(224,85,85,0.95)", borderRadius: 20, padding: "5px 12px", display: "inline-flex", alignItems: "center", gap: 5, border: "none" }}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: "dc-pd 0.8s ease-in-out infinite" }} />
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 800, color: "#ffffff", letterSpacing: "0.06em", textTransform: "uppercase" }}>Termina pronto</span>
                       </div>
                     )}
                     {esNuevo && (

@@ -115,9 +115,9 @@ export default function ConcursosSection() {
                   <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
                   {/* Badge */}
-                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
-                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
+                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: esUrgente ? "rgba(224,85,85,0.95)" : "rgba(10,8,18,0.75)", border: esUrgente ? "none" : "1px solid rgba(232,168,76,0.35)", borderRadius: "20px", padding: esUrgente ? "5px 12px" : "4px 10px 4px 6px", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                    <span style={{ width: esUrgente ? "6px" : "7px", height: esUrgente ? "6px" : "7px", borderRadius: "50%", background: esUrgente ? "#fff" : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: esUrgente ? "11px" : "0.68rem", fontWeight: esUrgente ? 800 : 700, letterSpacing: "0.06em", color: esUrgente ? "#ffffff" : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
