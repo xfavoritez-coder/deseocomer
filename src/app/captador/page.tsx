@@ -89,6 +89,9 @@ export default function CaptadorPanel() {
           📱 Mostrar QR a un local
         </button>
 
+        {/* Tips */}
+        <TipsCaptar />
+
         {/* Stats */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
           {[
@@ -154,6 +157,52 @@ export default function CaptadorPanel() {
 
         {/* Logout */}
         <button onClick={logout} style={{ width: "100%", padding: 12, background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.2)", borderRadius: 10, color: "#ff6b6b", fontFamily: "var(--font-cinzel)", fontSize: 12, textTransform: "uppercase", cursor: "pointer" }}>Cerrar sesión</button>
+      </div>
+    </div>
+  );
+}
+
+const GUION = `Hola, soy de DeseoComer, una plataforma gastronómica nueva en Santiago donde la gente busca dónde comer. Registrar tu local es gratis y apareces en la plataforma de inmediato. Lo más potente es que puedes publicar concursos — tus clientes y personas nuevas invitan a sus amigos a ganar un premio, y tú consigues visibilidad con el nombre de tu local siendo visto por muchas personas nuevas sin pagar publicidad. Es gratis, toma 5 minutos, y mientras más temprano te registres mejor posicionado quedas porque recién estamos creciendo.`;
+
+const OBJECIONES = [
+  { q: "¿Cuánto cuesta?", a: "Es completamente gratis. Siempre." },
+  { q: "¿Para qué me sirve?", a: "Para que más gente te encuentre cuando busca dónde comer en tu comuna." },
+  { q: "No tengo tiempo.", a: "Te registro yo mismo ahora, solo necesito tu nombre, correo y teléfono. En 5 minutos listo." },
+  { q: "Ya tengo Instagram.", a: "Acá la gente está buscando activamente dónde comer, no scrolleando. Es más directo para conseguir clientes nuevos." },
+  { q: "¿Qué es un concurso?", a: "Tú decides el premio. La gente participa e invita amigos. Te genera visibilidad gratis sin invertir nada." },
+];
+
+function TipsCaptar() {
+  const [copiado, setCopiado] = useState(false);
+  const copiar = () => { navigator.clipboard.writeText(GUION); setCopiado(true); setTimeout(() => setCopiado(false), 2000); };
+
+  return (
+    <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 16, overflow: "hidden", marginBottom: 20 }}>
+      <div style={{ background: "rgba(232,168,76,0.08)", borderBottom: "1px solid rgba(232,168,76,0.1)", padding: "12px 16px", display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 16 }}>💡</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.04em" }}>Cómo convencer a un local</span>
+      </div>
+      <div style={{ padding: 16 }}>
+        <p style={{ fontSize: 9, color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Di esto cuando entres al local:</p>
+        <div style={{ background: "rgba(10,8,18,0.5)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 10, padding: "12px 14px" }}>
+          <p style={{ fontSize: 13, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, fontStyle: "italic", margin: 0 }}>&ldquo;{GUION}&rdquo;</p>
+        </div>
+        <button onClick={copiar} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 12px", fontSize: 11, color: "rgba(240,234,214,0.4)", cursor: "pointer", marginTop: 8 }}>
+          {copiado ? "✓ Copiado" : "Copiar guión"}
+        </button>
+
+        <div style={{ height: 1, background: "rgba(232,168,76,0.08)", margin: "14px 0" }} />
+
+        <p style={{ fontSize: 9, color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Si te ponen objeciones:</p>
+        {OBJECIONES.map((o, i) => (
+          <div key={o.q} style={{ marginBottom: i < OBJECIONES.length - 1 ? 10 : 0 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "rgba(240,234,214,0.5)", marginBottom: 3 }}>{o.q}</p>
+            <div style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+              <span style={{ color: "#e8a84c", fontSize: 12, flexShrink: 0 }}>→</span>
+              <span style={{ fontSize: 12, color: "rgba(240,234,214,0.6)", lineHeight: 1.4 }}>{o.a}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

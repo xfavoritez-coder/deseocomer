@@ -32,31 +32,32 @@ export default function Footer() {
             {
               titulo: "Plataforma",
               links: [
-                { label: "Concursos",        href: "/concursos"   },
-                { label: "¿Cómo funcionan?", href: "/concursos/como-funciona" },
-                { label: "Promociones",      href: "/promociones" },
-                { label: "Locales",          href: "/locales"     },
+                { label: "Inicio",               href: "/" },
+                { label: "¿Qué es DeseoComer?",  href: "/que-es-deseocomer" },
+                { label: "Concursos",             href: "/concursos" },
+                { label: "Promociones",           href: "/promociones" },
+                { label: "Locales",               href: "/locales" },
               ],
             },
             {
               titulo: "Para Locales",
               links: [
-                { label: "Registra tu local",  href: "/solo-locales"  },
-                { label: "Iniciar sesión",     href: "/login-local"   },
-                { label: "Panel de control",   href: "/login-local"   },
+                { label: "Registra tu local",  href: "/registro-local" },
+                { label: "Iniciar sesión",     href: "/login-local" },
+                { label: "Panel de control",   href: "/panel" },
               ],
             },
             {
               titulo: "Captadores",
               links: [
-                { label: "Capta locales",      href: "/capta-locales" },
+                { label: "Ser captador",       href: "/capta-locales" },
                 { label: "Acceder al panel",   href: "/captador" },
               ],
             },
             {
               titulo: "Legal",
               links: [
-                { label: "Términos y condiciones", href: "/terminos" },
+                { label: "Términos y condiciones", href: "/terminos-y-condiciones" },
                 { label: "Privacidad",             href: "/privacidad" },
                 { label: "Contacto",               href: "/contacto" },
               ],

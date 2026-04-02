@@ -35,6 +35,22 @@ export async function POST(req: NextRequest) {
             <p style="font-size:12px;color:#999;margin:8px 0 0">Este código es tu identificador — no lo compartas.</p>
           </div>
 
+          <h2 style="font-size:14px;color:#c47f1a;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 12px">Cómo convencer a un local</h2>
+          <p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:8px">Cuando entres a un local, di esto:</p>
+          <div style="background:#faf7f2;border:1px solid rgba(180,130,40,0.2);border-radius:10px;padding:16px;margin:8px 0 16px;font-style:italic;font-size:14px;color:#444;line-height:1.7">
+            "Hola, soy de DeseoComer, una plataforma gastronómica nueva en Santiago donde la gente busca dónde comer. Registrar tu local es gratis y apareces en la plataforma de inmediato. Lo más potente es que puedes publicar concursos — tus clientes y personas nuevas invitan a sus amigos a ganar un premio, y tú consigues visibilidad con el nombre de tu local siendo visto por muchas personas nuevas sin pagar publicidad. Es gratis, toma 5 minutos, y mientras más temprano te registres mejor posicionado quedas porque recién estamos creciendo."
+          </div>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:4px"><strong>Si te dicen "¿Cuánto cuesta?":</strong></p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:8px">→ "Es completamente gratis. Siempre."</p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:4px"><strong>Si te dicen "¿Para qué me sirve?":</strong></p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:8px">→ "Para que más gente te encuentre cuando busca dónde comer en tu comuna."</p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:4px"><strong>Si te dicen "No tengo tiempo":</strong></p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:8px">→ "Te registro yo mismo ahora, solo necesito tu nombre, correo y teléfono. En 5 minutos listo."</p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:4px"><strong>Si te dicen "Ya tengo Instagram":</strong></p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:8px">→ "DeseoComer es diferente — acá la gente está buscando activamente dónde comer, no scrolleando. Es más directo para conseguir clientes nuevos."</p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:4px"><strong>Si te dicen "¿Qué es un concurso?":</strong></p>
+          <p style="font-size:13px;color:#555;line-height:1.6;margin-bottom:16px">→ "Tú decides el premio — una porción, un menú, lo que quieras. La gente participa e invita amigos. Te genera visibilidad gratis sin invertir nada."</p>
+
           <h2 style="font-size:14px;color:#c47f1a;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 12px">Cómo ingresar a tu panel</h2>
           <ol style="font-size:14px;color:#555;line-height:1.8;padding-left:20px">
             <li>Entra a <a href="https://deseocomer.com/captador" style="color:#c47f1a;font-weight:700">deseocomer.com/captador</a></li>
