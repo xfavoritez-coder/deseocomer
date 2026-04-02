@@ -9,6 +9,7 @@ const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
   const [concursos, setConcursos] = useState(concursosMock);
+  const [loading, setLoading] = useState(true);
   const [tiempos, setTiempos] = useState<Record<string, {d:number,h:number,m:number,s:number}>>({});
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function ConcursosSection() {
           topRanking: [],
         })));
       }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -69,7 +70,20 @@ export default function ConcursosSection() {
           <p className="section-description">Comparte tu link con amigos y sube en el ranking. Los mejores ganan premios reales cada semana.</p>
         </div>
 
-        {concursos.length === 0 ? (
+        {loading ? (
+          <div className="dc-cst-grid">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="dc-cst-card" style={{ background: "rgba(15,10,28,0.7)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 20, overflow: "hidden", textDecoration: "none", display: "block" }}>
+                <div style={{ height: 180, background: "linear-gradient(160deg, rgba(30,15,50,0.5), rgba(45,26,8,0.3))", animation: "dc-cst-pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ height: 16, width: "70%", borderRadius: 4, background: "rgba(232,168,76,0.1)", animation: "dc-cst-pulse 1.5s ease-in-out infinite" }} />
+                  <div style={{ height: 12, width: "50%", borderRadius: 4, background: "rgba(232,168,76,0.06)", animation: "dc-cst-pulse 1.5s ease-in-out infinite" }} />
+                  <div style={{ height: 40, borderRadius: 8, background: "rgba(232,168,76,0.06)", animation: "dc-cst-pulse 1.5s ease-in-out infinite", marginTop: 4 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : concursos.length === 0 ? (
           <div style={{ textAlign: "center", padding: "48px 20px" }}>
             <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🏆</p>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "var(--color-title)", marginBottom: "10px" }}>Próximamente</p>
@@ -192,6 +206,10 @@ export default function ConcursosSection() {
 
         @keyframes dc-pulse-dot {
           0%, 100% { opacity: 1; }
+          50% { opacity: 0.15; }
+        }
+        @keyframes dc-cst-pulse {
+          0%, 100% { opacity: 0.4; }
           50% { opacity: 0.15; }
         }
 
