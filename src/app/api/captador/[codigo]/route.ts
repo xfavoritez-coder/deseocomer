@@ -19,6 +19,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ cod
     });
     if (!captador || !captador.activo) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
+    if (!captador.terminosAceptados) {
+      return NextResponse.json({ requiereAceptarTerminos: true });
+    }
+
     const totalLocales = captador.locales.length;
     const localesConConcurso = captador.locales.filter(l => l.concursos.length > 0).length;
     const totalGanado = totalLocales * 10000 + localesConConcurso * 5000;

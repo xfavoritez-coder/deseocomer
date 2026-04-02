@@ -34,7 +34,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, email, telefono, rut, codigo } = await req.json();
+    const { nombre, email, telefono, rut, banco, tipoCuenta, numeroCuenta, codigo } = await req.json();
     if (!nombre || !email || !codigo) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
 
     // Check unique constraints
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (existeCodigo) codigoFinal = codigo + Math.floor(Math.random() * 90 + 10);
 
     const captador = await prisma.captador.create({
-      data: { nombre, email, telefono: telefono || "", rut: rut || "", codigo: codigoFinal },
+      data: { nombre, email, telefono: telefono || "", rut: rut || "", banco: banco || "", tipoCuenta: tipoCuenta || "", numeroCuenta: numeroCuenta || "", codigo: codigoFinal },
     });
 
     // Send welcome email (fire and forget)

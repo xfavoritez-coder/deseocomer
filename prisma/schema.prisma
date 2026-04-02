@@ -185,8 +185,13 @@ model Captador {
   email       String   @unique
   telefono    String   @default("")
   rut         String   @default("")
+  banco       String   @default("")
+  tipoCuenta  String   @default("")
+  numeroCuenta String  @default("")
   codigo      String   @unique
   activo      Boolean  @default(true)
+  terminosAceptados   Boolean   @default(false)
+  terminosAceptadosAt DateTime?
   createdAt   DateTime @default(now())
   locales     Local[]  @relation("CaptadorLocales")
   pagos       PagoCaptador[]

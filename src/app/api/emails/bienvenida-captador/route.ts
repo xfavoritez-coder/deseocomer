@@ -67,15 +67,9 @@ export async function POST(req: NextRequest) {
             <li>El dueño escanea y se registra con tu código</li>
             <li>Ganas $10.000 por cada local registrado</li>
             <li>Si el local publica un concurso, $5.000 más</li>
-          </ol>
-
-          <h2 style="font-size:14px;color:#c47f1a;text-transform:uppercase;letter-spacing:0.08em;margin:24px 0 12px">Lo que ganas</h2>
-          <ul style="font-size:14px;color:#555;line-height:1.8;padding-left:20px">
-            <li><strong>$10.000</strong> por cada local registrado</li>
-            <li><strong>$5.000</strong> extra si el local publica un concurso</li>
             <li>Sin límite de locales — cuantos más, mejor</li>
             <li>Pagos quincenales via transferencia bancaria</li>
-          </ul>
+          </ol>
 
           <p style="text-align:center;margin:28px 0">
             <a href="https://deseocomer.com/captador" style="background:#e8a84c;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;display:inline-block;font-size:14px">Entra a tu panel ahora →</a>

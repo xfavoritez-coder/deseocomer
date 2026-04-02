@@ -14,6 +14,8 @@ export default function CaptadorPanel() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [requiereTerminos, setRequiereTerminos] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,14 +29,25 @@ export default function CaptadorPanel() {
       const res = await fetch(`/api/captador/${encodeURIComponent(c)}`);
       if (!res.ok) { setError("Código no encontrado"); setLoading(false); return; }
       const d = await res.json();
+      if (d.requiereAceptarTerminos) { setRequiereTerminos(true); setCodigo(c); setLoading(false); return; }
       setData(d); setCodigo(c); localStorage.setItem("deseocomer_captador_codigo", c);
     } catch { setError("Error de conexión"); }
     setLoading(false);
   };
 
-  const handleAccess = () => {
+  const handleAccess = async () => {
     if (!input.trim()) return;
-    loadData(input.trim().toUpperCase());
+    const c = input.trim().toUpperCase();
+    if (requiereTerminos && aceptaTerminos) {
+      setLoading(true);
+      try {
+        await fetch(`/api/captador/${encodeURIComponent(c)}/terminos`, { method: "PATCH" });
+        setRequiereTerminos(false);
+        loadData(c);
+      } catch { setError("Error al aceptar términos"); setLoading(false); }
+      return;
+    }
+    loadData(c);
   };
 
   const logout = () => { localStorage.removeItem("deseocomer_captador_codigo"); setCodigo(""); setData(null); setInput(""); };
@@ -56,17 +69,29 @@ export default function CaptadorPanel() {
   const I: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 10, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", textTransform: "uppercase" };
 
   // ── LOGIN ──
-  if (!codigo || !data) return (
+  if (!data) return (
     <div style={{ background: "#0a0812", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ maxWidth: 340, width: "100%", textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>🧞</div>
         <h1 style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, color: "#f5d080", textTransform: "uppercase", marginBottom: 24 }}>Acceder a tu panel</h1>
-        <div style={{ marginBottom: 16 }}>
-          <input style={I} value={input} onChange={e => setInput(e.target.value.toUpperCase())} placeholder="Ej: JUAN234" onKeyDown={e => e.key === "Enter" && handleAccess()} />
-        </div>
+        {!requiereTerminos && (
+          <div style={{ marginBottom: 16 }}>
+            <input style={I} value={input} onChange={e => setInput(e.target.value.toUpperCase())} placeholder="Ej: JUAN234" onKeyDown={e => e.key === "Enter" && handleAccess()} />
+          </div>
+        )}
         {error && <p style={{ color: "#ff6b6b", fontSize: 13, marginBottom: 12 }}>{error}</p>}
-        <button onClick={handleAccess} disabled={loading} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#0a0812", textTransform: "uppercase", cursor: "pointer", opacity: loading ? 0.5 : 1 }}>
-          {loading ? "Verificando..." : "Acceder →"}
+        {requiereTerminos && (
+          <div style={{ textAlign: "left", marginBottom: 16 }}>
+            <label style={{ display: "flex", gap: 10, alignItems: "flex-start", cursor: "pointer" }}>
+              <input type="checkbox" checked={aceptaTerminos} onChange={e => setAceptaTerminos(e.target.checked)} style={{ accentColor: "#e8a84c", width: 18, height: 18, marginTop: 2, flexShrink: 0 }} />
+              <span style={{ fontSize: 12, color: "rgba(240,234,214,0.5)", lineHeight: 1.5 }}>
+                Acepto los <a href="/terminos-captadores" target="_blank" style={{ color: "#e8a84c", textDecoration: "underline" }}>términos del programa de captadores</a>. Entiendo que registrar locales sin su consentimiento explícito está prohibido y es motivo de descalificación sin derecho a pago.
+              </span>
+            </label>
+          </div>
+        )}
+        <button onClick={handleAccess} disabled={loading || (requiereTerminos && !aceptaTerminos)} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#0a0812", textTransform: "uppercase", cursor: "pointer", opacity: (loading || (requiereTerminos && !aceptaTerminos)) ? 0.5 : 1 }}>
+          {loading ? "Verificando..." : requiereTerminos ? "Aceptar y acceder →" : "Acceder →"}
         </button>
         <button onClick={() => window.location.href = "/"} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 12, cursor: "pointer", marginTop: 20 }}>← Volver a DeseoComer</button>
       </div>

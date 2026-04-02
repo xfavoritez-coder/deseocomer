@@ -60,9 +60,15 @@ export default function AdminLocales() {
         </div>
       </div>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", flexWrap: "wrap", gap: 8 }}>
         <span style={{ fontSize: "0.8rem", fontWeight: 700, color: sel.activo ? "#3db89e" : "#ff8080", background: sel.activo ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.activo ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.activo ? "✓ Activo" : "⏳ Pendiente"}</span>
+        {sel.captadorCodigo && <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "6px", padding: "3px 10px" }}>🤝 Captado por {sel.captadorCodigo}</span>}
       </div>
+      {sel.captadorCodigo && !sel.activo && (
+        <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", fontStyle: "italic", marginBottom: 16, background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 8, padding: "10px 14px" }}>
+          Este local fue registrado por un captador ({sel.captadorCodigo}). Verifica que el local haya dado su consentimiento antes de activar.
+        </p>
+      )}
 
       {/* Info cards */}
       <div style={cardS}>

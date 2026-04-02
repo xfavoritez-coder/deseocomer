@@ -26,6 +26,9 @@ export default function AdminCaptadores() {
   const [fEmail, setFEmail] = useState("");
   const [fTel, setFTel] = useState("");
   const [fRut, setFRut] = useState("");
+  const [fBanco, setFBanco] = useState("");
+  const [fTipoCuenta, setFTipoCuenta] = useState("");
+  const [fNumeroCuenta, setFNumeroCuenta] = useState("");
   const [fCodigo, setFCodigo] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -44,9 +47,9 @@ export default function AdminCaptadores() {
     if (!fNombre || !fEmail || !fCodigo) return;
     setSaving(true);
     try {
-      const res = await adminFetch("/api/admin/captadores", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: fNombre, email: fEmail, telefono: fTel, rut: fRut, codigo: fCodigo }) });
+      const res = await adminFetch("/api/admin/captadores", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: fNombre, email: fEmail, telefono: fTel, rut: fRut, banco: fBanco, tipoCuenta: fTipoCuenta, numeroCuenta: fNumeroCuenta, codigo: fCodigo }) });
       if (!res.ok) { const d = await res.json(); show(d.error ?? "Error"); setSaving(false); return; }
-      show("Captador creado"); setShowNew(false); setFNombre(""); setFEmail(""); setFTel(""); setFRut(""); setFCodigo(""); load();
+      show("Captador creado"); setShowNew(false); setFNombre(""); setFEmail(""); setFTel(""); setFRut(""); setFBanco(""); setFTipoCuenta(""); setFNumeroCuenta(""); setFCodigo(""); load();
     } catch { show("Error de conexión"); }
     setSaving(false);
   };
@@ -85,11 +88,19 @@ export default function AdminCaptadores() {
   // ── DETALLE VIEW ──
   if (sel && detalle) return (
     <div>
-      {toast && <div style={{ position: "fixed", top: 16, right: 16, background: "#e8a84c", color: "#0a0812", padding: "10px 20px", borderRadius: 8, fontFamily: "Georgia", fontSize: "0.82rem", zIndex: 999 }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", top: 16, right: 16, background: "#1a6b4a", color: "#fff", padding: "10px 20px", borderRadius: 8, fontFamily: "Georgia", fontSize: "0.82rem", zIndex: 999, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>{toast}</div>}
       <button onClick={() => { setSel(null); setDetalle(null); }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", marginBottom: 16 }}>← Captadores</button>
 
       <h2 style={{ fontFamily: "Georgia", color: "#f5d080", fontSize: "1.1rem", marginBottom: 4 }}>{detalle.nombre}</h2>
-      <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.4)", fontSize: "0.8rem", marginBottom: 16 }}>{detalle.email} · {detalle.codigo} · Desde {fmtDate(detalle.createdAt)}</p>
+      <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.4)", fontSize: "0.8rem", marginBottom: 8 }}>{detalle.email} · {detalle.codigo} · Desde {fmtDate(detalle.createdAt)}</p>
+      {(detalle.banco || detalle.rut) && (
+        <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 10, padding: "10px 14px", marginBottom: 16, display: "flex", flexWrap: "wrap", gap: "6px 16px" }}>
+          {detalle.rut && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.45)" }}>RUT: {detalle.rut}</span>}
+          {detalle.banco && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.45)" }}>{detalle.banco}</span>}
+          {detalle.tipoCuenta && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.45)" }}>{detalle.tipoCuenta}</span>}
+          {detalle.numeroCuenta && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.45)" }}>Nº {detalle.numeroCuenta}</span>}
+        </div>
+      )}
 
       {/* Link + QR */}
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
@@ -157,7 +168,7 @@ export default function AdminCaptadores() {
 
   return (
     <div>
-      {toast && <div style={{ position: "fixed", top: 16, right: 16, background: "#e8a84c", color: "#0a0812", padding: "10px 20px", borderRadius: 8, fontFamily: "Georgia", fontSize: "0.82rem", zIndex: 999 }}>{toast}</div>}
+      {toast && <div style={{ position: "fixed", top: 16, right: 16, background: "#1a6b4a", color: "#fff", padding: "10px 20px", borderRadius: 8, fontFamily: "Georgia", fontSize: "0.82rem", zIndex: 999, boxShadow: "0 4px 16px rgba(0,0,0,0.4)" }}>{toast}</div>}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
         <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c", margin: 0 }}>Captadores</h1>
@@ -203,9 +214,11 @@ export default function AdminCaptadores() {
                   <td style={{ padding: "10px 8px", color: c.pendiente > 0 ? "#ff8080" : "rgba(240,234,214,0.3)" }}>${fmt(Math.max(c.pendiente, 0))}</td>
                   <td style={{ padding: "10px 8px" }}><span style={{ fontSize: "0.72rem", padding: "2px 8px", borderRadius: 6, background: c.activo ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", color: c.activo ? "#3db89e" : "#ff6b6b" }}>{c.activo ? "Activo" : "Inactivo"}</span></td>
                   <td style={{ padding: "10px 8px", whiteSpace: "nowrap" }}>
-                    <button onClick={() => { setSel(c); loadDetalle(c.id); }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.75rem", cursor: "pointer", textDecoration: "underline", marginRight: 8 }}>Ver</button>
-                    <button onClick={() => setShowPagar(c)} style={{ background: "none", border: "none", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.75rem", cursor: "pointer", textDecoration: "underline", marginRight: 8 }}>Pagar</button>
-                    <button onClick={() => toggleActivo(c)} style={{ background: "none", border: "none", color: c.activo ? "#ff6b6b" : "#3db89e", fontFamily: "Georgia", fontSize: "0.75rem", cursor: "pointer", textDecoration: "underline" }}>{c.activo ? "Desactivar" : "Activar"}</button>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button onClick={() => { setSel(c); loadDetalle(c.id); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.72rem", padding: "5px 10px", borderRadius: 6, cursor: "pointer" }}>Ver</button>
+                      <button onClick={() => setShowPagar(c)} style={{ background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.72rem", padding: "5px 10px", borderRadius: 6, cursor: "pointer" }}>Pagar</button>
+                      <button onClick={() => toggleActivo(c)} style={{ background: c.activo ? "rgba(255,100,100,0.08)" : "rgba(61,184,158,0.08)", border: `1px solid ${c.activo ? "rgba(255,100,100,0.25)" : "rgba(61,184,158,0.25)"}`, color: c.activo ? "#ff6b6b" : "#3db89e", fontFamily: "Georgia", fontSize: "0.72rem", padding: "5px 10px", borderRadius: 6, cursor: "pointer" }}>{c.activo ? "Desactivar" : "Activar"}</button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -224,6 +237,9 @@ export default function AdminCaptadores() {
             <div><label style={L}>Email</label><input style={I} value={fEmail} onChange={e => setFEmail(e.target.value)} placeholder="juan@email.com" /></div>
             <div><label style={L}>Teléfono</label><input style={I} value={fTel} onChange={e => setFTel(e.target.value)} placeholder="+56 9 1234 5678" /></div>
             <div><label style={L}>RUT</label><input style={I} value={fRut} onChange={e => setFRut(e.target.value)} placeholder="12.345.678-9" /></div>
+            <div><label style={L}>Banco</label><select style={{ ...I, cursor: "pointer" }} value={fBanco} onChange={e => setFBanco(e.target.value)}><option value="">Seleccionar...</option>{["Banco de Chile","BancoEstado","Santander","BCI","Itaú","Scotiabank","Falabella","BICE","Security","Ripley","Consorcio","Internacional"].map(b => <option key={b} value={b}>{b}</option>)}</select></div>
+            <div><label style={L}>Tipo de cuenta</label><select style={{ ...I, cursor: "pointer" }} value={fTipoCuenta} onChange={e => setFTipoCuenta(e.target.value)}><option value="">Seleccionar...</option><option value="Cuenta Corriente">Cuenta Corriente</option><option value="Cuenta Vista">Cuenta Vista / RUT</option><option value="Cuenta de Ahorro">Cuenta de Ahorro</option></select></div>
+            <div><label style={L}>Número de cuenta</label><input style={I} value={fNumeroCuenta} onChange={e => setFNumeroCuenta(e.target.value)} placeholder="0012345678" /></div>
             <div>
               <label style={L}>Código único</label>
               <div style={{ display: "flex", gap: 8 }}>

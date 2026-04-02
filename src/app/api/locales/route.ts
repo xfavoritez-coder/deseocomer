@@ -105,17 +105,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Notify captador if local was referred
-    if (captadorData) {
-      try {
-        const base = req.nextUrl.origin;
-        await fetch(`${base}/api/emails/notificacion-captador`, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ captadorId: captadorData.captadorId, nombreLocal: nombre }),
-        });
-      } catch (e) { console.error("[Email notificacion captador]", e); }
-    }
-
     const { password: _, ...localSinPassword } = local;
     return NextResponse.json(localSinPassword, { status: 201 });
   } catch {

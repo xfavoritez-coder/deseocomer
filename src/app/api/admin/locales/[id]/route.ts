@@ -30,12 +30,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (accion === "aprobar") {
       await prisma.local.update({ where: { id }, data: { activo: true } });
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
+      const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
       await resend.emails.send({
-        from: `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`,
+        from,
         to: [local.email],
         subject: "¡Tu local fue aprobado en DeseoComer!",
-        html: `<div style="background:#1a0e05;color:#f0ead6;font-family:Georgia,serif;padding:40px;max-width:600px;margin:0 auto"><div style="text-align:center;margin-bottom:24px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:32px"><h2 style="color:#e8a84c;font-size:22px;margin:0 0 16px">¡Bienvenido, ${local.nombre}! 🎉</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Tu local fue revisado y aprobado. Ya apareces en DeseoComer y miles de personas pueden encontrarte.</p><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Accede a tu panel para completar tu perfil, subir fotos, crear tu primer concurso y publicar promociones.</p><div style="text-align:center"><a href="${appUrl}/login-local" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ir a mi panel →</a></div></div><div style="text-align:center;margin-top:24px"><p style="color:#5a4028;font-size:12px">DeseoComer · Santiago de Chile</p></div></div>`,
+        html: `<div style="background:#1a0e05;color:#f0ead6;font-family:Georgia,serif;padding:40px;max-width:600px;margin:0 auto"><div style="text-align:center;margin-bottom:24px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:32px"><h2 style="color:#e8a84c;font-size:22px;margin:0 0 16px">¡Bienvenido, ${local.nombre}! 🎉</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Tu local fue revisado y aprobado. Ya apareces en DeseoComer y miles de personas pueden encontrarte.</p><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Accede a tu panel para completar tu perfil, subir fotos, crear tu primer concurso y publicar promociones.</p><div style="text-align:center"><a href="${appUrl}/login-local" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ir a mi panel →</a></div></div><div style="text-align:center;margin-top:24px"><p style="color:#5a4028;font-size:12px">DeseoComer</p></div></div>`,
       }).catch(err => console.error("[Email aprobar]", err));
+
+      // Notify captador if local was referred
+      try {
+        const localFull = await prisma.local.findUnique({ where: { id }, include: { captador: true } });
+        if (localFull?.captadorId && localFull.captador) {
+          await resend.emails.send({
+            from,
+            to: localFull.captador.email,
+            subject: "✅ Local activado — $10.000 a tu favor",
+            html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px"><div style="text-align:center;padding:20px;background:linear-gradient(135deg,#e8a84c,#d4922a);border-radius:12px;margin-bottom:24px"><p style="font-size:28px;margin:0 0 8px">✅</p><h1 style="color:#fff;font-size:18px;margin:0">¡Local activado!</h1></div><p style="font-size:15px;color:#333;line-height:1.6">Hola <strong>${localFull.captador.nombre}</strong>,</p><p style="font-size:15px;color:#333;line-height:1.6">El local <strong>"${localFull.nombre}"</strong> que registraste acaba de ser verificado y activado en DeseoComer.</p><div style="background:#f0faf5;border:1px solid #3db89e;border-radius:10px;padding:16px;margin:16px 0;text-align:center"><p style="font-size:14px;color:#333;margin:0">Tienes <strong style="color:#c47f1a;font-size:18px">$10.000</strong> a favor en tu cuenta.</p></div><p style="font-size:14px;color:#555;line-height:1.6">Recuerda que si este local publica su primer concurso, ganarás <strong>$5.000 adicionales</strong>.</p><p style="text-align:center;margin:24px 0"><a href="https://deseocomer.com/captador" style="background:#e8a84c;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;display:inline-block">Revisa tu panel →</a></p><p style="font-size:14px;color:#555">¡Sigue captando!</p><hr style="border:none;border-top:1px solid #eee;margin:20px 0" /><p style="font-size:13px;color:#aaa;text-align:center">El equipo de DeseoComer 🧞</p></div>`,
+          });
+        }
+      } catch (e) { console.error("[Email captador activacion]", e); }
+
       return NextResponse.json({ ok: true, accion: "aprobado" });
     }
 
