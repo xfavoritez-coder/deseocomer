@@ -44,7 +44,6 @@ export interface Local {
   totalResenas: number;
   precio: string;
   isOpen: boolean;
-  verificado: boolean;
   totalFavoritos: number;
   imagenPortada: string;
   imagenLogo: string | null;
@@ -87,7 +86,6 @@ export const LOCALES: Local[] = [
     totalResenas: 247,
     precio: "$$$",
     isOpen: true,
-    verificado: true,
     totalFavoritos: 1832,
     imagenPortada: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
     imagenLogo: null,
@@ -157,7 +155,6 @@ export const LOCALES: Local[] = [
     totalResenas: 189,
     precio: "$$$$",
     isOpen: true,
-    verificado: true,
     totalFavoritos: 2104,
     imagenPortada: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1200",
     imagenLogo: null,
@@ -217,7 +214,6 @@ export const LOCALES: Local[] = [
     totalResenas: 312,
     precio: "$",
     isOpen: true,
-    verificado: false,
     totalFavoritos: 945,
     imagenPortada: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=1200",
     imagenLogo: null,
@@ -252,7 +248,6 @@ export const LOCALES: Local[] = [
     totalResenas: 156,
     precio: "$$",
     isOpen: false,
-    verificado: true,
     totalFavoritos: 1203,
     imagenPortada: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=1200",
     imagenLogo: null,
@@ -301,7 +296,6 @@ export const LOCALES: Local[] = [
     totalResenas: 98,
     precio: "$$",
     isOpen: false,
-    verificado: true,
     totalFavoritos: 678,
     imagenPortada: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
     imagenLogo: null,
@@ -348,7 +342,6 @@ export const LOCALES: Local[] = [
     totalResenas: 134,
     precio: "$",
     isOpen: true,
-    verificado: true,
     totalFavoritos: 891,
     imagenPortada: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200",
     imagenLogo: null,
