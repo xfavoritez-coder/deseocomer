@@ -48,7 +48,7 @@ export default function CTASection() {
 
           <p className="section-description" style={{ marginBottom: "48px" }}>
             Crea concursos virales, haz que tus clientes traigan nuevos clientes
-            y aparece en el mapa gastronómico de Santiago. Sin comisiones por reserva.
+            y aparece en el mapa gastronómico de Chile. Sin comisiones por reserva.
           </p>
 
           {/* Beneficios */}

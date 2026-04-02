@@ -98,7 +98,7 @@ export default function PromocionesPage() {
         <div style={{ position: "relative", textAlign: "center" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "16px" }}>Promociones</p>
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "#f5d080", textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Ofertas Exclusivas ⚡</h1>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Descuentos, happy hours y promociones especiales de los mejores restaurantes de Santiago.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Descuentos, happy hours y promociones especiales de los mejores restaurantes de Chile.</p>
         </div>
       </section>
 
@@ -142,26 +142,18 @@ export default function PromocionesPage() {
       </div>
 
       {/* Birthday section — only for authenticated users */}
-      {isAuthenticated && esCumple && promosCumple.length > 0 && (
-        <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 48px" }}>
-          <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(180,30,100,0.1))", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "32px", textAlign: "center", marginBottom: "0" }}>
-            <p style={{ fontSize: "2.5rem", margin: "0 0 12px" }}>🎂</p>
-            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", color: "var(--accent)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", margin: "0 0 8px" }}>¡Hoy es tu día especial!</h2>
-            <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.8))", fontSize: "1rem", marginBottom: "24px" }}>Estos locales tienen ofertas exclusivas para celebrar tu cumpleaños</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", textAlign: "left" }}>
-              {promosCumple.map(promo => (
-                <Link key={promo.id} href={`/promociones/${promo.id}`} style={{ background: "rgba(8,13,24,0.7)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", overflow: "hidden", textDecoration: "none", display: "block" }}>
-                  {promo.imagenUrl && (
-                    <div style={{ height: "120px", overflow: "hidden" }}>
-                      <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                    </div>
-                  )}
-                  <div style={{ padding: "14px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{promo.titulo}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)" }}>{promo.local} · {promo.comuna}</p>
-                  </div>
-                </Link>
+      {isAuthenticated && esCumple && (
+        <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 32px" }}>
+          <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(180,30,100,0.1))", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "28px 24px", textAlign: "center" }}>
+            <div style={{ position: "relative", overflow: "hidden" }}>
+              {["🎊", "✨", "🎉", "🎈", "🎊"].map((e, i) => (
+                <span key={i} style={{ position: "absolute", top: "50%", left: `${5 + i * 22}%`, transform: "translateY(-50%)", fontSize: "1.3rem", opacity: 0.2, pointerEvents: "none" }}>{e}</span>
               ))}
+              <div style={{ position: "relative", zIndex: 1 }}>
+                <p style={{ fontSize: "2.2rem", margin: "0 0 8px" }}>🎂</p>
+                <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", color: "var(--accent)", fontSize: "clamp(1.2rem, 4vw, 1.6rem)", margin: "0 0 6px" }}>¡Feliz cumpleaños!</h2>
+                <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.7))", fontSize: "0.9rem", lineHeight: 1.6, margin: 0 }}>Hoy es tu día especial. Disfruta todas las promociones y pásala increíble.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -188,13 +180,15 @@ export default function PromocionesPage() {
               const isHH = promo.tipo === "happy_hour";
               const accentColor = isHH ? "#d4a017" : "var(--accent)";
               const logoUrl = (promo as unknown as Record<string, unknown>).logoUrl as string | undefined;
+              const cumpleBorder = esCumple ? "1px solid rgba(224,80,144,0.35)" : "";
               return (
                 <a key={promo.id} href={`/promociones/${promo.id}`} style={{
                   backgroundColor: "rgba(45,26,8,0.85)",
-                  border: isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)",
+                  border: cumpleBorder || (isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)"),
                   borderRadius: "20px", cursor: "pointer", position: "relative", overflow: "hidden",
                   textDecoration: "none", display: "block", color: "inherit",
                   transition: "border-color 0.2s",
+                  boxShadow: esCumple ? "0 0 16px rgba(224,80,144,0.1)" : "none",
                 }}>
                   {isHH && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)", zIndex: 1 }} />}
 

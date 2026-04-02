@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
               </p>
               <p style="font-size:13px;color:#888">Para aparecer en DeseoComer, completa tu perfil: sube tu logo, foto de portada, dirección, horarios y categoría.</p>
               <hr style="border:none;border-top:1px solid #eee;margin:20px 0" />
-              <p style="font-size:12px;color:#aaa;text-align:center">DeseoComer — La plataforma gastronómica de Santiago</p>
+              <p style="font-size:12px;color:#aaa;text-align:center">DeseoComer — La plataforma gastronómica de Chile</p>
             </div>
           `,
         });

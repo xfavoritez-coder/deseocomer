@@ -17,7 +17,7 @@ export default function ComoFuncionaPage() {
             Gana Comida<br />Gratis 🏆
           </h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem,2vw,1.15rem)", color: "rgba(240,234,214,0.65)", lineHeight: 1.8, maxWidth: "480px", margin: "0 auto 36px" }}>
-            Comparte tu link con amigos, sube en el ranking y gana premios reales de los mejores restaurantes de Santiago. Es gratis y tarda 30 segundos.
+            Comparte tu link con amigos, sube en el ranking y gana premios reales de los mejores restaurantes de Chile.
           </p>
           <Link href="/concursos" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem,1.5vw,0.85rem)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", padding: "14px 36px", borderRadius: "30px", textDecoration: "none" }}>
             Ver concursos activos →
@@ -35,10 +35,10 @@ export default function ComoFuncionaPage() {
 
           <div className="cf-pasos">
             {[
-              { num: "1", title: "Regístrate gratis", desc: "Crea tu cuenta en 30 segundos. Sin tarjeta de crédito ni letra chica." },
+              { num: "1", title: "Regístrate gratis", desc: "Crea tu cuenta gratis. Sin tarjeta de crédito ni letra chica." },
               { num: "2", title: "Elige un concurso", desc: "Hay premios de distintos restaurantes. Únete al que más te guste." },
               { num: "3", title: "Comparte tu link", desc: "Recibes un link único. Compártelo por WhatsApp, Instagram o donde quieras." },
-              { num: "4", title: "Sube en el ranking", desc: "Cada amigo que se registra con tu link te da puntos. El que más tenga, gana." },
+              { num: "4", title: "Sube en el ranking", desc: "Cada amigo que se registra con tu link o persona que te apoya suma puntos. El que más tenga, gana." },
               { num: "🏆", title: "¡Ganas el premio!", desc: "Te contactamos en 24 horas para coordinar cómo retirar tu premio." },
             ].map((paso, i) => (
               <div key={i} className="cf-paso-item">
@@ -59,9 +59,9 @@ export default function ComoFuncionaPage() {
 
           <div className="cf-puntos">
             {[
-              { icon: "🎉", pts: "+1", color: "#3db89e", label: "Por registrarte en el concurso", highlight: false },
+              { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al unirte por primera vez a un concurso", highlight: false },
               { icon: "👥", pts: "+2", color: "#e8a84c", label: "Por cada amigo que se registra con tu link", highlight: true },
-              { icon: "🤝", pts: "+1", color: "#2a7a6f", label: "Cuando apoyas a otro participante (1 vez al día por persona)", highlight: false },
+              { icon: "❤️", pts: "+1", color: "#2a7a6f", label: "Cuando otro participante te apoya (1 vez al día por persona)", highlight: false },
             ].map((p, i) => (
               <div key={i} style={{ background: p.highlight ? "rgba(232,168,76,0.07)" : "rgba(255,255,255,0.03)", border: p.highlight ? "1px solid rgba(232,168,76,0.3)" : "0.5px solid rgba(232,168,76,0.1)", borderRadius: "16px", padding: "clamp(16px,3vw,28px) clamp(12px,2vw,20px)", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "12px" }}>{p.icon}</div>
@@ -71,11 +71,6 @@ export default function ComoFuncionaPage() {
             ))}
           </div>
 
-          <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: "12px", padding: "16px 20px", marginTop: "16px", maxWidth: "600px", margin: "16px auto 0" }}>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.82rem,1.3vw,0.9rem)", color: "rgba(61,184,158,0.9)", lineHeight: 1.7 }}>
-              💡 <strong>Tip:</strong> Los +2 puntos por referido son los que más importan. Quien invita a más personas gana, aunque haya llegado tarde al concurso.
-            </p>
-          </div>
         </section>
 
         {/* Premios reales */}

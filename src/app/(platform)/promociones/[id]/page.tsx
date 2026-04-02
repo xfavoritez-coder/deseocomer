@@ -13,6 +13,7 @@ import {
   isPromocionActivaAhora,
   terminaEnMenos2Horas,
   getTimerHastaFin,
+  normalizeTipo,
   type Promocion,
 } from "@/lib/mockPromociones";
 
@@ -28,21 +29,49 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
 export default function PromocionDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = Number(params.id);
+  const rawId = params.id as string;
 
-  const promo = PROMOCIONES.find((p) => p.id === id);
+  const mockPromo = PROMOCIONES.find((p) => String(p.id) === rawId);
   const relacionadas = PROMOCIONES.filter(
-    (p) => p.id !== id && p.activa && !p.esCumpleanos && (p.localId === promo?.localId || p.categoria === promo?.categoria)
+    (p) => String(p.id) !== rawId && p.activa && !p.esCumpleanos
   ).slice(0, 6);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [dbPromo, setDbPromo] = useState<any>(null);
-  const [dbLoading, setDbLoading] = useState(!promo);
+  const [dbLoading, setDbLoading] = useState(!mockPromo);
 
   useEffect(() => {
-    if (promo) { setDbLoading(false); return; }
-    fetch(`/api/promociones/${params.id}`).then(r => r.ok ? r.json() : null).then(data => { if (data) setDbPromo(data); setDbLoading(false); }).catch(() => setDbLoading(false));
-  }, [params.id, promo]);
+    if (mockPromo) { setDbLoading(false); return; }
+    fetch(`/api/promociones/${rawId}`).then(r => r.ok ? r.json() : null).then(data => { if (data) setDbPromo(data); setDbLoading(false); }).catch(() => setDbLoading(false));
+  }, [rawId, mockPromo]);
+
+  // Unify: map dbPromo to Promocion shape if needed
+  const promo: Promocion | null = mockPromo ?? (dbPromo ? {
+    id: dbPromo.id,
+    localId: dbPromo.localId,
+    local: dbPromo.local?.nombre ?? "Local",
+    comuna: dbPromo.local?.comuna ?? "",
+    tipo: normalizeTipo(dbPromo.tipo ?? ""),
+    categoria: "cena" as const,
+    imagen: "⚡",
+    imagenUrl: dbPromo.imagenUrl ?? "",
+    titulo: dbPromo.titulo ?? "",
+    descripcion: dbPromo.descripcion ?? "",
+    porcentajeDescuento: dbPromo.porcentajeDescuento ?? undefined,
+    precioOriginal: dbPromo.precioOriginal ?? undefined,
+    precioDescuento: dbPromo.precioDescuento ?? undefined,
+    diasSemana: Array.isArray(dbPromo.diasSemana) ? dbPromo.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
+    horaInicio: dbPromo.horaInicio ?? "12:00",
+    horaFin: dbPromo.horaFin ?? "22:00",
+    fechaVencimiento: "2099-12-31",
+    activa: dbPromo.activa ?? true,
+    esCumpleanos: dbPromo.esCumpleanos ?? false,
+    condiciones: dbPromo.condiciones ?? undefined,
+    // Extra fields from API
+    direccion: dbPromo.local?.direccion,
+    telefono: dbPromo.local?.telefono ?? dbPromo.local?.instagram,
+    logoUrl: dbPromo.local?.logoUrl,
+  } : null) as Promocion | null;
 
   const [mounted, setMounted] = useState(false);
   const [isActiva, setIsActiva] = useState(false);

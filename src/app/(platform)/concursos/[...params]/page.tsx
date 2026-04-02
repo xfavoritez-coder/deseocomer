@@ -367,7 +367,7 @@ function ConcursoDetallePage() {
           <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
             <div style={{ width: '40px', height: '1px', background: 'rgba(232,168,76,0.4)', margin: '10px auto' }} />
-            <p className="dc-cd-hero-desc" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", fontStyle: "italic", marginTop: 0, lineHeight: 1.4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>
+            <p className="dc-cd-hero-desc" style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.55)", fontStyle: "italic", marginTop: 0, lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>
           </>}
         </div>
       </section>
@@ -443,7 +443,7 @@ function ConcursoDetallePage() {
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido" }, { icon: "❤️", pts: "+1", label: "Al apoyar" }, { icon: "👤", pts: "+1", label: "Registro directo" }].map(s => (
+                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido" }, { icon: "❤️", pts: "+1", label: "Al recibir apoyo" }, { icon: "👤", pts: "+1", label: "Registro directo" }].map(s => (
                   <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
@@ -457,21 +457,21 @@ function ConcursoDetallePage() {
           {/* 6.5 Descripción completa del premio (si fue truncada en hero) */}
           {c.descripcionPremio && c.descripcionPremio.length > 120 && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Descripción del premio</p>
-              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 14px" }}>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", lineHeight: 1.45, margin: 0 }}>{c.descripcionPremio}</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Descripción del premio</p>
+              <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "14px 16px" }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.55, margin: 0 }}>{c.descripcionPremio}</p>
               </div>
             </div>
           )}
 
           {/* 7. Reglas y condiciones */}
           <div>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 10 }}>Reglas del concurso</p>
-            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 14px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Reglas del concurso</p>
+            <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "14px 16px" }}>
               {allRules.map((rule, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "8px 0", borderBottom: i < allRules.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
-                  <span style={{ width: 4, height: 4, borderRadius: "50%", background: "rgba(232,168,76,0.35)", marginTop: 6, flexShrink: 0 }} />
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", lineHeight: 1.45 }}>{rule}</span>
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 0", borderBottom: i < allRules.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "rgba(232,168,76,0.4)", marginTop: 7, flexShrink: 0 }} />
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.55 }}>{rule}</span>
                 </div>
               ))}
             </div>

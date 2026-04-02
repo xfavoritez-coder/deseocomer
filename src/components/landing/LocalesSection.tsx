@@ -75,7 +75,7 @@ export default function LocalesSection() {
             Descubre Dónde Comer
           </h2>
           <p className="section-description">
-            Los mejores locales gastronómicos de Santiago.
+            Los mejores locales gastronómicos de Chile.
           </p>
         </div>
 
