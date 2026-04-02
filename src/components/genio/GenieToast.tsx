@@ -257,10 +257,10 @@ export default function GenieToast() {
             ))}
           </div>
           <button onClick={() => dismissForever(toastActivo.id)} style={{
-            background: "none", border: "none", cursor: "pointer",
-            fontFamily: "var(--font-lato)", fontSize: "0.75rem",
-            color: "rgba(240,234,214,0.15)", marginTop: "10px",
-            padding: 0, display: "block",
+            background: "none", border: "1px solid rgba(240,234,214,0.12)", cursor: "pointer",
+            fontFamily: "var(--font-lato)", fontSize: "0.78rem",
+            color: "rgba(240,234,214,0.4)", marginTop: "12px",
+            padding: "6px 14px", display: "block", borderRadius: "16px",
           }}>No mostrar más</button>
         </>
       )}

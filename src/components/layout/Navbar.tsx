@@ -80,9 +80,10 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div className="dc-nav-links">
-          {NAV_LINKS.map(({ label, href }) => (
-            <Link key={label} href={href} className="dc-nav-link">{label}</Link>
-          ))}
+          {NAV_LINKS.map(({ label, href }) => {
+            const isActive = pathname === href || pathname.startsWith(href + "/");
+            return <Link key={label} href={href} className={`dc-nav-link${isActive ? " dc-nav-link--active" : ""}`}>{label}</Link>;
+          })}
 
           {/* Auth */}
           {mounted && (
@@ -133,11 +134,14 @@ export default function Navbar() {
                 { href: "/concursos", label: "Concursos", icon: "🏆" },
                 { href: "/promociones", label: "Promociones", icon: "⚡" },
                 { href: "/locales", label: "Locales", icon: "🍽️" },
-              ].map(item => (
-                <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 24px", fontFamily: "var(--font-cinzel)", fontSize: "1rem", letterSpacing: "0.1em", color: "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
-                  <span style={{ fontSize: "1.1rem", width: "24px" }}>{item.icon}</span>{item.label}
-                </Link>
-              ))}
+              ].map(item => {
+                const active = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 24px", fontFamily: "var(--font-cinzel)", fontSize: "1rem", letterSpacing: "0.1em", color: active ? "var(--accent)" : "var(--text-primary)", textDecoration: "none", borderBottom: "1px solid rgba(232,168,76,0.06)", background: active ? "rgba(232,168,76,0.06)" : "transparent", fontWeight: active ? 700 : 500 }}>
+                    <span style={{ fontSize: "1.1rem", width: "24px" }}>{item.icon}</span>{item.label}
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* User section */}
@@ -232,8 +236,14 @@ export default function Navbar() {
         .dc-nav-link {
           font-family: var(--font-cinzel); font-size: 0.82rem;
           letter-spacing: 0.15em; text-transform: uppercase;
-          color: var(--text-primary); text-decoration: none; white-space: nowrap;
-          font-weight: 500;
+          color: var(--text-muted); text-decoration: none; white-space: nowrap;
+          font-weight: 500; transition: color 0.2s;
+          padding-bottom: 2px; border-bottom: 2px solid transparent;
+        }
+        .dc-nav-link:hover { color: var(--text-primary); }
+        .dc-nav-link--active {
+          color: var(--accent); font-weight: 700;
+          border-bottom: 2px solid var(--accent);
         }
         .dc-nav-cta {
           font-family: var(--font-cinzel); font-size: 0.82rem;
