@@ -1,11 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export default function ContactoPage() {
+  return <Suspense><ContactoInner /></Suspense>;
+}
+
+function ContactoInner() {
   const searchParams = useSearchParams();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");

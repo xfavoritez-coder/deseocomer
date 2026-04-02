@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -14,6 +14,10 @@ const L: React.CSSProperties = { fontSize: 9, color: "rgba(80,60,20,0.45)", lett
 const I: React.CSSProperties = { background: "#faf7f2", border: "1px solid rgba(180,130,40,0.2)", borderRadius: 10, padding: "11px 14px", fontSize: 14, color: "#3a2c0a", fontFamily: "var(--font-lato), Lato, sans-serif", width: "100%", outline: "none", boxSizing: "border-box" };
 
 export default function UnetePage() {
+  return <Suspense><UneteInner /></Suspense>;
+}
+
+function UneteInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [nombreLocal, setNombreLocal] = useState("");
