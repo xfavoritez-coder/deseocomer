@@ -276,23 +276,6 @@ export default function MiLocalPage() {
         ))}
       </div>
 
-      <SectionTitle>Menú</SectionTitle>
-      <div style={{ marginBottom: "32px" }}>
-        <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}><input type="checkbox" checked={tieneMenu ?? false} onChange={e => set("tieneMenu", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>Mi local tiene menú con precios fijos</span></label>
-        {tieneMenu === false && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>Tu menú del día se actualiza frecuentemente. Tus clientes lo entenderán.</p>}
-        {tieneMenu && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {menuCats.map((cat, ci) => (
-              <div key={ci} style={{ background: "rgba(0,0,0,0.15)", borderRadius: "12px", padding: "16px", border: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}><input style={{ ...IS, flex: 1, fontWeight: 700 }} value={cat.nombre} onChange={e => { const c = [...menuCats]; c[ci] = { ...c[ci], nombre: e.target.value }; setMenuCats(c); }} placeholder="Nombre categoría" /><button onClick={() => setMenuCats(menuCats.filter((_, j) => j !== ci))} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff8080", cursor: "pointer", padding: "8px 12px", fontSize: "0.78rem" }}>✕</button></div>
-                {cat.items.map((item, ii) => (<div key={ii} style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: "8px", marginBottom: "8px" }}><input style={{ ...IS, fontSize: "0.8rem" }} value={item.nombre} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, nombre: e.target.value }; setMenuCats(c); }} placeholder="Plato" /><input style={{ ...IS, fontSize: "0.8rem" }} value={item.precio} onChange={e => { const c = [...menuCats]; c[ci].items[ii] = { ...item, precio: e.target.value }; setMenuCats(c); }} placeholder="$0" /><button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: c[ci].items.filter((_, j) => j !== ii) }; setMenuCats(c); }} style={{ background: "none", border: "none", color: "#ff8080", cursor: "pointer", fontSize: "0.8rem" }}>✕</button></div>))}
-                <button onClick={() => { const c = [...menuCats]; c[ci] = { ...c[ci], items: [...c[ci].items, { nombre: "", descripcion: "", precio: "", destacado: false }] }; setMenuCats(c); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--oasis-bright)", background: "none", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", padding: "6px 12px", cursor: "pointer" }}>+ Agregar plato</button>
-              </div>
-            ))}
-            <button onClick={() => setMenuCats([...menuCats, { nombre: "", items: [] }])} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)", background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", padding: "10px 16px", cursor: "pointer" }}>+ Agregar categoría</button>
-          </div>
-        )}
-      </div>
 
       <div style={{ padding: "24px 0 40px" }}>
         <button
