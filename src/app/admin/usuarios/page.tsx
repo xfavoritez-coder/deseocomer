@@ -79,21 +79,21 @@ export default function AdminUsuarios() {
       {toast && <div style={toastS}>{toast}</div>}
       <button onClick={() => { setSel(null); resetModes(); }} style={backS}>← Usuarios</button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
         {sel.fotoUrl ? (
-          <img src={sel.fotoUrl} alt="" style={{ width: "52px", height: "52px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid rgba(232,168,76,0.3)" }} />
+          <img src={sel.fotoUrl} alt="" style={{ width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid rgba(232,168,76,0.3)" }} />
         ) : (
-          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{sel.nombre?.charAt(0).toUpperCase()}</div>
+          <div style={{ width: "60px", height: "60px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{sel.nombre?.charAt(0).toUpperCase()}</div>
         )}
         <div style={{ minWidth: 0 }}>
-          <h2 style={{ fontFamily: "Georgia", color: "#f5d080", fontSize: "1.1rem", margin: 0 }}>{sel.nombre}</h2>
-          <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.5)", fontSize: "0.8rem", margin: "2px 0 0", wordBreak: "break-all" }}>{sel.email}</p>
-          {sel.tipo && sel.tipo !== "usuario" && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#8040d0", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "10px", padding: "2px 8px" }}>{sel.tipo}</span>}
+          <h2 style={{ fontFamily: "Georgia", color: "#f5d080", fontSize: "1.3rem", margin: 0 }}>{sel.nombre}</h2>
+          <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.55)", fontSize: "0.95rem", margin: "3px 0 0", wordBreak: "break-all" }}>{sel.email}</p>
+          {sel.tipo && sel.tipo !== "usuario" && <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#8040d0", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "10px", padding: "3px 10px", marginTop: "4px", display: "inline-block" }}>{sel.tipo}</span>}
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "0.8rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.92rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "6px 16px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
         {isIPDuplicada(sel.ipRegistro) && <span style={ipBadgeS}>⚠️ IP compartida</span>}
       </div>
 
@@ -106,10 +106,10 @@ export default function AdminUsuarios() {
         <p style={cardTitleS}>Actividad</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
           {[["❤️", sel._count?.favoritos ?? 0, "Favs"], ["⭐", sel._count?.resenas ?? 0, "Reseñas"], ["🏆", sel._count?.participaciones ?? 0, "Concursos"]].map(([icon, val, label]) => (
-            <div key={String(label)} style={{ textAlign: "center", padding: "10px", background: "rgba(255,255,255,0.03)", borderRadius: "8px" }}>
-              <p style={{ fontSize: "1rem", margin: "0 0 2px" }}>{icon}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#e8a84c", margin: 0 }}>{val}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{label}</p>
+            <div key={String(label)} style={{ textAlign: "center", padding: "14px 10px", background: "rgba(255,255,255,0.03)", borderRadius: "10px" }}>
+              <p style={{ fontSize: "1.3rem", margin: "0 0 4px" }}>{icon}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c", margin: 0 }}>{val}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", margin: "4px 0 0" }}>{label}</p>
             </div>
           ))}
         </div>
@@ -189,30 +189,30 @@ export default function AdminUsuarios() {
   return (
     <div>
       {toast && <div style={toastS}>{toast}</div>}
-      <h1 style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({usuarios.length})</h1>
-      <input style={{ ...inputS, marginBottom: "12px", maxWidth: "400px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
+      <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({usuarios.length})</h1>
+      <input style={{ ...inputS, marginBottom: "14px", maxWidth: "500px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
 
-      <label style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", cursor: "pointer" }}>
-        <input type="checkbox" checked={soloIPsDuplicadas} onChange={e => setSoloIPsDuplicadas(e.target.checked)} style={{ accentColor: "#ff8c00" }} />
-        <span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.5)" }}>Mostrar solo IPs duplicadas</span>
-        {soloIPsDuplicadas && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#ff8c00" }}>({filtered.length})</span>}
+      <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}>
+        <input type="checkbox" checked={soloIPsDuplicadas} onChange={e => setSoloIPsDuplicadas(e.target.checked)} style={{ accentColor: "#ff8c00", width: "18px", height: "18px" }} />
+        <span style={{ fontFamily: "Georgia", fontSize: "0.95rem", color: "rgba(240,234,214,0.55)" }}>Mostrar solo IPs duplicadas</span>
+        {soloIPsDuplicadas && <span style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#ff8c00" }}>({filtered.length})</span>}
       </label>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(u => (
-          <div key={u.id} onClick={() => { setSel(u); resetModes(); }} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", cursor: "pointer" }}>
-            <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{u.nombre?.charAt(0).toUpperCase()}</div>
+          <div key={u.id} onClick={() => { setSel(u); resetModes(); }} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", cursor: "pointer" }}>
+            <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{u.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{u.email}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", margin: "3px 0 0" }}>{u.email}</p>
             </div>
-            <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+            <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "3px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span style={{ fontSize: "0.72rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
+                <span style={{ fontSize: "0.85rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
                 {isIPDuplicada(u.ipRegistro) && <span style={ipBadgeS}>⚠️ IP</span>}
               </div>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.55)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.45)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
             </div>
           </div>
         ))}
@@ -222,16 +222,16 @@ export default function AdminUsuarios() {
 }
 
 function Row({ label, value }: { label: string; value: string }) {
-  return <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}><span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.5)" }}>{label}</span><span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "#f0ead6", textAlign: "right", maxWidth: "60%", wordBreak: "break-word" }}>{value}</span></div>;
+  return <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}><span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "rgba(240,234,214,0.55)" }}>{label}</span><span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#f0ead6", textAlign: "right", maxWidth: "60%", wordBreak: "break-word" }}>{value}</span></div>;
 }
 
-const toastS: React.CSSProperties = { position: "fixed", top: "16px", right: "16px", background: "rgba(13,7,3,0.97)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "10px", padding: "10px 18px", fontFamily: "Georgia", fontSize: "0.8rem", color: "#e8a84c", zIndex: 9999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" };
-const backS: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, marginBottom: "16px" };
-const cardS: React.CSSProperties = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", marginBottom: "12px" };
-const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", margin: "0 0 10px" };
-const inputS: React.CSSProperties = { width: "100%", padding: "10px 12px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" };
-const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" };
-const btnPrimaryS: React.CSSProperties = { flex: 1, padding: "10px", background: "#e8a84c", border: "none", borderRadius: "8px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" };
-const btnSecS: React.CSSProperties = { flex: 1, padding: "10px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.8rem", cursor: "pointer" };
-const btnOutlineS: React.CSSProperties = { display: "block", width: "100%", padding: "10px", background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer", textAlign: "left" };
-const ipBadgeS: React.CSSProperties = { background: "rgba(255,140,0,0.15)", border: "1px solid rgba(255,140,0,0.4)", color: "#ff8c00", borderRadius: "4px", padding: "2px 8px", fontSize: "10px", fontWeight: 700, whiteSpace: "nowrap" };
+const toastS: React.CSSProperties = { position: "fixed", top: "16px", right: "16px", background: "rgba(13,7,3,0.97)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "12px", padding: "14px 22px", fontFamily: "Georgia", fontSize: "0.95rem", color: "#e8a84c", zIndex: 9999, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" };
+const backS: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "1rem", cursor: "pointer", padding: 0, marginBottom: "16px" };
+const cardS: React.CSSProperties = { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "14px", padding: "18px", marginBottom: "14px" };
+const cardTitleS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.85rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(240,234,214,0.45)", margin: "0 0 12px" };
+const inputS: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "1rem", outline: "none", boxSizing: "border-box" };
+const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", display: "block", marginBottom: "6px" };
+const btnPrimaryS: React.CSSProperties = { flex: 1, padding: "14px", background: "#e8a84c", border: "none", borderRadius: "10px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.95rem", fontWeight: 700, cursor: "pointer" };
+const btnSecS: React.CSSProperties = { flex: 1, padding: "14px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "10px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.95rem", cursor: "pointer" };
+const btnOutlineS: React.CSSProperties = { display: "block", width: "100%", padding: "14px", background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.95rem", cursor: "pointer", textAlign: "left" };
+const ipBadgeS: React.CSSProperties = { background: "rgba(255,140,0,0.15)", border: "1px solid rgba(255,140,0,0.4)", color: "#ff8c00", borderRadius: "6px", padding: "3px 10px", fontSize: "0.78rem", fontWeight: 700, whiteSpace: "nowrap" };

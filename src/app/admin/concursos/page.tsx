@@ -90,7 +90,7 @@ export default function AdminConcursos() {
 
   return (
     <div>
-      <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c", marginBottom: "20px" }}>Concursos ({concursos.length})</h1>
+      <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "20px" }}>Concursos ({concursos.length})</h1>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr>{["Premio", "Local", "Participantes", "Inicio", "Fin", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
         <tbody>
@@ -257,19 +257,19 @@ export default function AdminConcursos() {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 style={{ fontFamily: "Georgia", fontSize: "0.75rem", letterSpacing: "0.2em", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", marginBottom: "12px" }}>{children}</h3>;
+  return <h3 style={{ fontFamily: "Georgia", fontSize: "0.88rem", letterSpacing: "0.18em", color: "rgba(240,234,214,0.45)", textTransform: "uppercase", marginBottom: "12px" }}>{children}</h3>;
 }
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-      <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)" }}>{label}</span>
-      <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6" }}>{value}</span>
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+      <span style={{ fontFamily: "Georgia", fontSize: "0.95rem", color: "rgba(240,234,214,0.55)" }}>{label}</span>
+      <span style={{ fontFamily: "Georgia", fontSize: "0.95rem", color: "#f0ead6" }}>{value}</span>
     </div>
   );
 }
 
-const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "8px 10px", textAlign: "left" };
-const TD: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", padding: "10px" };
+const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.82rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.55)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "10px 12px", textAlign: "left" };
+const TD: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.92rem", color: "#f0ead6", padding: "12px" };
 const PANEL: React.CSSProperties = { position: "fixed", top: 0, right: 0, width: "min(420px, 100vw)", height: "100vh", background: "rgba(10,8,18,0.98)", borderLeft: "1px solid rgba(232,168,76,0.2)", zIndex: 1000, overflowY: "auto", padding: "24px", boxShadow: "-20px 0 60px rgba(0,0,0,0.5)", animation: "slideIn 0.2s ease" };
-const BACK: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontSize: "0.85rem", cursor: "pointer", marginBottom: "20px", padding: 0, fontFamily: "Georgia" };
-const EDIT_INPUT: React.CSSProperties = { width: "100%", padding: "8px 12px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" };
+const BACK: React.CSSProperties = { background: "none", border: "none", color: "rgba(240,234,214,0.55)", fontSize: "1rem", cursor: "pointer", marginBottom: "20px", padding: 0, fontFamily: "Georgia" };
+const EDIT_INPUT: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" };

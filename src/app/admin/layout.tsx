@@ -37,8 +37,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div style={{ display: "flex", minHeight: "100vh", background: "#0a0812" }}>
       {/* Mobile top bar */}
       <div className="adm-mobilebar">
-        <Link href="/admin" style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#e8a84c", textDecoration: "none" }}>🧞 Admin</Link>
-        <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "8px", width: "38px", height: "38px", display: "flex", alignItems: "center", justifyContent: "center", color: "#e8a84c", fontSize: "1rem", cursor: "pointer" }}>{menuOpen ? "✕" : "☰"}</button>
+        <Link href="/admin" style={{ fontFamily: "Georgia", fontSize: "1.1rem", color: "#e8a84c", textDecoration: "none" }}>🧞 Admin</Link>
+        <button onClick={() => setMenuOpen(o => !o)} style={{ background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", width: "44px", height: "44px", display: "flex", alignItems: "center", justifyContent: "center", color: "#e8a84c", fontSize: "1.2rem", cursor: "pointer" }}>{menuOpen ? "✕" : "☰"}</button>
       </div>
 
       {/* Mobile menu */}
@@ -46,11 +46,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 998 }} />
         <div className="adm-mobilemenu">
           {NAV.map(n => (
-            <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "14px 20px", textDecoration: "none", fontFamily: "Georgia", fontSize: "0.85rem", color: isActive(n.href) ? "#e8a84c" : "rgba(240,234,214,0.5)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
-              <span>{n.icon}</span> {n.label}
+            <Link key={n.href} href={n.href} onClick={() => setMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 24px", textDecoration: "none", fontFamily: "Georgia", fontSize: "1.05rem", color: isActive(n.href) ? "#e8a84c" : "rgba(240,234,214,0.6)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+              <span style={{ fontSize: "1.2rem" }}>{n.icon}</span> {n.label}
             </Link>
           ))}
-          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "14px 20px", width: "100%", textAlign: "left", fontFamily: "Georgia", fontSize: "0.85rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer" }}>🚪 Cerrar sesión</button>
+          <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 24px", width: "100%", textAlign: "left", fontFamily: "Georgia", fontSize: "1.05rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer" }}>🚪 Cerrar sesión</button>
         </div>
       </>)}
 
@@ -82,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
         .adm-mobilebar { display: none; }
         .adm-mobilemenu {
-          position: fixed; top: 60px; right: 0; width: min(280px, 80vw); bottom: 0;
+          position: fixed; top: 64px; right: 0; width: min(300px, 85vw); bottom: 0;
           background: rgba(13,7,3,0.98); border-left: 1px solid rgba(232,168,76,0.15);
           z-index: 999; overflow-y: auto;
         }
@@ -90,11 +90,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           .adm-sidebar { display: none; }
           .adm-mobilebar {
             display: flex; position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-            padding: 12px 16px; background: rgba(10,8,18,0.98);
+            padding: 14px 18px; background: rgba(10,8,18,0.98);
             border-bottom: 1px solid rgba(232,168,76,0.15);
             justify-content: space-between; align-items: center;
           }
-          .adm-main { margin-left: 0; padding: 72px 12px 24px; }
+          .adm-main { margin-left: 0; padding: 80px 16px 32px; }
         }
       `}</style>
     </div>

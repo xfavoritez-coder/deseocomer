@@ -29,21 +29,21 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c", marginBottom: "24px" }}>Dashboard</h1>
+      <h1 className="adm-dash-title" style={{ fontFamily: "Georgia", color: "#e8a84c", marginBottom: "24px" }}>Dashboard</h1>
 
       {pendientes > 0 && (
-        <div style={{ background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.25)", borderRadius: "12px", padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "1.2rem" }}>🔔</span>
-          <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#ff8080", flex: 1, margin: 0 }}>Tienes <strong>{pendientes} {pendientes === 1 ? "local pendiente" : "locales pendientes"}</strong> de aprobación</p>
-          <a href="/admin/locales" style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#0a0812", background: "#e8a84c", padding: "8px 16px", borderRadius: "8px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar ahora →</a>
+        <div className="adm-dash-alert" style={{ background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.25)", borderRadius: "14px", padding: "16px 20px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "1.4rem" }}>🔔</span>
+          <p style={{ fontFamily: "Georgia", color: "#ff8080", flex: 1, margin: 0 }} className="adm-dash-alert-text">Tienes <strong>{pendientes} {pendientes === 1 ? "local pendiente" : "locales pendientes"}</strong> de aprobación</p>
+          <a href="/admin/locales" className="adm-dash-alert-btn" style={{ fontFamily: "Georgia", color: "#0a0812", background: "#e8a84c", padding: "10px 20px", borderRadius: "10px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar ahora →</a>
         </div>
       )}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "12px", marginBottom: "32px" }}>
+      <div className="adm-dash-cards" style={{ display: "grid", gap: "12px", marginBottom: "32px" }}>
         {cards.map(c => (
-          <div key={c.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "18px", textAlign: "center" }}>
-            <div style={{ fontSize: "1.2rem", marginBottom: "6px" }}>{c.icon}</div>
-            <p style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", lineHeight: 1 }}>{c.value}</p>
-            <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", marginTop: "6px" }}>{c.label}</p>
+          <div key={c.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", padding: "20px", textAlign: "center" }}>
+            <div className="adm-dash-card-icon" style={{ marginBottom: "6px" }}>{c.icon}</div>
+            <p className="adm-dash-card-value" style={{ fontFamily: "Georgia", color: "#e8a84c", lineHeight: 1 }}>{c.value}</p>
+            <p className="adm-dash-card-label" style={{ fontFamily: "Georgia", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.55)", marginTop: "8px" }}>{c.label}</p>
           </div>
         ))}
       </div>
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
         <div>
           <h3 style={TH}>Últimos usuarios</h3>
           <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "340px" }}>
             <thead><tr>{["Nombre", "Email", "Ciudad", "Fecha"].map(h => <th key={h} style={THC}>{h}</th>)}</tr></thead>
             <tbody>{(stats.ultimosUsuarios ?? []).map((u: S) => <tr key={u.id} style={TR}><td style={TD}>{u.nombre}</td><td style={TD}>{u.email}</td><td style={TD}>{u.ciudad}</td><td style={TD}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</td></tr>)}</tbody>
           </table>
@@ -61,23 +61,39 @@ export default function AdminDashboard() {
         <div>
           <h3 style={TH}>Últimos locales</h3>
           <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "340px" }}>
             <thead><tr>{["Nombre", "Email", "Ciudad", "Estado"].map(h => <th key={h} style={THC}>{h}</th>)}</tr></thead>
-            <tbody>{(stats.ultimosLocales ?? []).map((l: S) => <tr key={l.id} style={TR}><td style={TD}>{l.nombre}</td><td style={TD}>{l.email}</td><td style={TD}>{l.ciudad}</td><td style={TD}><span style={{ color: l.activo ? "#3db89e" : "#ff6b6b", fontSize: "0.82rem" }}>{l.activo ? "Activo" : "Inactivo"}</span></td></tr>)}</tbody>
+            <tbody>{(stats.ultimosLocales ?? []).map((l: S) => <tr key={l.id} style={TR}><td style={TD}>{l.nombre}</td><td style={TD}>{l.email}</td><td style={TD}>{l.ciudad}</td><td style={TD}><span style={{ color: l.activo ? "#3db89e" : "#ff6b6b" }}>{l.activo ? "Activo" : "Inactivo"}</span></td></tr>)}</tbody>
           </table>
           </div>
         </div>
       </div>
 
       <style>{`
+        .adm-dash-title { font-size: 1.5rem; }
+        .adm-dash-alert-text { font-size: 0.9rem; }
+        .adm-dash-alert-btn { font-size: 0.88rem; }
+        .adm-dash-cards { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+        .adm-dash-card-icon { font-size: 1.3rem; }
+        .adm-dash-card-value { font-size: 1.6rem; }
+        .adm-dash-card-label { font-size: 0.76rem; }
         .adm-tables { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        @media (max-width: 767px) { .adm-tables { grid-template-columns: 1fr; } }
+        @media (max-width: 767px) {
+          .adm-dash-title { font-size: 1.8rem; }
+          .adm-dash-alert-text { font-size: 1rem; }
+          .adm-dash-alert-btn { font-size: 1rem; padding: 12px 22px; }
+          .adm-dash-cards { grid-template-columns: repeat(2, 1fr); }
+          .adm-dash-card-icon { font-size: 1.6rem; }
+          .adm-dash-card-value { font-size: 2rem; }
+          .adm-dash-card-label { font-size: 0.85rem; }
+          .adm-tables { grid-template-columns: 1fr; }
+        }
       `}</style>
     </div>
   );
 }
 
-const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#e8a84c", marginBottom: "12px" };
-const THC: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.5)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "8px 12px", textAlign: "left" };
-const TD: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", padding: "10px 12px" };
+const TH: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#e8a84c", marginBottom: "12px" };
+const THC: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.8rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.55)", borderBottom: "1px solid rgba(232,168,76,0.15)", padding: "10px 12px", textAlign: "left" };
+const TD: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.9rem", color: "#f0ead6", padding: "12px" };
 const TR: React.CSSProperties = { borderBottom: "1px solid rgba(255,255,255,0.04)" };
