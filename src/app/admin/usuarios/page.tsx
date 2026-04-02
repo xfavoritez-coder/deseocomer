@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,6 +16,8 @@ export default function AdminUsuarios() {
   const [passMode, setPassMode] = useState(false);
   const [newPass, setNewPass] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [soloIPsDuplicadas, setSoloIPsDuplicadas] = useState(false);
+  const [descalificarConfirm, setDescalificarConfirm] = useState(false);
 
   useEffect(() => { adminFetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
@@ -31,8 +33,45 @@ export default function AdminUsuarios() {
     } catch { show("Error de conexión"); setLoading(false); return false; }
   };
 
-  const filtered = usuarios.filter(u => !busq || u.nombre?.toLowerCase().includes(busq.toLowerCase()) || u.email?.toLowerCase().includes(busq.toLowerCase()));
-  const resetModes = () => { setEditMode(false); setPassMode(false); setDeleteConfirm(false); };
+  // IP duplicadas
+  const ipCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const u of usuarios) {
+      const ip = u.ipRegistro || "";
+      if (ip && ip !== "unknown") map[ip] = (map[ip] || 0) + 1;
+    }
+    return map;
+  }, [usuarios]);
+
+  const isIPDuplicada = (ip: string) => ip && ip !== "unknown" && (ipCounts[ip] || 0) > 1;
+
+  const filtered = usuarios.filter(u => {
+    if (busq && !u.nombre?.toLowerCase().includes(busq.toLowerCase()) && !u.email?.toLowerCase().includes(busq.toLowerCase())) return false;
+    if (soloIPsDuplicadas && !isIPDuplicada(u.ipRegistro)) return false;
+    return true;
+  });
+
+  const resetModes = () => { setEditMode(false); setPassMode(false); setDeleteConfirm(false); setDescalificarConfirm(false); };
+
+  const handleDescalificar = async () => {
+    if (!sel) return;
+    setLoading(true);
+    try {
+      const res = await adminFetch(`/api/admin/usuarios/${sel.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accion: "descalificar" }),
+      });
+      if (res.ok) {
+        show("✓ Usuario descalificado de todos los concursos activos");
+        setDescalificarConfirm(false);
+      } else {
+        const d = await res.json();
+        show(d.error ?? "Error al descalificar");
+      }
+    } catch { show("Error de conexión"); }
+    setLoading(false);
+  };
 
   // ── DETAIL VIEW ──
   if (sel) return (
@@ -48,13 +87,14 @@ export default function AdminUsuarios() {
         </div>
       </div>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
         <span style={{ fontSize: "0.8rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "4px 12px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
+        {isIPDuplicada(sel.ipRegistro) && <span style={ipBadgeS}>⚠️ IP compartida</span>}
       </div>
 
       <div style={cardS}>
         <p style={cardTitleS}>Información</p>
-        {[["Nombre", sel.nombre], ["Email", sel.email], ["Ciudad", sel.ciudad], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Email", sel.email], ["Ciudad", sel.ciudad], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
       </div>
 
       <div style={cardS}>
@@ -108,7 +148,18 @@ export default function AdminUsuarios() {
         </div>
       )}
 
-      {!editMode && !passMode && !deleteConfirm && (
+      {descalificarConfirm && (
+        <div style={{ ...cardS, borderColor: "rgba(255,80,80,0.3)", textAlign: "center" }}>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#ff6b6b", fontWeight: 700, marginBottom: "6px" }}>¿Descalificar a {sel.nombre}?</p>
+          <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginBottom: "14px" }}>Se le quitarán los puntos en todos los concursos activos donde participa.</p>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={handleDescalificar} disabled={loading} style={{ ...btnPrimaryS, background: "#e05555" }}>{loading ? "..." : "Descalificar"}</button>
+            <button onClick={() => setDescalificarConfirm(false)} style={btnSecS}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {!editMode && !passMode && !deleteConfirm && !descalificarConfirm && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
           <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", ciudad: sel.ciudad ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
@@ -121,6 +172,7 @@ export default function AdminUsuarios() {
           {sel.emailVerificado && (
             <button onClick={async () => { if (await action("desactivar")) { setSel({ ...sel, emailVerificado: false }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, emailVerificado: false } : u)); show("Usuario desactivado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ Desactivar cuenta</button>
           )}
+          <button onClick={() => { resetModes(); setDescalificarConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8c00", borderColor: "rgba(255,140,0,0.4)" }}>🚫 Descalificar de concursos</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar usuario</button>
         </div>
       )}
@@ -132,7 +184,13 @@ export default function AdminUsuarios() {
     <div>
       {toast && <div style={toastS}>{toast}</div>}
       <h1 style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({usuarios.length})</h1>
-      <input style={{ ...inputS, marginBottom: "16px", maxWidth: "400px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
+      <input style={{ ...inputS, marginBottom: "12px", maxWidth: "400px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
+
+      <label style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", cursor: "pointer" }}>
+        <input type="checkbox" checked={soloIPsDuplicadas} onChange={e => setSoloIPsDuplicadas(e.target.checked)} style={{ accentColor: "#ff8c00" }} />
+        <span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.5)" }}>Mostrar solo IPs duplicadas</span>
+        {soloIPsDuplicadas && <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#ff8c00" }}>({filtered.length})</span>}
+      </label>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(u => (
@@ -142,9 +200,13 @@ export default function AdminUsuarios() {
               <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{u.email}</p>
             </div>
-            <div style={{ textAlign: "right", flexShrink: 0 }}>
-              <span style={{ fontSize: "0.72rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", margin: "2px 0 0" }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
+            <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "2px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <span style={{ fontSize: "0.72rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
+                {isIPDuplicada(u.ipRegistro) && <span style={ipBadgeS}>⚠️ IP</span>}
+              </div>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
             </div>
           </div>
         ))}
@@ -166,3 +228,4 @@ const labelS: React.CSSProperties = { fontFamily: "Georgia", fontSize: "0.75rem"
 const btnPrimaryS: React.CSSProperties = { flex: 1, padding: "10px", background: "#e8a84c", border: "none", borderRadius: "8px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" };
 const btnSecS: React.CSSProperties = { flex: 1, padding: "10px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.8rem", cursor: "pointer" };
 const btnOutlineS: React.CSSProperties = { display: "block", width: "100%", padding: "10px", background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer", textAlign: "left" };
+const ipBadgeS: React.CSSProperties = { background: "rgba(255,140,0,0.15)", border: "1px solid rgba(255,140,0,0.4)", color: "#ff8c00", borderRadius: "4px", padding: "2px 8px", fontSize: "10px", fontWeight: 700, whiteSpace: "nowrap" };

@@ -61,6 +61,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: true });
     }
 
+    if (accion === "descalificar") {
+      // Descalificar de todos los concursos activos
+      const participaciones = await prisma.participanteConcurso.findMany({
+        where: { usuarioId: id, concurso: { activo: true, cancelado: false, fechaFin: { gt: new Date() } } },
+      });
+      if (participaciones.length === 0) return NextResponse.json({ error: "No participa en concursos activos" }, { status: 400 });
+      await prisma.participanteConcurso.updateMany({
+        where: { id: { in: participaciones.map(p => p.id) } },
+        data: { estado: "descalificado", puntos: 0 },
+      });
+      return NextResponse.json({ ok: true, descalificados: participaciones.length });
+    }
+
     return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
   } catch (error) {
     console.error("[Admin usuarios PUT]", error);

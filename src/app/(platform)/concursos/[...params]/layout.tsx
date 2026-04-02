@@ -19,8 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!concurso) return {};
 
     const title = `🏆 ${concurso.premio} — ${concurso.local.nombre} | DeseoComer`;
-    const description = concurso.descripcion || `Participa gratis en el concurso de ${concurso.local.nombre} y gana: ${concurso.premio}`;
-    const image = concurso.imagenUrl || concurso.local.portadaUrl || "https://deseocomer.com/og-default.png";
+    const description = `Participa gratis y gana ${concurso.premio}. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!`;
+    const image = concurso.imagenUrl || concurso.local.portadaUrl || null;
+    const url = `https://deseocomer.com/concursos/${slug}`;
 
     return {
       title,
@@ -28,16 +29,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title,
         description,
-        images: [{ url: image, width: 1200, height: 630 }],
-        type: "website",
+        url,
         siteName: "DeseoComer",
+        ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: concurso.premio }] } : {}),
+        type: "website",
+        locale: "es_CL",
       },
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: [image],
+        ...(image ? { images: [image] } : {}),
       },
+      alternates: { canonical: url },
     };
   } catch {
     return {};

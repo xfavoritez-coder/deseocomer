@@ -1,29 +1,47 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useGenie } from "@/contexts/GenieContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  PROMOCIONES,
-  TIPO_ICONS,
-  TIPO_LABELS,
   DIAS_SHORT,
-  pad2,
   isPromocionActivaAhora,
   terminaEnMenos2Horas,
   getTimerHastaFin,
+  normalizeTipo,
   type Promocion,
 } from "@/lib/mockPromociones";
 
-// Top 3: if birthday, show birthday promos first; then active, happy_hour, rest
-function getTop3(esCumple: boolean): Promocion[] {
-  const cumple = esCumple ? PROMOCIONES.filter(p => p.esCumpleanos && p.activa) : [];
-  const noB = PROMOCIONES.filter(p => !p.esCumpleanos && p.activa);
-  const activas   = noB.filter(p => isPromocionActivaAhora(p));
-  const happyHour = noB.filter(p => !isPromocionActivaAhora(p) && p.tipo === "happy_hour");
-  const resto     = noB.filter(p => !isPromocionActivaAhora(p) && p.tipo !== "happy_hour");
-  return [...cumple, ...activas, ...happyHour, ...resto].slice(0, 3);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface PromoFromDB { id: string; localId: string; local: string; logoUrl: string; comuna: string; tipo: string; imagenUrl: string; titulo: string; descripcion: string; porcentajeDescuento: number | null; precioOriginal: number | null; precioDescuento: number | null; diasSemana: boolean[]; horaInicio: string; horaFin: string; activa: boolean; esCumpleanos: boolean; condiciones: string | null; }
+
+function mapDBToPromocion(p: PromoFromDB): Promocion {
+  return {
+    id: p.id as unknown as number, localId: p.localId, local: p.local,
+    comuna: p.comuna, tipo: normalizeTipo(p.tipo),
+    categoria: "cena" as const, imagen: "⚡", imagenUrl: p.imagenUrl,
+    titulo: p.titulo, descripcion: p.descripcion,
+    porcentajeDescuento: p.porcentajeDescuento ?? undefined,
+    precioOriginal: p.precioOriginal ?? undefined,
+    precioDescuento: p.precioDescuento ?? undefined,
+    diasSemana: Array.isArray(p.diasSemana) ? p.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
+    horaInicio: p.horaInicio, horaFin: p.horaFin,
+    fechaVencimiento: "2099-12-31", activa: p.activa,
+    esCumpleanos: p.esCumpleanos,
+    condiciones: p.condiciones ?? undefined,
+  };
+}
+
+const DIAS_NOMBRE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+function formatDias(dias: number[]): string {
+  if (dias.length === 0) return "";
+  if (dias.length === 7) return "Todos los días";
+  const sorted = [...dias].sort((a, b) => a - b);
+  const weekdays = [1, 2, 3, 4, 5];
+  if (sorted.length === 5 && weekdays.every(d => sorted.includes(d))) return "Lun a Vie";
+  if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
+  return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
 
 function checkBirthday(): boolean {
@@ -39,46 +57,43 @@ function checkBirthday(): boolean {
 
 interface TimerState { horas: number; minutos: number; segundos: number }
 
-export default function PromocionesSection() {
+export default function PromocionesSection({ initialData = [] }: { initialData?: PromoFromDB[] }) {
   const { isAuthenticated } = useAuth();
   const [mounted, setMounted]   = useState(false);
   const [esCumple, setEsCumple] = useState(false);
-  const [promos, setPromos]     = useState<Promocion[]>(getTop3(false));
 
-  // Try fetching from API (supplement mock data)
-  useEffect(() => {
-    fetch("/api/promociones").then(r => r.json()).then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        // BD promos found — for now just log, full integration later
-        console.log("[Promos] BD tiene", data.length, "promociones");
-      }
-    }).catch(() => {});
-  }, []);
-  const [timers, setTimers]     = useState<Record<number, TimerState>>({});
+  // Map server data immediately — no client fetch needed
+  const allPromos = initialData.map(mapDBToPromocion);
+  const promos = allPromos.slice(0, 3);
+
+  const [timers, setTimers]     = useState<Record<string, TimerState>>({});
   const [activasAhora, setActivasAhora] = useState(0);
-
-  const updateTimers = useCallback(() => {
-    const next: Record<number, TimerState> = {};
-    let activas = 0;
-    for (const p of PROMOCIONES) {
-      if (isPromocionActivaAhora(p)) {
-        next[p.id] = getTimerHastaFin(p);
-        activas++;
-      }
-    }
-    setTimers(next);
-    setActivasAhora(activas);
-  }, []);
 
   useEffect(() => {
     setMounted(true);
-    const cumple = isAuthenticated && checkBirthday();
-    setEsCumple(cumple);
-    if (cumple) setPromos(getTop3(true));
-    updateTimers();
-    const id = setInterval(updateTimers, 1000);
+    setEsCumple(isAuthenticated && checkBirthday());
+  }, [isAuthenticated]);
+
+  // Update timers
+  useEffect(() => {
+    if (promos.length === 0) return;
+    const update = () => {
+      const next: Record<string, TimerState> = {};
+      let activas = 0;
+      for (const p of promos) {
+        if (isPromocionActivaAhora(p)) {
+          next[p.id] = getTimerHastaFin(p);
+          activas++;
+        }
+      }
+      setTimers(next);
+      setActivasAhora(activas);
+    };
+    update();
+    const id = setInterval(update, 1000);
     return () => clearInterval(id);
-  }, [updateTimers, isAuthenticated]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData.length]);
 
   return (
     <section className="dc-ps-section" style={{ backgroundColor: "var(--bg-secondary)", borderTop: "1px solid rgba(61,184,158,0.08)", borderBottom: "1px solid rgba(61,184,158,0.08)" }}>
@@ -100,7 +115,7 @@ export default function PromocionesSection() {
             fontFamily: "var(--font-cinzel-decorative)",
             fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
             fontWeight: 800, letterSpacing: "0.02em",
-            color: "var(--color-title)",
+            color: "#f5d080",
             textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
             marginBottom: "20px",
           }}>
@@ -213,30 +228,33 @@ export default function PromocionesSection() {
                 {/* Local info below image */}
                 <div style={{
                   padding: "16px 24px 0",
-                  display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                  display: "flex", alignItems: "center", gap: "10px",
                   pointerEvents: "none",
                 }}>
+                  {initialData.find(d => d.id === String(promo.id))?.logoUrl ? (
+                    <img src={initialData.find(d => d.id === String(promo.id))!.logoUrl} alt="" style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
+                  ) : (
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.25), rgba(232,168,76,0.08))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.2)", flexShrink: 0 }}>{(promo.local ?? "L").charAt(0).toUpperCase()}</div>
+                  )}
                   <div>
                     <p style={{
                       fontFamily: "var(--font-cinzel)",
-                      fontSize: "0.72rem",
-                      letterSpacing: "0.2em",
-                      textTransform: "uppercase",
-                      color: "var(--text-muted)",
-                      marginBottom: "3px",
-                    }}>
-                      {promo.comuna}
-                    </p>
-                    <p style={{
-                      fontFamily: "var(--font-cinzel)",
                       fontSize: "0.85rem",
-                      color: isHH ? "#d4a017" : "var(--color-link)",
+                      color: isHH ? "#d4a017" : "var(--text-primary)",
                       fontWeight: 600,
                     }}>
                       {promo.local}
                     </p>
+                    <p style={{
+                      fontFamily: "var(--font-cinzel)",
+                      fontSize: "0.68rem",
+                      letterSpacing: "0.15em",
+                      textTransform: "uppercase",
+                      color: "var(--text-muted)",
+                    }}>
+                      {promo.comuna}
+                    </p>
                   </div>
-                  <div />
                 </div>
 
                 <div className="dc-ps-card-inner" style={{ pointerEvents: "none" }}>
@@ -247,6 +265,10 @@ export default function PromocionesSection() {
                     color: "var(--color-title)",
                     marginBottom: "8px",
                     lineHeight: 1.3,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical" as const,
+                    overflow: "hidden",
                   }}>
                     {promo.titulo}
                   </h3>
@@ -296,81 +318,27 @@ export default function PromocionesSection() {
                     </div>
                   )}
 
-                  {/* Horario stats */}
+                  {/* Días + Horario */}
                   <div style={{
                     display: "flex",
-                    gap: "16px",
-                    marginBottom: "16px",
-                    padding: "12px 16px",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginBottom: "20px",
+                    padding: "10px 14px",
                     background: "rgba(0,0,0,0.2)",
                     borderRadius: "10px",
                   }}>
-                    <div style={{ flex: 1, textAlign: "center" }}>
-                      <p style={{
-                        fontFamily: "var(--font-cinzel-decorative)",
-                        fontSize: "1rem",
-                        color: accentColor,
-                      }}>
-                        {promo.horaInicio}
-                      </p>
-                      <p style={{
-                        fontFamily: "var(--font-lato)",
-                        fontSize: "0.72rem",
-                        color: "var(--text-muted)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
-                      }}>
-                        Inicio
-                      </p>
-                    </div>
-                    <div style={{ width: "1px", background: "var(--border-color)" }} />
-                    <div style={{ flex: 1, textAlign: "center" }}>
-                      <p style={{
-                        fontFamily: "var(--font-cinzel-decorative)",
-                        fontSize: "1rem",
-                        color: accentColor,
-                      }}>
-                        {promo.horaFin}
-                      </p>
-                      <p style={{
-                        fontFamily: "var(--font-lato)",
-                        fontSize: "0.72rem",
-                        color: "var(--text-muted)",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.1em",
-                      }}>
-                        Fin
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Días */}
-                  <div style={{ display: "flex", gap: "5px", marginBottom: "20px" }}>
-                    {DIAS_SHORT.map((dia, idx) => (
-                      <span
-                        key={idx}
-                        style={{
-                          fontFamily: "var(--font-cinzel)",
-                          fontSize: "0.65rem",
-                          width: "22px", height: "22px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50%",
-                          border: promo.diasSemana.includes(idx)
-                            ? isHH ? "1px solid rgba(212,160,23,0.6)" : "1px solid var(--accent)"
-                            : "1px solid var(--border-color)",
-                          background: promo.diasSemana.includes(idx)
-                            ? isHH ? "rgba(212,160,23,0.15)" : "color-mix(in srgb, var(--accent) 15%, transparent)"
-                            : "transparent",
-                          color: promo.diasSemana.includes(idx)
-                            ? isHH ? "#d4a017" : "var(--accent)"
-                            : "var(--text-muted)",
-                        }}
-                      >
-                        {dia}
-                      </span>
-                    ))}
+                    <span style={{ fontSize: "0.85rem" }}>🕐</span>
+                    <p style={{
+                      fontFamily: "var(--font-lato)",
+                      fontSize: "0.8rem",
+                      color: "var(--text-muted)",
+                      lineHeight: 1.4,
+                    }}>
+                      <span style={{ color: accentColor, fontWeight: 600 }}>{formatDias(promo.diasSemana)}</span>
+                      {" · "}
+                      {promo.horaInicio} – {promo.horaFin}
+                    </p>
                   </div>
 
 
@@ -383,12 +351,12 @@ export default function PromocionesSection() {
                         : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))",
                       borderRadius: "16px",
                       fontFamily: "var(--font-cinzel)",
-                      fontSize: "clamp(0.9rem, 2.5vw, 1rem)",
-                      letterSpacing: "0.08em",
+                      fontSize: "0.78rem",
+                      letterSpacing: "0.1em",
                       textTransform: "uppercase",
                       color: "#07040f",
                       fontWeight: 700,
-                      minHeight: "52px",
+                      minHeight: "46px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -429,11 +397,15 @@ export default function PromocionesSection() {
         .dc-ps-section { padding: 100px 60px 80px; }
         .dc-ps-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
           gap: 28px;
+          max-width: 420px;
+          margin: 0 auto;
         }
+        .dc-ps-grid:has(:nth-child(2)) { max-width: 860px; }
+        .dc-ps-grid:has(:nth-child(3)) { max-width: 100%; }
         .dc-ps-card-inner { padding: 16px 28px 28px; }
-        .dc-ps-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
+        .dc-ps-card:hover { border-color: var(--accent) !important; }
         .dc-ps-card--hh:hover { border-color: #d4a017 !important; }
 
         @keyframes dc-ps-blink {

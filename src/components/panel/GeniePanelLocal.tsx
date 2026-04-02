@@ -100,10 +100,16 @@ export default function GeniePanelLocal() {
     const timer = setTimeout(() => {
       setMensaje(msg);
       setGloboVisible(true);
-      markShown(msg.id);
     }, 3000);
     return () => clearTimeout(timer);
   }, [pathname, datosLocal]);
+
+  // Auto-dismiss globo after 8 seconds
+  useEffect(() => {
+    if (!globoVisible || !mensaje) return;
+    const t = setTimeout(() => setGloboVisible(false), 8000);
+    return () => clearTimeout(t);
+  }, [globoVisible, mensaje?.id]);
 
   const localId = datosLocal?.slug || datosLocal?.id || "";
 
@@ -122,11 +128,17 @@ export default function GeniePanelLocal() {
         <div style={{ position: "fixed", bottom: "88px", right: "24px", width: "min(300px, calc(100vw - 48px))", background: "rgba(13,7,3,0.97)", border: `1px solid ${tipoColor(mensaje.tipo)}60`, borderRadius: "16px", padding: "16px", zIndex: 999, boxShadow: "0 8px 32px rgba(0,0,0,0.6)", animation: "genio-toast-in 0.3s ease both" }}>
           <button onClick={() => setGloboVisible(false)} style={{ position: "absolute", top: "8px", right: "10px", background: "none", border: "none", color: "rgba(245,208,128,0.4)", fontSize: "0.85rem", cursor: "pointer" }}>✕</button>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.875rem", color: "rgba(245,208,128,0.9)", lineHeight: 1.5, margin: "0 0 12px", paddingRight: "16px" }}>{mensaje.texto}</p>
-          {mensaje.accion && (
-            <Link href={mensaje.accion.href} onClick={() => setGloboVisible(false)} style={{ display: "inline-block", padding: "8px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "none" }}>
-              {mensaje.accion.label} →
-            </Link>
-          )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
+            {mensaje.accion && (
+              <Link href={mensaje.accion.href} onClick={() => setGloboVisible(false)} style={{ display: "inline-block", padding: "8px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "var(--accent)", textDecoration: "none" }}>
+                {mensaje.accion.label} →
+              </Link>
+            )}
+            <button onClick={() => { markShown(mensaje.id); setGloboVisible(false); }} style={{ padding: "8px 16px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.6)", cursor: "pointer" }}>
+              Entendido
+            </button>
+          </div>
+          <button onClick={() => { markShown(mensaje.id); setGloboVisible(false); }} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.15)", padding: 0 }}>No mostrar más</button>
           <div style={{ position: "absolute", bottom: "-8px", right: "22px", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `8px solid ${tipoColor(mensaje.tipo)}60` }} />
         </div>
       )}

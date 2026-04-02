@@ -34,6 +34,19 @@ export interface Promocion {
   condiciones?: string;
 }
 
+// ─── Normalize DB tipo → TipoPromocion ──────────────────────────────────────
+const TIPO_MAP: Record<string, TipoPromocion> = {
+  "Descuento %": "descuento",
+  "2x1": "2x1",
+  "Happy Hour": "happy_hour",
+  "Cupón": "cupon",
+  "Regalo": "precio_especial",
+  "Cumpleaños": "cumpleanos",
+};
+export function normalizeTipo(tipo: string): TipoPromocion {
+  return TIPO_MAP[tipo] ?? "descuento";
+}
+
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 export const PROMOCIONES: Promocion[] = [];

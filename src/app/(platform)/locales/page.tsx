@@ -110,7 +110,7 @@ export default function LocalesPage() {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 65%)" }} />
         <div style={{ position: "relative", textAlign: "center" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "16px" }}>Locales</p>
-          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2.2rem, 7vw, 4.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Descubre Dónde Comer</h1>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Descubre Dónde Comer</h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Los mejores locales gastronómicos de Santiago.</p>
         </div>
       </section>
@@ -246,9 +246,9 @@ export default function LocalesPage() {
                     </div>
 
                     {/* Content */}
-                    <div style={{ padding: "16px 20px 20px" }}>
+                    <div style={{ padding: local.descripcion ? "16px 20px 20px" : "16px 20px 16px" }}>
                       {/* Header: logo + nombre + meta + rating */}
-                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: local.descripcion ? "10px" : "0" }}>
                         <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", flex: 1, minWidth: 0 }}>
                           {local.logoUrl ? (
                             <img src={local.logoUrl} alt="" style={{ width: "40px", height: "40px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
@@ -278,9 +278,9 @@ export default function LocalesPage() {
                       </div>
 
                       {/* Descripción */}
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.92rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", margin: 0 }}>
+                      {local.descripcion && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.92rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", margin: 0 }}>
                         {local.descripcion}
-                      </p>
+                      </p>}
                     </div>
                   </Link>
                 );
@@ -317,6 +317,7 @@ export default function LocalesPage() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
           gap: 20px;
+          align-items: start;
         }
         .dc-loc-card {
           background: rgba(255,255,255,0.04);
@@ -327,7 +328,6 @@ export default function LocalesPage() {
           transition: transform 0.2s, border-color 0.2s;
         }
         .dc-loc-card:hover {
-          transform: translateY(-4px);
           border-color: var(--accent) !important;
         }
         .dc-loc-skeleton {

@@ -126,9 +126,9 @@ export default function LocalesSection() {
                 <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categoria, comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
               </div>
-              <div style={{ padding: "16px 20px 20px" }}>
+              <div style={{ padding: local.descripcion ? "16px 20px 20px" : "16px 20px 16px" }}>
                 {/* Header: logo + nombre + meta + rating */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px", marginBottom: local.descripcion ? "10px" : "0" }}>
                   <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", flex: 1, minWidth: 0 }}>
                     <div style={{
                       width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0,
@@ -161,14 +161,14 @@ export default function LocalesSection() {
                 </div>
 
                 {/* Descripción */}
-                <p style={{
+                {local.descripcion && <p style={{
                   fontFamily: "var(--font-lato)",
                   fontSize: "clamp(0.85rem, 2vw, 0.9rem)",
                   color: "var(--text-muted)",
                   lineHeight: 1.7,
                   fontWeight: 400,
                   display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden",
-                }}>{local.descripcion}</p>
+                }}>{local.descripcion}</p>}
               </div>
             </Link>
           ))}
@@ -210,6 +210,7 @@ export default function LocalesSection() {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
           gap: 24px;
+          align-items: start;
         }
 
         .dc-loc-card {
@@ -220,7 +221,6 @@ export default function LocalesSection() {
           transition: transform 0.2s ease, border-color 0.2s ease;
         }
         .dc-loc-card:hover {
-          transform: translateY(-4px);
           border-color: var(--accent);
         }
 

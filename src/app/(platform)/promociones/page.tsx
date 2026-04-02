@@ -4,9 +4,22 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, type Promocion } from "@/lib/mockPromociones";
+import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, normalizeTipo, type Promocion } from "@/lib/mockPromociones";
 
 const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
+const DIAS_NOMBRE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
+function formatDias(dias: number[]): string {
+  if (dias.length === 0) return "";
+  if (dias.length === 7) return "Todos los días";
+  const sorted = [...dias].sort((a, b) => a - b);
+  // Check consecutive weekdays (1-5)
+  const weekdays = [1, 2, 3, 4, 5];
+  if (sorted.length === 5 && weekdays.every(d => sorted.includes(d))) return "Lun a Vie";
+  // Check consecutive weekend (0,6)
+  if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
+  return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
+}
 const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
@@ -26,11 +39,27 @@ export default function PromocionesPage() {
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
   const [esCumple, setEsCumple] = useState(false);
 
-  // Fetch from BD and merge
+  // Fetch from BD
   useEffect(() => {
     fetch("/api/promociones").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
-        console.log("[Promos] BD:", data.length);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mapped = data.map((p: any) => ({
+          id: p.id, localId: p.localId, local: p.local?.nombre ?? "Local",
+          logoUrl: p.local?.logoUrl ?? "",
+          comuna: p.local?.comuna ?? "", tipo: normalizeTipo(p.tipo ?? ""),
+          categoria: "cena" as const, imagen: "⚡", imagenUrl: p.imagenUrl ?? "",
+          titulo: p.titulo ?? "", descripcion: p.descripcion ?? "",
+          porcentajeDescuento: p.porcentajeDescuento ?? undefined,
+          precioOriginal: p.precioOriginal ?? undefined,
+          precioDescuento: p.precioDescuento ?? undefined,
+          diasSemana: Array.isArray(p.diasSemana) ? p.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
+          horaInicio: p.horaInicio ?? "12:00", horaFin: p.horaFin ?? "22:00",
+          fechaVencimiento: "2099-12-31", activa: p.activa ?? true,
+          esCumpleanos: p.esCumpleanos ?? false,
+          condiciones: p.condiciones ?? undefined,
+        }));
+        setPromos(mapped);
       }
     }).catch(() => {});
   }, []);
@@ -68,7 +97,7 @@ export default function PromocionesPage() {
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 65%)" }} />
         <div style={{ position: "relative", textAlign: "center" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem, 2vw, 0.85rem)", letterSpacing: "0.45em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "16px" }}>Promociones</p>
-          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2.2rem, 7vw, 4.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 50%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Ofertas Exclusivas ⚡</h1>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.8rem, 5vw, 3.5rem)", fontWeight: 800, letterSpacing: "0.02em", color: "#f5d080", textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>Ofertas Exclusivas ⚡</h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, maxWidth: "520px", margin: "0 auto", lineHeight: 1.8 }}>Descuentos, happy hours y promociones especiales de los mejores restaurantes de Santiago.</p>
         </div>
       </section>
@@ -84,7 +113,7 @@ export default function PromocionesPage() {
         </div>
 
         {/* Fila 2 — Filtros de tipo */}
-        <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "nowrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none" }}>
+        <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "wrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none" }}>
           {[
             { key: "activas", label: "Activas ahora", color: "var(--oasis-bright)" },
             { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
@@ -121,14 +150,14 @@ export default function PromocionesPage() {
             <p style={{ fontFamily: "var(--font-lato)", color: "var(--color-text, rgba(240,234,214,0.8))", fontSize: "1rem", marginBottom: "24px" }}>Estos locales tienen ofertas exclusivas para celebrar tu cumpleaños</p>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "16px", textAlign: "left" }}>
               {promosCumple.map(promo => (
-                <Link key={promo.id} href={`/promociones/${promo.id}`} style={{ background: "rgba(8,13,24,0.7)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", overflow: "hidden", textDecoration: "none", display: "block", transition: "transform 0.2s" }} onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; }} onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}>
+                <Link key={promo.id} href={`/promociones/${promo.id}`} style={{ background: "rgba(8,13,24,0.7)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", overflow: "hidden", textDecoration: "none", display: "block" }}>
                   {promo.imagenUrl && (
                     <div style={{ height: "120px", overflow: "hidden" }}>
                       <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
                   <div style={{ padding: "14px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "4px" }}>{promo.titulo}</p>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{promo.titulo}</p>
                     <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)" }}>{promo.local} · {promo.comuna}</p>
                   </div>
                 </Link>
@@ -156,38 +185,68 @@ export default function PromocionesPage() {
             {promosNormales.map(promo => {
               const activa = isPromocionActivaAhora(promo);
               const sello = getSello(promo);
+              const isHH = promo.tipo === "happy_hour";
+              const accentColor = isHH ? "#d4a017" : "var(--accent)";
+              const logoUrl = (promo as unknown as Record<string, unknown>).logoUrl as string | undefined;
               return (
-                <Link key={promo.id} href={`/promociones/${promo.id}`} style={{
-                  background: "rgba(8,13,24,0.85)", border: "1px solid rgba(232,168,76,0.15)",
-                  borderRadius: "16px", overflow: "hidden", textDecoration: "none", display: "block",
-                  borderLeft: activa ? "3px solid var(--oasis-bright)" : "3px solid transparent",
-                  transition: "transform 0.2s, border-color 0.2s",
-                }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
-                >
+                <a key={promo.id} href={`/promociones/${promo.id}`} style={{
+                  backgroundColor: "rgba(45,26,8,0.85)",
+                  border: isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)",
+                  borderRadius: "20px", cursor: "pointer", position: "relative", overflow: "hidden",
+                  textDecoration: "none", display: "block", color: "inherit",
+                  transition: "border-color 0.2s",
+                }}>
+                  {isHH && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)", zIndex: 1 }} />}
+
                   {promo.imagenUrl && (
                     <div style={{ position: "relative", height: "160px", overflow: "hidden" }}>
                       <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                       {sello && (
-                        <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "5px 12px" }}>
+                        <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 3, background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "5px 12px" }}>
                           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
                         </div>
                       )}
                     </div>
                   )}
-                  <div style={{ padding: "16px" }}>
-                    {activa && (
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", padding: "3px 10px", borderRadius: "20px", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.35)", marginBottom: "8px" }}>
-                        <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "var(--oasis-bright)", display: "inline-block", animation: "dc-ps-blink 1.5s infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
-                      </div>
+
+                  {/* Local info */}
+                  <div style={{ padding: "16px 24px 0", display: "flex", alignItems: "center", gap: "10px" }}>
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="" style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
+                    ) : (
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.25), rgba(232,168,76,0.08))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.2)", flexShrink: 0 }}>{(promo.local ?? "L").charAt(0).toUpperCase()}</div>
                     )}
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.95rem", color: "#f5d080", marginBottom: "4px" }}>{promo.titulo}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.65)", marginBottom: "6px" }}>{promo.local} · {promo.comuna}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-primary)", lineHeight: 1.5 }}>{promo.descripcion?.slice(0, 80)}{(promo.descripcion?.length ?? 0) > 80 ? "..." : ""}</p>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: isHH ? "#d4a017" : "var(--text-primary)", fontWeight: 600 }}>{promo.local}</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>{promo.comuna}</p>
+                    </div>
                   </div>
-                </Link>
+
+                  <div style={{ padding: "16px 28px 28px" }}>
+                    <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(0.9rem, 2.5vw, 1rem)", color: "var(--color-title)", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                      {promo.titulo}
+                    </h3>
+
+                    {promo.descripcion && (
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                        {promo.descripcion}
+                      </p>
+                    )}
+
+                    {/* Días + Horario */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px", padding: "10px 14px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
+                      <span style={{ fontSize: "0.85rem" }}>🕐</span>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.4, margin: 0 }}>
+                        <span style={{ color: accentColor, fontWeight: 600 }}>{formatDias(promo.diasSemana)}</span>
+                        {" · "}{promo.horaInicio} – {promo.horaFin}
+                      </p>
+                    </div>
+
+                    <div style={{ width: "100%", background: isHH ? "linear-gradient(135deg, #c8850a, #d4a017)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", borderRadius: "16px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#07040f", fontWeight: 700, minHeight: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      Ver promoción →
+                    </div>
+                  </div>
+                </a>
               );
             })}
           </div>

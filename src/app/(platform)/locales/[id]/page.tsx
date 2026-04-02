@@ -63,7 +63,7 @@ function getColor(name: string): string {
   return COLORS[name.charCodeAt(0) % COLORS.length];
 }
 
-type Tab = "Información" | "Menú" | "Reseñas" | "Fotos" | "Concursos" | "Promociones";
+type Tab = "Información" | "Menú" | "Reseñas" | "Concursos" | "Promociones";
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -171,7 +171,10 @@ export default function LocalDetailPage() {
   }
 
   const todayName = DAY_NAMES[new Date().getDay()];
-  const concursosLocal = CONCURSOS.filter(c => c.local === local.nombre);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dbConcursos = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).concursos) ? ((dbLocal as Record<string, unknown>).concursos as any[]).filter((c: any) => !c.cancelado) : [];
+  const concursosLocal: any[] = dbConcursos.length > 0 ? dbConcursos : CONCURSOS.filter(c => c.local === local.nombre);
+  const promosLocal = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).promociones) ? (dbLocal as Record<string, unknown>).promociones as Record<string, unknown>[] : [];
   const similares = LOCALES.filter(l => l.categoria === local.categoria && l.id !== local.id).slice(0, 3);
   const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
@@ -254,9 +257,8 @@ export default function LocalDetailPage() {
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
           { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
-          { key: "Fotos" as Tab, label: "Fotos", count: null, countColor: "", countBg: "" },
           { key: "Concursos" as Tab, label: "Concursos", count: concursosLocal.length > 0 ? concursosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c" },
-          { key: "Promociones" as Tab, label: "Promociones", count: null, countColor: "", countBg: "" },
+          { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#c97060" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
             {t.label}
@@ -299,7 +301,7 @@ export default function LocalDetailPage() {
                           <span style={{ fontSize: "1.5rem" }}>🏆</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{c.premio}</p>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{c.participantes} participantes</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
                           </div>
                           <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "0.9rem", flexShrink: 0 }}>→</span>
                         </Link>
@@ -418,21 +420,6 @@ export default function LocalDetailPage() {
             {/* TAB: Reseñas */}
             {tab === "Reseñas" && <ResenasTab local={local} isAuth={isAuthenticated} esLocal={esLocal} />}
 
-            {/* TAB: Fotos */}
-            {tab === "Fotos" && (
-              local.galeria.length > 0 ? (
-                <div className="dc-ld-gallery">
-                  {local.galeria.map((foto, i) => (
-                    <div key={i} onClick={() => setLightbox(foto)} style={{ cursor: "pointer", height: "200px", borderRadius: "12px", overflow: "hidden" }}>
-                      <img src={foto} alt={`${local.nombre} ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", transition: "transform 0.3s" }} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState icon="📷" title="Sin fotos" text="Este local aún no ha subido fotos" />
-              )
-            )}
-
             {/* TAB: Concursos */}
             {tab === "Concursos" && (
               concursosLocal.length > 0 ? (
@@ -443,10 +430,14 @@ export default function LocalDetailPage() {
                       background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)",
                       borderRadius: "14px", padding: "16px", textDecoration: "none",
                     }}>
-                      <span style={{ fontSize: "2rem" }}>{c.imagen}</span>
+                      {c.imagenUrl ? (
+                        <img src={c.imagenUrl} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+                      ) : (
+                        <span style={{ fontSize: "2rem" }}>🏆</span>
+                      )}
                       <div>
                         <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>{c.participantes} participantes</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
                       </div>
                     </Link>
                   ))}
@@ -458,7 +449,26 @@ export default function LocalDetailPage() {
 
             {/* TAB: Promociones */}
             {tab === "Promociones" && (
-              <EmptyState icon="⚡" title="Sin promociones activas" text="Este local no tiene promociones activas en este momento." />
+              promosLocal.length > 0 ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {promosLocal.map((p: Record<string, unknown>) => (
+                    <Link key={p.id as string} href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "14px 16px", textDecoration: "none" }}>
+                      {p.imagenUrl ? (
+                        <img src={p.imagenUrl as string} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 56, height: 56, borderRadius: 10, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>⚡</div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo as string}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
+                      </div>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState icon="⚡" title="Sin promociones activas" text="Este local no tiene promociones activas en este momento." />
+              )
             )}
           </div>
 

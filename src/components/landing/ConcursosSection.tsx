@@ -198,7 +198,7 @@ export default function ConcursosSection() {
       <style>{`
         .dc-cst-section { padding: 100px 60px 80px; }
         .dc-cst-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .dc-cst-card:hover { transform: translateY(-6px); border-color: var(--accent) !important; }
+        .dc-cst-card:hover { border-color: var(--accent) !important; }
         .dc-cst-img { height: 180px; }
         .dc-cst-premio { font-size: 24px; }
         .dc-cst-desc { display: none !important; }

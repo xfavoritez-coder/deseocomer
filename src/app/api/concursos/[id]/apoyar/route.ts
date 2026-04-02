@@ -10,6 +10,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!supporterId || !targetUsuarioId) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
     if (supporterId === targetUsuarioId) return NextResponse.json({ error: "No puedes apoyarte a ti mismo" }, { status: 400 });
 
+    // Verificar que el usuario que apoya tenga email verificado
+    const supporter = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { emailVerificado: true } });
+    if (!supporter?.emailVerificado) {
+      return NextResponse.json({ error: "Debes verificar tu correo antes de poder apoyar a otros participantes." }, { status: 403 });
+    }
+
     const concurso = await prisma.concurso.findFirst({
       where: { OR: [{ id }, { slug: id }], activo: true },
       include: { local: { select: { nombre: true } } },

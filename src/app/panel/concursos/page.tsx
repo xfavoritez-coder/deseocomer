@@ -42,6 +42,7 @@ export default function PanelConcursos() {
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelMotivo, setCancelMotivo] = useState("");
   const [actionToast, setActionToast] = useState("");
+  const [abrirEditando, setAbrirEditando] = useState(false);
 
   useEffect(() => {
     const s = getSession();
@@ -55,6 +56,19 @@ export default function PanelConcursos() {
         .catch(() => setLoading(false));
     } else setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (abrirEditando && detalle) {
+      setEditPremio(detalle.premio ?? "");
+      setEditDescripcion(detalle.descripcion ?? "");
+      setEditCondiciones(detalle.condiciones ?? "");
+      setEditImagen(detalle.imagenUrl ?? "");
+      setEditFechaFin(new Date(detalle.fechaFin).toISOString().slice(0, 16));
+      setEditError("");
+      setEditando(true);
+      setAbrirEditando(false);
+    }
+  }, [abrirEditando, detalle]);
 
   const pFinal = premio;
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "10px 18px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: sel ? 700 : 400 });
@@ -284,7 +298,7 @@ export default function PanelConcursos() {
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Premio</label>
-                <input style={I} value={editPremio} onChange={e => setEditPremio(e.target.value)} />
+                <input style={I} value={editPremio} onChange={e => setEditPremio(e.target.value)} maxLength={80} />
               </div>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Descripción del premio</label>
@@ -338,7 +352,8 @@ export default function PanelConcursos() {
         <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>¿Qué vas a regalar?</h2>
 
         {labelReq("Premio")}
-        <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, café por un mes, etc" />
+        <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, café por un mes, etc" maxLength={80} />
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", marginTop: "4px", textAlign: "right" }}>{premio.length}/80</p>
 
         {labelReq("Descripción del premio")}
         <input style={I} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
@@ -449,19 +464,24 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} onClick={() => setDetalle(c)} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "center", cursor: "pointer", transition: "border-color 0.2s" }}>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", display: "flex", alignItems: "center", transition: "border-color 0.2s" }}>
               {c.imagenUrl ? (
-                <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", flexShrink: 0 }} />
+                <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                  <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", display: "block" }} />
+                </a>
               ) : (
-                <div style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem" }}>🏆</div>
+                <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", textDecoration: "none" }}>🏆</a>
               )}
-              <div style={{ flex: 1, padding: "12px 16px" }}>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
+              <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer" }}>
+                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
                   {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", padding: "0 16px 0 0" }}>Detalle →</span>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0, padding: "0 12px 0 0" }}>
+                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
+                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
+              </div>
             </div>
           );
         })}

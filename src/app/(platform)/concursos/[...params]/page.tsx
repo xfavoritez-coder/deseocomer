@@ -228,6 +228,7 @@ function ConcursoDetallePage() {
     ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
     : null;
   const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {} };
+  const [supportError, setSupportError] = useState("");
   const handleSupport = async (targetName: string, targetId: string, targetUsuarioId: string) => {
     if (!user) return;
     const ok = supportUser(concursoId, user.id, targetId);
@@ -235,7 +236,13 @@ function ConcursoDetallePage() {
     setSupportedMap(m => ({ ...m, [targetId]: true })); setTooltipActivo(targetId); setTimeout(() => setTooltipActivo(null), 2000);
     // Call API to persist the +1 in DB
     if (targetUsuarioId) {
-      try { await fetch(`/api/concursos/${slug}/apoyar`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ supporterId: user.id, targetUsuarioId }) }); } catch {}
+      try {
+        const res = await fetch(`/api/concursos/${slug}/apoyar`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ supporterId: user.id, targetUsuarioId }) });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          if (res.status === 403) { setSupportError(data.error ?? "Debes verificar tu correo para apoyar."); setTimeout(() => setSupportError(""), 5000); setSupportedMap(m => { const n = { ...m }; delete n[targetId]; return n; }); }
+        }
+      } catch {}
     }
     refreshRanking();
   };
@@ -257,6 +264,7 @@ function ConcursoDetallePage() {
   // Ranking block (shared between mobile + desktop sidebar)
   const rankingBlock = (
     <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden" }}>
+      {supportError && <div style={{ padding: "10px 14px", background: "rgba(255,80,80,0.1)", borderBottom: "1px solid rgba(255,80,80,0.2)", fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", textAlign: "center" }}>{supportError} <a href="/verificar-email" style={{ color: "#e8a84c", fontWeight: 700 }}>Reenviar verificación →</a></div>}
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "rgba(120,140,220,0.8)" }}>Ranking en tiempo real</span>

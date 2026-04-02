@@ -60,6 +60,8 @@ model Local {
   tieneMenu     Boolean  @default(false)
   resetToken        String?
   resetTokenExpira  DateTime?
+  nombreEncargado               String   @default("")
+  registroRapido                Boolean  @default(false)
   verificado                    Boolean  @default(false)
   activo                        Boolean  @default(true)
   primerParticipanteNotificado  Boolean  @default(false)
@@ -132,6 +134,7 @@ model Promocion {
   tipo                String
   titulo              String
   descripcion         String?
+  condiciones         String?
   porcentajeDescuento Int?
   precioOriginal      Float?
   precioDescuento     Float?

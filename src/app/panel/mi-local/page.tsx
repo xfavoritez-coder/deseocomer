@@ -127,6 +127,7 @@ export default function MiLocalPage() {
         }
         setSaving(false);
         setSaved(true);
+        showToast("Cambios guardados con éxito", "ok");
         setTimeout(() => window.location.reload(), 1200);
       } else {
         const err = await res.json().catch(() => ({}));

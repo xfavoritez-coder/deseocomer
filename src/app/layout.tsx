@@ -28,6 +28,7 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://deseocomer.com"),
   title: "DeseoComer.com — El genio que cumple tu deseo de comer",
   description: "Gana comida gratis, descubre los mejores locales y promociones de tu ciudad.",
   icons: {
