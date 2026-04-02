@@ -7,6 +7,11 @@ interface MapaLocalProps {
   nombre: string;
 }
 
+function isDay(): boolean {
+  const h = new Date().getHours();
+  return h >= 7 && h < 20;
+}
+
 export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -30,9 +35,10 @@ export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
         attributionControl: false,
       });
 
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        maxZoom: 19,
-      }).addTo(map);
+      const tileUrl = isDay()
+        ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+      L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map);
 
       const iconoDorado = L.divIcon({
         html: `
@@ -100,7 +106,7 @@ export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
       />
       <style>{`
         .leaflet-container {
-          background: #0d0d0d !important;
+          background: ${isDay() ? "#f0ece4" : "#0d0d0d"} !important;
           border-radius: 12px;
           z-index: 1 !important;
         }

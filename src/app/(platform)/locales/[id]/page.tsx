@@ -63,7 +63,7 @@ function getColor(name: string): string {
   return COLORS[name.charCodeAt(0) % COLORS.length];
 }
 
-type Tab = "Información" | "Menú" | "Reseñas" | "Concursos" | "Promociones";
+type Tab = "Información" | "Reseñas" | "Concursos" | "Promociones";
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -255,7 +255,6 @@ export default function LocalDetailPage() {
       <div className="dc-tabs-sticky" style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
-          { key: "Menú" as Tab, label: "Menú", count: null, countColor: "", countBg: "" },
           { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
           { key: "Concursos" as Tab, label: "Concursos", count: concursosLocal.length > 0 ? concursosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c" },
           { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#c97060" },
@@ -292,22 +291,55 @@ export default function LocalDetailPage() {
                     )}
                   </div>
 
-                  {/* Concursos activos */}
-                  {concursosLocal.length > 0 && (
-                    <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concursos activos</p>
-                      {concursosLocal.map(c => (
-                        <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", marginBottom: "8px", textDecoration: "none" }}>
-                          <span style={{ fontSize: "1.5rem" }}>🏆</span>
+                  {/* Concurso destacado (solo el más reciente) */}
+                  {concursosLocal.length > 0 && (() => {
+                    const c = concursosLocal[0];
+                    return (
+                      <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concurso activo</p>
+                        <Link href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
+                          {c.imagenUrl ? (
+                            <img src={c.imagenUrl} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                          ) : (
+                            <span style={{ fontSize: "1.5rem" }}>🏆</span>
+                          )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{c.premio}</p>
                             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
                           </div>
-                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "0.9rem", flexShrink: 0 }}>→</span>
+                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
                         </Link>
-                      ))}
-                    </div>
-                  )}
+                        {concursosLocal.length > 1 && (
+                          <button onClick={() => setTab("Concursos")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todos ({concursosLocal.length}) →</button>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Promoción destacada (solo la más reciente) */}
+                  {promosLocal.length > 0 && (() => {
+                    const p = promosLocal[0];
+                    return (
+                      <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Promoción activa</p>
+                        <Link href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
+                          {p.imagenUrl ? (
+                            <img src={p.imagenUrl as string} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
+                          ) : (
+                            <span style={{ fontSize: "1.5rem" }}>⚡</span>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{p.titulo as string}</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
+                          </div>
+                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
+                        </Link>
+                        {promosLocal.length > 1 && (
+                          <button onClick={() => setTab("Promociones")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todas ({promosLocal.length}) →</button>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Reseñas preview */}
                   {local.resenas.length === 0 ? (
@@ -383,40 +415,6 @@ export default function LocalDetailPage() {
               </div>
             )}
 
-            {/* TAB: Menú */}
-            {tab === "Menú" && (
-              local.tieneMenu && local.menu.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                  {local.menu.map(cat => (
-                    <div key={cat.categoria}>
-                      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>
-                        {cat.categoria}
-                      </h3>
-                      <div className="dc-ld-menu-grid">
-                        {cat.items.map(item => (
-                          <div key={item.id} style={{ background: "rgba(45,26,8,0.85)", borderRadius: "12px", padding: "16px", border: "1px solid var(--border-color)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                              <div>
-                                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "4px" }}>
-                                  {item.nombre} {item.destacado && <span style={{ fontSize: "0.78rem" }}>⭐</span>}
-                                </p>
-                                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{item.descripcion}</p>
-                              </div>
-                              <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", flexShrink: 0, marginLeft: "12px" }}>
-                                {formatPrice(item.precio)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState icon="🍽️" title="Menú no disponible" text="Este local no ha publicado su menú aún. Visítanos para conocer nuestras opciones del día." />
-              )
-            )}
-
             {/* TAB: Reseñas */}
             {tab === "Reseñas" && <ResenasTab local={local} isAuth={isAuthenticated} esLocal={esLocal} />}
 
@@ -425,20 +423,21 @@ export default function LocalDetailPage() {
               concursosLocal.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   {concursosLocal.map(c => (
-                    <Link key={c.id} href={`/concursos/${c.id}`} style={{
+                    <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{
                       display: "flex", alignItems: "center", gap: "14px",
                       background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)",
-                      borderRadius: "14px", padding: "16px", textDecoration: "none",
+                      borderRadius: "14px", padding: "14px 16px", textDecoration: "none",
                     }}>
                       {c.imagenUrl ? (
                         <img src={c.imagenUrl} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
                       ) : (
-                        <span style={{ fontSize: "2rem" }}>🏆</span>
+                        <div style={{ width: 56, height: 56, borderRadius: 10, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>🏆</div>
                       )}
-                      <div>
-                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)" }}>{c.premio}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--oasis-bright)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
                       </div>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
                     </Link>
                   ))}
                 </div>
