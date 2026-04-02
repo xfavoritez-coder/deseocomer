@@ -7,6 +7,11 @@ interface Props {
   onChange: (lat: number, lng: number) => void;
 }
 
+function isDay(): boolean {
+  const h = new Date().getHours();
+  return h >= 7 && h < 20;
+}
+
 export default function MapaUbicacion({ lat, lng, onChange }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,7 +27,10 @@ export default function MapaUbicacion({ lat, lng, onChange }: Props) {
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({ iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png", iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png", shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png" });
       const map = L.map(mapRef.current!, { center: [lat || -33.4489, lng || -70.6693], zoom: 15 });
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { attribution: "© CartoDB" }).addTo(map);
+      const tileUrl = isDay()
+        ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+      L.tileLayer(tileUrl, { attribution: "© CartoDB" }).addTo(map);
       const marker = L.marker([lat || -33.4489, lng || -70.6693], { draggable: true }).addTo(map);
       marker.on("dragend", () => { const p = marker.getLatLng(); onChange(p.lat, p.lng); });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

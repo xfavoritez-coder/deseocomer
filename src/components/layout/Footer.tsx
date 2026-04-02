@@ -14,7 +14,7 @@ export default function Footer() {
               textShadow: "0 0 20px color-mix(in srgb, var(--accent) 50%, transparent)",
               marginBottom: "16px",
             }}>
-              🪔 DeseoComer
+              🏮 DeseoComer
             </p>
             <p style={{
               fontFamily: "var(--font-lato)",
@@ -44,6 +44,13 @@ export default function Footer() {
                 { label: "Registra tu local",  href: "/solo-locales"  },
                 { label: "Iniciar sesión",     href: "/login-local"   },
                 { label: "Panel de control",   href: "/login-local"   },
+              ],
+            },
+            {
+              titulo: "Captadores",
+              links: [
+                { label: "Capta locales",      href: "/capta-locales" },
+                { label: "Acceder al panel",   href: "/captador" },
               ],
             },
             {
@@ -128,7 +135,7 @@ export default function Footer() {
         }
         .dc-footer-grid {
           display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
+          grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
           gap: 60px;
           margin-bottom: 60px;
         }

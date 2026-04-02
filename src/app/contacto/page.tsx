@@ -1,13 +1,20 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 export default function ContactoPage() {
+  const searchParams = useSearchParams();
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
-  const [motivo, setMotivo] = useState("Registrar mi local");
+  const [motivo, setMotivo] = useState("Consulta general");
+
+  useEffect(() => {
+    const m = searchParams.get("motivo");
+    if (m) setMotivo(m);
+  }, [searchParams]);
   const [mensaje, setMensaje] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -54,8 +61,7 @@ export default function ContactoPage() {
               {[
                 { icon: "🏪", color: "rgba(232,168,76,0.1)", title: "Quiero registrar mi local", desc: "Llega a miles de personas en Santiago", href: "/registro-local" },
                 { icon: "🏆", color: "rgba(61,184,158,0.1)", title: "Tengo dudas sobre un concurso", desc: "Premios, reglas o cómo participar", href: "/concursos/como-funciona" },
-                { icon: "💡", color: "rgba(128,64,208,0.1)", title: "Sugerencia o feedback", desc: "Ayúdanos a mejorar DeseoComer", href: null },
-              ].map((op, i) => op.href ? (
+              ].map((op, i) => (
                 <Link key={i} href={op.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.12)", borderRadius: "14px", textDecoration: "none", transition: "border-color 0.2s" }}>
                   <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: op.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", flexShrink: 0 }}>{op.icon}</div>
                   <div style={{ flex: 1 }}>
@@ -64,15 +70,6 @@ export default function ContactoPage() {
                   </div>
                   <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem" }}>→</span>
                 </Link>
-              ) : (
-                <div key={i} onClick={() => setMotivo("Sugerencia o feedback")} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.12)", borderRadius: "14px", cursor: "pointer" }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: op.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", flexShrink: 0 }}>{op.icon}</div>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f0ead6", marginBottom: "2px" }}>{op.title}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)" }}>{op.desc}</p>
-                  </div>
-                  <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem" }}>↓</span>
-                </div>
               ))}
             </div>
 
@@ -96,10 +93,10 @@ export default function ContactoPage() {
               <div>
                 <label style={labelStyle}>Motivo</label>
                 <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ ...inputStyle, background: "#0a0812", cursor: "pointer" }}>
-                  <option value="Registrar mi local">Registrar mi local</option>
-                  <option value="Dudas sobre concursos">Dudas sobre concursos</option>
-                  <option value="Sugerencia o feedback">Sugerencia o feedback</option>
-                  <option value="Prensa o alianzas">Prensa o alianzas</option>
+                  <option value="Consulta general">Consulta general</option>
+                  <option value="Registrar mi local">Quiero registrar mi local</option>
+                  <option value="captador">Quiero ser captador de locales</option>
+                  <option value="Problema técnico">Problema técnico</option>
                   <option value="Otro">Otro</option>
                 </select>
               </div>

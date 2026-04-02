@@ -65,6 +65,8 @@ model Local {
   verificado                    Boolean  @default(false)
   activo                        Boolean  @default(true)
   primerParticipanteNotificado  Boolean  @default(false)
+  captadorId      String?
+  captadorCodigo  String?  @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -73,6 +75,7 @@ model Local {
   promociones Promocion[]
   favoritos   Favorito[]
   resenas     Resena[]
+  captador    Captador? @relation("CaptadorLocales", fields: [captadorId], references: [id])
 }
 
 model MenuItem {
@@ -174,6 +177,28 @@ model Resena {
 
   usuario         Usuario   @relation(fields: [usuarioId], references: [id])
   local           Local     @relation(fields: [localId], references: [id])
+}
+
+model Captador {
+  id          String   @id @default(cuid())
+  nombre      String
+  email       String   @unique
+  telefono    String   @default("")
+  rut         String   @default("")
+  codigo      String   @unique
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  locales     Local[]  @relation("CaptadorLocales")
+  pagos       PagoCaptador[]
+}
+
+model PagoCaptador {
+  id           String   @id @default(cuid())
+  captadorId   String
+  monto        Int
+  referencia   String   @default("")
+  createdAt    DateTime @default(now())
+  captador     Captador @relation(fields: [captadorId], references: [id])
 }
 
 model ListaEsperaLocal {

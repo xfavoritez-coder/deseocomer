@@ -53,7 +53,7 @@ function getMensajeContextual(
   if (pathname === "/locales" || pathname.startsWith("/locales/")) {
     if (favCat && isLoggedIn) {
       return {
-        texto: `🪔${nombre}, según tus gustos te puede interesar un local de ${favCat}`,
+        texto: `🏮${nombre}, según tus gustos te puede interesar un local de ${favCat}`,
         opciones: ["Muéstrame", "Explorar todo"],
       };
     }
@@ -65,7 +65,7 @@ function getMensajeContextual(
     }
     if (!isLoggedIn) {
       return {
-        texto: "🪔 Guarda tus locales favoritos para que te recomiende mejor",
+        texto: "🏮 Guarda tus locales favoritos para que te recomiende mejor",
         opciones: ["Registrarme", "Ahora no"],
       };
     }
@@ -88,7 +88,7 @@ function getMensajeContextual(
     }
     if (favCat && isLoggedIn) {
       return {
-        texto: `🪔 Hay promociones de ${favCat} que podrían interesarte`,
+        texto: `🏮 Hay promociones de ${favCat} que podrían interesarte`,
         opciones: ["Ver ahora", "Explorar todo"],
       };
     }

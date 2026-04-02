@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       from: `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`,
       to: ["favoritez@gmail.com"],
       replyTo: email,
-      subject: `[Contacto] ${escapeHtml(motivo)} — ${escapeHtml(nombre)}`,
+      subject: motivo === "captador" ? `[CAPTADOR] Quiero ser captador — ${escapeHtml(nombre)}` : `[Contacto] ${escapeHtml(motivo)} — ${escapeHtml(nombre)}`,
       html: `<h2>Nuevo mensaje de contacto</h2><p><strong>Nombre:</strong> ${escapeHtml(nombre)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Motivo:</strong> ${escapeHtml(motivo)}</p><hr/><p><strong>Mensaje:</strong></p><p>${escapeHtml(mensaje).replace(/\n/g, "<br/>")}</p>`,
     });
 

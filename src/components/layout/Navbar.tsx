@@ -76,7 +76,7 @@ export default function Navbar() {
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
       <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
-        <Link href="/" className="dc-nav-logo">🪔 DeseoComer</Link>
+        <Link href="/" className="dc-nav-logo">🏮 DeseoComer</Link>
 
         {/* Desktop links */}
         <div className="dc-nav-links">
@@ -124,7 +124,7 @@ export default function Navbar() {
           <div style={{ position: "fixed", top: 0, right: 0, width: "min(320px, 80vw)", height: "100vh", background: "rgba(13,7,3,0.98)", borderLeft: "1px solid rgba(232,168,76,0.15)", zIndex: 1001, display: "flex", flexDirection: "column", animation: "dc-drawer-in 0.25s ease both", overflowY: "auto" }}>
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
-              <Link href="/" onClick={() => setMenuOpen(false)} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>🪔 DeseoComer</Link>
+              <Link href="/" onClick={() => setMenuOpen(false)} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>🏮 DeseoComer</Link>
               <button onClick={() => setMenuOpen(false)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "1rem", cursor: "pointer" }}>✕</button>
             </div>
 

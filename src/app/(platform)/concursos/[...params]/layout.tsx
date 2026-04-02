@@ -18,9 +18,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!concurso) return {};
 
-    const title = `🏆 ${concurso.premio} — ${concurso.local.nombre} | DeseoComer`;
-    const description = `Participa gratis y gana ${concurso.premio}. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!`;
-    const image = concurso.imagenUrl || concurso.local.portadaUrl || null;
+    const premioCorto = concurso.premio.length > 40
+      ? concurso.premio.substring(0, 40).trim() + '...'
+      : concurso.premio;
+    const title = `🏆 Premio: ${premioCorto} — ${concurso.local.nombre} | DeseoComer`;
+    const description = "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
+    const image = concurso.imagenUrl?.startsWith('http')
+      ? concurso.imagenUrl
+      : concurso.imagenUrl
+        ? `https://deseocomer.com${concurso.imagenUrl}`
+        : concurso.local.portadaUrl?.startsWith('http')
+          ? concurso.local.portadaUrl
+          : concurso.local.portadaUrl
+            ? `https://deseocomer.com${concurso.local.portadaUrl}`
+            : null;
     const url = `https://deseocomer.com/concursos/${slug}`;
 
     return {

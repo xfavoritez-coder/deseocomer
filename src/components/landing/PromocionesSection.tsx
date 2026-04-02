@@ -122,7 +122,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
             Promociones Activas
           </h2>
           <p className="section-description" style={{ marginBottom: "24px" }}>
-            Descuentos, happy hours y cupones exclusivos en los mejores locales de Chile. Algunos terminan hoy.
+            Descuentos, happy hours y cupones exclusivos en los mejores locales de Chile.
           </p>
 
           {mounted && activasAhora > 0 && (

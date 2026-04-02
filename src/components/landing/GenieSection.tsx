@@ -67,7 +67,7 @@ export default function GenieSection() {
           textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)",
           marginBottom: "20px",
         }}>
-          Consulta al Genio 🪔
+          Consulta al Genio 🏮
         </h2>
         <p className="section-description" style={{ marginBottom: "48px" }}>
           No sabes qué comer. El Genio sí.<br />
@@ -83,7 +83,7 @@ export default function GenieSection() {
           animation: cargando ? "none" : "lampFloat 4s ease-in-out infinite",
           display: "inline-block",
         }}>
-          🪔
+          🏮
         </div>
 
         {/* Opciones */}

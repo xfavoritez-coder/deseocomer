@@ -65,19 +65,7 @@ export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
       });
 
       L.marker([lat, lng], { icon: iconoDorado })
-        .addTo(map)
-        .bindPopup(`
-          <div style="
-            font-family: sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a0e05;
-            padding: 4px 8px;
-          ">
-            📍 ${nombre}
-          </div>
-        `)
-        .openPopup();
+        .addTo(map);
 
       mapInstance.current = map;
     });
@@ -110,18 +98,7 @@ export default function MapaLocal({ lat, lng, nombre }: MapaLocalProps) {
           border-radius: 12px;
           z-index: 1 !important;
         }
-        .leaflet-popup {
-          z-index: 10 !important;
-        }
-        .leaflet-popup-content-wrapper {
-          background: #f5d080;
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        .leaflet-popup-tip {
-          background: #f5d080;
-        }
-        .leaflet-control-zoom {
+.leaflet-control-zoom {
           border: 1px solid rgba(232,168,76,0.3) !important;
           border-radius: 8px !important;
           overflow: hidden;

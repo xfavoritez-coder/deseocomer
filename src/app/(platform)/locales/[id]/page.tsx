@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { MapPin, Phone, AtSign, Globe } from "lucide-react";
 import { useGenie } from "@/contexts/GenieContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavoritos } from "@/hooks/useFavoritos";
@@ -64,6 +65,7 @@ function getColor(name: string): string {
 }
 
 type Tab = "Información" | "Reseñas" | "Concursos" | "Promociones";
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -219,7 +221,7 @@ export default function LocalDetailPage() {
           {esFavorito(String(local.id)) ? "❤️" : "🤍"}
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>
+          <div className="dc-hero-inner" style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>
             <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: local.imagenLogo ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0, overflow: "hidden" }}>
               {local.imagenLogo ? <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
             </div>
@@ -252,7 +254,8 @@ export default function LocalDetailPage() {
 
 
       {/* Tabs */}
-      <div className="dc-tabs-sticky" style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", display: "flex", overflowX: "auto", scrollbarWidth: "none", padding: "0 24px" }}>
+      <div className="dc-tabs-sticky" style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", overflowX: "auto", scrollbarWidth: "none" }}>
+        <div className="dc-tabs-inner" style={{ display: "flex", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
@@ -264,6 +267,7 @@ export default function LocalDetailPage() {
             {t.count !== null && <span style={{ background: tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)", color: tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)", fontSize: "0.72rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
           </button>
         ))}
+        </div>
       </div>
 
       {/* Content */}
@@ -330,7 +334,7 @@ export default function LocalDetailPage() {
                           )}
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{p.titulo as string}</p>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{TIPO_LABEL[p.tipo as string] || p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
                           </div>
                           <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
                         </Link>
@@ -397,12 +401,12 @@ export default function LocalDetailPage() {
                   )}
                   {tieneUbicacion && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Ubicación</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Información</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
-                      {local.direccion && <p style={bodyStyle}>📍 {local.direccion}{local.barrio ? `, ${local.barrio}` : ""}</p>}
-                      {local.telefono && <p style={bodyStyle}>📞 {local.telefono}</p>}
-                      {local.instagram && <p style={bodyStyle}>📷 <a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram}</a></p>}
-                      {local.sitioWeb && <p style={bodyStyle}>🌐 <a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
+                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.direccion}{local.barrio ? `, ${local.barrio}` : ""}</a></p>}
+                      {local.telefono && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Phone size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`tel:${local.telefono.replace(/\s/g, "")}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.telefono}</a></p>}
+                      {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
+                      {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
                     </div>
                     <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
                       <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
@@ -459,7 +463,7 @@ export default function LocalDetailPage() {
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo as string}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{TIPO_LABEL[p.tipo as string] || p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
                       </div>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
                     </Link>
@@ -525,6 +529,10 @@ export default function LocalDetailPage() {
         @media (max-width: 1023px) {
           .dc-local-layout { grid-template-columns: 1fr; }
           .dc-local-sidebar { position: static; }
+        }
+        @media (min-width: 1024px) {
+          .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
+          .dc-tabs-inner { max-width: 1100px; margin: 0 auto; }
         }
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }

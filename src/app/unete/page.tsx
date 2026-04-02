@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 function generarPassword(): string {
@@ -15,6 +15,7 @@ const I: React.CSSProperties = { background: "#faf7f2", border: "1px solid rgba(
 
 export default function UnetePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [nombreLocal, setNombreLocal] = useState("");
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
@@ -23,6 +24,11 @@ export default function UnetePage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
   const [emailUsado, setEmailUsado] = useState("");
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) localStorage.setItem("deseocomer_captador_ref", ref);
+  }, [searchParams]);
 
   const canSubmit = nombreLocal.trim() && nombre.trim() && email.trim() && telefono.trim();
 
@@ -39,6 +45,7 @@ export default function UnetePage() {
     setEmailUsado("");
 
     const pw = generarPassword();
+    const captadorCodigo = localStorage.getItem("deseocomer_captador_ref") || "";
     try {
       const res = await fetch("/api/locales", {
         method: "POST",
@@ -53,6 +60,7 @@ export default function UnetePage() {
           ciudad: "Santiago",
           registroRapido: true,
           passwordPlain: pw,
+          captadorCodigo,
         }),
       });
 

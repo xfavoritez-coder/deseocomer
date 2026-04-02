@@ -36,7 +36,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, nombreDueno, nombreEncargado, email, password, telefono, ciudad, registroRapido, passwordPlain } = await req.json();
+    const { nombre, nombreDueno, nombreEncargado, email, password, telefono, ciudad, registroRapido, passwordPlain, captadorCodigo } = await req.json();
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
@@ -49,12 +49,23 @@ export async function POST(req: NextRequest) {
 
     const hash = await bcrypt.hash(password, 10);
     const slug = makeLocalSlug(nombre, ciudad);
+
+    // Resolve captador if code provided
+    let captadorData: { captadorId: string; captadorCodigo: string } | undefined;
+    if (captadorCodigo) {
+      try {
+        const captador = await prisma.captador.findUnique({ where: { codigo: captadorCodigo } });
+        if (captador) captadorData = { captadorId: captador.id, captadorCodigo: captador.codigo };
+      } catch { /* ignore */ }
+    }
+
     const local = await prisma.local.create({
       data: {
         nombre, slug, nombreDueno: nombreDueno || nombreEncargado, celularDueno: telefono,
         email, password: hash, ciudad, activo: false,
         ...(nombreEncargado && { nombreEncargado }),
         ...(registroRapido && { registroRapido: true }),
+        ...(captadorData && captadorData),
       },
     });
 
@@ -92,6 +103,17 @@ export async function POST(req: NextRequest) {
       } catch (emailErr) {
         console.error("[Email registro rápido]", emailErr);
       }
+    }
+
+    // Notify captador if local was referred
+    if (captadorData) {
+      try {
+        const base = req.nextUrl.origin;
+        await fetch(`${base}/api/emails/notificacion-captador`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ captadorId: captadorData.captadorId, nombreLocal: nombre }),
+        });
+      } catch (e) { console.error("[Email notificacion captador]", e); }
     }
 
     const { password: _, ...localSinPassword } = local;

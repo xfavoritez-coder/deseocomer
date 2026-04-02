@@ -1,234 +1,192 @@
 "use client";
-import { useEffect, useRef } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
-// ─── Animate on scroll ──────────────────────────────────────────────────────
-
-function useReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { el.style.opacity = "1"; el.style.transform = "translateY(0)"; obs.disconnect(); } },
-      { threshold: 0.15 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return ref;
-}
-
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useReveal();
-  return (
-    <div ref={ref} style={{ opacity: 0, transform: "translateY(24px)", transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s` }}>
-      {children}
-    </div>
-  );
-}
-
-// ─── Data ────────────────────────────────────────────────────────────────────
-
 const BENEFICIOS = [
-  { icon: "🏆", titulo: "Concursos que se comparten solos", texto: "Tus clientes invitan amigos para ganar puntos. Tú consigues visibilidad sin pagar publicidad." },
-  { icon: "⚡", titulo: "Tus promociones donde la gente las busca", texto: "Happy hours, descuentos y cupones visibles para miles de usuarios que buscan dónde comer hoy." },
-  { icon: "🎛️", titulo: "Panel simple, sin complicaciones", texto: "Publica un concurso en 3 pasos. Gestiona todo desde tu celular en minutos." },
+  { icon: "🏆", titulo: "Concursos que se comparten solos", texto: "Tus clientes invitan amigos para ganar puntos. Tú consigues nuevos clientes ", highlight: "sin pagar un peso en publicidad." },
+  { icon: "⚡", titulo: "Aumenta tus ventas con promociones", texto: "Publica happy hours, descuentos y cupones. ", highlight: "Miles de personas los ven", after: " cuando deciden dónde comer hoy." },
+  { icon: "📱", titulo: "Panel simple desde tu celular", texto: "Publica un concurso en 3 pasos. ", highlight: "Sin conocimientos técnicos", after: ", sin complicaciones." },
+  { icon: "📍", titulo: "Tu local en el mapa de Santiago", texto: "Aparece cuando alguien busca comida en tu comuna. ", highlight: "Visibilidad real", after: " donde están tus clientes." },
 ];
 
 const PASOS = [
-  { n: "①", titulo: "Regístrate gratis", texto: "Solo necesitas email, nombre del local y teléfono. Listo en 2 minutos." },
-  { n: "②", titulo: "Publica tu primer concurso", texto: "Elige el premio, la duración y publica. Tus clientes empiezan a participar de inmediato." },
-  { n: "③", titulo: "Observa cómo crece tu audiencia", texto: "Cada participante trae amigos. Tu local gana visibilidad real sin invertir en ads." },
+  { titulo: "Regístrate gratis", texto: "Solo nombre del local, tu nombre y correo. Listo en menos de 3 minutos." },
+  { titulo: "Publica tu primer concurso o promoción", texto: "Elige el premio o el descuento, configura y publica. Tus clientes lo ven de inmediato." },
+  { titulo: "Mira cómo crece tu audiencia", texto: "Cada participante trae amigos. Tu local gana visibilidad y ventas reales." },
 ];
 
 const TESTIMONIOS = [
-  { nombre: "María José R.", local: "Café Bellavista", texto: "Publicamos un concurso el lunes y el miércoles ya teníamos 200 participantes nuevos siguiéndonos." },
-  { nombre: "Rodrigo M.", local: "Pizza Napoli", texto: "Nunca pensé que regalar una pizza nos traería tanta gente nueva. Vale mil veces la inversión." },
-  { nombre: "Catalina V.", local: "Verde Oasis", texto: "El panel es súper fácil. Lo manejo yo sola sin ayuda." },
+  { iniciales: "MJ", nombre: "María José R.", local: "Café Bellavista", texto: "Publicamos un concurso el lunes y el miércoles ya teníamos 200 personas nuevas. Nunca había llegado a tanta gente tan rápido." },
+  { iniciales: "RM", nombre: "Rodrigo M.", local: "Pizza Napoli", texto: "Regalar una pizza nos trajo clientes que nunca nos habrían conocido. Vale mil veces la inversión." },
+  { iniciales: "CV", nombre: "Catalina V.", local: "Verde Oasis", texto: "El panel es súper fácil. Lo manejo yo sola sin ayuda y publico mis promociones en minutos." },
 ];
 
-const COLORS = ["#2a7a6f", "#c4853a", "#7c3fa8"];
+const FAQS = [
+  { icon: "💰", pregunta: "¿Cuánto cuesta?", respuesta: "Registrar tu local es completamente gratis. Publica concursos y promociones sin costo." },
+  { icon: "🤔", pregunta: "¿Necesito saber de tecnología?", respuesta: "Para nada. Si sabes usar WhatsApp, sabes usar DeseoComer. El panel está diseñado para manejarlo desde el celular." },
+  { icon: "🍕", pregunta: "¿Funciona para mi tipo de local?", respuesta: "Sí. Restaurantes, cafeterías, locales de comida rápida, delivery, food trucks — cualquier negocio de comida en Santiago." },
+  { icon: "⏱️", pregunta: "¿Cuánto toma publicar un concurso?", respuesta: "Menos de 3 minutos. Eliges el premio, subes una foto y defines la duración. Listo." },
+];
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+const sectionLabel: React.CSSProperties = {
+  fontSize: 9, color: "rgba(240,234,214,0.6)", letterSpacing: "0.14em",
+  textTransform: "uppercase", textAlign: "center", marginBottom: 20,
+};
+
+const btnStyle: React.CSSProperties = {
+  background: "var(--accent)", color: "var(--bg-primary)",
+  fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700,
+  padding: "14px 28px", borderRadius: 12, border: "none",
+  letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer",
+};
+
+const hl: React.CSSProperties = { color: "rgba(240,234,214,0.9)", fontWeight: 600 };
 
 export default function SoloLocalesPage() {
+  const router = useRouter();
+
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section style={{ padding: "160px 24px 100px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 60%)" }} />
-        <div style={{ position: "relative", maxWidth: "700px", margin: "0 auto" }}>
-          <Reveal>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "var(--oasis-bright)", marginBottom: "20px" }}>
-              Para restaurantes y locales
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(2rem, 7vw, 3.5rem)", color: "var(--accent)", textShadow: "0 0 60px color-mix(in srgb, var(--accent) 40%, transparent)", marginBottom: "20px", lineHeight: 1.1 }}>
-              Tu local, visto por miles
-            </h1>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "var(--text-primary)", fontWeight: 400, lineHeight: 1.8, marginBottom: "36px", maxWidth: "560px", margin: "0 auto 36px" }}>
-              Publica concursos virales, gestiona tus promociones y llega a clientes que buscan exactamente lo que ofreces.
-            </p>
-          </Reveal>
-          <Reveal delay={0.4}>
-            <Link href="/registro-local" style={{
-              display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
-              letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700,
-              background: "var(--accent)", color: "var(--bg-primary)",
-              padding: "18px 48px", borderRadius: "14px", textDecoration: "none",
-              boxShadow: "0 4px 24px color-mix(in srgb, var(--accent) 35%, transparent)",
-            }}>
-              Registrar mi local gratis →
-            </Link>
-          </Reveal>
+      {/* ── HERO ──────────────────────────────────────────── */}
+      <section className="sl-hero" style={{ padding: "48px 24px 40px", textAlign: "center", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
+        <p style={{ fontSize: 10, color: "#3db89e", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>
+          🧞 Para restaurantes y locales
+        </p>
+        <h1 className="sl-hero-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", lineHeight: 1.2, letterSpacing: "0.03em", marginBottom: 12 }}>
+          Más clientes, más ventas
+        </h1>
+        <p className="sl-hero-sub" style={{ fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
+          Llega a miles de personas en Santiago que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local gratis.
+        </p>
+        <button style={btnStyle} onClick={() => router.push("/registro-local")}>
+          Registrar mi local gratis →
+        </button>
+        <p style={{ fontSize: 11, color: "rgba(240,234,214,0.22)", marginTop: 10 }}>Listo en 3 minutos</p>
+      </section>
+
+      {/* ── STATS ─────────────────────────────────────────── */}
+      <section style={{ padding: 24, borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+        <div className="sl-stats" style={{ display: "flex", gap: 10 }}>
+          {[
+            { num: "+500", label: "Personas buscan dónde comer cada semana" },
+            { num: "3 min", label: "Para publicar tu primer concurso" },
+            { num: "100%", label: "Gratis para registrar tu local" },
+          ].map((s) => (
+            <div key={s.num} style={{ flex: 1, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 14, padding: "16px 8px", textAlign: "center" }}>
+              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, color: "#e8a84c" }}>{s.num}</div>
+              <div style={{ fontSize: 10, color: "rgba(240,234,214,0.32)", lineHeight: 1.3, marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── BENEFICIOS ───────────────────────────────────────────── */}
-      <section style={{ padding: "80px 24px", maxWidth: "1100px", margin: "0 auto" }}>
-        <Reveal>
-          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", color: "var(--accent)", textAlign: "center", marginBottom: "48px" }}>
-            ¿Por qué unirte?
-          </h2>
-        </Reveal>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+      {/* ── BENEFICIOS ────────────────────────────────────── */}
+      <section style={{ padding: "28px 24px", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+        <p style={sectionLabel}>¿Por qué unirte?</p>
+        <div className="sl-beneficios">
           {BENEFICIOS.map((b, i) => (
-            <Reveal key={b.titulo} delay={i * 0.1}>
-              <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "28px 24px", height: "100%" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                  <span style={{ fontSize: "1.6rem", flexShrink: 0 }}>{b.icon}</span>
-                  <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", fontWeight: 700, margin: 0 }}>{b.titulo}</h3>
-                </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>{b.texto}</p>
+            <div key={b.titulo} className="sl-beneficio" style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: i < BENEFICIOS.length - 1 ? 18 : 0 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", fontSize: 18, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {b.icon}
               </div>
-            </Reveal>
+              <div>
+                <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", marginBottom: 4 }}>{b.titulo}</div>
+                <p style={{ fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>
+                  {b.texto}<span style={hl}>{b.highlight}</span>{b.after ?? ""}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* ── CÓMO FUNCIONA ────────────────────────────────────────── */}
-      <section style={{ padding: "80px 24px", maxWidth: "900px", margin: "0 auto" }}>
-        <Reveal>
-          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", color: "var(--accent)", textAlign: "center", marginBottom: "48px" }}>
-            Así de simple
-          </h2>
-        </Reveal>
-        <div className="dc-sl-pasos">
+      {/* ── PASOS ─────────────────────────────────────────── */}
+      <section style={{ padding: "28px 24px", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+        <p style={sectionLabel}>Así de simple</p>
+        <div className="sl-pasos">
           {PASOS.map((p, i) => (
-            <Reveal key={p.titulo} delay={i * 0.15}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", position: "relative" }}>
-                <div style={{
-                  fontFamily: "var(--font-cinzel-decorative)", fontSize: "2.5rem",
-                  color: "var(--accent)", marginBottom: "16px", lineHeight: 1,
-                  textShadow: "0 0 20px color-mix(in srgb, var(--accent) 40%, transparent)",
-                }}>{p.n}</div>
-                <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "8px", fontWeight: 700 }}>{p.titulo}</h3>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6, maxWidth: "240px" }}>{p.texto}</p>
+            <div key={p.titulo} className="sl-paso" style={{ display: "flex", gap: 14, alignItems: "flex-start", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 14, padding: 14, marginBottom: i < PASOS.length - 1 ? 10 : 0 }}>
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                {i + 1}
               </div>
-            </Reveal>
+              <div>
+                <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#f5d080", textTransform: "uppercase", marginBottom: 3 }}>{p.titulo}</div>
+                <p style={{ fontSize: 12, color: "rgba(240,234,214,0.45)", lineHeight: 1.4, margin: 0 }}>{p.texto}</p>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF ─────────────────────────────────────────── */}
-      <section style={{ padding: "80px 24px", background: "var(--bg-secondary)" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <Reveal>
-            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem, 4vw, 2.2rem)", color: "var(--accent)", textAlign: "center", marginBottom: "48px" }}>
-              Úsalo como lo usan los mejores locales
-            </h2>
-          </Reveal>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
-            {TESTIMONIOS.map((t, i) => (
-              <Reveal key={t.nombre} delay={i * 0.1}>
-                <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "28px" }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.7, fontStyle: "italic", marginBottom: "20px" }}>
-                    "{t.texto}"
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <div style={{
-                      width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0,
-                      background: COLORS[i], display: "flex", alignItems: "center", justifyContent: "center",
-                      fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: "#fff",
-                    }}>
-                      {t.nombre.split(" ").map(w => w[0]).slice(0, 2).join("")}
-                    </div>
-                    <div>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 600 }}>{t.nombre}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>{t.local}</p>
-                    </div>
-                  </div>
+      {/* ── TESTIMONIOS ───────────────────────────────────── */}
+      <section style={{ padding: "28px 24px", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+        <p style={sectionLabel}>Lo que dicen los locales</p>
+        <div className="sl-testimonios">
+          {TESTIMONIOS.map((t, i) => (
+            <div key={t.nombre} className="sl-testimonio" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 14, padding: 16, marginBottom: i < TESTIMONIOS.length - 1 ? 12 : 0 }}>
+              <p style={{ fontSize: 13, color: "rgba(240,234,214,0.65)", lineHeight: 1.55, fontStyle: "italic", marginBottom: 12, marginTop: 0 }}>
+                &ldquo;{t.texto}&rdquo;
+              </p>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  {t.iniciales}
                 </div>
-              </Reveal>
-            ))}
-          </div>
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(240,234,214,0.6)" }}>{t.nombre}</div>
+                  <div style={{ fontSize: 11, color: "rgba(240,234,214,0.3)" }}>{t.local}</div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── CTA FINAL ────────────────────────────────────────────── */}
-      <section style={{ padding: "100px 24px", textAlign: "center", position: "relative" }}>
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", background: "radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--accent) 6%, transparent) 0%, transparent 60%)" }} />
-        <Reveal>
-          <div style={{ fontSize: "3rem", marginBottom: "16px" }}>🧞</div>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.6rem, 5vw, 2.8rem)", color: "var(--accent)", marginBottom: "16px", textShadow: "0 0 40px color-mix(in srgb, var(--accent) 40%, transparent)" }}>
-            ¿Listo para crecer?
-          </h2>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.05rem", color: "var(--text-primary)", marginBottom: "36px", maxWidth: "420px", margin: "0 auto 36px", lineHeight: 1.7 }}>
-            Únete hoy y aparece en DeseoComer esta semana.
-          </p>
-        </Reveal>
-        <Reveal delay={0.3}>
-          <Link href="/registro-local" style={{
-            display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.85rem, 2.5vw, 1rem)",
-            letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700,
-            background: "var(--accent)", color: "var(--bg-primary)",
-            padding: "18px 48px", borderRadius: "14px", textDecoration: "none",
-            boxShadow: "0 4px 24px color-mix(in srgb, var(--accent) 35%, transparent)",
-          }}>
-            Comenzar gratis →
-          </Link>
-        </Reveal>
+      {/* ── FAQ ────────────────────────────────────────────── */}
+      <section style={{ padding: "28px 24px", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+        <p style={sectionLabel}>Preguntas frecuentes</p>
+        <div className="sl-faq">
+          {FAQS.map((f, i) => (
+            <div key={f.pregunta} className="sl-faq-item" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 12, padding: "14px 16px", marginBottom: i < FAQS.length - 1 ? 10 : 0 }}>
+              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textTransform: "uppercase", marginBottom: 6 }}>{f.icon} {f.pregunta}</div>
+              <p style={{ fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, margin: 0 }}>{f.respuesta}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA FINAL ─────────────────────────────────────── */}
+      <section style={{ padding: "32px 24px", textAlign: "center" }}>
+        <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, color: "#f5d080", textTransform: "uppercase", marginBottom: 8, lineHeight: 1.2 }}>
+          ¿Listo para vender más?
+        </h2>
+        <p style={{ fontSize: 13, color: "rgba(240,234,214,0.4)", marginBottom: 20, lineHeight: 1.5 }}>
+          Únete hoy y tu local aparece en DeseoComer esta misma semana. Sin tarjeta de crédito, sin compromisos.
+        </p>
+        <button style={btnStyle} onClick={() => router.push("/registro-local")}>
+          Comenzar gratis →
+        </button>
       </section>
 
       <Footer />
 
       <style>{`
-        .dc-sl-pasos {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 32px;
-          position: relative;
-        }
-        .dc-sl-pasos::before {
-          content: "";
-          position: absolute;
-          top: 20px;
-          left: 20%;
-          right: 20%;
-          height: 1px;
-          border-top: 2px dashed rgba(232,168,76,0.25);
-          pointer-events: none;
-        }
-        @media (max-width: 767px) {
-          .dc-sl-pasos {
-            grid-template-columns: 1fr;
-            gap: 40px;
-          }
-          .dc-sl-pasos::before {
-            display: none;
-          }
+        @media (min-width: 1024px) {
+          .sl-hero { padding: 80px 48px 64px !important; }
+          .sl-hero-title { font-size: 40px !important; }
+          .sl-hero-sub { font-size: 17px !important; max-width: 560px; margin-left: auto; margin-right: auto; }
+          .sl-stats { max-width: 700px; margin: 0 auto; }
+          .sl-beneficios { display: grid !important; grid-template-columns: 1fr 1fr; gap: 20px; }
+          .sl-beneficio { margin-bottom: 0 !important; }
+          .sl-pasos { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+          .sl-paso { flex-direction: column !important; margin-bottom: 0 !important; }
+          .sl-testimonios { display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+          .sl-testimonio { margin-bottom: 0 !important; }
+          .sl-faq { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+          .sl-faq-item { margin-bottom: 0 !important; }
+          main > section { max-width: 900px; margin-left: auto; margin-right: auto; }
         }
       `}</style>
     </main>

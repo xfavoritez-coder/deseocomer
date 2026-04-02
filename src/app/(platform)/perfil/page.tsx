@@ -17,7 +17,7 @@ const TABS = [
   { key: "concursos", icon: "🏆", label: "Concursos" },
   { key: "historial", icon: "🕐", label: "Historial" },
   { key: "logros",    icon: "🎖️", label: "Logros" },
-  { key: "genio",     icon: "🪔", label: "Mi Genio" },
+  { key: "genio",     icon: "🏮", label: "Mi Genio" },
   { key: "perfil",    icon: "⚙️", label: "Mi Perfil" },
 ] as const;
 
@@ -61,7 +61,7 @@ export default function PerfilPage() {
       <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
         <Navbar />
         <div style={{ padding: "160px 40px", textAlign: "center" }}>
-          <div style={{ fontSize: "3rem" }}>🪔</div>
+          <div style={{ fontSize: "3rem" }}>🏮</div>
         </div>
       </main>
     );
@@ -321,7 +321,7 @@ function TabLogros() {
   const comunasSet = new Set(visits.map(v => v.comuna));
 
   const badges = [
-    { icon: "🪔", name: "Primer Deseo", desc: "Completaste el flujo del Genio", unlocked: perfil.respuestasGenio.length > 0 },
+    { icon: "🏮", name: "Primer Deseo", desc: "Completaste el flujo del Genio", unlocked: perfil.respuestasGenio.length > 0 },
     { icon: "❤️", name: "Guardador", desc: "Guardaste tu primer favorito", unlocked: (() => { try { return JSON.parse(localStorage.getItem(FAVS_KEY) ?? "[]").length > 0; } catch { return false; } })() },
     { icon: "🏆", name: "Concursante", desc: "Participaste en tu primer concurso", unlocked: (() => { try { return Object.keys(JSON.parse(localStorage.getItem("dc_refs") ?? "{}")).length > 0; } catch { return false; } })() },
     { icon: "🔥", name: "Explorador", desc: "Visitaste 5 locales distintos", unlocked: new Set(visits.map(v => v.id)).size >= 5 },
