@@ -490,7 +490,7 @@ export default function PanelConcursos() {
         })}
       </div>
     )}
-    {modalInstagram && <ModalInstagram concurso={{ ...modalInstagram, local: { nombre: session?.nombre || "Local" } }} onClose={() => setModalInstagram(null)} />}
+    {modalInstagram && <ModalInstagram concurso={{ ...modalInstagram, local: { nombre: getSession().nombre || "Local" } }} onClose={() => setModalInstagram(null)} />}
   </div>);
 }
 
