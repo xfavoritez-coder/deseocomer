@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 function OjoIcon({ visible }: { visible: boolean }) {
@@ -13,8 +14,14 @@ function OjoIcon({ visible }: { visible: boolean }) {
 }
 
 export default function LoginPage() {
+  return <Suspense><LoginContent /></Suspense>;
+}
+
+function LoginContent() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = searchParams.get("next") || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -41,7 +48,7 @@ export default function LoginPage() {
     setLoading(true);
     const res = await login(email.trim(), password, remember);
     setLoading(false);
-    if (res.success) router.push("/");
+    if (res.success) router.push(nextUrl);
     else {
       setError(res.error ?? "Error al iniciar sesión.");
       if (res.codigo === "EMAIL_NO_VERIFICADO") setEmailNoVerificado(true);
