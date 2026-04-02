@@ -289,7 +289,7 @@ function ConcursoDetallePage() {
         return (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
-            <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)" }}>{r.nombre}</span>
+            <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
             {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
             <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
             {isAuthenticated && !isMe && (
@@ -297,7 +297,7 @@ function ConcursoDetallePage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
               </button>
             )}
-            {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 4px)", right: 14, background: "rgba(13,7,3,0.96)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-lato)", fontSize: 13, color: "#3db89e", whiteSpace: "nowrap", zIndex: 10 }}>¡+1 punto a {r.nombre}!</div>}
+            {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 14, background: "rgba(30,20,5,0.96)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 10, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap", zIndex: 10, fontWeight: 700 }}>❤️ ¡+1 punto a {r.nombre.split(/\s+/)[0]}!</div>}
           </div>
         );
       })}

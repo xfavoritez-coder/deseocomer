@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resend } from "@/lib/resend";
+import { primerApoyoHtml } from "@/emails/primerApoyoHtml";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,6 +12,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const concurso = await prisma.concurso.findFirst({
       where: { OR: [{ id }, { slug: id }], activo: true },
+      include: { local: { select: { nombre: true } } },
     });
     if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
     if (new Date(concurso.fechaFin) <= new Date()) return NextResponse.json({ error: "Concurso finalizado" }, { status: 400 });
@@ -23,6 +26,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       where: { id: target.id },
       data: { puntos: { increment: 1 } },
     });
+
+    // Email primer apoyo recibido (una sola vez por usuario)
+    try {
+      const targetUser = await prisma.usuario.findUnique({ where: { id: targetUsuarioId }, select: { nombre: true, email: true, primerApoyoNotificado: true } });
+      if (targetUser && !targetUser.primerApoyoNotificado) {
+        await resend.emails.send({
+          from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
+          to: targetUser.email,
+          subject: `❤️ ¡Alguien te apoya en tu concurso! — ${concurso.premio}`,
+          html: primerApoyoHtml({
+            nombreUsuario: targetUser.nombre,
+            premioConcurso: concurso.premio,
+            nombreLocal: concurso.local?.nombre ?? "un local",
+          }),
+        });
+        await prisma.usuario.update({ where: { id: targetUsuarioId }, data: { primerApoyoNotificado: true } });
+      }
+    } catch (emailErr) {
+      console.error("[Email primer apoyo]", emailErr);
+    }
 
     return NextResponse.json({ ok: true });
   } catch {
