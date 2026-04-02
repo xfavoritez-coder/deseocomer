@@ -48,6 +48,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function ConcursoLayout({ children }: Props) {
+export default function ConcursoLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
