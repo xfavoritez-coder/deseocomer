@@ -37,6 +37,10 @@ export default function PromocionesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
+  const [diaSeleccionado, setDiaSeleccionado] = useState<string>(() => {
+    const dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    return dias[new Date().getDay()];
+  });
   const [esCumple, setEsCumple] = useState(false);
 
   // Fetch from BD
@@ -81,6 +85,12 @@ export default function PromocionesPage() {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
+    // Day filter
+    if (diaSeleccionado !== "Todos") {
+      const diaIndex: Record<string, number> = { "Lun": 0, "Mar": 1, "Mié": 2, "Jue": 3, "Vie": 4, "Sáb": 5, "Dom": 6 };
+      const targetDay = diaSeleccionado === "Hoy" ? diaIndex[["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][new Date().getDay()]] : diaIndex[diaSeleccionado];
+      if (targetDay !== undefined && Array.isArray(p.diasSemana) && !p.diasSemana.includes(targetDay)) return false;
+    }
     return true;
   });
 
@@ -133,10 +143,24 @@ export default function PromocionesPage() {
           })}
         </div>
 
-        {/* Fila 3 — Limpiar */}
+        {/* Fila 3 — Filtro por día */}
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
+          {["Hoy", "Todos", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => {
+            const isHoy = d === "Hoy";
+            const active = diaSeleccionado === d || (d === "Hoy" && diaSeleccionado === ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][new Date().getDay()]);
+            const sel = diaSeleccionado === d;
+            return (
+              <button key={d} onClick={() => setDiaSeleccionado(d)} style={{ padding: "6px 12px", borderRadius: 20, fontSize: 12, cursor: "pointer", fontFamily: "var(--font-lato)", border: sel ? (isHoy ? "1px solid rgba(61,184,158,0.35)" : "1px solid rgba(232,168,76,0.3)") : "1px solid rgba(232,168,76,0.12)", background: sel ? (isHoy ? "rgba(61,184,158,0.12)" : "rgba(232,168,76,0.12)") : "rgba(255,255,255,0.02)", color: sel ? (isHoy ? "#3db89e" : "#e8a84c") : "rgba(240,234,214,0.45)", fontWeight: sel ? 700 : 400, transition: "all 0.2s" }}>
+                {d}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Fila 4 — Limpiar */}
         {(filtrosTipo.length > 0 || filtroActivas || busqueda) && (
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setDiaSeleccionado("Hoy"); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
           </div>
         )}
       </div>
@@ -228,12 +252,28 @@ export default function PromocionesPage() {
                     )}
 
                     {/* Días + Horario */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px", padding: "10px 14px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", padding: "10px 14px", background: "rgba(0,0,0,0.2)", borderRadius: "10px" }}>
                       <span style={{ fontSize: "0.85rem" }}>🕐</span>
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.4, margin: 0 }}>
                         <span style={{ color: accentColor, fontWeight: 600 }}>{formatDias(promo.diasSemana)}</span>
                         {" · "}{promo.horaInicio} – {promo.horaFin}
                       </p>
+                    </div>
+                    {/* Day dots */}
+                    <div style={{ display: "flex", gap: 6, justifyContent: "center", marginBottom: 16 }}>
+                      {promo.diasSemana.length === 7 ? (
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "#3db89e" }}>Todos los días</span>
+                      ) : (
+                        ["L", "M", "M", "J", "V", "S", "D"].map((letra, idx) => {
+                          const activo = promo.diasSemana.includes(idx);
+                          return (
+                            <div key={idx} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                              <div style={{ width: 6, height: 6, borderRadius: "50%", background: activo ? "#e8a84c" : "rgba(232,168,76,0.15)" }} />
+                              <span style={{ fontSize: 8, color: activo ? "rgba(240,234,214,0.5)" : "rgba(240,234,214,0.15)" }}>{letra}</span>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
 
                     <div style={{ width: "100%", background: isHH ? "linear-gradient(135deg, #c8850a, #d4a017)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", borderRadius: "16px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#07040f", fontWeight: 700, minHeight: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>

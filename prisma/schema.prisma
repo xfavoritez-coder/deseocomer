@@ -66,6 +66,10 @@ model Local {
   verificado                    Boolean  @default(false)
   activo                        Boolean  @default(true)
   primerParticipanteNotificado  Boolean  @default(false)
+  activadoAt                    DateTime?
+  recordatorio2d                Boolean  @default(false)
+  recordatorio5d                Boolean  @default(false)
+  recordatorio10d               Boolean  @default(false)
   captadorId      String?
   captadorCodigo  String?  @default("")
   createdAt     DateTime @default(now())
@@ -148,6 +152,7 @@ model Promocion {
   activa              Boolean  @default(true)
   esCumpleanos        Boolean  @default(false)
   imagenUrl           String?
+  fechaVencimiento    DateTime?
   createdAt           DateTime @default(now())
 
   local               Local    @relation(fields: [localId], references: [id])

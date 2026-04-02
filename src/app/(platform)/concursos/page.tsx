@@ -62,18 +62,31 @@ export default function ConcursosPage() {
     { key: "ganadores", label: "Ganadores 🏆" },
   ];
 
+  function scoreConcurso(c: typeof concursos[0]): number {
+    const ahora = Date.now();
+    const horasRestantes = (c.endsAt - ahora) / 3600000;
+    const createdAt = (c as unknown as Record<string, unknown>).createdAt;
+    const horasDesdeCreacion = createdAt ? (ahora - new Date(createdAt as string).getTime()) / 3600000 : 999;
+    let score = 0;
+    if (horasRestantes <= 24) score += 10000;
+    else if (horasRestantes <= 72) score += 5000;
+    if (horasDesdeCreacion <= 48) score += 2000;
+    const participantesRecientes = ((c as unknown as Record<string, unknown>).participantesRecientes as number) ?? 0;
+    score += participantesRecientes * 100;
+    score += Math.min(c.participantes, 50) * 2;
+    const diasTotales = (c.endsAt - new Date((createdAt as string) ?? Date.now()).getTime()) / 86400000;
+    if (diasTotales > 5 && participantesRecientes === 0) score -= 500;
+    return score;
+  }
+
   const sorted = [...concursos].filter(c => {
     const ended = getTimeLeft(c.endsAt).ended;
     const soon = isSoonEnding(c.endsAt);
     if (filter === "activos") return !ended && !soon;
     if (filter === "por_terminar") return !ended && soon;
     if (filter === "ganadores") return false;
-    return !ended; // todos
-  }).sort((a, b) => {
-    const sA = isSoonEnding(a.endsAt), sB = isSoonEnding(b.endsAt);
-    if (sA && !sB) return -1; if (!sA && sB) return 1;
-    return a.endsAt - b.endsAt;
-  });
+    return !ended;
+  }).sort((a, b) => scoreConcurso(b) - scoreConcurso(a));
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -140,9 +153,15 @@ export default function ConcursosPage() {
               const soon = isSoonEnding(c.endsAt);
               const urg = "#e05555";
               const localInitial = c.local?.[0] ?? "L";
+              const horasRestantes = (c.endsAt - Date.now()) / 3600000;
+              const createdAt = (c as unknown as Record<string, unknown>).createdAt;
+              const horasDesdeCreacion = createdAt ? (Date.now() - new Date(createdAt as string).getTime()) / 3600000 : 999;
+              const esTerminaHoy = horasRestantes <= 24;
+              const esTerminaProonto = !esTerminaHoy && horasRestantes <= 72;
+              const esNuevo = !esTerminaHoy && !esTerminaProonto && horasDesdeCreacion <= 48;
 
               return (
-                <div key={c.id} onClick={() => router.push(`/concursos/${c.slug}`)} style={{
+                <div key={c.id} className="dc-cp-card" onClick={() => router.push(`/concursos/${c.slug}`)} style={{
                   background: "rgba(15,10,28,0.98)", border: `1px solid ${soon ? "rgba(224,85,85,0.45)" : "rgba(232,168,76,0.2)"}`,
                   borderRadius: 20, overflow: "hidden", cursor: "pointer", transition: "transform 0.2s, border-color 0.2s",
                 }}
@@ -154,11 +173,22 @@ export default function ConcursosPage() {
 
                     <div style={{ position: "absolute", top: 0, right: 0, zIndex: 3, lineHeight: 0 }}><SelloGratis size="sm" /></div>
 
-                    {/* Badge urgente */}
-                    {soon && (
+                    {/* Badge */}
+                    {esTerminaHoy && (
                       <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(224,85,85,0.15)", border: "1px solid rgba(224,85,85,0.5)", borderRadius: 6, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: urg, animation: "dc-pd 0.8s ease-in-out infinite" }} />
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: urg }}>¡Termina pronto!</span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: urg }}>¡Termina hoy!</span>
+                      </div>
+                    )}
+                    {esTerminaProonto && (
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(232,116,76,0.12)", border: "1px solid rgba(232,116,76,0.4)", borderRadius: 6, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#e8744c", animation: "dc-pd 1.2s ease-in-out infinite" }} />
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8744c" }}>Termina pronto</span>
+                      </div>
+                    )}
+                    {esNuevo && (
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 6, padding: "4px 10px" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#3db89e" }}>Nuevo 🔥</span>
                       </div>
                     )}
 
@@ -248,6 +278,7 @@ export default function ConcursosPage() {
         .dc-cp-fbtn:hover { border-color: var(--accent); color: var(--accent); }
         .dc-cp-fbtn--on { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); color: var(--accent); }
         .dc-cp-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .dc-cp-card:hover { border-color: var(--accent) !important; }
         @keyframes dc-pd { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes dc-sk-pulse { 0%,100%{opacity:0.4} 50%{opacity:0.15} }
         @media (max-width: 767px) {

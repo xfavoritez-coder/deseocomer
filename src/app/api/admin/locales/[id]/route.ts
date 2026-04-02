@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     if (accion === "aprobar") {
-      await prisma.local.update({ where: { id }, data: { activo: true } });
+      await prisma.local.update({ where: { id }, data: { activo: true, activadoAt: new Date() } });
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
       const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
       await resend.emails.send({

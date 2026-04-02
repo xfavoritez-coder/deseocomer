@@ -11,7 +11,7 @@ const B: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.
 const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
-const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "" };
+const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "", tieneVencimiento: false, fechaVencimiento: "" };
 
 export default function PanelPromociones() {
   const [promos, setPromos] = useState<PromoDB[]>([]);
@@ -54,6 +54,7 @@ export default function PanelPromociones() {
             tipo: form.tipo, titulo: form.titulo.trim(), descripcion: form.descripcion || null,
             condiciones: form.condiciones || null, porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
             horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias, imagenUrl: form.imagenUrl || null,
+            fechaVencimiento: form.tieneVencimiento && form.fechaVencimiento ? new Date(form.fechaVencimiento).toISOString() : null,
           }),
         });
       } else {
@@ -65,6 +66,7 @@ export default function PanelPromociones() {
             porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
             horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias,
             esCumpleanos: false, imagenUrl: form.imagenUrl || null,
+            fechaVencimiento: form.tieneVencimiento && form.fechaVencimiento ? new Date(form.fechaVencimiento).toISOString() : null,
           }),
         });
       }
@@ -81,6 +83,10 @@ export default function PanelPromociones() {
       tipo: p.tipo, titulo: p.titulo, descripcion: p.descripcion ?? "",
       condiciones: p.condiciones ?? "", descuento: p.porcentajeDescuento ? String(p.porcentajeDescuento) : "",
       dias, horaInicio: p.horaInicio, horaFin: p.horaFin, imagenUrl: p.imagenUrl ?? "",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tieneVencimiento: !!(p as any).fechaVencimiento,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      fechaVencimiento: (p as any).fechaVencimiento ? new Date((p as any).fechaVencimiento).toISOString().split("T")[0] : "",
     });
     setEditId(p.id);
     setShowForm(true);
@@ -135,6 +141,16 @@ export default function PanelPromociones() {
         <div style={{ display: "flex", gap: "12px" }}>
           <div style={{ flex: 1 }}><label style={L}>Hora inicio</label><input type="time" style={I} value={form.horaInicio} onChange={e => set("horaInicio", e.target.value)} /></div>
           <div style={{ flex: 1 }}><label style={L}>Hora fin</label><input type="time" style={I} value={form.horaFin} onChange={e => set("horaFin", e.target.value)} /></div>
+        </div>
+        {/* Fecha vencimiento */}
+        <div style={{ marginTop: 8 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+            <input type="checkbox" checked={form.tieneVencimiento} onChange={e => set("tieneVencimiento", e.target.checked)} style={{ accentColor: "var(--accent)", width: 16, height: 16 }} />
+            <span style={{ ...L, margin: 0, display: "inline" }}>Tiene fecha de vencimiento</span>
+          </label>
+          {form.tieneVencimiento && (
+            <div style={{ marginTop: 8 }}><input type="date" style={I} value={form.fechaVencimiento} onChange={e => set("fechaVencimiento", e.target.value)} /></div>
+          )}
         </div>
         <button onClick={publish} disabled={!canPublish || saving} style={{ ...B, marginTop: "8px", opacity: canPublish ? 1 : 0.5 }}>{saving ? "Guardando..." : editId ? "Guardar cambios" : "Publicar promoción"}</button>
       </div>

@@ -257,12 +257,12 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     // Filter by category STRICTLY (also check tags)
     if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
       const catLower = categoria.toLowerCase();
-      candidates = candidates.filter(l =>
-        l.categoria.toLowerCase() === catLower ||
-        (Array.isArray((l as Record<string, unknown>).tags) && ((l as Record<string, unknown>).tags as string[]).some((t: string) =>
-          t.toLowerCase().includes(catLower) || catLower.includes(t.toLowerCase())
-        ))
-      );
+      candidates = candidates.filter(l => {
+        if (l.categoria.toLowerCase() === catLower) return true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tags = (l as any).tags as string[] | undefined;
+        return Array.isArray(tags) && tags.some(t => t.toLowerCase().includes(catLower) || catLower.includes(t.toLowerCase()));
+      });
     }
 
     // Filter by comuna STRICTLY

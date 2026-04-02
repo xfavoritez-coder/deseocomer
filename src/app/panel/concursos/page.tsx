@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import SubirFoto from "@/components/SubirFoto";
+import ModalInstagram from "@/components/concursos/ModalInstagram";
 
 const SESSION_KEY = "deseocomer_local_session";
 
@@ -41,6 +42,7 @@ export default function PanelConcursos() {
   const [editError, setEditError] = useState("");
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelMotivo, setCancelMotivo] = useState("");
+  const [modalInstagram, setModalInstagram] = useState<Concurso | null>(null);
   const [actionToast, setActionToast] = useState("");
   const [abrirEditando, setAbrirEditando] = useState(false);
 
@@ -479,6 +481,7 @@ export default function PanelConcursos() {
                 </p>
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0, padding: "0 12px 0 0" }}>
+                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); setModalInstagram(c); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
                 <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
                 <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
@@ -487,6 +490,7 @@ export default function PanelConcursos() {
         })}
       </div>
     )}
+    {modalInstagram && <ModalInstagram concurso={{ ...modalInstagram, local: { nombre: session?.nombre || "Local" } }} onClose={() => setModalInstagram(null)} />}
   </div>);
 }
 

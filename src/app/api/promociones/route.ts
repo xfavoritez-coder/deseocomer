@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const promociones = await prisma.promocion.findMany({
       where: localId
         ? { localId }
-        : { activa: true, local: { activo: true, direccion: { not: "" }, categoria: { not: null } } },
+        : { activa: true, local: { activo: true, direccion: { not: "" }, categoria: { not: null } }, OR: [{ fechaVencimiento: null }, { fechaVencimiento: { gte: new Date() } }] },
       include: { local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true } } },
       orderBy: { createdAt: "desc" },
     });
@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana, esCumpleanos, imagenUrl } = await req.json();
+    const { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana, esCumpleanos, imagenUrl, fechaVencimiento } = await req.json();
     if (!localId || !tipo || !titulo || !horaInicio || !horaFin) return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     const promocion = await prisma.promocion.create({
-      data: { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana: diasSemana || [], esCumpleanos: esCumpleanos || false, imagenUrl },
+      data: { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana: diasSemana || [], esCumpleanos: esCumpleanos || false, imagenUrl, ...(fechaVencimiento && { fechaVencimiento: new Date(fechaVencimiento) }) },
     });
     return NextResponse.json(promocion, { status: 201 });
   } catch {

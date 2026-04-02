@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/recordatorios-ganador",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/recordatorios-locales",
+      "schedule": "0 10 * * *"
     }
   ]
 }

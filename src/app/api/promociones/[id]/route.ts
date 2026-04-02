@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const promocion = await prisma.promocion.findUnique({
       where: { id },
       include: {
-        local: { select: { id: true, nombre: true, comuna: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true } },
+        local: { select: { id: true, nombre: true, comuna: true, categoria: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true } },
       },
     });
     if (!promocion) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
@@ -34,6 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.imagenUrl !== undefined && { imagenUrl: body.imagenUrl }),
         ...(body.condiciones !== undefined && { condiciones: body.condiciones }),
         ...(body.activa !== undefined && { activa: body.activa }),
+        ...(body.fechaVencimiento !== undefined && { fechaVencimiento: body.fechaVencimiento ? new Date(body.fechaVencimiento) : null }),
       },
     });
     return NextResponse.json(promocion);

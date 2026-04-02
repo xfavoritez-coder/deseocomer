@@ -64,6 +64,14 @@ export default function CaptaLocalesPage() {
           </div>
         </section>
 
+        {/* ── NOTA GRATIS ───────────────────────────────── */}
+        <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: 14, padding: "14px 16px", marginBottom: 24, display: "flex", gap: 10, alignItems: "flex-start" }}>
+          <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>✅</span>
+          <p style={{ fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>
+            <strong style={{ color: "#3db89e" }}>Registrar un local es gratis para el dueño.</strong> No tiene que pagar nada, ni ahora ni después. Tu rol es mostrarles la plataforma — el registro toma menos de 5 minutos.
+          </p>
+        </div>
+
         {/* ── CALCULADORA ───────────────────────────────── */}
         <section style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 16, padding: 20, marginBottom: 28 }}>
           <p style={{ fontSize: 12, color: "rgba(240,234,214,0.5)", marginBottom: 12, marginTop: 0 }}>¿Cuántos locales puedes visitar al mes?</p>
@@ -123,7 +131,6 @@ export default function CaptaLocalesPage() {
           <button onClick={() => router.push("/contacto?motivo=captador")} style={{ background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase", padding: "14px 28px", borderRadius: 12, border: "none", cursor: "pointer" }}>
             Quiero ser captador →
           </button>
-          <p style={{ fontSize: 11, color: "rgba(240,234,214,0.22)", marginTop: 8 }}>Al hacer click irás al formulario de contacto</p>
         </section>
       </div>
 

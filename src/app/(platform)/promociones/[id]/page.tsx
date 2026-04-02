@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
@@ -53,6 +53,7 @@ export default function PromocionDetailPage() {
     comuna: dbPromo.local?.comuna ?? "",
     tipo: normalizeTipo(dbPromo.tipo ?? ""),
     categoria: "cena" as const,
+    categoriaLocal: dbPromo.local?.categoria ?? "",
     imagen: "⚡",
     imagenUrl: dbPromo.imagenUrl ?? "",
     titulo: dbPromo.titulo ?? "",
@@ -63,7 +64,7 @@ export default function PromocionDetailPage() {
     diasSemana: Array.isArray(dbPromo.diasSemana) ? dbPromo.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
     horaInicio: dbPromo.horaInicio ?? "12:00",
     horaFin: dbPromo.horaFin ?? "22:00",
-    fechaVencimiento: "2099-12-31",
+    fechaVencimiento: dbPromo.fechaVencimiento ? new Date(dbPromo.fechaVencimiento).toLocaleDateString("es-CL") : null,
     activa: dbPromo.activa ?? true,
     esCumpleanos: dbPromo.esCumpleanos ?? false,
     condiciones: dbPromo.condiciones ?? undefined,
@@ -79,19 +80,22 @@ export default function PromocionDetailPage() {
   const [timer, setTimer] = useState({ horas: 0, minutos: 0, segundos: 0 });
   const [copiado, setCopiado] = useState(false);
 
-  const updateTimer = useCallback(() => {
-    if (!promo) return;
-    setIsActiva(isPromocionActivaAhora(promo));
-    setIsUltimas(terminaEnMenos2Horas(promo));
-    setTimer(getTimerHastaFin(promo));
-  }, [promo]);
+  const promoRef = useRef(promo);
+  promoRef.current = promo;
 
   useEffect(() => {
     setMounted(true);
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
+    const tick = () => {
+      const p = promoRef.current;
+      if (!p) return;
+      setIsActiva(isPromocionActivaAhora(p));
+      setIsUltimas(terminaEnMenos2Horas(p));
+      setTimer(getTimerHastaFin(p));
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [updateTimer]);
+  }, []);
 
   const copiarCodigo = () => {
     if (!promo?.codigoCupon) return;
@@ -145,41 +149,60 @@ export default function PromocionDetailPage() {
       <Navbar />
 
       {/* ── Hero: full-width image header ── */}
-      <section className="dc-pd-hero">
+      <section className="dc-pd-hero" style={{ pointerEvents: "none" }}>
         {promo.imagenUrl ? (
           <>
-            <img src={promo.imagenUrl} alt={promo.titulo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.75 }} />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(8,13,24,0.2) 0%, rgba(8,13,24,0.7) 60%, var(--bg-primary) 100%)" }} />
+            <img src={promo.imagenUrl} alt={promo.titulo} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.75, pointerEvents: "none" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(8,13,24,0.2) 0%, rgba(8,13,24,0.7) 60%, var(--bg-primary) 100%)", pointerEvents: "none" }} />
           </>
         ) : (
-          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 70%)" }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
         )}
 
         {/* Back link */}
-        <Link href="/promociones" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Promociones</Link>
-
-        {/* Sello pill */}
-        {sello && (
-          <div style={{ position: "absolute", top: "100px", right: "clamp(20px, 5vw, 60px)", zIndex: 3, pointerEvents: "none", background: "rgba(13,7,3,0.88)", border: `1px solid ${sello.color}`, borderRadius: "20px", padding: "6px 16px" }}>
-            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px", whiteSpace: "nowrap" }}>{sello.text}</span>
-          </div>
-        )}
+        <Link href="/promociones" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 5, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none", pointerEvents: "auto" }}>← Promociones</Link>
 
         {/* Hero content overlay */}
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 4vw, 2.8rem)", color: "#f5d080", textShadow: "0 2px 20px rgba(0,0,0,0.6)", marginBottom: "12px", lineHeight: 1.25, maxWidth: "700px", margin: "0 auto 12px" }}>
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 700, margin: "0 auto", pointerEvents: "auto" }}>
+          {/* 1. Logo + nombre local + categoría local */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 14 }}>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(promo as any).logoUrl ? (
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              <img src={(promo as any).logoUrl} alt="" style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)", flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(232,168,76,0.2)", border: "1.5px solid rgba(232,168,76,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>
+                {promo.local.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", color: "rgba(240,234,214,0.85)", fontWeight: 600 }}>{promo.local}</span>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {((promo as any).categoriaLocal || promo.comuna) && (<>
+              <span style={{ width: 3, height: 3, borderRadius: "50%", background: "rgba(240,234,214,0.3)" }} />
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", letterSpacing: "0.05em" }}>{(promo as any).categoriaLocal || promo.comuna}</span>
+            </>)}
+          </div>
+
+          {/* 2. Título de la promoción */}
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 4vw, 2.8rem)", color: "#f5d080", textShadow: "0 2px 20px rgba(0,0,0,0.6)", marginBottom: "14px", lineHeight: 1.25 }}>
             {promo.titulo}
           </h1>
 
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.08em", color: "rgba(240,234,214,0.7)" }}>
-            {promo.local} · {promo.comuna}
-          </p>
-
-          {/* Active badge */}
-          {mounted && isActiva && (
-            <div style={{ marginTop: "16px", display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 16px", borderRadius: "20px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", backdropFilter: "blur(4px)" }}>
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--oasis-bright)", display: "inline-block", animation: "dc-pd-blink 1.5s infinite" }} />
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
+          {/* 3. Etiqueta + Activa ahora */}
+          {(sello || (mounted && isActiva)) && (
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+              {sello && (
+                <div style={{ display: "inline-flex", alignItems: "center", padding: "6px 16px", borderRadius: "20px", background: "rgba(13,7,3,0.7)", border: `1px solid ${sello.color}`, backdropFilter: "blur(4px)" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: 700, color: sello.color, letterSpacing: "0.5px" }}>{sello.text}</span>
+                </div>
+              )}
+              {mounted && isActiva && (
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "6px 16px", borderRadius: "20px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", backdropFilter: "blur(4px)" }}>
+                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--oasis-bright)", display: "inline-block", animation: "dc-pd-blink 1.5s infinite" }} />
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", color: "var(--oasis-bright)", textTransform: "uppercase" }}>Activa ahora</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -316,12 +339,19 @@ export default function PromocionDetailPage() {
               <div className="dc-pd-card">
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>Publicado por</p>
                 <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: promo.descripcionLocal ? "14px" : 0 }}>
-                  <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-                    {promo.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
-                  </div>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(promo as any).logoUrl ? (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    <img src={(promo as any).logoUrl} alt="" style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.3)", flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+                      {promo.local.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()}
+                    </div>
+                  )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", fontWeight: 700, color: "#e8a84c", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{promo.local}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)" }}>{promo.categoria} · {promo.comuna}</p>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)" }}>{(promo as any).categoriaLocal || promo.comuna}{(promo as any).categoriaLocal && promo.comuna ? ` · ${promo.comuna}` : ""}</p>
                   </div>
                 </div>
                 {promo.descripcionLocal && (
@@ -410,6 +440,7 @@ export default function PromocionDetailPage() {
         }
         .dc-pd-horario-mobile { display: none; }
         .dc-pd-content {
+          position: relative;
           padding: 40px clamp(20px, 5vw, 60px) 100px;
           max-width: 1100px;
           margin: 0 auto;
