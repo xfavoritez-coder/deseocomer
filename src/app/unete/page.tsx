@@ -11,7 +11,7 @@ function generarPassword(): string {
 }
 
 const L: React.CSSProperties = { fontSize: 9, color: "rgba(80,60,20,0.45)", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 700, marginBottom: 4, display: "block" };
-const I: React.CSSProperties = { background: "#faf7f2", border: "1px solid rgba(180,130,40,0.2)", borderRadius: 10, padding: "11px 14px", fontSize: 14, color: "#3a2c0a", fontFamily: "var(--font-lato)", width: "100%", outline: "none", boxSizing: "border-box" };
+const I: React.CSSProperties = { background: "#faf7f2", border: "1px solid rgba(180,130,40,0.2)", borderRadius: 10, padding: "11px 14px", fontSize: 14, color: "#3a2c0a", fontFamily: "var(--font-lato), Lato, sans-serif", width: "100%", outline: "none", boxSizing: "border-box" };
 
 export default function UnetePage() {
   const router = useRouter();
@@ -74,13 +74,13 @@ export default function UnetePage() {
   };
 
   return (
-    <div style={{ background: "#f5f0e8", fontFamily: "var(--font-lato)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px", margin: 0 }}>
+    <div style={{ background: "#f5f0e8", fontFamily: "var(--font-lato), Lato, sans-serif", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px", margin: 0 }}>
       <div style={{ background: "#fff", border: "1px solid rgba(180,130,40,0.2)", borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 24px rgba(180,130,40,0.12)", width: "100%", maxWidth: 340 }}>
 
         {/* Hero */}
         <div style={{ background: "linear-gradient(135deg, #e8a84c 0%, #d4922a 100%)", padding: "28px 24px 22px", textAlign: "center" }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>🧞</div>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6, margin: "0 0 6px" }}>Únete a DeseoComer</p>
+          <p style={{ fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 18, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6, margin: "0 0 6px" }}>Únete a DeseoComer</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.5 }}>Solo 4 datos y tu local estará en la plataforma.<br />El resto lo completas después con calma.</p>
         </div>
 
@@ -88,11 +88,11 @@ export default function UnetePage() {
           /* Success screen */
           <div style={{ padding: "40px 24px 32px", textAlign: "center" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, color: "#2a6010", fontWeight: 700, marginBottom: 12 }}>¡Ya estás dentro!</p>
+            <p style={{ fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 20, color: "#2a6010", fontWeight: 700, marginBottom: 12 }}>¡Ya estás dentro!</p>
             <p style={{ fontSize: 13, color: "rgba(80,60,20,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
               Te enviamos un correo a <strong style={{ color: "#3a2c0a" }}>{email}</strong> con tus datos de acceso. Entra al panel y completa tu perfil para aparecer en DeseoComer.
             </p>
-            <button onClick={() => router.push("/login-local")} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}>
+            <button onClick={() => router.push("/login-local")} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 14, fontWeight: 700, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer" }}>
               Ir al panel →
             </button>
           </div>
@@ -132,7 +132,7 @@ export default function UnetePage() {
               {errors.telefono && <p style={{ fontSize: 12, color: "#e05555", margin: "4px 0 0" }}>{errors.telefono}</p>}
             </div>
 
-            <button onClick={handleSubmit} disabled={!canSubmit || saving} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer", marginTop: 4, opacity: canSubmit && !saving ? 1 : 0.5 }}>
+            <button onClick={handleSubmit} disabled={!canSubmit || saving} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 14, fontWeight: 700, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer", marginTop: 4, opacity: canSubmit && !saving ? 1 : 0.5 }}>
               {saving ? "Registrando..." : "Registrarse →"}
             </button>
           </div>
