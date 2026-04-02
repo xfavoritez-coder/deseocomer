@@ -55,7 +55,7 @@ export default function SoloLocalesPage() {
         <p style={{ fontSize: 10, color: "#3db89e", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 700, marginBottom: 14 }}>
           🧞 Para restaurantes y locales
         </p>
-        <h1 className="sl-hero-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", lineHeight: 1.2, letterSpacing: "0.03em", marginBottom: 12 }}>
+        <h1 className="sl-hero-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", lineHeight: 1.2, letterSpacing: "0.03em", marginBottom: 12 }}>
           Más clientes, más ventas
         </h1>
         <p className="sl-hero-sub" style={{ fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
