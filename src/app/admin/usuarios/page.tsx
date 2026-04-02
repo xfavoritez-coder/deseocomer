@@ -99,8 +99,81 @@ export default function AdminUsuarios() {
 
       <div style={cardS}>
         <p style={cardTitleS}>Información</p>
-        {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Ciudad", sel.ciudad], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Ciudad", sel.ciudad], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })], ["Cuenta activada", sel.emailVerificadoAt ? new Date(sel.emailVerificadoAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : (sel.emailVerificado ? "Sí (fecha no registrada)" : "No")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
       </div>
+
+      {/* Perfil del Genio */}
+      {sel.geniePerfil && (() => {
+        const gp = sel.geniePerfil as { gustos?: { categorias?: Record<string, number>; comunas?: Record<string, number>; ocasiones?: Record<string, number>; horario?: Record<string, number>; precioPreferido?: string | null }; comportamiento?: { localesVisitados?: { nombre: string; categoria: string; comuna: string }[]; promocionesAbiertas?: string[]; concursosVistos?: string[]; filtrosUsados?: string[] }; respuestasGenio?: { pregunta: string; respuesta: string }[] };
+        const gustos = gp.gustos ?? {};
+        const comp = gp.comportamiento ?? {};
+        const topCats = Object.entries(gustos.categorias ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const topComunas = Object.entries(gustos.comunas ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const topHorarios = Object.entries(gustos.horario ?? {}).sort((a, b) => b[1] - a[1]);
+        const visitados = comp.localesVisitados ?? [];
+        const respuestas = gp.respuestasGenio ?? [];
+        return (
+          <div style={cardS}>
+            <p style={cardTitleS}>🧞 Perfil del Genio</p>
+            {topCats.length > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Categorías favoritas</p>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {topCats.map(([cat, score]) => (
+                    <span key={cat} style={{ fontFamily: "Georgia", fontSize: "0.85rem", padding: "4px 12px", borderRadius: "16px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", color: "#e8a84c" }}>{cat} ({score})</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {topComunas.length > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Comunas preferidas</p>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {topComunas.map(([com, score]) => (
+                    <span key={com} style={{ fontFamily: "Georgia", fontSize: "0.85rem", padding: "4px 12px", borderRadius: "16px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.25)", color: "#3db89e" }}>{com} ({score})</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {topHorarios.length > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Horarios de uso</p>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {topHorarios.map(([h, score]) => (
+                    <span key={h} style={{ fontFamily: "Georgia", fontSize: "0.85rem", padding: "4px 12px", borderRadius: "16px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.25)", color: "#a070e0" }}>{h} ({score})</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {gustos.precioPreferido && <Row label="Precio preferido" value={gustos.precioPreferido} />}
+            {visitados.length > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Últimos locales visitados ({visitados.length})</p>
+                {visitados.slice(-5).reverse().map((v, i) => (
+                  <p key={i} style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f0ead6", margin: "2px 0", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>{v.nombre} <span style={{ color: "rgba(240,234,214,0.4)" }}>· {v.categoria} · {v.comuna}</span></p>
+                ))}
+              </div>
+            )}
+            {(comp.filtrosUsados?.length ?? 0) > 0 && (
+              <div style={{ marginBottom: "12px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Filtros usados</p>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "rgba(240,234,214,0.6)" }}>{[...new Set(comp.filtrosUsados)].join(", ")}</p>
+              </div>
+            )}
+            {respuestas.length > 0 && (
+              <div>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.45)", marginBottom: "6px" }}>Respuestas al Genio ({respuestas.length})</p>
+                {respuestas.slice(-3).reverse().map((r, i) => (
+                  <div key={i} style={{ padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", margin: 0 }}>{r.pregunta}</p>
+                    <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f0ead6", margin: "2px 0 0" }}>{r.respuesta}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <div style={cardS}>
         <p style={cardTitleS}>Actividad</p>

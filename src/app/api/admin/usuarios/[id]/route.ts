@@ -47,7 +47,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     if (accion === "activar") {
-      await prisma.usuario.update({ where: { id }, data: { emailVerificado: true, tokenVerificacion: null } });
+      await prisma.usuario.update({ where: { id }, data: { emailVerificado: true, emailVerificadoAt: new Date(), tokenVerificacion: null } });
       return NextResponse.json({ ok: true });
     }
 

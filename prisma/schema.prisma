@@ -21,6 +21,8 @@ model Usuario {
   fotoUrl             String    @default("")
   tipo                String    @default("usuario")
   emailVerificado     Boolean   @default(false)
+  emailVerificadoAt   DateTime?
+  geniePerfil         Json?
   tokenVerificacion   String?
   resetToken          String?
   resetTokenExpira    DateTime?

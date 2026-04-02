@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const tokenAge = Date.now() - new Date(usuario.createdAt).getTime();
     if (tokenAge > 48 * 60 * 60 * 1000) return NextResponse.json({ error: "Este enlace ha expirado. Solicita uno nuevo." }, { status: 400 });
 
-    await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, tokenVerificacion: null } });
+    await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, emailVerificadoAt: new Date(), tokenVerificacion: null } });
 
     // Mover puntos pendientes a reales en concursos activos
     const participaciones = await prisma.participanteConcurso.findMany({

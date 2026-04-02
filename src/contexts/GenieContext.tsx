@@ -89,12 +89,27 @@ function loadPerfil(): GeniePerfil {
   } catch { return createEmptyPerfil(); }
 }
 
-function savePerfil(p: GeniePerfil) {
+function savePerfil(p: GeniePerfil, userId?: string | null) {
   try {
     p.updatedAt = Date.now();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
-    console.log("[Genio] Perfil actualizado:", p);
+    // Sync to DB if user is logged in (debounced via caller)
+    if (userId) {
+      syncToDBDebounced(userId, p);
+    }
   } catch { /* noop */ }
+}
+
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+function syncToDBDebounced(userId: string, perfil: GeniePerfil) {
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    fetch("/api/usuarios/genio-perfil", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usuarioId: userId, perfil }),
+    }).catch(() => {});
+  }, 5000);
 }
 
 // ─── Context ─────────────────────────────────────────────────────────────────
@@ -143,9 +158,14 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     }).catch(() => {});
   }, []);
 
-  // Load from localStorage on mount + track sessions for non-logged users
+  // Load from localStorage on mount + sync to DB if logged in
   useEffect(() => {
-    setPerfil(loadPerfil());
+    const localPerfil = loadPerfil();
+    setPerfil(localPerfil);
+    // Sync existing localStorage data to DB on first load if logged in
+    if (user?.id && (Object.keys(localPerfil.gustos.categorias).length > 0 || localPerfil.comportamiento.localesVisitados.length > 0)) {
+      syncToDBDebounced(user.id, localPerfil);
+    }
     const count = getSessionCount();
     setSessionCount(count);
     if (!isLoggedIn) {
@@ -180,13 +200,15 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     }
   }, [isLoggedIn, setToastActivo]);
 
+  const userId = user?.id ?? null;
+
   const updatePerfil = useCallback((updater: (p: GeniePerfil) => GeniePerfil) => {
     setPerfil(prev => {
       const next = updater({ ...prev, gustos: { ...prev.gustos }, comportamiento: { ...prev.comportamiento } });
-      savePerfil(next);
+      savePerfil(next, userId);
       return next;
     });
-  }, []);
+  }, [userId]);
 
   const addInteraccion = useCallback((tipo: string, datos: Record<string, string | number>) => {
     updatePerfil(p => {
