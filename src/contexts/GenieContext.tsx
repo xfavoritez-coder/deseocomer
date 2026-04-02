@@ -50,7 +50,7 @@ interface GenieContextType {
   setToastActivo: (t: { mensaje: string; opciones: string[]; id: string } | null) => void;
   addInteraccion: (tipo: string, datos: Record<string, string | number>) => void;
   addRespuestaGenio: (pregunta: string, respuesta: string) => void;
-  getRecomendacion: (categoria?: string, comuna?: string, excludeIds?: string[]) => LocalRecomendado;
+  getRecomendacion: (categoria?: string, comuna?: string, excludeIds?: string[]) => LocalRecomendado | null;
   isLoggedIn: boolean;
   userName: string | null;
   sessionCount: number;
@@ -250,38 +250,43 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     });
   }, [updatePerfil]);
 
-  const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[]): LocalRecomendado => {
+  const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[]): LocalRecomendado | null => {
     let candidates = [...localesDB];
     if (excludeIds?.length) candidates = candidates.filter(l => !excludeIds.includes(l.id));
 
-    // Filter by category if specified
-    if (categoria && categoria !== "sorprendeme") {
+    // Filter by category STRICTLY (also check tags)
+    if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
       const catLower = categoria.toLowerCase();
-      const filtered = candidates.filter(l => l.categoria === catLower);
-      if (filtered.length > 0) candidates = filtered;
+      candidates = candidates.filter(l =>
+        l.categoria.toLowerCase() === catLower ||
+        (Array.isArray((l as Record<string, unknown>).tags) && ((l as Record<string, unknown>).tags as string[]).some((t: string) =>
+          t.toLowerCase().includes(catLower) || catLower.includes(t.toLowerCase())
+        ))
+      );
     }
 
-    // Filter by comuna if specified
+    // Filter by comuna STRICTLY
     if (comuna) {
       const comLower = comuna.toLowerCase();
-      const filtered = candidates.filter(l => l.comuna.toLowerCase() === comLower);
-      if (filtered.length > 0) candidates = filtered;
+      candidates = candidates.filter(l => l.comuna.toLowerCase() === comLower);
     }
+
+    // If no candidates, return null
+    if (candidates.length === 0) return null;
 
     // Score each candidate
     const scored = candidates.map(l => {
-      let score = l.rating * 10;
+      let score = (l.rating ?? 4) * 10;
       const catScore = perfil.gustos.categorias[l.categoria] ?? 0;
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;
       score += catScore * 2 + comScore;
       if (l.descuento > 0) score += l.descuento * 0.5;
-      // Add randomness to avoid always showing the same
       score += Math.random() * 5;
       return { ...l, score };
     });
 
     scored.sort((a, b) => b.score - a.score);
-    return scored[0] ?? LOCALES_DB[0];
+    return scored[0] ?? null;
   }, [perfil.gustos, localesDB]);
 
   const showFavoritoToast = useCallback(() => {

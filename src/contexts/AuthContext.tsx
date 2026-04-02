@@ -9,6 +9,7 @@ export interface AuthUser {
   id: string;
   nombre: string;
   email: string;
+  fotoUrl?: string;
   type: UserType;
   nombreLocal?: string;
   comuna?: string;
@@ -81,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: session.id,
             nombre: session.nombre,
             email: session.email,
+            fotoUrl: session.fotoUrl || "",
             type: session.tipo === "local" ? "local" : "user",
           });
         }
@@ -109,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.data.id,
         nombre: data.data.nombre,
         email: data.data.email,
+        fotoUrl: data.data.fotoUrl || "",
         type: "user",
       };
 
@@ -121,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data.data.id,
         nombre: data.data.nombre,
         email: data.data.email,
+        fotoUrl: data.data.fotoUrl || "",
         tipo: "usuario",
         loggedIn: true,
       }));

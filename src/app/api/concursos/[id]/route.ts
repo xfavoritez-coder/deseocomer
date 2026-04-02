@@ -8,7 +8,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { OR: [{ id }, { slug: id }] },
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true } },
-        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true } } }, orderBy: { puntos: "desc" } },
+        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true } } }, orderBy: { puntos: "desc" } },
         _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
       },
     });

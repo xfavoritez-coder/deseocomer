@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGenie } from "@/contexts/GenieContext";
+import SubirFoto from "@/components/SubirFoto";
 import { getAllRefCounts } from "@/lib/referrals";
 import { CONCURSOS, CONCURSOS_FINALIZADOS, getRefCode } from "@/lib/mockConcursos";
 
@@ -81,12 +82,13 @@ export default function PerfilPage() {
         <div className="dc-pf-header">
           <div style={{
             width: "80px", height: "80px", borderRadius: "50%",
-            background: "linear-gradient(135deg, #c4853a, #e8a84c, #f5d080)",
+            background: user.fotoUrl ? "transparent" : "linear-gradient(135deg, #c4853a, #e8a84c, #f5d080)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.6rem",
-            color: "#1a0e05", flexShrink: 0, fontWeight: 700,
+            color: "#1a0e05", flexShrink: 0, fontWeight: 700, overflow: "hidden",
+            border: "2px solid rgba(232,168,76,0.3)",
           }}>
-            {initials}
+            {user.fotoUrl ? <img src={user.fotoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <h1 style={{
@@ -493,8 +495,24 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
 
   const S = { fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", background: "#1a1008", border: "1px solid var(--border-color)", borderRadius: "10px", padding: "10px 14px", width: "100%", boxSizing: "border-box" as const, outline: "none" };
 
+  const [fotoUrl, setFotoUrl] = useState((() => { try { const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}"); return s.fotoUrl || ""; } catch { return ""; } })());
+
+  const handleFotoUpload = async (url: string) => {
+    setFotoUrl(url);
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      await fetch("/api/usuarios/foto", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: s.id, fotoUrl: url }) });
+      s.fotoUrl = url;
+      localStorage.setItem("deseocomer_session", JSON.stringify(s));
+    } catch { /* noop */ }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "480px" }}>
+      <div>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: 6 }}>Foto de perfil</span>
+        <SubirFoto folder="perfiles" circular preview={fotoUrl || null} label="Subir foto" height="80px" onUpload={handleFotoUpload} />
+      </div>
       <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>Nombre completo</span>
         <input style={S} value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />

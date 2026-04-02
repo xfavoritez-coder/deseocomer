@@ -101,15 +101,23 @@ export default function GeniePanel() {
     addInteraccion("categoria_seleccionada", { categoria: c });
     shownIds.current = [];
     const rec = getRecomendacion(c === "Sorpréndeme" ? undefined : c, comuna || undefined, []);
-    shownIds.current.push(rec.id);
-    setResultado(rec);
-    setStepActual(4);
+    if (rec) {
+      shownIds.current.push(rec.id);
+      setResultado(rec);
+      setStepActual(4);
+    } else {
+      setStepActual("sin_resultados");
+    }
   };
 
   const handleOtra = () => {
     const rec = getRecomendacion(categoria === "Sorpréndeme" ? undefined : categoria, comuna || undefined, shownIds.current);
-    shownIds.current.push(rec.id);
-    setResultado(rec);
+    if (rec) {
+      shownIds.current.push(rec.id);
+      setResultado(rec);
+    } else {
+      setStepActual("sin_resultados");
+    }
   };
 
   return (
@@ -190,6 +198,26 @@ export default function GeniePanel() {
               </div>
             </div>
           )}
+
+          {/* Step sin_resultados */}
+          {stepActual === "sin_resultados" && (
+            <div>
+              <button onClick={() => setStepActual(3)} style={VOLVER}>← Volver</button>
+              <div style={{ textAlign: "center", padding: "8px 0" }}>
+                <div style={{ fontSize: "2rem", marginBottom: "10px" }}>🧞</div>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px", lineHeight: 1.4 }}>
+                  Aún no tenemos {categoria.toLowerCase()} en {comuna}
+                </p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.5)", marginBottom: "16px", lineHeight: 1.5 }}>
+                  Estamos creciendo. ¿Probamos con otra categoría o buscamos en otra zona?
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <button onClick={() => setStepActual(3)} style={{ padding: "10px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.85)", cursor: "pointer" }}>Cambiar categoría</button>
+                  <button onClick={() => { setStepActual(2); setComuna(""); }} style={{ padding: "10px", background: "transparent", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.45)", cursor: "pointer" }}>Buscar en otra zona</button>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
 
@@ -219,7 +247,7 @@ export default function GeniePanel() {
               {r.portadaUrl || r.foto ? (
                 <img src={(r.portadaUrl || r.foto)!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
-                <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a0f2e, #2d1a08)" }} />
+                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.6 }} />
               )}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0) 30%, rgba(10,8,18,0.82) 100%)" }} />
               <div style={{ position: "absolute", bottom: "10px", left: "12px", display: "flex", alignItems: "center", gap: "8px" }}>

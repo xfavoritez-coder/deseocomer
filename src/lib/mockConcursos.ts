@@ -3,6 +3,7 @@
 export interface RankingEntry {
   nombre: string;
   referidos: number;
+  fotoUrl?: string;
 }
 
 export interface Concurso {

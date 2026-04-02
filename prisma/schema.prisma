@@ -18,6 +18,7 @@ model Usuario {
   cumpleDia   Int?
   cumpleMes   Int?
   cumpleAnio  Int?
+  fotoUrl             String    @default("")
   tipo                String    @default("usuario")
   emailVerificado     Boolean   @default(false)
   tokenVerificacion   String?
