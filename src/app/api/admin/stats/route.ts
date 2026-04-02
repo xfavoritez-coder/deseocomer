@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
       prisma.promocion.count(), prisma.favorito.count(), prisma.resena.count(), prisma.listaEsperaLocal.count(),
     ]);
     const ultimosUsuarios = await prisma.usuario.findMany({ take: 5, orderBy: { createdAt: "desc" }, select: { id: true, nombre: true, email: true, ciudad: true, createdAt: true } });
-    const ultimosLocales = await prisma.local.findMany({ take: 5, orderBy: { createdAt: "desc" }, select: { id: true, nombre: true, email: true, ciudad: true, activo: true, verificado: true, createdAt: true } });
+    const ultimosLocales = await prisma.local.findMany({ take: 5, orderBy: { createdAt: "desc" }, select: { id: true, nombre: true, email: true, ciudad: true, activo: true, createdAt: true } });
     return NextResponse.json({ totalUsuarios, totalLocales, localesActivos, totalConcursos, concursosActivos, totalPromociones, totalFavoritos, totalResenas, listaEspera, ultimosUsuarios, ultimosLocales });
   } catch (error) {
     console.error("[Admin stats]", error);

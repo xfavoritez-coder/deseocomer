@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import SubirFoto from "@/components/SubirFoto";
-import ModalInstagram from "@/components/concursos/ModalInstagram";
 
 const SESSION_KEY = "deseocomer_local_session";
 
@@ -42,7 +41,6 @@ export default function PanelConcursos() {
   const [editError, setEditError] = useState("");
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelMotivo, setCancelMotivo] = useState("");
-  const [modalInstagram, setModalInstagram] = useState<Concurso | null>(null);
   const [actionToast, setActionToast] = useState("");
   const [abrirEditando, setAbrirEditando] = useState(false);
 
@@ -474,14 +472,14 @@ export default function PanelConcursos() {
               ) : (
                 <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", textDecoration: "none" }}>🏆</a>
               )}
-              <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer" }}>
+              <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer", minWidth: 0, overflow: "hidden" }}>
                 <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
                   {parts} participantes · {ended ? (c.premioEntregado ? <span style={{ color: "#3db89e" }}>✓ Entregado</span> : <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
                 </p>
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0, padding: "0 12px 0 0" }}>
-                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); setModalInstagram(c); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
+                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
                 <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
                 <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
@@ -490,7 +488,6 @@ export default function PanelConcursos() {
         })}
       </div>
     )}
-    {modalInstagram && <ModalInstagram concurso={{ ...modalInstagram, local: { nombre: getSession().nombre || "Local" } }} onClose={() => setModalInstagram(null)} />}
   </div>);
 }
 

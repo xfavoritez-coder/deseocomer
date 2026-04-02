@@ -123,7 +123,7 @@ export default function PromocionesPage() {
         </div>
 
         {/* Fila 2 — Filtros de tipo */}
-        <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "wrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none" }}>
+        <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "wrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {[
             { key: "activas", label: "Activas ahora", color: "var(--oasis-bright)" },
             { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
@@ -300,6 +300,7 @@ export default function PromocionesPage() {
         .dc-filtros-tipo::-webkit-scrollbar { display: none; }
         @media (max-width: 767px) {
           .dc-pp-hero { padding: 100px 20px 50px; }
+          .dc-filtros-tipo { flex-wrap: nowrap !important; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
           .dc-pp-hero { padding: 120px 40px 60px; }

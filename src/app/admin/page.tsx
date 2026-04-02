@@ -63,7 +63,7 @@ export default function AdminDashboard() {
           <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "400px" }}>
             <thead><tr>{["Nombre", "Email", "Ciudad", "Estado"].map(h => <th key={h} style={THC}>{h}</th>)}</tr></thead>
-            <tbody>{(stats.ultimosLocales ?? []).map((l: S) => <tr key={l.id} style={TR}><td style={TD}>{l.nombre}</td><td style={TD}>{l.email}</td><td style={TD}>{l.ciudad}</td><td style={TD}><span style={{ color: l.activo ? "#3db89e" : "#ff6b6b", fontSize: "0.82rem" }}>{l.activo ? "Activo" : "Inactivo"}</span>{l.verificado && " ✓"}</td></tr>)}</tbody>
+            <tbody>{(stats.ultimosLocales ?? []).map((l: S) => <tr key={l.id} style={TR}><td style={TD}>{l.nombre}</td><td style={TD}>{l.email}</td><td style={TD}>{l.ciudad}</td><td style={TD}><span style={{ color: l.activo ? "#3db89e" : "#ff6b6b", fontSize: "0.82rem" }}>{l.activo ? "Activo" : "Inactivo"}</span></td></tr>)}</tbody>
           </table>
           </div>
         </div>

@@ -22,12 +22,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         data: {
           ...(body.nombre !== undefined && { nombre: body.nombre }),
           ...(body.ciudad !== undefined && { ciudad: body.ciudad }),
+          ...(body.telefono !== undefined && { telefono: body.telefono || null }),
+          ...(body.fotoUrl !== undefined && { fotoUrl: body.fotoUrl }),
+          ...(body.tipo !== undefined && { tipo: body.tipo }),
           ...(body.cumpleDia !== undefined && { cumpleDia: body.cumpleDia ? Number(body.cumpleDia) : null }),
           ...(body.cumpleMes !== undefined && { cumpleMes: body.cumpleMes ? Number(body.cumpleMes) : null }),
+          ...(body.cumpleAnio !== undefined && { cumpleAnio: body.cumpleAnio ? Number(body.cumpleAnio) : null }),
         },
       });
       const { password: _, ...safe } = updated;
       return NextResponse.json({ ok: true, data: safe });
+    }
+
+    if (accion === "resetear-foto") {
+      await prisma.usuario.update({ where: { id }, data: { fotoUrl: "" } });
+      return NextResponse.json({ ok: true });
     }
 
     if (accion === "cambiar-password") {

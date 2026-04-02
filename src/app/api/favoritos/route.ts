@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     if (!usuarioId) return NextResponse.json({ error: "Falta usuarioId" }, { status: 400 });
     const favoritos = await prisma.favorito.findMany({
       where: { usuarioId },
-      include: { local: { select: { id: true, nombre: true, categoria: true, comuna: true, logoUrl: true, portadaUrl: true, descripcion: true, verificado: true } } },
+      include: { local: { select: { id: true, nombre: true, categoria: true, comuna: true, logoUrl: true, portadaUrl: true, descripcion: true } } },
       orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(favoritos);

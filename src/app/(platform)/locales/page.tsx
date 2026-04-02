@@ -51,7 +51,6 @@ export default function LocalesPage() {
             imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
             logoUrl: l.logoUrl,
             descripcion: l.descripcion ?? "",
-            verificado: false,
             horarios: l.horarios,
             createdAt: l.createdAt,
             _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },

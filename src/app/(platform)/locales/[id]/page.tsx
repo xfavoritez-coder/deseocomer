@@ -109,7 +109,6 @@ export default function LocalDetailPage() {
     totalResenas: (dbLocal._count as Record<string, number>)?.resenas ?? 0,
     precio: "$$",
     isOpen: true,
-    verificado: dbLocal.verificado as boolean ?? false,
     totalFavoritos: (dbLocal._count as Record<string, number>)?.favoritos ?? 0,
     imagenPortada: dbLocal.portadaUrl as string ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
     imagenLogo: dbLocal.logoUrl as string ?? null,

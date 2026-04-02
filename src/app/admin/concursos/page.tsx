@@ -187,6 +187,44 @@ export default function AdminConcursos() {
                   <div>
                     <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Fecha de cierre</label>
                     <input style={EDIT_INPUT} type="datetime-local" value={editFechaFin} onChange={e => setEditFechaFin(e.target.value)} />
+                    {/* Tiempo restante y ajuste rápido */}
+                    {(() => {
+                      const fechaMs = new Date(editFechaFin).getTime();
+                      const ahora = Date.now();
+                      const restMs = Math.max(0, fechaMs - ahora);
+                      const d = Math.floor(restMs / 86400000);
+                      const h = Math.floor((restMs % 86400000) / 3600000);
+                      const m = Math.floor((restMs % 3600000) / 60000);
+                      const ajustar = (ms: number) => {
+                        const nueva = new Date(fechaMs + ms);
+                        setEditFechaFin(nueva.toISOString().slice(0, 16));
+                      };
+                      const AJUSTE_BTN: React.CSSProperties = { padding: "4px 10px", borderRadius: "6px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(232,168,76,0.06)", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.72rem", cursor: "pointer" };
+                      const AJUSTE_BTN_NEG: React.CSSProperties = { ...AJUSTE_BTN, borderColor: "rgba(255,80,80,0.2)", background: "rgba(255,80,80,0.06)", color: "#ff8080" };
+                      return (
+                        <div style={{ marginTop: "8px" }}>
+                          <p style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: restMs > 0 ? "#3db89e" : "#ff6b6b", marginBottom: "8px" }}>
+                            {restMs > 0 ? `⏱ ${d}d ${h}h ${m}m restantes` : "⏱ Ya terminó"}
+                          </p>
+                          <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", marginBottom: "6px" }}>Ajuste rápido:</p>
+                          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                            <button type="button" onClick={() => ajustar(30 * 60000)} style={AJUSTE_BTN}>+30m</button>
+                            <button type="button" onClick={() => ajustar(60 * 60000)} style={AJUSTE_BTN}>+1h</button>
+                            <button type="button" onClick={() => ajustar(6 * 3600000)} style={AJUSTE_BTN}>+6h</button>
+                            <button type="button" onClick={() => ajustar(24 * 3600000)} style={AJUSTE_BTN}>+1d</button>
+                            <button type="button" onClick={() => ajustar(3 * 86400000)} style={AJUSTE_BTN}>+3d</button>
+                            <button type="button" onClick={() => ajustar(7 * 86400000)} style={AJUSTE_BTN}>+7d</button>
+                          </div>
+                          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginTop: "6px" }}>
+                            <button type="button" onClick={() => ajustar(-30 * 60000)} style={AJUSTE_BTN_NEG}>-30m</button>
+                            <button type="button" onClick={() => ajustar(-60 * 60000)} style={AJUSTE_BTN_NEG}>-1h</button>
+                            <button type="button" onClick={() => ajustar(-6 * 3600000)} style={AJUSTE_BTN_NEG}>-6h</button>
+                            <button type="button" onClick={() => ajustar(-24 * 3600000)} style={AJUSTE_BTN_NEG}>-1d</button>
+                            <button type="button" onClick={() => ajustar(-3 * 86400000)} style={AJUSTE_BTN_NEG}>-3d</button>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div>
                     <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>

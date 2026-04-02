@@ -80,10 +80,15 @@ export default function AdminUsuarios() {
       <button onClick={() => { setSel(null); resetModes(); }} style={backS}>← Usuarios</button>
 
       <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "20px" }}>
-        <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{sel.nombre?.charAt(0).toUpperCase()}</div>
+        {sel.fotoUrl ? (
+          <img src={sel.fotoUrl} alt="" style={{ width: "52px", height: "52px", borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "2px solid rgba(232,168,76,0.3)" }} />
+        ) : (
+          <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.2rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{sel.nombre?.charAt(0).toUpperCase()}</div>
+        )}
         <div style={{ minWidth: 0 }}>
           <h2 style={{ fontFamily: "Georgia", color: "#f5d080", fontSize: "1.1rem", margin: 0 }}>{sel.nombre}</h2>
           <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.5)", fontSize: "0.8rem", margin: "2px 0 0", wordBreak: "break-all" }}>{sel.email}</p>
+          {sel.tipo && sel.tipo !== "usuario" && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#8040d0", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "10px", padding: "2px 8px" }}>{sel.tipo}</span>}
         </div>
       </div>
 
@@ -94,7 +99,7 @@ export default function AdminUsuarios() {
 
       <div style={cardS}>
         <p style={cardTitleS}>Información</p>
-        {[["Nombre", sel.nombre], ["Email", sel.email], ["Ciudad", sel.ciudad], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Ciudad", sel.ciudad], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
       </div>
 
       <div style={cardS}>
@@ -113,7 +118,7 @@ export default function AdminUsuarios() {
       {editMode && (
         <div style={cardS}>
           <p style={cardTitleS}>Editar datos</p>
-          {[["nombre", "Nombre"], ["ciudad", "Ciudad"], ["cumpleDia", "Día cumpleaños"], ["cumpleMes", "Mes cumpleaños"]].map(([key, label]) => (
+          {[["nombre", "Nombre"], ["telefono", "Teléfono"], ["ciudad", "Ciudad"], ["tipo", "Tipo (usuario/admin)"], ["fotoUrl", "URL foto de perfil"], ["cumpleDia", "Día cumpleaños"], ["cumpleMes", "Mes cumpleaños"], ["cumpleAnio", "Año cumpleaños"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
@@ -161,8 +166,9 @@ export default function AdminUsuarios() {
 
       {!editMode && !passMode && !deleteConfirm && !descalificarConfirm && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", ciudad: sel.ciudad ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", telefono: sel.telefono ?? "", ciudad: sel.ciudad ?? "", tipo: sel.tipo ?? "usuario", fotoUrl: sel.fotoUrl ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? ""), cumpleAnio: String(sel.cumpleAnio ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
+          {sel.fotoUrl && <button onClick={async () => { if (await action("resetear-foto")) { setSel({ ...sel, fotoUrl: "" }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, fotoUrl: "" } : u)); show("✓ Foto de perfil eliminada"); } }} disabled={loading} style={btnOutlineS}>🖼️ Resetear foto de perfil</button>}
           {!sel.emailVerificado && (
             <>
               <button onClick={async () => { if (await action("activar")) { setSel({ ...sel, emailVerificado: true }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, emailVerificado: true } : u)); show("✓ Usuario activado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>✓ Activar cuenta</button>
@@ -205,8 +211,8 @@ export default function AdminUsuarios() {
                 <span style={{ fontSize: "0.72rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
                 {isIPDuplicada(u.ipRegistro) && <span style={ipBadgeS}>⚠️ IP</span>}
               </div>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.55)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.45)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
             </div>
           </div>
         ))}

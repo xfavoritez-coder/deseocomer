@@ -92,9 +92,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: true, data: safe });
     }
 
-    // Fallback: update genérico (toggle activo/verificado)
-    const { activo, verificado } = body;
-    const updated = await prisma.local.update({ where: { id }, data: { ...(activo !== undefined && { activo }), ...(verificado !== undefined && { verificado }) } });
+    // Fallback: update genérico (toggle activo)
+    const { activo } = body;
+    const updated = await prisma.local.update({ where: { id }, data: { ...(activo !== undefined && { activo }) } });
     return NextResponse.json(updated);
   } catch (error) {
     console.error("[Admin locales PUT]", error);
