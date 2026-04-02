@@ -24,6 +24,7 @@ export default function ConcursosPage() {
   const [timers, setTimers] = useState<Record<string, TimeLeft>>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [concursos, setConcursos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
@@ -39,7 +40,7 @@ export default function ConcursosPage() {
           ranking: (c.participantes ?? []).slice(0, 3).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", refs: p.puntos ?? 0 })),
         })));
       }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const updateTimers = useCallback(() => {
@@ -108,7 +109,25 @@ export default function ConcursosPage() {
           ))}
         </div>
 
-        {sorted.length === 0 ? (
+        {loading ? (
+          <div className="dc-cp-grid">
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{ background: "rgba(15,10,28,0.98)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 20, overflow: "hidden" }}>
+                <div style={{ height: 200, background: "linear-gradient(160deg, rgba(30,15,50,0.5), rgba(45,26,8,0.3))", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                <div style={{ padding: "14px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(232,168,76,0.1)", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                    <div style={{ height: 10, width: 80, borderRadius: 4, background: "rgba(232,168,76,0.08)", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                  </div>
+                  <div style={{ height: 18, width: "75%", borderRadius: 4, background: "rgba(232,168,76,0.1)", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                  <div style={{ height: 12, width: "90%", borderRadius: 4, background: "rgba(232,168,76,0.06)", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                  <div style={{ height: 48, borderRadius: 10, background: "rgba(232,168,76,0.06)", animation: "dc-sk-pulse 1.5s ease-in-out infinite", marginTop: 4 }} />
+                  <div style={{ height: 44, borderRadius: 10, background: "rgba(232,168,76,0.08)", animation: "dc-sk-pulse 1.5s ease-in-out infinite" }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : sorted.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 20px" }}>
             <p style={{ fontSize: "3rem", marginBottom: 16 }}>🧞</p>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", color: "var(--text-muted)", letterSpacing: "0.1em", marginBottom: 6 }}>No hay concursos activos en este momento.</p>
@@ -231,6 +250,7 @@ export default function ConcursosPage() {
         .dc-cp-fbtn--on { background: color-mix(in srgb, var(--accent) 15%, transparent); border-color: var(--accent); color: var(--accent); }
         .dc-cp-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @keyframes dc-pd { 0%,100%{opacity:1} 50%{opacity:0.15} }
+        @keyframes dc-sk-pulse { 0%,100%{opacity:0.4} 50%{opacity:0.15} }
         @media (max-width: 767px) {
           .dc-cp-hero { padding: 100px 20px 50px; }
           .dc-cp-content { padding: 0 14px 60px; }
