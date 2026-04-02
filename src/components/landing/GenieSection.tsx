@@ -83,7 +83,7 @@ export default function GenieSection() {
           animation: cargando ? "none" : "lampFloat 4s ease-in-out infinite",
           display: "inline-block",
         }}>
-          🏮
+          🪔
         </div>
 
         {/* Opciones */}

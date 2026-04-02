@@ -97,7 +97,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
       {/* Mobile top bar */}
       <div className="dc-panel-mobilebar">
-        <Link href="/panel" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>🏮 DeseoComer</Link>
+        <Link href="/panel" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>🪔 DeseoComer</Link>
         <button onClick={() => setMobileMenu(o => !o)} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontSize: "1.1rem", cursor: "pointer" }}>{mobileMenu ? "✕" : "☰"}</button>
       </div>
       {mobileMenu && (<>
@@ -120,7 +120,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
       {/* Desktop Sidebar */}
       <aside className="dc-panel-sidebar">
         <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "block", padding: "24px 20px 12px" }}>
-          🏮 DeseoComer
+          🪔 DeseoComer
         </Link>
 
         {/* Local profile card */}

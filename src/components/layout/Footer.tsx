@@ -14,7 +14,7 @@ export default function Footer() {
               textShadow: "0 0 20px color-mix(in srgb, var(--accent) 50%, transparent)",
               marginBottom: "16px",
             }}>
-              🏮 DeseoComer
+              🪔 DeseoComer
             </p>
             <p style={{
               fontFamily: "var(--font-lato)",

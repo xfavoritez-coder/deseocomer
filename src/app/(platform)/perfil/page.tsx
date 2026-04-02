@@ -61,7 +61,7 @@ export default function PerfilPage() {
       <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
         <Navbar />
         <div style={{ padding: "160px 40px", textAlign: "center" }}>
-          <div style={{ fontSize: "3rem" }}>🏮</div>
+          <div style={{ fontSize: "3rem" }}>🪔</div>
         </div>
       </main>
     );
