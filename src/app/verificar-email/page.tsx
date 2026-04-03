@@ -21,11 +21,14 @@ function VerificarContent() {
         if (data.ok) {
           setStatus("ok");
           setNombre(data.nombre ?? "");
-          // Auto-login: save session
+          // Auto-login: save session with emailVerificado
           try {
+            const existingSession = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
             localStorage.setItem("deseocomer_session", JSON.stringify({
+              ...existingSession,
               id: data.id, nombre: data.nombre, email: data.email,
               tipo: "usuario", loggedIn: true,
+              emailVerificado: true,
             }));
           } catch {}
         } else setStatus("error");

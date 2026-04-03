@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function BannerVerificacion() {
@@ -7,8 +7,21 @@ export default function BannerVerificacion() {
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(false);
+  const [hidden, setHidden] = useState(true); // hidden by default to avoid flash
 
-  if (!isAuthenticated || !user || user.emailVerificado) return null;
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    // Check multiple sources for verification status
+    if (user.emailVerificado) { setHidden(true); return; }
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (session.emailVerificado === true) { setHidden(true); return; }
+    } catch {}
+    // Not verified from any local source → show banner
+    setHidden(false);
+  }, [isAuthenticated, user]);
+
+  if (hidden || !user) return null;
 
   const reenviar = async () => {
     if (enviando || enviado) return;
