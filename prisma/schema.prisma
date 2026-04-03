@@ -38,6 +38,8 @@ model Usuario {
   ganador2De      Concurso[] @relation("Ganador2")
   ganador3De      Concurso[] @relation("Ganador3")
   ganadorActualDe Concurso[] @relation("GanadorActual")
+  mensajesVistos  MensajeVisto[]
+  toastsDismissed ToastDismissed[]
 }
 
 model Local {
@@ -280,4 +282,42 @@ model ConfigSite {
   id    String @id @default("main")
   clave String @unique
   valor String
+}
+
+model MensajeGenio {
+  id            String   @id @default(cuid())
+  contenido     String
+  tipo          String   @default("info")       // info, importante, promocion
+  destinatario  String   @default("todos")      // "todos" o un usuarioId específico
+  fijo          Boolean  @default(false)         // true = queda hasta que el usuario lo cierre
+  duracion      Int?                             // segundos que se muestra (null = 8s default)
+  activo        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  vistas        MensajeVisto[]
+}
+
+model MensajeVisto {
+  id          String   @id @default(cuid())
+  mensajeId   String
+  usuarioId   String
+  vistoAt     DateTime @default(now())
+  dismissedAt DateTime?                          // null = solo visto, con fecha = cerró/dismiss
+  noMostrar   Boolean  @default(false)           // true = marcó "no mostrar más"
+  createdAt   DateTime @default(now())
+
+  mensaje     MensajeGenio @relation(fields: [mensajeId], references: [id])
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id])
+
+  @@unique([mensajeId, usuarioId])
+}
+
+model ToastDismissed {
+  id        String   @id @default(cuid())
+  usuarioId String
+  toastId   String                               // ID del toast (ej: "cumpleanos", "concursos_ya_sabe")
+  createdAt DateTime @default(now())
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@unique([usuarioId, toastId])
 }

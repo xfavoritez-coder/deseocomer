@@ -15,9 +15,34 @@ export default function GenieToast() {
   };
 
   const dismissForever = (id: string) => {
+    // Save to localStorage (instant)
     try { const d = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "{}"); d[id] = true; localStorage.setItem(DISMISSED_KEY, JSON.stringify(d)); } catch {}
+    // Save to BD if logged in (persistent)
+    if (isAuthenticated && user?.id) {
+      fetch("/api/genio/toast-dismiss", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuarioId: user.id, toastId: id }),
+      }).catch(() => {});
+    }
     setToastActivo(null);
   };
+
+  // Sync dismissed toasts from BD on login
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    fetch(`/api/genio/toast-dismissed?usuarioId=${user.id}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(ids => {
+        if (!Array.isArray(ids)) return;
+        try {
+          const d = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "{}");
+          let changed = false;
+          for (const id of ids) { if (!d[id]) { d[id] = true; changed = true; } }
+          if (changed) localStorage.setItem(DISMISSED_KEY, JSON.stringify(d));
+        } catch {}
+      })
+      .catch(() => {});
+  }, [isAuthenticated, user?.id]);
 
   const dismissToast = () => setToastActivo(null);
 
@@ -26,6 +51,42 @@ export default function GenieToast() {
   const [mes, setMes] = useState("");
   const [anio, setAnio] = useState("");
   const [guardado, setGuardado] = useState(false);
+
+  // ── Mensajes importantes del admin ──
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [mensajeImportante, setMensajeImportante] = useState<any>(null);
+
+  useEffect(() => {
+    const uid = user?.id || "";
+    fetch(`/api/genio/mensajes${uid ? `?usuarioId=${uid}` : ""}`)
+      .then(r => r.ok ? r.json() : [])
+      .then(msgs => {
+        if (Array.isArray(msgs) && msgs.length > 0) {
+          const importante = msgs.find((m: { tipo: string }) => m.tipo === "importante") ?? msgs[0];
+          setMensajeImportante(importante);
+          // Track view
+          if (uid && importante) {
+            fetch("/api/genio/mensajes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensajeId: importante.id, usuarioId: uid, accion: "visto" }) }).catch(() => {});
+          }
+        }
+      })
+      .catch(() => {});
+  }, [user?.id]);
+
+  // Auto-dismiss mensaje importante con duración
+  useEffect(() => {
+    if (!mensajeImportante || mensajeImportante.fijo || !mensajeImportante.duracion) return;
+    const t = setTimeout(() => dismissMensajeImportante(false), mensajeImportante.duracion * 1000);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mensajeImportante?.id]);
+
+  const dismissMensajeImportante = (noMostrar = false) => {
+    if (mensajeImportante && isAuthenticated && user?.id) {
+      fetch("/api/genio/mensajes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mensajeId: mensajeImportante.id, usuarioId: user.id, accion: noMostrar ? "no_mostrar" : "dismissed" }) }).catch(() => {});
+    }
+    setMensajeImportante(null);
+  };
 
   // Reset state when toast changes
   useEffect(() => {
@@ -36,12 +97,13 @@ export default function GenieToast() {
     setGuardado(false);
   }, [toastActivo?.id]);
 
-  // Auto-dismiss after 8 seconds for automatic toasts
+  // Auto-dismiss after 8 seconds for automatic toasts (only when no important message)
   useEffect(() => {
+    if (mensajeImportante) return; // Don't auto-dismiss while important message is showing
     if (!toastActivo || mostrandoFecha || guardado) return;
     const t = setTimeout(() => setToastActivo(null), 8000);
     return () => clearTimeout(t);
-  }, [toastActivo?.id, mostrandoFecha, guardado]);
+  }, [toastActivo?.id, mostrandoFecha, guardado, mensajeImportante]);
 
   // Skip if user dismissed this toast forever
   useEffect(() => {
@@ -57,6 +119,39 @@ export default function GenieToast() {
     }, 2500);
     return () => clearTimeout(t);
   }, [guardado, setToastActivo]);
+
+  // ── Render mensaje importante (priority over regular toasts) ──
+  if (mensajeImportante) {
+    const autoClose = mensajeImportante.duracion && !mensajeImportante.fijo;
+    return (
+      <>
+        <div style={{
+          position: "fixed", bottom: "calc(24px + 56px + 12px)", right: "16px", zIndex: 960,
+          width: "min(340px, 90vw)",
+          background: "rgba(13,7,3,0.98)", border: "1px solid rgba(255,80,80,0.4)", borderRadius: "16px",
+          boxShadow: "0 0 40px rgba(255,80,80,0.15), 0 0 20px rgba(0,0,0,0.5)",
+          overflow: "hidden", animation: "genieSlideUp 0.3s ease both",
+        }}>
+          <div style={{ background: "rgba(255,80,80,0.1)", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#ff8080", fontWeight: 700 }}>Mensaje importante</span>
+            <button onClick={() => dismissMensajeImportante(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1rem", cursor: "pointer", padding: "2px" }}>✕</button>
+          </div>
+          <div style={{ padding: "16px" }}>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.85)", lineHeight: 1.6, marginBottom: "12px" }}>{mensajeImportante.contenido}</p>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => dismissMensajeImportante(false)} style={{ flex: 1, padding: "10px", borderRadius: "8px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", color: "#e8a84c", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", cursor: "pointer" }}>Entendido</button>
+              <button onClick={() => dismissMensajeImportante(true)} style={{ padding: "10px 14px", borderRadius: "8px", background: "none", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.3)", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", cursor: "pointer" }}>No mostrar más</button>
+            </div>
+          </div>
+          {autoClose && <div style={{ height: "2px", background: "rgba(255,80,80,0.3)" }}><div style={{ height: "100%", background: "#ff8080", animation: `shrinkBar ${mensajeImportante.duracion}s linear forwards` }} /></div>}
+        </div>
+        <style>{`
+          @keyframes shrinkBar { from { width: 100%; } to { width: 0%; } }
+          @keyframes genieSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        `}</style>
+      </>
+    );
+  }
 
   if (!toastActivo) return null;
 
