@@ -99,19 +99,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
       });
       if (refParticipante) {
-        // Determine if referido is new (registered < 7 days ago) or existing
-        const referidoUser = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { createdAt: true } });
+        const referidoUser = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { createdAt: true, emailVerificado: true, ipRegistro: true } });
         const esNuevo = referidoUser && (Date.now() - new Date(referidoUser.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
         const puntosRef = esNuevo ? 3 : 2;
 
-        // Always add as pending (accrued when referido verifies email)
-        await prisma.participanteConcurso.update({
-          where: { id: refParticipante.id },
-          data: {
-            puntosPendientes: { increment: puntosRef },
-            ...(esNuevo ? { puntosReferidosNuevos: { increment: puntosRef } } : { puntosReferidosExistentes: { increment: puntosRef } }),
-          },
-        });
+        if (referidoUser?.emailVerificado) {
+          // Usuario ya verificado → acreditar puntos directamente
+          await prisma.participanteConcurso.update({
+            where: { id: refParticipante.id },
+            data: {
+              puntos: { increment: puntosRef },
+              ...(esNuevo ? { puntosReferidosNuevos: { increment: puntosRef } } : { puntosReferidosExistentes: { increment: puntosRef } }),
+            },
+          });
+        } else {
+          // Usuario no verificado → puntos pendientes hasta que verifique
+          await prisma.participanteConcurso.update({
+            where: { id: refParticipante.id },
+            data: {
+              puntosPendientes: { increment: puntosRef },
+              ...(esNuevo ? { puntosReferidosNuevos: { increment: puntosRef } } : { puntosReferidosExistentes: { increment: puntosRef } }),
+            },
+          });
+        }
 
         // Notification
         const refNombre = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
@@ -124,6 +134,52 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
               : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código. +${puntosRef} pts 👏`,
           }
         }).catch(() => {});
+      }
+    }
+
+    // Nivel 2: si el usuario ya está verificado, acreditar inmediatamente
+    if (usuario.emailVerificado && referidorNivel2Id) {
+      const nivel2Part = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidorNivel2Id } },
+      });
+      if (nivel2Part) {
+        const usuarioCompleto = await prisma.usuario.findUnique({
+          where: { id: usuarioId }, select: { ipRegistro: true, createdAt: true }
+        });
+        const refDirectoUser = referidorDirectoId
+          ? await prisma.usuario.findUnique({ where: { id: referidorDirectoId }, select: { ipRegistro: true, createdAt: true } })
+          : null;
+        const nivel2User = await prisma.usuario.findUnique({
+          where: { id: referidorNivel2Id }, select: { ipRegistro: true }
+        });
+
+        const mismaIP = usuarioCompleto?.ipRegistro && usuarioCompleto.ipRegistro !== "unknown" && usuarioCompleto.ipRegistro !== "" &&
+          (usuarioCompleto.ipRegistro === refDirectoUser?.ipRegistro || usuarioCompleto.ipRegistro === nivel2User?.ipRegistro);
+        const menosDeUnaHora = refDirectoUser?.createdAt
+          ? Date.now() - new Date(refDirectoUser.createdAt).getTime() < 3600000
+          : false;
+
+        if (mismaIP || menosDeUnaHora) {
+          await prisma.participanteConcurso.update({
+            where: { id: nivel2Part.id },
+            data: { puntosNivel2Pendientes: { increment: 1 } },
+          });
+        } else if ((nivel2Part.puntosNivel2 ?? 0) < 10) {
+          await prisma.participanteConcurso.update({
+            where: { id: nivel2Part.id },
+            data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } },
+          });
+          const refDirectoNombre = referidorDirectoId
+            ? await prisma.usuario.findUnique({ where: { id: referidorDirectoId }, select: { nombre: true } })
+            : null;
+          prisma.notificacion.create({
+            data: {
+              usuarioId: referidorNivel2Id,
+              tipo: "nivel2",
+              mensaje: `La red de ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} te sumó +1 punto 🧞`,
+            },
+          }).catch(() => {});
+        }
       }
     }
 

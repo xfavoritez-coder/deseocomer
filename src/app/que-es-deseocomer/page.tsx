@@ -129,6 +129,7 @@ export default function QueEsDeseoComerPage() {
                 </div>
               ))}
             </div>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.6, marginTop: 10 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros, tú sigues sumando +1 punto por cada uno que traigan. Así tu red trabaja para ti en cada concurso.</p>
           </div>
         </section>
 

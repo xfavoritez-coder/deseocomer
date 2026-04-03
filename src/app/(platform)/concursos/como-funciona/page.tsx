@@ -110,7 +110,7 @@ export default async function ComoFuncionaPage() {
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>El poder de tu red</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>No solo ganas por las personas que tú invitas directamente. Si tus referidos también invitan a sus amigos, tú también sumas puntos.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros a participar, tú ganas +1 punto por cada uno que traigan. Así tu red trabaja para ti. Máximo 10 puntos acumulables por esta vía.</p>
             <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>

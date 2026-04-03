@@ -405,6 +405,7 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
                         Red de referidos: <span style={{ color: "var(--accent)" }}>+{nivel2}</span>
                       </p>
+                      {nivel2 > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(240,234,214,0.25)", fontStyle: "italic", marginTop: 2 }}>Puntos ganados porque personas que tú invitaste también invitaron a otros al concurso.</p>}
                       {nivel2Pend > 0 && (
                         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>
                           En verificaci&oacute;n: +{nivel2Pend} pts

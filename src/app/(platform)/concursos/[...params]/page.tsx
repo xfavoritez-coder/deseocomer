@@ -649,6 +649,7 @@ function ConcursoDetallePage() {
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
                     </div>
                   )}
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 6, lineHeight: 1.4 }}>Comparte tu link o código. Si quien lo usa también invita a otros, seguirás sumando puntos.</p>
                 </div>
               ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
@@ -692,7 +693,7 @@ function ConcursoDetallePage() {
   { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ganas 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos" },
   { icon: "👥", pts: "+2", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 2 puntos por cada uno.", ttPts: "+2 puntos" },
   { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
-  { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando alguien que tú invitaste invita a otros, también sumas 1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
+  { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
   { icon: "💛", pts: "+1", label: "Al apoyar", id: "tt6", ttTitle: "Al apoyar a otro", ttText: "Toca el corazón junto a cualquier participante en el ranking para darle +1 punto. Puedes apoyar una vez cada 24 horas.", ttPts: "+1 punto al otro" },
 ].map((s, idx) => {
                   const isTop = idx < 3;
@@ -743,7 +744,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
                   </div>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Invitas a alguien nuevo → <strong style={{ color: "#e8a84c" }}>+3 puntos</strong> para ti. Cuando tu referido invita a otros → <strong style={{ color: "#e8a84c" }}>+1 punto</strong> adicional para ti por cada uno que traigan.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros a participar, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.28)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
