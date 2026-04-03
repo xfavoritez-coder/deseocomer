@@ -8,7 +8,13 @@ export async function GET(req: NextRequest) {
   try {
     const locales = await prisma.local.findMany({
       orderBy: { createdAt: "desc" },
-      select: { id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true, ciudad: true, comuna: true, direccion: true, categoria: true, logoUrl: true, activo: true, createdAt: true, _count: { select: { concursos: true, promociones: true, favoritos: true, resenas: true } } },
+      select: {
+        id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true,
+        ciudad: true, comuna: true, direccion: true, categoria: true, logoUrl: true, portadaUrl: true,
+        lat: true, lng: true, instagram: true, sitioWeb: true, descripcion: true, historia: true,
+        activo: true, captadorCodigo: true, createdAt: true,
+        _count: { select: { concursos: true, promociones: true, favoritos: true, resenas: true } },
+      },
     });
     return NextResponse.json(locales);
   } catch (error) {

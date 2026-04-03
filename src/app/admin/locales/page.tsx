@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/adminFetch";
+import SubirFoto from "@/components/SubirFoto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
@@ -70,10 +71,25 @@ export default function AdminLocales() {
         </p>
       )}
 
+      {/* Portada + Logo */}
+      <div style={cardS}>
+        <div style={{ height: "120px", borderRadius: "10px", overflow: "hidden", marginBottom: "12px", position: "relative" }}>
+          {sel.portadaUrl ? (
+            <img src={sel.portadaUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #2d1a08, #0a0812)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: "2rem", opacity: 0.2 }}>🍽️</span>
+            </div>
+          )}
+          {sel.logoUrl && <img src={sel.logoUrl} alt="" style={{ position: "absolute", bottom: "8px", left: "12px", width: "44px", height: "44px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.4)" }} />}
+        </div>
+      </div>
+
       {/* Info cards */}
       <div style={cardS}>
         <p style={cardTitleS}>Datos del local</p>
-        {[["Nombre", sel.nombre], ["Categoría", sel.categoria], ["Ciudad", sel.ciudad], ["Comuna", sel.comuna], ["Dirección", sel.direccion], ["Teléfono", sel.telefono]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Categoría", sel.categoria], ["Comuna", sel.comuna], ["Dirección", sel.direccion], ["Teléfono", sel.telefono], ["Instagram", sel.instagram], ["Sitio web", sel.sitioWeb]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {sel.descripcion && <div style={{ marginTop: "8px", padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.05)" }}><p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", marginBottom: "4px" }}>Descripción</p><p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.5 }}>{sel.descripcion}</p></div>}
       </div>
 
       <div style={cardS}>
@@ -98,12 +114,24 @@ export default function AdminLocales() {
       {editMode && (
         <div style={cardS}>
           <p style={cardTitleS}>Editar datos</p>
-          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["categoria", "Categoría"], ["ciudad", "Ciudad"], ["comuna", "Comuna"], ["direccion", "Dirección"], ["telefono", "Teléfono"]].map(([key, label]) => (
+          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["categoria", "Categoría"], ["comuna", "Comuna"], ["direccion", "Dirección"], ["telefono", "Teléfono"], ["instagram", "Instagram"], ["sitioWeb", "Sitio web"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
             </div>
           ))}
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Descripción</label>
+            <textarea style={{ ...inputS, minHeight: "60px", resize: "vertical" }} value={editData.descripcion ?? ""} onChange={e => setEditData(d => ({ ...d, descripcion: e.target.value }))} />
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Logo</label>
+            <SubirFoto folder="locales/logos" preview={editData.logoUrl || null} label="Subir logo" height="80px" onUpload={url => setEditData(d => ({ ...d, logoUrl: url }))} />
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Portada</label>
+            <SubirFoto folder="locales/portadas" preview={editData.portadaUrl || null} label="Subir portada" height="120px" onUpload={url => setEditData(d => ({ ...d, portadaUrl: url }))} />
+          </div>
           <div style={{ display: "flex", gap: "8px" }}>
             <button onClick={async () => { if (await action("editar", editData)) { setSel({ ...sel, ...editData }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, ...editData } : l)); setEditMode(false); show("✓ Datos actualizados"); } }} disabled={loading} style={btnPrimaryS}>{loading ? "..." : "Guardar"}</button>
             <button onClick={() => setEditMode(false)} style={btnSecS}>Cancelar</button>
@@ -151,9 +179,11 @@ export default function AdminLocales() {
       {!editMode && !passMode && !rejectMode && !deleteConfirm && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
           <a href={`/locales/${sel.slug || sel.id}`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center" }}>👁️ Ver local público</a>
+          <a href={`/panel/concursos`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center", color: "#e8a84c", borderColor: "rgba(232,168,76,0.4)" }}>🏆 Ver concursos del local</a>
+          <a href={`/panel`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center", color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>⚡ Ver promociones del local</a>
           {!sel.activo && <button onClick={async () => { if (await action("aprobar")) { setSel({ ...sel, activo: true }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, activo: true } : l)); show("✓ Aprobado y notificado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>✓ Aprobar y notificar</button>}
           {!sel.activo && <button onClick={async () => { if (await action("reenviar-activacion")) show("✓ Email de activación enviado"); }} disabled={loading} style={btnOutlineS}>📧 Reenviar email de activación</button>}
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categoria: sel.categoria ?? "", ciudad: sel.ciudad ?? "", comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "" }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categoria: sel.categoria ?? "", comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "" }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           <button onClick={() => { resetModes(); setRejectMode(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ {sel.activo ? "Desactivar" : "Rechazar"}</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar</button>

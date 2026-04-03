@@ -109,14 +109,14 @@ export async function GET(
           style={{
             position: "absolute",
             top: "88px",
-            left: "-112px",
+            right: "-112px",
             width: "480px",
             backgroundColor: "#3db89e",
             padding: "24px 0",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transform: "rotate(-45deg)",
+            transform: "rotate(45deg)",
             zIndex: 10,
           }}
         >

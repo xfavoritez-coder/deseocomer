@@ -86,6 +86,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           ...(body.comuna !== undefined && { comuna: body.comuna }),
           ...(body.direccion !== undefined && { direccion: body.direccion }),
           ...(body.telefono !== undefined && { telefono: body.telefono }),
+          ...(body.logoUrl !== undefined && { logoUrl: body.logoUrl || null }),
+          ...(body.portadaUrl !== undefined && { portadaUrl: body.portadaUrl || null }),
+          ...(body.lat !== undefined && { lat: body.lat ? Number(body.lat) : null }),
+          ...(body.lng !== undefined && { lng: body.lng ? Number(body.lng) : null }),
+          ...(body.instagram !== undefined && { instagram: body.instagram || null }),
+          ...(body.sitioWeb !== undefined && { sitioWeb: body.sitioWeb || null }),
+          ...(body.descripcion !== undefined && { descripcion: body.descripcion || null }),
+          ...(body.historia !== undefined && { historia: body.historia || null }),
         },
       });
       const { password: _, ...safe } = updated;

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/adminFetch";
+import SubirFoto from "@/components/SubirFoto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type C = any;
@@ -105,7 +106,7 @@ export default function AdminConcursos() {
     try {
       const res = await adminFetch(`/api/admin/concursos/${sel.id}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ premio: editPremio, descripcion: editDescripcion.trim() || null, condiciones: editCondiciones.trim() || null, fechaFin: new Date(editFechaFin).toISOString() }),
+        body: JSON.stringify({ premio: editPremio, descripcion: editDescripcion.trim() || null, condiciones: editCondiciones.trim() || null, fechaFin: new Date(editFechaFin).toISOString(), imagenUrl: sel.imagenUrl || null }),
       });
       if (!res.ok) { const d = await res.json(); setEditError(d.error ?? "Error al guardar"); return; }
       const updated = await res.json();
@@ -332,6 +333,10 @@ export default function AdminConcursos() {
                   <div>
                     <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>
                     <textarea style={{ ...EDIT_INPUT, resize: "vertical", minHeight: "50px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Opcional" />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Foto del concurso</label>
+                    <SubirFoto folder="concursos" preview={sel.imagenUrl || null} label="Cambiar foto" height="100px" onUpload={url => { setSel((s: C) => s ? { ...s, imagenUrl: url } : s); }} />
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
                     <button onClick={() => setEditando(false)} style={{ flex: 1, background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>Cancelar</button>
