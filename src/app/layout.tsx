@@ -77,6 +77,8 @@ export default function RootLayout({
           s.setProperty("--color-label",t.label);s.setProperty("--color-text",t.ctext);
           requestAnimationFrame(function(){requestAnimationFrame(function(){s.removeProperty("transition")})});
         })()` }} />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3K676TN3WZ" />
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-3K676TN3WZ');` }} />
       </head>
       <body className={`${cinzelDecorative.variable} ${cinzel.variable} ${lato.variable}`} suppressHydrationWarning>
         <ErrorBoundary>
