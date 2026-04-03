@@ -8,7 +8,6 @@ export async function GET(req: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "50"), 100);
     const offset = parseInt(searchParams.get("offset") ?? "0");
 
-    const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const concursos = await prisma.concurso.findMany({
       where: {
         activo: true,
@@ -26,15 +25,7 @@ export async function GET(req: NextRequest) {
       skip: offset,
     });
 
-    // Count recent participants for each concurso
-    const enriched = await Promise.all(concursos.map(async (c) => {
-      const recientes = await prisma.participanteConcurso.count({
-        where: { concursoId: c.id, createdAt: { gte: hace24h } },
-      });
-      return { ...c, participantesRecientes: recientes };
-    }));
-
-    return NextResponse.json(enriched);
+    return NextResponse.json(concursos);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
