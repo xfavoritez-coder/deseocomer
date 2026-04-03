@@ -138,6 +138,57 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: true });
     }
 
+    if (accion === "ajustar-puntos") {
+      const { concursoId, nuevosPuntos, motivo, enviarCorreo } = body;
+      if (!concursoId || nuevosPuntos === undefined) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
+
+      const participante = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId, usuarioId: id } },
+        include: { concurso: { select: { premio: true, local: { select: { nombre: true } } } } },
+      });
+      if (!participante) return NextResponse.json({ error: "No participa en este concurso" }, { status: 404 });
+
+      const puntosAnteriores = participante.puntos;
+      await prisma.participanteConcurso.update({
+        where: { id: participante.id },
+        data: { puntos: parseInt(nuevosPuntos) },
+      });
+
+      if (enviarCorreo) {
+        try {
+          const diferencia = parseInt(nuevosPuntos) - puntosAnteriores;
+          const subieron = diferencia > 0;
+          await resend.emails.send({
+            from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
+            to: usuario.email,
+            subject: `Ajuste de puntos en tu concurso · DeseoComer`,
+            html: `<html><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:40px 24px">
+<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
+<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
+<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">Ajuste de puntos</h2>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Hola ${usuario.nombre.split(" ")[0]},</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Te informamos que se ha realizado un ajuste en tus puntos del concurso <strong style="color:#f5d080">"${participante.concurso.premio}"</strong> de <strong style="color:#e8a84c">${participante.concurso.local.nombre}</strong>.</p>
+<div style="background-color:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+<p style="color:rgba(240,234,214,0.5);font-size:14px;margin:0 0 8px">Puntos anteriores: <strong style="color:rgba(240,234,214,0.7)">${puntosAnteriores}</strong></p>
+<p style="color:#e8a84c;font-size:24px;font-weight:bold;margin:0">Puntos actuales: ${nuevosPuntos}</p>
+<p style="color:${subieron ? "#3db89e" : "#ff8080"};font-size:14px;margin:8px 0 0">${subieron ? "+" : ""}${diferencia} puntos</p>
+</div>
+${motivo ? `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px"><strong style="color:#e8a84c">Motivo:</strong> ${motivo}</p>` : ""}
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Recuerda que los puntos de referidos solo se acreditan cuando la persona que invitaste verifica su correo electrónico. Si tus referidos activan su cuenta, los puntos correspondientes se sumarán automáticamente.</p>
+<div style="text-align:center"><a href="https://deseocomer.com/concursos" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mis concursos →</a></div>
+</div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
+</div></body></html>`,
+          });
+        } catch (emailErr) {
+          console.error("[Email ajuste puntos]", emailErr);
+        }
+      }
+
+      return NextResponse.json({ ok: true, puntosAnteriores, nuevosPuntos: parseInt(nuevosPuntos) });
+    }
+
     if (accion === "descalificar") {
       // Descalificar de todos los concursos activos
       const participaciones = await prisma.participanteConcurso.findMany({

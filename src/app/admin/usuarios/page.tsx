@@ -21,6 +21,11 @@ export default function AdminUsuarios() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [redReferidos, setRedReferidos] = useState<any[]>([]);
   const [loadingRed, setLoadingRed] = useState(false);
+  const [ajustarPuntos, setAjustarPuntos] = useState<{ concursoId: string; premio: string; puntosActuales: number } | null>(null);
+  const [ajustarNuevosPuntos, setAjustarNuevosPuntos] = useState("");
+  const [ajustarMotivo, setAjustarMotivo] = useState("");
+  const [ajustarEnviarCorreo, setAjustarEnviarCorreo] = useState(true);
+  const [ajustarLoading, setAjustarLoading] = useState(false);
 
   useEffect(() => { adminFetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
@@ -237,12 +242,43 @@ export default function AdminUsuarios() {
               <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f5d080", marginBottom: "4px" }}>{r.premio}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: "10px" }}>{r.localNombre}</p>
 
-              {/* Desglose puntos */}
-              <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
+              {/* Desglose puntos + ajustar */}
+              <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(232,168,76,0.1)", color: "#e8a84c" }}>{r.puntos} pts total</span>
                 {r.puntosNivel2 > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(61,184,158,0.1)", color: "#3db89e" }}>{r.puntosNivel2} pts nivel 2</span>}
                 {r.puntosNivel2Pendientes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(255,140,0,0.1)", color: "#ff8c00", fontStyle: "italic" }}>{r.puntosNivel2Pendientes} pendientes</span>}
+                <button onClick={() => { setAjustarPuntos({ concursoId: r.concursoId, premio: r.premio, puntosActuales: r.puntos }); setAjustarNuevosPuntos(String(r.puntos)); setAjustarMotivo(""); setAjustarEnviarCorreo(true); }} style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "3px 10px", borderRadius: "8px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", color: "#a070e0", cursor: "pointer", marginLeft: "auto" }}>Ajustar puntos</button>
               </div>
+
+              {/* Formulario ajustar puntos */}
+              {ajustarPuntos?.concursoId === r.concursoId && (
+                <div style={{ background: "rgba(128,64,208,0.06)", border: "1px solid rgba(128,64,208,0.2)", borderRadius: "10px", padding: "12px", marginBottom: "10px" }}>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#a070e0", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>Ajustar puntos — {r.premio}</p>
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "8px", alignItems: "center" }}>
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)" }}>{ajustarPuntos.puntosActuales} pts →</span>
+                    <input type="number" value={ajustarNuevosPuntos} onChange={e => setAjustarNuevosPuntos(e.target.value)} style={{ width: "70px", padding: "6px 10px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "6px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.9rem", outline: "none", textAlign: "center" }} />
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)" }}>pts</span>
+                  </div>
+                  <div style={{ marginBottom: "8px" }}>
+                    <textarea value={ajustarMotivo} onChange={e => setAjustarMotivo(e.target.value)} placeholder="Motivo del ajuste (se incluye en el correo al usuario)" style={{ width: "100%", padding: "8px 10px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", outline: "none", boxSizing: "border-box", resize: "vertical", minHeight: "50px" }} />
+                  </div>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", cursor: "pointer" }}>
+                    <input type="checkbox" checked={ajustarEnviarCorreo} onChange={e => setAjustarEnviarCorreo(e.target.checked)} style={{ accentColor: "#a070e0", width: "16px", height: "16px" }} />
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)" }}>Enviar correo al usuario explicando el ajuste</span>
+                  </label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => setAjustarPuntos(null)} style={{ flex: 1, padding: "8px", background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "6px", color: "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer" }}>Cancelar</button>
+                    <button disabled={ajustarLoading || !ajustarNuevosPuntos} onClick={async () => {
+                      setAjustarLoading(true);
+                      try {
+                        const res = await adminFetch(`/api/admin/usuarios/${sel.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "ajustar-puntos", concursoId: ajustarPuntos.concursoId, nuevosPuntos: parseInt(ajustarNuevosPuntos), motivo: ajustarMotivo, enviarCorreo: ajustarEnviarCorreo }) });
+                        if (res.ok) { show("✓ Puntos ajustados"); setAjustarPuntos(null); setRedReferidos(prev => prev.map(x => x.concursoId === ajustarPuntos.concursoId ? { ...x, puntos: parseInt(ajustarNuevosPuntos) } : x)); } else { const d = await res.json(); show(d.error ?? "Error"); }
+                      } catch { show("Error de conexión"); }
+                      setAjustarLoading(false);
+                    }} style={{ flex: 2, padding: "8px", background: "#a070e0", border: "none", borderRadius: "6px", color: "#fff", fontFamily: "Georgia", fontSize: "0.78rem", fontWeight: 700, cursor: "pointer", opacity: ajustarNuevosPuntos ? 1 : 0.5 }}>{ajustarLoading ? "..." : "Aplicar ajuste"}</button>
+                  </div>
+                </div>
+              )}
 
               {/* Referido por */}
               {r.referidoPorNombre && (
