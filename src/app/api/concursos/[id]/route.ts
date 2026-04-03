@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import crypto from "crypto";
-import { emailGanador, emailLocal } from "@/lib/emails/concurso-cierre";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -21,6 +17,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     // Lazy close: if contest ended but still "activo", close it now and send emails
     if (concurso.estado === "activo" && new Date(concurso.fechaFin) <= new Date() && concurso.participantes.length > 0) {
+      const crypto = await import("crypto");
+      const { emailGanador, emailLocal } = await import("@/lib/emails/concurso-cierre");
+      const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
+
       const [p1, p2, p3] = concurso.participantes;
       const codigo = `DC-${concurso.id.slice(-6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
       const token = crypto.randomUUID();
