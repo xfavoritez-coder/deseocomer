@@ -123,6 +123,7 @@ function ConcursoDetallePage() {
   const [refBannerName, setRefBannerName] = useState<string | null | undefined>(undefined);
   const [refBannerDismissed, setRefBannerDismissed] = useState(false);
   const [tooltipActivo, setTooltipActivo] = useState<string | null>(null);
+  const [showAllRanking, setShowAllRanking] = useState(false);
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
@@ -388,11 +389,13 @@ function ConcursoDetallePage() {
         return (
           <>
             {visibles.map((r, i) => renderRow(r, i))}
-            {ocultos.length > 0 && (
+            {ocultos.length > 0 && !showAllRanking && (
               <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
                 <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {ocultos.length} participante{ocultos.length !== 1 ? "s" : ""} más con 1 punto</span>
+                <button onClick={() => setShowAllRanking(true)} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
               </div>
             )}
+            {showAllRanking && ocultos.map((r, i) => renderRow(r, visibles.length + i))}
             {myEntry && !meVisible && (
               <div style={{ padding: "10px 14px", background: "rgba(61,184,158,0.06)", borderTop: "1px solid rgba(61,184,158,0.15)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
