@@ -101,7 +101,8 @@ function ConcursoDetallePage() {
             reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
-          setConcursoData(built); setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
+          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ?? null, premioConfirmadoAt: data.premioConfirmadoAt ?? null });
+          setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
         }
         setDbLoading(false);
       })
@@ -222,7 +223,8 @@ function ConcursoDetallePage() {
   if (!concurso && !finalizado) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar /><div style={{ padding: "80px 40px", textAlign: "center" }}><p style={{ fontSize: "4rem", marginBottom: "20px" }}>🏆</p><h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", marginBottom: "24px" }}>Concurso no encontrado</h2><Link href="/concursos" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>← Volver a concursos</Link></div><Footer /></main>);
 
   const c = concurso ?? finalizado!;
-  const isEnded = !!finalizado || !!timer?.ended;
+  const dbEstado = c.estado ?? (timer?.ended ? "finalizado" : "activo");
+  const isEnded = !!finalizado || !!timer?.ended || dbEstado !== "activo";
   const soon = concurso ? isSoonEnding(concurso.endsAt) : false;
   const urgColor = "#e05555";
   const refLink = isAuthenticated && user && c
@@ -380,6 +382,43 @@ function ConcursoDetallePage() {
       {/* Body */}
       <div className="dc-cd-body">
         <div className="dc-cd-main" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Estado-based banners for non-active concursos */}
+          {dbEstado === "finalizado" && (
+            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#f5d080", fontWeight: 700, marginBottom: 8 }}>Concurso finalizado</p>
+              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", marginBottom: 4 }}>Ganador: <strong style={{ color: "#e8a84c" }}>{c.ganadorActualNombre}</strong></p>}
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Esperando confirmación de entrega del premio</p>
+            </div>
+          )}
+          {dbEstado === "en_revision" && (
+            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#f5d080", fontWeight: 700, marginBottom: 8 }}>Verificando resultados...</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.5)", lineHeight: 1.6 }}>El concurso ha finalizado. Estamos verificando los resultados para anunciar al ganador oficial.</p>
+              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", marginTop: 8 }}>Ganador provisorio: {c.ganadorActualNombre} (sujeto a verificación antifraude)</p>}
+            </div>
+          )}
+          {dbEstado === "completado" && (
+            <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#3db89e", fontWeight: 700, marginBottom: 8 }}>Concurso completado</p>
+              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", marginBottom: 4 }}>Ganador oficial: <strong style={{ color: "#3db89e" }}>{c.ganadorActualNombre}</strong> 🏆</p>}
+              {c.premioConfirmadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Premio entregado el {new Date(c.premioConfirmadoAt).toLocaleDateString("es-CL")}</p>}
+              <Link href="/concursos" style={{ display: "inline-block", marginTop: 16, fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textDecoration: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "8px 20px" }}>Ver más concursos →</Link>
+            </div>
+          )}
+          {dbEstado === "expirado" && (
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "rgba(240,234,214,0.5)", fontWeight: 700, marginBottom: 8 }}>Este concurso ha expirado</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.35)" }}>El premio no fue reclamado</p>
+              <Link href="/concursos" style={{ display: "inline-block", marginTop: 16, fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textDecoration: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "8px 20px" }}>Ver concursos activos →</Link>
+            </div>
+          )}
+          {dbEstado === "en_disputa" && (
+            <div style={{ background: "rgba(255,80,80,0.06)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#ff8080", fontWeight: 700, marginBottom: 8 }}>Verificando entrega del premio</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.4)" }}>Nuestro equipo está investigando este caso</p>
+            </div>
+          )}
 
           {/* 3. Countdown */}
           {!isEnded && timer && (

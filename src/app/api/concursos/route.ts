@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
       },
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true } },
+        ganadorActual: { select: { nombre: true } },
         _count: { select: { participantes: true } },
       },
       orderBy: { fechaFin: "asc" },

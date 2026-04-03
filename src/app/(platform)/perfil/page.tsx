@@ -220,8 +220,19 @@ function TabFavoritos() {
 function TabConcursos({ userId, userName }: { userId: string; userName: string }) {
   const [refCounts, setRefCounts] = useState<Array<{ concursoId: string | number; count: number }>>([]);
   const [copied, setCopied] = useState<string | number | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [ganados, setGanados] = useState<any[]>([]);
+  const [ganadosLoading, setGanadosLoading] = useState(true);
 
   useEffect(() => { setRefCounts(getAllRefCounts(userId)); }, [userId]);
+
+  useEffect(() => {
+    fetch(`/api/usuarios/${userId}/concursos-ganados`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { if (Array.isArray(data)) setGanados(data); })
+      .catch(() => {})
+      .finally(() => setGanadosLoading(false));
+  }, [userId]);
 
   const copyLink = async (concursoId: string | number) => {
     const c = CONCURSOS.find(x => x.id === concursoId);
@@ -231,51 +242,104 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
     try { await navigator.clipboard.writeText(url); setCopied(concursoId); setTimeout(() => setCopied(null), 2500); } catch {}
   };
 
-  if (refCounts.length === 0) return (
-    <EmptyState icon="🏆" text="No participas en ningún concurso aún" btnText="Ver concursos activos" btnHref="/concursos" />
-  );
+  const estadoBadge = (estado: string) => {
+    const map: Record<string, { bg: string; border: string; color: string; label: string }> = {
+      finalizado: { bg: "rgba(232,168,76,0.1)", border: "rgba(232,168,76,0.3)", color: "#e8a84c", label: "Pendiente de entrega" },
+      completado: { bg: "rgba(61,184,158,0.1)", border: "rgba(61,184,158,0.3)", color: "#3db89e", label: "Premio recibido ✓" },
+      en_disputa: { bg: "rgba(255,80,80,0.1)", border: "rgba(255,80,80,0.3)", color: "#ff6b6b", label: "Disputa activa" },
+      en_revision: { bg: "rgba(232,168,76,0.1)", border: "rgba(232,168,76,0.3)", color: "#e8a84c", label: "En revisión" },
+      expirado: { bg: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)", label: "Expirado" },
+    };
+    const s = map[estado] ?? map.finalizado;
+    return <span style={{ display: "inline-block", background: s.bg, border: `1px solid ${s.border}`, borderRadius: "20px", padding: "2px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: s.color }}>{s.label}</span>;
+  };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-      {refCounts.map(({ concursoId, count }) => {
-        const info = CONCURSOS.find(x => x.id === concursoId) ?? CONCURSOS_FINALIZADOS.find(x => x.id === concursoId);
-        const isActive = CONCURSOS.some(c => c.id === concursoId);
-        return (
-          <div key={concursoId} style={{
-            background: "var(--bg-secondary)", border: "1px solid var(--border-color)",
-            borderRadius: "16px", padding: "18px 20px",
-            display: "flex", alignItems: "center", gap: "14px",
-          }}>
-            <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <Link href={`/concursos/${concursoId}`} style={{
-                fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
-                color: "var(--accent)", textDecoration: "none",
-              }}>
-                {info?.premio ?? `Concurso #${concursoId}`}
-              </Link>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
-                  {isActive ? "Activo" : "Finalizado"}
-                </span>
-              </p>
-            </div>
-            <div style={{ textAlign: "center", flexShrink: 0 }}>
-              <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{count}</p>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
-            </div>
-            {isActive && (
-              <button onClick={() => copyLink(concursoId)} style={{
-                background: "none", border: "1px solid var(--border-color)",
-                borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
-                fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
-              }}>
-                {copied === concursoId ? "✓" : "📋"}
-              </button>
-            )}
+    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Concursos ganados */}
+      {!ganadosLoading && ganados.length > 0 && (
+        <div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>Mis concursos ganados</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {ganados.map((g) => (
+              <div key={g.id} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "18px 20px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "1.4rem" }}>🏆</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Link href={`/concursos/${g.slug || g.id}`} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>{g.premio}</Link>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{g.local?.nombre}</p>
+                  </div>
+                  {estadoBadge(g.estado)}
+                </div>
+                {g.estado === "finalizado" && g.codigoEntrega && (
+                  <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", padding: "10px 14px", marginTop: "8px" }}>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "4px" }}>Tu código: <strong style={{ color: "var(--accent)", letterSpacing: "0.05em" }}>{g.codigoEntrega}</strong></p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)" }}>Revisa tu email para instrucciones de entrega</p>
+                  </div>
+                )}
+                {g.estado === "completado" && g.premioConfirmadoAt && (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>Recibido el {new Date(g.premioConfirmadoAt).toLocaleDateString("es-CL")}</p>
+                )}
+                {g.estado === "en_disputa" && (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>Nuestro equipo está investigando tu caso</p>
+                )}
+              </div>
+            ))}
           </div>
-        );
-      })}
+        </div>
+      )}
+
+      {/* Mis participaciones */}
+      {refCounts.length > 0 && (
+        <div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>Mis participaciones</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {refCounts.map(({ concursoId, count }) => {
+              const info = CONCURSOS.find(x => x.id === concursoId) ?? CONCURSOS_FINALIZADOS.find(x => x.id === concursoId);
+              const isActive = CONCURSOS.some(c => c.id === concursoId);
+              return (
+                <div key={concursoId} style={{
+                  background: "var(--bg-secondary)", border: "1px solid var(--border-color)",
+                  borderRadius: "16px", padding: "18px 20px",
+                  display: "flex", alignItems: "center", gap: "14px",
+                }}>
+                  <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <Link href={`/concursos/${concursoId}`} style={{
+                      fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
+                      color: "var(--accent)", textDecoration: "none",
+                    }}>
+                      {info?.premio ?? `Concurso #${concursoId}`}
+                    </Link>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                      {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
+                        {isActive ? "Activo" : "Finalizado"}
+                      </span>
+                    </p>
+                  </div>
+                  <div style={{ textAlign: "center", flexShrink: 0 }}>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{count}</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
+                  </div>
+                  {isActive && (
+                    <button onClick={() => copyLink(concursoId)} style={{
+                      background: "none", border: "1px solid var(--border-color)",
+                      borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
+                      fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
+                    }}>
+                      {copied === concursoId ? "✓" : "📋"}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {refCounts.length === 0 && ganados.length === 0 && !ganadosLoading && (
+        <EmptyState icon="🏆" text="No participas en ningún concurso aún" btnText="Ver concursos activos" btnHref="/concursos" />
+      )}
     </div>
   );
 }

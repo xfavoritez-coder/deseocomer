@@ -11,8 +11,7 @@ export async function GET(
   const concurso = await prisma.concurso.findFirst({
     where: {
       OR: [{ id }, { slug: id }],
-      activo: true,
-      cancelado: false,
+      estado: { not: "cancelado" },
     },
     include: { local: true },
   });

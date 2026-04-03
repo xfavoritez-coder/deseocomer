@@ -15,7 +15,7 @@ import {
   type Concurso,
 } from "@/lib/mockConcursos";
 
-type Filter = "todos" | "activos" | "por_terminar" | "ganadores";
+type Filter = "todos" | "activos" | "por_terminar" | "finalizados";
 interface TimeLeft { dias: number; horas: number; minutos: number; segundos: number; ended: boolean }
 
 export default function ConcursosPage() {
@@ -24,6 +24,9 @@ export default function ConcursosPage() {
   const [timers, setTimers] = useState<Record<string, TimeLeft>>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [concursos, setConcursos] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [finalizados, setFinalizados] = useState<any[]>([]);
+  const [finalizadosLoading, setFinalizadosLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,7 +63,7 @@ export default function ConcursosPage() {
     { key: "todos", label: "Todos" },
     { key: "activos", label: "Activos" },
     { key: "por_terminar", label: "Por terminar" },
-    { key: "ganadores", label: "Ganadores 🏆" },
+    { key: "finalizados", label: "Finalizados" },
   ];
 
   function scoreConcurso(c: typeof concursos[0]): number {
@@ -85,9 +88,17 @@ export default function ConcursosPage() {
     const soon = isSoonEnding(c.endsAt);
     if (filter === "activos") return !ended && !soon;
     if (filter === "por_terminar") return !ended && soon;
-    if (filter === "ganadores") return false;
-    return !ended;
-  }).sort((a, b) => scoreConcurso(b) - scoreConcurso(a));
+    if (filter === "finalizados") return false;
+    return true; // Show all including ended
+  }).sort((a, b) => {
+    const endedA = getTimeLeft(a.endsAt).ended;
+    const endedB = getTimeLeft(b.endsAt).ended;
+    // Finalizados siempre al final
+    if (endedA && !endedB) return 1;
+    if (!endedA && endedB) return -1;
+    if (endedA && endedB) return b.endsAt - a.endsAt;
+    return scoreConcurso(b) - scoreConcurso(a);
+  });
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -116,14 +127,88 @@ export default function ConcursosPage() {
       <section className="dc-cp-content">
         <div className="dc-cp-filters">
           {filters.map(({ key, label }) => (
-            <button key={key} onClick={() => { if (key === "ganadores") { router.push("/concursos/ganadores"); return; } setFilter(key); }} className={`dc-cp-fbtn${filter === key ? " dc-cp-fbtn--on" : ""}`}>
+            <button key={key} onClick={() => { if (key === "finalizados" && finalizados.length === 0 && !finalizadosLoading) { setFinalizadosLoading(true); fetch("/api/concursos/finalizados").then(r => r.json()).then(data => { if (Array.isArray(data)) setFinalizados(data); }).catch(() => {}).finally(() => setFinalizadosLoading(false)); } setFilter(key); }} className={`dc-cp-fbtn${filter === key ? " dc-cp-fbtn--on" : ""}`}>
               {label}
               {key === "por_terminar" && <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#ff4444", marginLeft: 7, verticalAlign: "middle", boxShadow: "0 0 6px #ff4444" }} />}
             </button>
           ))}
         </div>
 
-        {loading ? (
+        {filter === "finalizados" ? (
+          finalizadosLoading ? (
+            <div style={{ textAlign: "center", padding: "60px 20px" }}>
+              <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-muted)" }}>Cargando concursos finalizados...</p>
+            </div>
+          ) : finalizados.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "80px 20px" }}>
+              <p style={{ fontSize: "3rem", marginBottom: 16 }}>🏆</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", color: "var(--text-muted)", letterSpacing: "0.1em", marginBottom: 6 }}>Aún no hay concursos finalizados</p>
+            </div>
+          ) : (
+            <div className="dc-cp-grid">
+              {finalizados.map((c) => {
+                const estado = c.estado ?? "finalizado";
+                const estadoConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
+                  finalizado: { label: "Esperando entrega", color: "#e8a84c", bg: "rgba(232,168,76,0.08)", border: "rgba(232,168,76,0.25)" },
+                  en_revision: { label: "En revisión", color: "#e8a84c", bg: "rgba(232,168,76,0.08)", border: "rgba(232,168,76,0.25)" },
+                  completado: { label: "Premio entregado", color: "#3db89e", bg: "rgba(61,184,158,0.08)", border: "rgba(61,184,158,0.25)" },
+                  expirado: { label: "Expirado", color: "rgba(240,234,214,0.4)", bg: "rgba(255,255,255,0.03)", border: "rgba(255,255,255,0.1)" },
+                };
+                const est = estadoConfig[estado] ?? estadoConfig.finalizado;
+                const ganadorNombre = c.ganadorActual?.nombre ?? null;
+                const localInitial = c.local?.nombre?.[0] ?? "L";
+
+                return (
+                  <div key={c.id} className="dc-cp-card" onClick={() => router.push(`/concursos/${c.slug || c.id}`)} style={{
+                    background: "rgba(15,10,28,0.98)", border: `1px solid ${est.border}`,
+                    borderRadius: 20, overflow: "hidden", cursor: "pointer", transition: "transform 0.2s, border-color 0.2s",
+                  }}>
+                    {/* Image */}
+                    <div style={{ position: "relative", height: 200, overflow: "hidden" }}>
+                      {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
+                        : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a0f2e, #2d1a08)" }} />}
+                      {/* Badge estado */}
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.8)", border: `1px solid ${est.border}`, borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: est.color }} />
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: est.color, textTransform: "uppercase" }}>{est.label}</span>
+                      </div>
+                    </div>
+                    {/* Body */}
+                    <div style={{ padding: "14px 16px 16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                        {c.local?.logoUrl ? <img src={c.local.logoUrl} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
+                          : <div style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitial}</div>}
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.local?.nombre}</span>
+                      </div>
+                      <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 8, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>🏆 {c.premio}</div>
+
+                      {/* Estado box */}
+                      <div style={{ background: est.bg, border: `1px solid ${est.border}`, borderRadius: 10, padding: "10px 12px", marginBottom: 12, textAlign: "center" }}>
+                        {ganadorNombre && estado === "completado" && (
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: est.color, marginBottom: 2 }}>Ganador: <strong>{ganadorNombre}</strong></p>
+                        )}
+                        {ganadorNombre && estado === "finalizado" && (
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.5)", marginBottom: 2 }}>Ganador: {ganadorNombre}</p>
+                        )}
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: est.color, letterSpacing: "0.06em" }}>{est.label}</p>
+                        {c.premioConfirmadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", marginTop: 2 }}>{new Date(c.premioConfirmadoAt).toLocaleDateString("es-CL")}</p>}
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
+                          👥 {c._count?.participantes ?? 0} participante{(c._count?.participantes ?? 0) !== 1 ? "s" : ""}
+                        </span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)" }}>
+                          {new Date(c.fechaFin).toLocaleDateString("es-CL")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        ) : loading ? (
           <div className="dc-cp-grid">
             {[1, 2, 3].map(i => (
               <div key={i} style={{ background: "rgba(15,10,28,0.98)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 20, overflow: "hidden" }}>
@@ -155,10 +240,11 @@ export default function ConcursosPage() {
               const urg = "#e05555";
               const localInitial = c.local?.[0] ?? "L";
               const horasRestantes = (c.endsAt - Date.now()) / 3600000;
+              const ended = t?.ended ?? false;
               const createdAt = (c as unknown as Record<string, unknown>).createdAt;
               const horasDesdeCreacion = createdAt ? (Date.now() - new Date(createdAt as string).getTime()) / 3600000 : 999;
-              const esTerminaHoy = horasRestantes <= 24;
-              const esNuevo = !esTerminaHoy && horasDesdeCreacion <= 24;
+              const esTerminaHoy = !ended && horasRestantes <= 24;
+              const esNuevo = !ended && !esTerminaHoy && horasDesdeCreacion <= 24;
 
               return (
                 <div key={c.id} className="dc-cp-card" onClick={() => router.push(`/concursos/${c.slug}`)} style={{
@@ -183,6 +269,11 @@ export default function ConcursosPage() {
                     {esNuevo && (
                       <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(61,184,158,0.5)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#3db89e", textTransform: "uppercase" }}>Nuevo</span>
+                      </div>
+                    )}
+                    {ended && (
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Finalizado</span>
                       </div>
                     )}
 
@@ -215,6 +306,13 @@ export default function ConcursosPage() {
                             {i < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: soon ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)", marginBottom: 10 }}>:</span>}
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* Ended box */}
+                    {ended && (
+                      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 10, padding: "10px", textAlign: "center", marginBottom: 12 }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", letterSpacing: "0.08em" }}>Concurso finalizado</span>
                       </div>
                     )}
 

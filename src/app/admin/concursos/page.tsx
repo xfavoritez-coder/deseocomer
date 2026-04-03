@@ -8,6 +8,7 @@ type Participante = { id: string; usuarioId: string; nombre: string; email: stri
 
 export default function AdminConcursos() {
   const [concursos, setConcursos] = useState<C[]>([]);
+  const [atencion, setAtencion] = useState<C[]>([]);
   const [sel, setSel] = useState<C | null>(null);
   const [detalle, setDetalle] = useState<C | null>(null);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
@@ -19,8 +20,27 @@ export default function AdminConcursos() {
   const [editCondiciones, setEditCondiciones] = useState("");
   const [editFechaFin, setEditFechaFin] = useState("");
   const [editError, setEditError] = useState("");
+  const [accionLoading, setAccionLoading] = useState("");
 
   useEffect(() => { fetch("/api/concursos").then(r => r.json()).then(d => setConcursos(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+
+  useEffect(() => {
+    adminFetch("/api/admin/concursos/atencion").then(r => r.json()).then(d => { if (Array.isArray(d)) setAtencion(d); }).catch(() => {});
+  }, []);
+
+  const accionAdmin = async (concursoId: string, accion: string, extra: Record<string, string> = {}) => {
+    setAccionLoading(concursoId + accion);
+    try {
+      const res = await adminFetch(`/api/admin/concursos/${concursoId}`, {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accion, ...extra }),
+      });
+      if (res.ok) {
+        setAtencion(prev => prev.filter(c => c.id !== concursoId));
+      }
+    } catch {}
+    setAccionLoading("");
+  };
 
   const cerrar = async (id: string) => {
     await adminFetch(`/api/admin/concursos/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ activo: false }) });
@@ -90,14 +110,88 @@ export default function AdminConcursos() {
 
   return (
     <div>
+      {/* Sección: Requieren atención */}
+      {atencion.length > 0 && (
+        <div style={{ marginBottom: "32px" }}>
+          <h2 style={{ fontFamily: "Georgia", fontSize: "1.2rem", color: "#ff8080", marginBottom: "16px" }}>⚠️ Requieren atención ({atencion.length})</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {atencion.map(c => (
+              <div key={c.id} style={{ background: c.estado === "en_revision" ? "rgba(232,168,76,0.06)" : "rgba(255,80,80,0.06)", border: `1px solid ${c.estado === "en_revision" ? "rgba(232,168,76,0.2)" : "rgba(255,80,80,0.2)"}`, borderRadius: "12px", padding: "16px 20px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "12px" }}>
+                  <div>
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", fontWeight: 700, color: c.estado === "en_revision" ? "#e8a84c" : "#ff6b6b", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                      {c.estado === "en_revision" ? "Fraude detectado" : "Disputa activa"}
+                    </span>
+                    <h3 style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#f0ead6", marginTop: "4px" }}>{c.premio}</h3>
+                    <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)" }}>{c.local?.nombre}</p>
+                  </div>
+                </div>
+
+                {/* Info del ganador */}
+                <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6" }}>
+                    Ganador actual: <strong style={{ color: "#e8a84c" }}>{c.ganadorActual?.nombre ?? "—"}</strong>
+                    {c.ganadorActual?.email && <span style={{ color: "rgba(240,234,214,0.4)", marginLeft: "8px" }}>{c.ganadorActual.email}</span>}
+                  </p>
+                  {c.ganador2 && <p style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", marginTop: "4px" }}>2° lugar: {c.ganador2.nombre}</p>}
+                  {c.ganador3 && <p style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>3° lugar: {c.ganador3.nombre}</p>}
+                </div>
+
+                {/* Acciones */}
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  {c.estado === "en_revision" && (
+                    <>
+                      <button
+                        onClick={() => accionAdmin(c.id, "aprobar_ganador")}
+                        disabled={!!accionLoading}
+                        style={{ background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.82rem", padding: "8px 16px", cursor: "pointer" }}
+                      >✓ Aprobar ganador</button>
+                      <button
+                        onClick={() => accionAdmin(c.id, "descalificar_ganador")}
+                        disabled={!!accionLoading}
+                        style={{ background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.82rem", padding: "8px 16px", cursor: "pointer" }}
+                      >✗ Descalificar y pasar al siguiente</button>
+                    </>
+                  )}
+                  {c.estado === "en_disputa" && (
+                    <>
+                      <button
+                        onClick={() => accionAdmin(c.id, "resolver_disputa", { resolucion: "entregado" })}
+                        disabled={!!accionLoading}
+                        style={{ background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "8px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.82rem", padding: "8px 16px", cursor: "pointer" }}
+                      >Premio sí fue entregado</button>
+                      <button
+                        onClick={() => accionAdmin(c.id, "resolver_disputa", { resolucion: "no_entregado" })}
+                        disabled={!!accionLoading}
+                        style={{ background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.82rem", padding: "8px 16px", cursor: "pointer" }}
+                      >Premio no fue entregado</button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "20px" }}>Concursos ({concursos.length})</h1>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr>{["Premio", "Local", "Participantes", "Inicio", "Fin", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
         <tbody>
           {concursos.map(c => {
             const ended = new Date(c.fechaFin) <= new Date();
-            const status = !c.activo ? "Desactivado" : ended ? "Terminado" : "Activo";
-            const color = !c.activo ? "#ff6b6b" : ended ? "#e8a84c" : "#3db89e";
+            const estadoMap: Record<string, { label: string; color: string }> = {
+              activo: { label: "Activo", color: "#3db89e" },
+              finalizado: { label: "Finalizado", color: "#e8a84c" },
+              en_revision: { label: "En revisión", color: "#e8a84c" },
+              completado: { label: "Completado", color: "#3db89e" },
+              expirado: { label: "Expirado", color: "rgba(240,234,214,0.4)" },
+              en_disputa: { label: "Disputa", color: "#ff6b6b" },
+              cancelado: { label: "Cancelado", color: "#ff6b6b" },
+            };
+            const est = c.estado ? estadoMap[c.estado] : null;
+            const status = est?.label ?? (!c.activo ? "Desactivado" : ended ? "Terminado" : "Activo");
+            const color = est?.color ?? (!c.activo ? "#ff6b6b" : ended ? "#e8a84c" : "#3db89e");
             return (
               <tr key={c.id} onClick={() => abrirDetalle(c)} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,168,76,0.06)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
                 <td style={TD}>{c.premio}</td>

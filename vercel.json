@@ -5,8 +5,8 @@
   "installCommand": "npm install",
   "crons": [
     {
-      "path": "/api/cron/recordatorios-ganador",
-      "schedule": "0 12 * * *"
+      "path": "/api/cron/cerrar-concursos",
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/cron/recordatorios-locales",

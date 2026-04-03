@@ -34,6 +34,10 @@ model Usuario {
   favoritos       Favorito[]
   resenas         Resena[]
   participaciones ParticipanteConcurso[]
+  ganador1De      Concurso[] @relation("Ganador1")
+  ganador2De      Concurso[] @relation("Ganador2")
+  ganador3De      Concurso[] @relation("Ganador3")
+  ganadorActualDe Concurso[] @relation("GanadorActual")
 }
 
 model Local {
@@ -99,6 +103,16 @@ model MenuItem {
   local       Local    @relation(fields: [localId], references: [id])
 }
 
+enum EstadoConcurso {
+  activo
+  finalizado
+  en_revision
+  completado
+  expirado
+  en_disputa
+  cancelado
+}
+
 model Concurso {
   id           String   @id @default(cuid())
   slug         String?  @unique
@@ -109,6 +123,8 @@ model Concurso {
   imagenUrl    String?
   fechaInicio  DateTime @default(now())
   fechaFin     DateTime
+
+  // Legacy fields (kept for backwards compat, use estado instead)
   activo            Boolean  @default(true)
   cancelado         Boolean  @default(false)
   motivoCancelacion String   @default("")
@@ -116,10 +132,34 @@ model Concurso {
   premioEntregadoAt DateTime?
   recordatorio48h   Boolean  @default(false)
   recordatorio7d    Boolean  @default(false)
+
+  // New estado-based fields
+  estado              EstadoConcurso @default(activo)
+  ganador1Id          String?
+  ganador2Id          String?
+  ganador3Id          String?
+  ganadorActualId     String?
+  codigoEntrega       String?
+  confirmacionToken   String?
+  ganadorNotificadoAt DateTime?
+  localNotificadoAt   DateTime?
+  segundoNotificadoAt DateTime?
+  terceroNotificadoAt DateTime?
+  premioConfirmadoAt  DateTime?
+  premioExpiradoAt    DateTime?
+  disputaAt           DateTime?
+  ganadorDescartadoRazon String?
+
   createdAt         DateTime @default(now())
 
   local         Local    @relation(fields: [localId], references: [id])
   participantes ParticipanteConcurso[]
+  ganador1      Usuario? @relation("Ganador1", fields: [ganador1Id], references: [id])
+  ganador2      Usuario? @relation("Ganador2", fields: [ganador2Id], references: [id])
+  ganador3      Usuario? @relation("Ganador3", fields: [ganador3Id], references: [id])
+  ganadorActual Usuario? @relation("GanadorActual", fields: [ganadorActualId], references: [id])
+
+  @@index([estado, fechaFin])
 }
 
 model ParticipanteConcurso {

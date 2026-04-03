@@ -18,7 +18,7 @@ export default function TerminosPage() {
         {/* Hero */}
         <div style={{ textAlign: "center", marginBottom: "48px" }}>
           <h1 style={{ fontFamily: "var(--font-cinzel)", fontSize: "28px", color: "#f5d080", marginBottom: "12px" }}>Términos y Condiciones</h1>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.4)" }}>Última actualización: marzo 2026</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.4)" }}>Última actualización: abril 2026</p>
         </div>
 
         {/* Contenido */}
@@ -44,22 +44,32 @@ export default function TerminosPage() {
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.5 Cancelación:</strong> El local puede cancelar un concurso solo si no tiene participantes activos. Con participantes, la cancelación debe gestionarse con el equipo de DeseoComer.</p>
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.6 Aceptación:</strong> Participar en un concurso implica la aceptación plena de estas condiciones y las específicas del local organizador.</p>
 
-          <h2 style={H2}>6. Promociones</h2>
+          <h2 style={H2}>6. Entrega de premios</h2>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.1 Selección del ganador:</strong> El ganador es determinado automáticamente por el sistema según los puntos acumulados al cierre del concurso, sujeto a verificación antifraude.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.2 Plazo de reclamo:</strong> El ganador tiene 7 días desde la notificación por email para confirmar la recepción de su premio. Si no lo hace, el premio pasa al segundo lugar.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.3 Orden de precedencia:</strong> Si el ganador original no reclama su premio o es descalificado por fraude, el premio pasa en orden al 2° y 3° lugar. Cada uno tiene 5 y 3 días respectivamente para reclamarlo.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.4 Código de acreditación:</strong> El ganador recibirá un código único por email que debe presentar al local para retirar su premio.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.5 Responsabilidad de entrega:</strong> La entrega del premio es responsabilidad exclusiva del local organizador. DeseoComer actúa como intermediario facilitando la comunicación entre las partes.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.6 Disputas:</strong> Si el ganador reporta no haber recibido su premio, DeseoComer investigará el caso en un plazo de 48 horas.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.7 Premio no reclamado:</strong> Si ninguno de los 3 primeros lugares reclama el premio dentro del plazo establecido, el premio queda sin entregar y el concurso se marca como expirado.</p>
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.8 Fraude:</strong> Cualquier participante descalificado por fraude pierde automáticamente el derecho al premio, que pasa al siguiente lugar.</p>
+
+          <h2 style={H2}>7. Promociones</h2>
           <p style={P}>Las promociones publicadas en DeseoComer son responsabilidad exclusiva de cada local. DeseoComer no garantiza la disponibilidad, vigencia ni condiciones de las promociones. Ante cualquier inconveniente con una promoción, el usuario debe contactar directamente al local.</p>
 
-          <h2 style={H2}>7. Propiedad intelectual</h2>
+          <h2 style={H2}>8. Propiedad intelectual</h2>
           <p style={P}>Todo el contenido de DeseoComer, incluyendo diseño, textos, logos e imágenes propias, está protegido por derechos de autor. Los locales conservan los derechos sobre su propio contenido (fotos, descripciones) y otorgan a DeseoComer una licencia de uso para su publicación en la plataforma.</p>
 
-          <h2 style={H2}>8. Limitación de responsabilidad</h2>
+          <h2 style={H2}>9. Limitación de responsabilidad</h2>
           <p style={P}>DeseoComer no será responsable por daños directos o indirectos derivados del uso de la plataforma, la calidad de los productos o servicios de los locales, la veracidad de la información publicada por locales, ni por interrupciones del servicio por causas ajenas a nuestra voluntad.</p>
 
-          <h2 style={H2}>9. Modificaciones</h2>
+          <h2 style={H2}>10. Modificaciones</h2>
           <p style={P}>DeseoComer se reserva el derecho de modificar estos términos en cualquier momento. Los cambios serán notificados en la plataforma. El uso continuado de DeseoComer tras los cambios implica su aceptación.</p>
 
-          <h2 style={H2}>10. Legislación aplicable</h2>
+          <h2 style={H2}>11. Legislación aplicable</h2>
           <p style={P}>Estos términos se rigen por las leyes de la República de Chile. Cualquier disputa será sometida a los tribunales competentes de Santiago de Chile.</p>
 
-          <h2 style={H2}>11. Contacto</h2>
+          <h2 style={H2}>12. Contacto</h2>
           <p style={{ ...P, marginBottom: 0 }}>Para consultas sobre estos términos escríbenos a través de nuestra página de contacto en <Link href="/contacto" style={{ color: "#e8a84c", textDecoration: "none" }}>DeseoComer.com/contacto</Link></p>
         </div>
 

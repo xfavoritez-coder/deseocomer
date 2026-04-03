@@ -19,6 +19,11 @@ export default function ConcursosSection() {
         const sorted = [...data].sort((a, b) => {
           const rA = new Date(a.fechaFin).getTime() - ahora;
           const rB = new Date(b.fechaFin).getTime() - ahora;
+          const endedA = rA <= 0, endedB = rB <= 0;
+          // Finalizados siempre al final
+          if (endedA && !endedB) return 1;
+          if (!endedA && endedB) return -1;
+          if (endedA && endedB) return rB - rA;
           const uA = rA <= 86400000, uB = rB <= 86400000;
           if (uA && !uB) return -1; if (!uA && uB) return 1;
           if (uA && uB) return rA - rB;
@@ -102,7 +107,8 @@ export default function ConcursosSection() {
             const numColor = esUrgente ? urgColor : "rgba(240,234,214,0.9)";
             const sepColor = esUrgente ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)";
             const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina hoy!" : "Activo";
-            const badgeDot = ended ? "var(--text-muted)" : esUrgente ? urgColor : "#3db89e";
+            const badgeColor = ended ? "rgba(240,234,214,0.4)" : esUrgente ? urgColor : "#3db89e";
+            const badgeDot = ended ? "rgba(240,234,214,0.3)" : esUrgente ? urgColor : "#3db89e";
 
             return (
               <a key={c.id} href={`/concursos/${c.slug || c.id}`} className="dc-cst-card" style={{
@@ -116,9 +122,9 @@ export default function ConcursosSection() {
                   <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
                   {/* Badge */}
-                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
-                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: esUrgente ? urgColor : "#e8a84c", textTransform: "uppercase" }}>{badgeText}</span>
+                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${ended ? "rgba(255,255,255,0.12)" : esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: badgeDot, animation: ended ? "none" : `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: badgeColor, textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
                 </div>
 
