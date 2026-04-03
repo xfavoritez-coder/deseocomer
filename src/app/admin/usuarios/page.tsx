@@ -18,6 +18,9 @@ export default function AdminUsuarios() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [soloIPsDuplicadas, setSoloIPsDuplicadas] = useState(false);
   const [descalificarConfirm, setDescalificarConfirm] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [redReferidos, setRedReferidos] = useState<any[]>([]);
+  const [loadingRed, setLoadingRed] = useState(false);
 
   useEffect(() => { adminFetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
 
@@ -72,6 +75,16 @@ export default function AdminUsuarios() {
     } catch { show("Error de conexión"); }
     setLoading(false);
   };
+
+  // Load referral network when user is selected
+  useEffect(() => {
+    if (!sel) { setRedReferidos([]); return; }
+    setLoadingRed(true);
+    adminFetch(`/api/admin/usuarios/${sel.id}`).then(r => r.json()).then(d => {
+      if (Array.isArray(d)) setRedReferidos(d);
+      else setRedReferidos([]);
+    }).catch(() => setRedReferidos([])).finally(() => setLoadingRed(false));
+  }, [sel?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── DETAIL VIEW ──
   if (sel) return (
@@ -214,6 +227,67 @@ export default function AdminUsuarios() {
           })}
         </div>
       )}
+
+      {/* Red de referidos */}
+      {redReferidos.length > 0 && (
+        <div style={cardS}>
+          <p style={cardTitleS}>Red de referidos</p>
+          {redReferidos.map((r: { concursoId: string; premio: string; localNombre: string; slug: string; puntos: number; puntosNivel2: number; puntosNivel2Pendientes: number; referidoPorId: string | null; referidoPorNombre: string | null; referidosDirectos: { id: string; nombre: string; email: string; verificado: boolean; puntos: number; estado: string }[]; referidosNivel2: { id: string; nombre: string; email: string; verificado: boolean }[] }) => (
+            <div key={r.concursoId} style={{ marginBottom: "16px", padding: "12px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px" }}>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f5d080", marginBottom: "4px" }}>{r.premio}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: "10px" }}>{r.localNombre}</p>
+
+              {/* Desglose puntos */}
+              <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
+                <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(232,168,76,0.1)", color: "#e8a84c" }}>{r.puntos} pts total</span>
+                {r.puntosNivel2 > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(61,184,158,0.1)", color: "#3db89e" }}>{r.puntosNivel2} pts nivel 2</span>}
+                {r.puntosNivel2Pendientes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(255,140,0,0.1)", color: "#ff8c00", fontStyle: "italic" }}>{r.puntosNivel2Pendientes} pendientes</span>}
+              </div>
+
+              {/* Referido por */}
+              {r.referidoPorNombre && (
+                <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginBottom: "8px" }}>
+                  Referido por: <button onClick={() => { const u = usuarios.find(x => x.id === r.referidoPorId); if (u) { setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textDecoration: "underline" }}>{r.referidoPorNombre}</button>
+                </p>
+              )}
+
+              {/* Referidos directos */}
+              {r.referidosDirectos.length > 0 && (
+                <div style={{ marginBottom: "8px" }}>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Referidos directos ({r.referidosDirectos.length})</p>
+                  {r.referidosDirectos.map((ref) => (
+                    <div key={ref.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", background: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }} />
+                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)" }}>{ref.email}</span>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#e8a84c" }}>{ref.puntos} pts</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Referidos nivel 2 */}
+              {r.referidosNivel2.length > 0 && (
+                <div>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Red nivel 2 ({r.referidosNivel2.length})</p>
+                  {r.referidosNivel2.map((ref) => (
+                    <div key={ref.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", background: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }} />
+                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)" }}>{ref.email}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {r.referidosDirectos.length === 0 && !r.referidoPorNombre && (
+                <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", fontStyle: "italic" }}>Sin referidos en este concurso</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {loadingRed && <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", textAlign: "center" }}>Cargando red...</p>}
 
       {editMode && (
         <div style={cardS}>

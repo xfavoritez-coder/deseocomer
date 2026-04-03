@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
         _count: { select: { favoritos: true, resenas: true, participaciones: true } },
         participaciones: {
           select: {
-            id: true, puntos: true, estado: true, createdAt: true,
+            id: true, puntos: true, puntosNivel2: true, puntosNivel2Pendientes: true, estado: true, createdAt: true,
+            referidoPor: true, referidorDirectoId: true, referidorNivel2Id: true,
             concurso: { select: { id: true, slug: true, premio: true, fechaFin: true, estado: true, local: { select: { nombre: true } } } },
           },
           orderBy: { createdAt: "desc" },

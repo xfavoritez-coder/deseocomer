@@ -5,6 +5,73 @@ import { resend } from "@/lib/resend";
 import bcrypt from "bcryptjs";
 import * as crypto from "crypto";
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+  try {
+    const { id } = await params;
+
+    // Get all participations with referral data
+    const participaciones = await prisma.participanteConcurso.findMany({
+      where: { usuarioId: id },
+      select: {
+        id: true, concursoId: true, puntos: true, puntosNivel2: true, puntosNivel2Pendientes: true,
+        referidoPor: true, referidorDirectoId: true, referidorNivel2Id: true, estado: true,
+        concurso: { select: { id: true, slug: true, premio: true, fechaFin: true, estado: true, local: { select: { nombre: true } } } },
+      },
+    });
+
+    const result = await Promise.all(participaciones.map(async (p) => {
+      // Who referred this user
+      let referidoPorNombre: string | null = null;
+      if (p.referidorDirectoId) {
+        const ref = await prisma.usuario.findUnique({ where: { id: p.referidorDirectoId }, select: { id: true, nombre: true, email: true } });
+        if (ref) referidoPorNombre = ref.nombre;
+      }
+
+      // Direct referrals (people this user brought)
+      const referidosDirectos = await prisma.participanteConcurso.findMany({
+        where: { concursoId: p.concursoId, referidorDirectoId: id },
+        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true } } },
+      });
+
+      // Level 2 referrals (people brought by this user's referrals)
+      const referidosNivel2 = await prisma.participanteConcurso.findMany({
+        where: { concursoId: p.concursoId, referidorNivel2Id: id },
+        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true } } },
+      });
+
+      return {
+        concursoId: p.concursoId,
+        premio: p.concurso.premio,
+        localNombre: p.concurso.local.nombre,
+        slug: p.concurso.slug,
+        estadoConcurso: p.concurso.estado,
+        fechaFin: p.concurso.fechaFin,
+        puntos: p.puntos,
+        puntosNivel2: p.puntosNivel2,
+        puntosNivel2Pendientes: p.puntosNivel2Pendientes,
+        estado: p.estado,
+        referidoPorId: p.referidorDirectoId,
+        referidoPorNombre,
+        referidosDirectos: referidosDirectos.map(r => ({
+          id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
+          verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+        })),
+        referidosNivel2: referidosNivel2.map(r => ({
+          id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
+          verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+        })),
+      };
+    }));
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("[Admin usuarios GET referidos]", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authErr = checkAdminAuth(req);
   if (authErr) return authErr;
