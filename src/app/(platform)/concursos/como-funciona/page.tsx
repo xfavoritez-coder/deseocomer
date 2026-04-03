@@ -1,9 +1,43 @@
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { CONCURSOS_FINALIZADOS } from "@/lib/mockConcursos";
+import { prisma } from "@/lib/prisma";
 
-export default function ComoFuncionaPage() {
+async function getGanadoresReales() {
+  try {
+    const concursos = await prisma.concurso.findMany({
+      where: {
+        OR: [
+          { estado: "completado" },
+          { activo: false, fechaFin: { lt: new Date() } },
+        ],
+        cancelado: false,
+      },
+      include: {
+        local: { select: { nombre: true, logoUrl: true } },
+        ganadorActual: { select: { nombre: true } },
+        participantes: { orderBy: { puntos: "desc" }, take: 1, select: { puntos: true } },
+      },
+      orderBy: { fechaFin: "desc" },
+      take: 4,
+    });
+    return concursos.map(c => {
+      const ganadorNombre = c.ganadorActual?.nombre ?? null;
+      const nombre = ganadorNombre
+        ? (() => { const parts = ganadorNombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()
+        : "Por confirmar";
+      return {
+        premio: c.premio,
+        local: c.local.nombre,
+        imagenUrl: c.imagenUrl,
+        ganador: { nombre, referidos: c.participantes[0]?.puntos ?? 0 },
+      };
+    });
+  } catch { return []; }
+}
+
+export default async function ComoFuncionaPage() {
+  const ganadores = await getGanadoresReales();
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
@@ -102,12 +136,13 @@ export default function ComoFuncionaPage() {
         </section>
 
         {/* Premios reales */}
+        {ganadores.length > 0 ? (
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Premios reales</p>
           <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>Esto es lo que han ganado otros</h2>
 
           <div className="cf-premios">
-            {CONCURSOS_FINALIZADOS.slice(0, 4).map((c, i) => (
+            {ganadores.map((c, i) => (
               <div key={i} style={{ background: "rgba(232,168,76,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "16px", overflow: "hidden" }}>
                 {c.imagenUrl ? (
                   <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "120px", objectFit: "cover", display: "block", opacity: 0.75 }} />
@@ -132,6 +167,13 @@ export default function ComoFuncionaPage() {
             </Link>
           </div>
         </section>
+        ) : (
+        <section style={{ marginBottom: "clamp(48px,8vw,96px)", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", marginBottom: "10px" }}>Premios reales</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", marginBottom: "16px", lineHeight: 1.3 }}>Esto es lo que han ganado otros</h2>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.4)", lineHeight: 1.6 }}>Próximamente los primeros ganadores aparecerán aquí</p>
+        </section>
+        )}
 
         {/* FAQ */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
