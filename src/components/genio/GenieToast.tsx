@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useGenie } from "@/contexts/GenieContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function GenieToast() {
   const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen } = useGenie();
+  const { user, isAuthenticated } = useAuth();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const DISMISSED_KEY = "genio_toasts_dismissed";
@@ -131,6 +133,14 @@ export default function GenieToast() {
       localStorage.setItem("deseocomer_usuario_perfil", JSON.stringify(profile));
       localStorage.setItem("genio_cumple_solicitado", "true");
     } catch {}
+    // Persist to DB if logged in
+    if (isAuthenticated && user?.id) {
+      fetch("/api/usuarios/cumpleanos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuarioId: user.id, dia: d, mes: m, anio: a }),
+      }).catch(() => {});
+    }
     addRespuestaGenio("cumpleaños", `${d}/${m}/${a}`);
     setGuardado(true);
   };

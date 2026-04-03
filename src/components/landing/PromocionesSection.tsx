@@ -450,6 +450,20 @@ function BirthdayBanner({ esCumpleHoy }: { esCumpleHoy: boolean }) {
 
   useEffect(() => {
     try { setTieneFecha(!!localStorage.getItem("deseocomer_user_birthday")); } catch {}
+    // Also check from API if user is logged in and localStorage is empty
+    if (isAuthenticated && user?.id && !localStorage.getItem("deseocomer_user_birthday")) {
+      fetch(`/api/usuarios/${user.id}/cumpleanos-check`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.tieneCumple) {
+            setTieneFecha(true);
+            if (data.dia && data.mes) {
+              localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: data.dia, mes: data.mes, anio: data.anio }));
+            }
+          }
+        })
+        .catch(() => {});
+    }
     // Check if banner was dismissed
     try {
       if (sessionStorage.getItem("deseocomer_banner_cumple_cerrado_sesion")) { setBannerCerrado(true); }
