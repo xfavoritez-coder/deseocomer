@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import BannerVerificacion from "@/components/layout/BannerVerificacion";
 
 const NAV_LINKS = [
   { label: "Concursos",   href: "/concursos"   },
@@ -242,6 +243,8 @@ export default function Navbar() {
           </div>
         </>
       )}
+
+      <BannerVerificacion />
 
       <style>{`
         .dc-nav {
