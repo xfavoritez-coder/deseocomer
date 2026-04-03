@@ -17,7 +17,6 @@ const TABS = [
   { key: "favoritos", icon: "💛", label: "Favoritos" },
   { key: "concursos", icon: "🏆", label: "Concursos" },
   { key: "historial", icon: "🕐", label: "Historial" },
-  { key: "logros",    icon: "🎖️", label: "Logros" },
   { key: "genio",     icon: "🏮", label: "Mi Genio" },
   { key: "perfil",    icon: "⚙️", label: "Mi Perfil" },
 ] as const;
@@ -129,7 +128,7 @@ export default function PerfilPage() {
         {tab === "favoritos" && <TabFavoritos />}
         {tab === "concursos" && <TabConcursos userId={user.id} userName={user.nombre} />}
         {tab === "historial" && <TabHistorial />}
-        {tab === "logros" && <TabLogros />}
+
         {tab === "genio" && <TabGenio />}
         {tab === "perfil" && <TabPerfil user={user} logout={logout} router={router} />}
       </div>
