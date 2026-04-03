@@ -57,6 +57,7 @@ export interface Local {
   tieneDelivery?: boolean;
   comunasDelivery?: string[];
   tieneRetiro?: boolean;
+  sirveEnMesa?: boolean;
   linkPedido?: string;
 }
 
