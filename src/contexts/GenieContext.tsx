@@ -60,6 +60,7 @@ interface GenieContextType {
   sessionCount: number;
   showFavoritoToast: () => void;
   comunasConLocales: string[];
+  comunasDelivery: string[];
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -395,7 +396,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [addInteraccion, showFavoritoToast]);
 
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))] }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => l.comunasDelivery ?? []))] }}>
       {children}
     </GenieContext.Provider>
   );

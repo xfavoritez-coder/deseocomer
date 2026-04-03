@@ -87,8 +87,9 @@ const PREGUNTA: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSi
 const CHIP: React.CSSProperties = { background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" };
 
 export default function GeniePanel() {
-  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales } = useGenie();
+  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales, comunasDelivery } = useGenie();
   const COMUNAS_CON_COBERTURA = useMemo(() => comunasConLocales, [comunasConLocales]);
+  const COMUNAS_DELIVERY = useMemo(() => comunasDelivery, [comunasDelivery]);
 
   const [stepActual, setStepActual] = useState<number | string>(0);
   const [modalidad, setModalidad] = useState("");
@@ -118,7 +119,8 @@ export default function GeniePanel() {
     setComuna(c);
     addInteraccion("comuna_seleccionada", { comuna: c });
     setBusquedaComuna("");
-    setStepActual(COMUNAS_CON_COBERTURA.includes(c) ? 3 : "sin_cobertura");
+    const cobertura = modalidad === "Delivery a domicilio" ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
+    setStepActual(cobertura.includes(c) ? 3 : "sin_cobertura");
   };
 
   const handleCategoria = (c: string) => {
@@ -184,14 +186,41 @@ export default function GeniePanel() {
               <p style={PREGUNTA}>{modalidad === "Delivery a domicilio" ? "¿A qué comuna quieres que te llegue?" : modalidad === "Retiro en local" ? "¿Desde qué zona vas a retirar?" : "¿En qué zona de Santiago?"}</p>
               <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComuna} onChange={e => setBusquedaComuna(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "10px" }} />
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", maxHeight: "180px", overflowY: "auto" }}>
-                {COMUNAS.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase())).map(c => (
-                  <button key={c} onClick={() => handleComuna(c)} style={{ background: COMUNAS_CON_COBERTURA.includes(c) ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.04)", border: COMUNAS_CON_COBERTURA.includes(c) ? "1px solid rgba(232,168,76,0.25)" : "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: COMUNAS_CON_COBERTURA.includes(c) ? "rgba(245,208,128,0.85)" : "rgba(245,208,128,0.45)" }}>
-                    {c}{COMUNAS_CON_COBERTURA.includes(c) && <span style={{ marginLeft: "4px", fontSize: "0.72rem", color: "#3db89e" }}>●</span>}
-                  </button>
-                ))}
-              </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.3)", marginTop: "8px" }}>● Disponible en DeseoComer</p>
+              {(() => {
+                const cobertura = modalidad === "Delivery a domicilio" ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
+                const filtered = COMUNAS.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()));
+                const activas = filtered.filter(c => cobertura.includes(c)).sort((a, b) => a.localeCompare(b));
+                const noActivas = filtered.filter(c => !cobertura.includes(c)).sort((a, b) => a.localeCompare(b));
+                return (
+                  <div style={{ maxHeight: "220px", overflowY: "auto" }}>
+                    {activas.length > 0 && (
+                      <>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "#3db89e", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>{modalidad === "Delivery a domicilio" ? "Delivery disponible" : "Disponibles"}</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
+                          {activas.map(c => (
+                            <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" }}>
+                              {c}<span style={{ marginLeft: "4px", fontSize: "0.72rem", color: "#3db89e" }}>●</span>
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {noActivas.length > 0 && (
+                      <>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(245,208,128,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Aún no disponibles</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                          {noActivas.map(c => (
+                            <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.35)" }}>
+                              {c}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.3)", marginTop: "8px" }}>● {modalidad === "Delivery a domicilio" ? "Delivery disponible" : "Disponible en DeseoComer"}</p>
             </div>
           )}
 
