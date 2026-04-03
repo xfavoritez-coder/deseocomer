@@ -163,16 +163,6 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {isAuthenticated && user && !user.emailVerificado && (
-        <div style={{ background: "rgba(224,85,85,0.1)", border: "1px solid rgba(224,85,85,0.35)", borderTop: "none", borderBottom: "none", margin: "8px 16px", borderRadius: 12, padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e05555", textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>Verifica tu cuenta</span>
-          <span style={{ color: "rgba(224,85,85,0.4)", fontSize: 12 }}>—</span>
-          <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.6)" }}>Necesitas verificar tu email para participar en concursos y sumar puntos.</span>
-          <button onClick={async (e) => { const btn = e.currentTarget; try { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email }) }); btn.textContent = "✓ Enviado"; btn.style.background = "transparent"; btn.style.color = "rgba(240,234,214,0.6)"; setTimeout(() => { btn.textContent = "Reenviar →"; btn.style.background = "#e05555"; btn.style.color = "#fff"; }, 3000); } catch {} }} style={{ background: "#e05555", color: "#fff", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", border: "none", borderRadius: 20, padding: "6px 14px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>Reenviar →</button>
-        </div>
-      )}
-
       {/* Mobile drawer */}
       {menuOpen && (
         <>
