@@ -40,6 +40,10 @@ export interface LocalRecomendado {
   promociones?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   concursos?: any[];
+  tieneDelivery?: boolean;
+  comunasDelivery?: string[];
+  tieneRetiro?: boolean;
+  linkPedido?: string;
 }
 
 interface GenieContextType {
@@ -50,7 +54,7 @@ interface GenieContextType {
   setToastActivo: (t: { mensaje: string; opciones: string[]; id: string } | null) => void;
   addInteraccion: (tipo: string, datos: Record<string, string | number>) => void;
   addRespuestaGenio: (pregunta: string, respuesta: string) => void;
-  getRecomendacion: (categoria?: string, comuna?: string, excludeIds?: string[]) => LocalRecomendado | null;
+  getRecomendacion: (categoria?: string, comuna?: string, excludeIds?: string[], modalidad?: string) => LocalRecomendado | null;
   isLoggedIn: boolean;
   userName: string | null;
   sessionCount: number;
@@ -154,6 +158,10 @@ export function GenieProvider({ children }: { children: ReactNode }) {
           promociones: (l.promociones as any[]) ?? [],
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           concursos: (l.concursos as any[]) ?? [],
+          tieneDelivery: (l.tieneDelivery as boolean) ?? false,
+          comunasDelivery: (l.comunasDelivery as string[]) ?? [],
+          tieneRetiro: (l.tieneRetiro as boolean) ?? false,
+          linkPedido: (l.linkPedido as string) ?? "",
         })));
       }
     }).catch(() => {});
@@ -273,9 +281,17 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     });
   }, [updatePerfil]);
 
-  const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[]): LocalRecomendado | null => {
+  const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[], modalidad?: string): LocalRecomendado | null => {
     let candidates = [...localesDB];
     if (excludeIds?.length) candidates = candidates.filter(l => !excludeIds.includes(l.id));
+
+    // Filter by modalidad
+    if (modalidad === "Delivery a domicilio") {
+      candidates = candidates.filter(l => l.tieneDelivery === true);
+      if (comuna) candidates = candidates.filter(l => l.comunasDelivery?.includes(comuna));
+    } else if (modalidad === "Retiro en local") {
+      candidates = candidates.filter(l => l.tieneRetiro === true);
+    }
 
     // Filter by category STRICTLY (also check tags)
     if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {

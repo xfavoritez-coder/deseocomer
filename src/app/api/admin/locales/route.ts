@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
         ciudad: true, comuna: true, direccion: true, categoria: true, logoUrl: true, portadaUrl: true,
         lat: true, lng: true, instagram: true, sitioWeb: true, descripcion: true, historia: true,
         activo: true, captadorCodigo: true, createdAt: true,
+        tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,
         _count: { select: { concursos: true, promociones: true, favoritos: true, resenas: true } },
       },
     });

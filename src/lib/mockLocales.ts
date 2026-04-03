@@ -54,6 +54,10 @@ export interface Local {
   resenas: Resena[];
   lat: number;
   lng: number;
+  tieneDelivery?: boolean;
+  comunasDelivery?: string[];
+  tieneRetiro?: boolean;
+  linkPedido?: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

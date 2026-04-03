@@ -119,6 +119,10 @@ export default function LocalDetailPage() {
     resenas: ((dbLocal.resenas as Resena[]) ?? []),
     lat: dbLocal.lat as number ?? -33.43,
     lng: dbLocal.lng as number ?? -70.65,
+    tieneDelivery: (dbLocal.tieneDelivery as boolean) ?? false,
+    comunasDelivery: (dbLocal.comunasDelivery as string[]) ?? [],
+    tieneRetiro: (dbLocal.tieneRetiro as boolean) ?? false,
+    linkPedido: (dbLocal.linkPedido as string) ?? "",
   } : null);
 
   // Detect owner / local session
@@ -415,6 +419,25 @@ export default function LocalDetailPage() {
                       {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
                       {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
                     </div>
+                    {/* Modalidades */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
+                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e" }}>Delivery disponible</span>}
+                      {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", color: "rgba(232,168,76,0.8)" }}>Retiro en local</span>}
+                      {!local.tieneDelivery && !local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)" }}>Solo en local</span>}
+                    </div>
+                    {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
+                      <div style={{ marginBottom: "12px" }}>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "6px" }}>Hacemos delivery a:</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                          {(local.comunasDelivery ?? []).map((c: string) => <span key={c} style={{ fontSize: "0.7rem", padding: "3px 10px", borderRadius: "20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", color: "rgba(240,234,214,0.5)" }}>{c}</span>)}
+                        </div>
+                      </div>
+                    )}
+                    {local.linkPedido && (() => {
+                      const esWA = /^(\+?56)?[0-9]{8,9}$/.test(local.linkPedido.replace(/\s/g, ""));
+                      const href = esWA ? `https://wa.me/${local.linkPedido.replace(/\D/g, "").replace(/^(?!56)/, "56")}` : local.linkPedido;
+                      return <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", padding: "12px 20px", borderRadius: "10px", background: esWA ? "rgba(37,211,102,0.1)" : "rgba(61,184,158,0.1)", border: `1px solid ${esWA ? "rgba(37,211,102,0.3)" : "rgba(61,184,158,0.3)"}`, color: esWA ? "#25d366" : "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", textDecoration: "none", textAlign: "center", marginBottom: "12px", boxSizing: "border-box" as const }}>{esWA ? "Pedir por WhatsApp" : "Pedir online"}</a>;
+                    })()}
                     <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
                       <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
                     </div>

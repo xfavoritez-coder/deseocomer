@@ -43,6 +43,32 @@ function getFrase(ocasion: string, categoria: string, comuna: string): string {
   return `En ${comuna} encontramos esto para ti 🧞`;
 }
 
+function getOcasiones(mod: string): string[] {
+  const h = new Date().getHours();
+  if (mod === "Comer en el local") {
+    if (h >= 7 && h < 12) return ["Desayuno", "Brunch", "Café de mañana"];
+    if (h >= 12 && h < 16) return ["Almuerzo solo", "Con amigos", "Reunión de trabajo", "Antojo rápido"];
+    if (h >= 16 && h < 20) return ["Once", "Café de tarde", "Antojo rápido"];
+    if (h >= 20) return ["Cena romántica", "Con amigos", "Cena en familia", "Antojo nocturno"];
+    return ["Antojo nocturno"];
+  }
+  if (mod === "Delivery a domicilio") {
+    if (h >= 7 && h < 12) return ["Desayuno a domicilio", "Brunch en casa"];
+    if (h >= 12 && h < 16) return ["Almuerzo", "Para la oficina", "Reunión de trabajo"];
+    if (h >= 16 && h < 20) return ["Once en casa", "Antojo de tarde"];
+    if (h >= 20) return ["Cena en casa", "Antojo nocturno", "Para la familia"];
+    return ["Antojo nocturno"];
+  }
+  if (mod === "Retiro en local") {
+    if (h >= 7 && h < 12) return ["Desayuno", "Café de mañana"];
+    if (h >= 12 && h < 16) return ["Almuerzo", "Antojo rápido", "Para llevar"];
+    if (h >= 16 && h < 20) return ["Once para llevar", "Antojo rápido"];
+    if (h >= 20) return ["Cena para llevar", "Antojo nocturno"];
+    return ["Antojo nocturno"];
+  }
+  return ["Almuerzo", "Con amigos", "Antojo rápido"];
+}
+
 function getSaludo(): string {
   const h = new Date().getHours();
   if (h >= 7 && h < 12) return "Buenos días ✨ ¿Para qué ocasión busco?";
@@ -64,7 +90,8 @@ export default function GeniePanel() {
   const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales } = useGenie();
   const COMUNAS_CON_COBERTURA = useMemo(() => comunasConLocales, [comunasConLocales]);
 
-  const [stepActual, setStepActual] = useState<number | string>(1);
+  const [stepActual, setStepActual] = useState<number | string>(0);
+  const [modalidad, setModalidad] = useState("");
   const [ocasion, setOcasion] = useState("");
   const [comuna, setComuna] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -98,7 +125,7 @@ export default function GeniePanel() {
     setCategoria(c);
     addInteraccion("categoria_seleccionada", { categoria: c });
     shownIds.current = [];
-    const rec = getRecomendacion(c === "Sorpréndeme" ? undefined : c, comuna || undefined, []);
+    const rec = getRecomendacion(c === "Sorpréndeme" ? undefined : c, comuna || undefined, [], modalidad);
     if (rec) {
       shownIds.current.push(rec.id);
       setResultado(rec);
@@ -109,7 +136,7 @@ export default function GeniePanel() {
   };
 
   const handleOtra = () => {
-    const rec = getRecomendacion(categoria === "Sorpréndeme" ? undefined : categoria, comuna || undefined, shownIds.current);
+    const rec = getRecomendacion(categoria === "Sorpréndeme" ? undefined : categoria, comuna || undefined, shownIds.current, modalidad);
     if (rec) {
       shownIds.current.push(rec.id);
       setResultado(rec);
@@ -129,12 +156,23 @@ export default function GeniePanel() {
             <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "rgba(245,208,128,0.5)", fontSize: "1.2rem", cursor: "pointer", padding: "4px" }}>✕</button>
           </div>
 
+          {/* Step 0: Modalidad */}
+          {stepActual === 0 && (
+            <div>
+              <p style={PREGUNTA}>{isLoggedIn && userName ? `Hola ${userName} ✨ ¿Cómo quieres comer hoy?` : "¿Cómo quieres comer hoy? 🧞"}</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {["Comer en el local", "Delivery a domicilio", "Retiro en local"].map(m => <button key={m} onClick={() => { setModalidad(m); addInteraccion("modalidad_seleccionada", { modalidad: m }); setStepActual(1); }} style={CHIP}>{m}</button>)}
+              </div>
+            </div>
+          )}
+
           {/* Step 1: Ocasión */}
           {stepActual === 1 && (
             <div>
+              <button onClick={() => setStepActual(0)} style={VOLVER}>← Volver</button>
               <p style={PREGUNTA}>{isLoggedIn && userName ? `Hola ${userName} ✨ ¿Qué deseas hoy?` : getSaludo()}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {OCASIONES.map(o => <button key={o} onClick={() => handleOcasion(o)} style={CHIP}>{o}</button>)}
+                {getOcasiones(modalidad).map(o => <button key={o} onClick={() => handleOcasion(o)} style={CHIP}>{o}</button>)}
               </div>
             </div>
           )}
@@ -143,7 +181,7 @@ export default function GeniePanel() {
           {stepActual === 2 && (
             <div>
               <button onClick={() => setStepActual(1)} style={VOLVER}>← Volver</button>
-              <p style={PREGUNTA}>¿En qué zona de Santiago?</p>
+              <p style={PREGUNTA}>{modalidad === "Delivery a domicilio" ? "¿A qué comuna quieres que te llegue?" : modalidad === "Retiro en local" ? "¿Desde qué zona vas a retirar?" : "¿En qué zona de Santiago?"}</p>
               <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComuna} onChange={e => setBusquedaComuna(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "10px" }} />
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", maxHeight: "180px", overflowY: "auto" }}>

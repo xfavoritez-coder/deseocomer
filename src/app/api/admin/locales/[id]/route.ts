@@ -94,6 +94,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           ...(body.sitioWeb !== undefined && { sitioWeb: body.sitioWeb || null }),
           ...(body.descripcion !== undefined && { descripcion: body.descripcion || null }),
           ...(body.historia !== undefined && { historia: body.historia || null }),
+          ...(body.tieneDelivery !== undefined && { tieneDelivery: Boolean(body.tieneDelivery) }),
+          ...(body.comunasDelivery !== undefined && { comunasDelivery: body.comunasDelivery }),
+          ...(body.tieneRetiro !== undefined && { tieneRetiro: Boolean(body.tieneRetiro) }),
+          ...(body.linkPedido !== undefined && { linkPedido: body.linkPedido }),
         },
       });
       const { password: _, ...safe } = updated;

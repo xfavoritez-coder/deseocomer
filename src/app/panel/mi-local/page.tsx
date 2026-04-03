@@ -64,7 +64,7 @@ export default function MiLocalPage() {
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
-            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng };
+            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng, tieneDelivery: data.tieneDelivery ?? local.tieneDelivery ?? false, comunasDelivery: data.comunasDelivery ?? local.comunasDelivery ?? [], tieneRetiro: data.tieneRetiro ?? local.tieneRetiro ?? false, linkPedido: data.linkPedido ?? local.linkPedido ?? "" };
             setD(merged); save(merged);
           }
         }).catch(() => {});
@@ -276,6 +276,78 @@ export default function MiLocalPage() {
         ))}
       </div>
 
+      {/* Pedidos y modalidades */}
+      <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "20px", marginBottom: "20px" }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Pedidos y modalidades</p>
+
+        {/* Toggle Delivery */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Ofreces delivery?</span>
+          <button onClick={() => {
+            const v = !(d.tieneDelivery as boolean);
+            set("tieneDelivery", v);
+            try {
+              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tieneDelivery: v }) });
+            } catch {}
+          }} style={{ width: "48px", height: "26px", borderRadius: "13px", border: "none", cursor: "pointer", background: (d.tieneDelivery as boolean) ? "#3db89e" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#fff", position: "absolute", top: "3px", left: (d.tieneDelivery as boolean) ? "25px" : "3px", transition: "left 0.2s" }} />
+          </button>
+        </div>
+
+        {/* Comunas delivery */}
+        {(d.tieneDelivery as boolean) && (
+          <div style={{ marginBottom: "16px" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Comunas donde haces delivery</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxHeight: "160px", overflowY: "auto" }}>
+              {COMUNAS_SANTIAGO.map(c => {
+                const comunas = (d.comunasDelivery as string[]) ?? [];
+                const sel = comunas.includes(c);
+                return (
+                  <button key={c} onClick={() => {
+                    const cur = (d.comunasDelivery as string[]) ?? [];
+                    const next = sel ? cur.filter(x => x !== c) : [...cur, c];
+                    set("comunasDelivery", next);
+                    try {
+                      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+                      if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ comunasDelivery: next }) });
+                    } catch {}
+                  }} style={{ padding: "5px 12px", borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid rgba(232,168,76,0.5)" : "1px solid rgba(255,255,255,0.1)", color: sel ? "#e8a84c" : "rgba(240,234,214,0.45)" }}>
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Toggle Retiro */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Ofreces retiro en local?</span>
+          <button onClick={() => {
+            const v = !(d.tieneRetiro as boolean);
+            set("tieneRetiro", v);
+            try {
+              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tieneRetiro: v }) });
+            } catch {}
+          }} style={{ width: "48px", height: "26px", borderRadius: "13px", border: "none", cursor: "pointer", background: (d.tieneRetiro as boolean) ? "#3db89e" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#fff", position: "absolute", top: "3px", left: (d.tieneRetiro as boolean) ? "25px" : "3px", transition: "left 0.2s" }} />
+          </button>
+        </div>
+
+        {/* Link pedidos */}
+        <div>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Link o número para recibir pedidos (opcional)</p>
+          <input value={(d.linkPedido as string) ?? ""} onChange={e => set("linkPedido", e.target.value)} onBlur={() => {
+            try {
+              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ linkPedido: d.linkPedido }) });
+            } catch {}
+          }} placeholder="Ej: +56912345678 o https://tupedido.com" style={{ width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} />
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", marginTop: "6px", lineHeight: 1.4 }}>Puede ser tu número de WhatsApp o tu web de pedidos. Los clientes verán un botón para contactarte directamente.</p>
+        </div>
+      </div>
 
       <div style={{ padding: "24px 0 40px" }}>
         <button

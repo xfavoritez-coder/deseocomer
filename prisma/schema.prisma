@@ -65,6 +65,10 @@ model Local {
   galeria       Json?
   tags          String[] @default([])
   tieneMenu     Boolean  @default(false)
+  tieneDelivery     Boolean  @default(false)
+  comunasDelivery   String[] @default([])
+  tieneRetiro       Boolean  @default(false)
+  linkPedido        String?  @default("")
   resetToken        String?
   resetTokenExpira  DateTime?
   nombreEncargado               String   @default("")
@@ -149,6 +153,7 @@ model Concurso {
   premioExpiradoAt    DateTime?
   disputaAt           DateTime?
   ganadorDescartadoRazon String?
+  modalidadPremio   String[] @default([])
 
   createdAt         DateTime @default(now())
 
