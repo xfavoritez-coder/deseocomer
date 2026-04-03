@@ -20,11 +20,18 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  // Load fonts directly from Google Fonts
-  const [cinzelBold, latoBold] = await Promise.all([
-    fetch("https://fonts.gstatic.com/s/cinzel/v23/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnTYrvDE5ZdqU.woff2").then((r) => r.arrayBuffer()),
-    fetch("https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2").then((r) => r.arrayBuffer()),
-  ]);
+  // Load fonts from Google Fonts (ttf for broad compat)
+  let cinzelBold: ArrayBuffer;
+  let latoBold: ArrayBuffer;
+  try {
+    [cinzelBold, latoBold] = await Promise.all([
+      fetch("https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgTYo.ttf").then((r) => { if (!r.ok) throw new Error(`Cinzel font: ${r.status}`); return r.arrayBuffer(); }),
+      fetch("https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2").then((r) => { if (!r.ok) throw new Error(`Lato font: ${r.status}`); return r.arrayBuffer(); }),
+    ]);
+  } catch (fontErr) {
+    console.error("[story-image] Font load error:", fontErr);
+    return new Response("Font load failed", { status: 500 });
+  }
 
   const fonts = [
     { name: "Cinzel", data: cinzelBold, weight: 700 as const },
