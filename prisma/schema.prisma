@@ -29,6 +29,11 @@ model Usuario {
   resetToken          String?
   resetTokenExpira    DateTime?
   ipRegistro          String    @default("")
+  codigoRef                     String   @default("")
+  totalPuntosHistoricos         Int      @default(0)
+  totalConcursosParticipados    Int      @default(0)
+  totalConcursosGanados         Int      @default(0)
+  mejorPosicion                 Int?
   primerApoyoNotificado Boolean  @default(false)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
@@ -42,6 +47,7 @@ model Usuario {
   ganadorActualDe Concurso[] @relation("GanadorActual")
   mensajesVistos  MensajeVisto[]
   toastsDismissed ToastDismissed[]
+  notificaciones  Notificacion[]
 }
 
 model Local {
@@ -184,6 +190,11 @@ model ParticipanteConcurso {
   referidorNivel2Id     String?
   puntosNivel2          Int      @default(0)
   puntosNivel2Pendientes Int     @default(0)
+  esMadrugador              Boolean  @default(false)
+  puntosMadrugador          Int      @default(0)
+  puntosReferidosNuevos     Int      @default(0)
+  puntosReferidosExistentes Int      @default(0)
+  codigoInvitacion          String?
   puntos           Int      @default(1)
   puntosPendientes Int      @default(0)
   estado           String   @default("activo")
@@ -332,4 +343,15 @@ model ToastDismissed {
   usuario   Usuario  @relation(fields: [usuarioId], references: [id])
 
   @@unique([usuarioId, toastId])
+}
+
+model Notificacion {
+  id          String   @id @default(cuid())
+  usuarioId   String
+  tipo        String
+  mensaje     String
+  datos       Json?
+  leida       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
 }

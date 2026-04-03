@@ -36,10 +36,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
-    // Create participation (+1 por unirse)
-    const participante = await prisma.participanteConcurso.create({
-      data: { concursoId: concurso.id, usuarioId, referidoPor, puntos: 1, referidorDirectoId, referidorNivel2Id },
+    // Bonus madrugador: primeros 10 participantes
+    const totalParticipantes = await prisma.participanteConcurso.count({
+      where: { concursoId: concurso.id }
     });
+    const esMadrugador = totalParticipantes < 10;
+
+    // Create participation (+1 por unirse, +2 bonus madrugador si aplica)
+    const participante = await prisma.participanteConcurso.create({
+      data: {
+        concursoId: concurso.id, usuarioId, referidoPor, puntos: esMadrugador ? 3 : 1,
+        referidorDirectoId, referidorNivel2Id,
+        esMadrugador, puntosMadrugador: esMadrugador ? 2 : 0,
+      },
+    });
+
+    // Notificación madrugador
+    if (esMadrugador) {
+      prisma.notificacion.create({
+        data: { usuarioId, tipo: "madrugador", mensaje: "¡Entraste entre los primeros 10! +2 pts bonus ⚡" }
+      }).catch(() => {});
+    }
+
+    // Incrementar totalConcursosParticipados
+    prisma.usuario.update({
+      where: { id: usuarioId },
+      data: { totalConcursosParticipados: { increment: 1 } }
+    }).catch(() => {});
 
     // Email al local: primer participante (una sola vez por cuenta de local)
     try {
@@ -64,20 +87,41 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       console.error("[Email primer participante] Error:", emailErr);
     }
 
-    // Guardar +2 como PENDIENTES al referidor (se acreditan cuando el referido verifica email)
+    // Referral points: +3 si referido es nuevo (< 7 días), +2 si existente
     if (referidoPor) {
       const refParticipante = await prisma.participanteConcurso.findUnique({
         where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
       });
       if (refParticipante) {
+        // Determine if referido is new (registered < 7 days ago) or existing
+        const referidoUser = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { createdAt: true } });
+        const esNuevo = referidoUser && (Date.now() - new Date(referidoUser.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+        const puntosRef = esNuevo ? 3 : 2;
+
+        // Always add as pending (accrued when referido verifies email)
         await prisma.participanteConcurso.update({
           where: { id: refParticipante.id },
-          data: { puntosPendientes: { increment: 2 } },
+          data: {
+            puntosPendientes: { increment: puntosRef },
+            ...(esNuevo ? { puntosReferidosNuevos: { increment: puntosRef } } : { puntosReferidosExistentes: { increment: puntosRef } }),
+          },
         });
+
+        // Notification
+        const refNombre = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
+        prisma.notificacion.create({
+          data: {
+            usuarioId: referidoPor,
+            tipo: esNuevo ? "referido_nuevo" : "referido_existente",
+            mensaje: esNuevo
+              ? `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} se registró con tu link. +${puntosRef} pts para ti 🎉`
+              : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código. +${puntosRef} pts 👏`,
+          }
+        }).catch(() => {});
       }
     }
 
-    return NextResponse.json(participante, { status: 201 });
+    return NextResponse.json({ ...participante, esMadrugador, totalParticipantes: totalParticipantes + 1 }, { status: 201 });
   } catch (error) {
     console.error("[API /concursos/[id]/participar]", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

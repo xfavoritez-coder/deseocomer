@@ -11,6 +11,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         puntos: true,
         puntosNivel2: true,
         puntosNivel2Pendientes: true,
+        puntosMadrugador: true,
+        puntosReferidosNuevos: true,
+        puntosReferidosExistentes: true,
       },
     });
     return NextResponse.json(participaciones.map(p => ({
@@ -18,6 +21,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       puntos: p.puntos,
       puntosNivel2: p.puntosNivel2 ?? 0,
       puntosNivel2Pendientes: p.puntosNivel2Pendientes ?? 0,
+      puntosMadrugador: p.puntosMadrugador ?? 0,
+      puntosReferidosNuevos: p.puntosReferidosNuevos ?? 0,
+      puntosReferidosExistentes: p.puntosReferidosExistentes ?? 0,
     })));
   } catch {
     return NextResponse.json([]);

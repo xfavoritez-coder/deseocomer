@@ -221,6 +221,9 @@ interface ParticipacionAPI {
   puntos: number;
   puntosNivel2: number;
   puntosNivel2Pendientes: number;
+  puntosMadrugador: number;
+  puntosReferidosNuevos: number;
+  puntosReferidosExistentes: number;
 }
 
 function TabConcursos({ userId, userName }: { userId: string; userName: string }) {
@@ -230,6 +233,7 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
   const [ganados, setGanados] = useState<any[]>([]);
   const [ganadosLoading, setGanadosLoading] = useState(true);
   const [participacionesAPI, setParticipacionesAPI] = useState<ParticipacionAPI[]>([]);
+  const [expandedConcurso, setExpandedConcurso] = useState<string | null>(null);
 
   useEffect(() => { setRefCounts(getAllRefCounts(userId)); }, [userId]);
 
@@ -270,6 +274,22 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {/* Stats grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+        {[
+          { label: "Concursos", value: participacionesAPI.length, icon: "🏆" },
+          { label: "Ganados", value: ganados.length, icon: "👑" },
+          { label: "Mejor posición", value: (() => { const pts = participacionesAPI.map(p => p.puntos).filter(Boolean); return pts.length > 0 ? Math.max(...pts) + " pts" : "—"; })(), icon: "📊" },
+          { label: "Puntos históricos", value: participacionesAPI.reduce((acc, p) => acc + (p.puntos ?? 0), 0), icon: "✨" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 14, padding: 16, textAlign: "center" }}>
+            <p style={{ fontSize: "1.2rem", marginBottom: 4 }}>{s.icon}</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.4rem", color: "var(--accent)", fontWeight: 700 }}>{s.value}</p>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 4 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
       {/* Concursos ganados */}
       {!ganadosLoading && ganados.length > 0 && (
         <div>
@@ -318,9 +338,9 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
               const registro = 1;
               const referidosDirectos = Math.max(0, totalPts - registro - nivel2);
               return (
-                <div key={concursoId} style={{
+                <div key={concursoId} onClick={() => setExpandedConcurso(prev => prev === String(concursoId) ? null : String(concursoId))} style={{
                   background: "var(--bg-secondary)", border: "1px solid var(--border-color)",
-                  borderRadius: "16px", padding: "18px 20px",
+                  borderRadius: "16px", padding: "18px 20px", cursor: "pointer",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
                     <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
@@ -376,6 +396,16 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
                       )}
                     </div>
                   </div>
+                  {expandedConcurso === String(concursoId) && (
+                    <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(232,168,76,0.08)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.8 }}>
+                      <p>• Registro: +1</p>
+                      {(apiData?.puntosMadrugador ?? 0) > 0 && <p>• Bonus madrugador: +{apiData!.puntosMadrugador}</p>}
+                      {(apiData?.puntosReferidosNuevos ?? 0) > 0 && <p>• Referidos nuevos: +{apiData!.puntosReferidosNuevos}</p>}
+                      {(apiData?.puntosReferidosExistentes ?? 0) > 0 && <p>• Referidos existentes: +{apiData!.puntosReferidosExistentes}</p>}
+                      {nivel2 > 0 && <p>• Red de referidos: +{nivel2}</p>}
+                      <p style={{ color: "var(--accent)", fontWeight: 700, marginTop: 4 }}>Total: +{totalPts} pts</p>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -653,6 +683,17 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "480px" }}>
+      {/* Código de invitación */}
+      {user?.id && (
+        <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: 8 }}>Tu código de invitación</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", flex: 1 }}>{(user as any).codigoRef || "—"}</span>
+            <button onClick={() => { navigator.clipboard.writeText((user as any).codigoRef || ""); }} style={{ padding: "6px 14px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Copiar</button>
+          </div>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginTop: 8, lineHeight: 1.5 }}>Comparte este código con amigos para ganar puntos cuando participen en concursos</p>
+        </div>
+      )}
       <div>
         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: 6 }}>Foto de perfil</span>
         <SubirFoto folder="perfiles" circular preview={fotoUrl || null} label="Subir foto" height="80px" onUpload={handleFotoUpload} />

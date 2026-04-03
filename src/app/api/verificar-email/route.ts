@@ -46,10 +46,10 @@ export async function GET(req: NextRequest) {
       const refPart = await prisma.participanteConcurso.findUnique({
         where: { concursoId_usuarioId: { concursoId: mp.concursoId, usuarioId: mp.referidorDirectoId } },
       });
-      if (refPart && refPart.puntosPendientes >= 2) {
+      if (refPart && refPart.puntosPendientes > 0) {
         await prisma.participanteConcurso.update({
           where: { id: refPart.id },
-          data: { puntos: { increment: 2 }, puntosPendientes: { decrement: 2 } },
+          data: { puntos: { increment: refPart.puntosPendientes }, puntosPendientes: 0 },
         });
       }
     }

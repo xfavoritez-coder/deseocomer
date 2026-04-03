@@ -194,6 +194,33 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         },
       });
 
+      // Update winner stats
+      await prisma.usuario.update({
+        where: { id: p1.usuario.id },
+        data: { totalConcursosGanados: { increment: 1 } }
+      }).catch(() => {});
+
+      // Update stats for top 20 participants
+      const allParticipants = await prisma.participanteConcurso.findMany({
+        where: { concursoId: c.id, estado: { not: "descalificado" } },
+        orderBy: { puntos: "desc" },
+        select: { usuarioId: true, puntos: true },
+      });
+      for (let i = 0; i < Math.min(allParticipants.length, 20); i++) {
+        const p = allParticipants[i];
+        const posicion = i + 1;
+        try {
+          const usr = await prisma.usuario.findUnique({ where: { id: p.usuarioId }, select: { mejorPosicion: true } });
+          await prisma.usuario.update({
+            where: { id: p.usuarioId },
+            data: {
+              totalPuntosHistoricos: { increment: p.puntos },
+              ...(!usr?.mejorPosicion || posicion < usr.mejorPosicion ? { mejorPosicion: posicion } : {}),
+            },
+          });
+        } catch {}
+      }
+
       if (esSospechoso) {
         log.push(`[EN_REVISION] ${c.id} - ganador sospechoso: ${p1.usuario.email}`);
         continue;

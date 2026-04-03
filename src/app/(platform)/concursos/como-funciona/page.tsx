@@ -59,9 +59,12 @@ export default function ComoFuncionaPage() {
 
           <div className="cf-puntos">
             {[
-              { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al unirte por primera vez a un concurso", highlight: false },
-              { icon: "👥", pts: "+2", color: "#e8a84c", label: "Por cada amigo que se registra con tu link", highlight: true },
-              { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Cuando otro participante te apoya (1 vez al día por persona)", highlight: false },
+              { icon: "🆕", pts: "+3", color: "#e8a84c", label: "Traes a alguien nuevo a DeseoComer", highlight: true },
+              { icon: "👥", pts: "+2", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
+              { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
+              { icon: "🔗", pts: "+1", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
+              { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
+              { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Al apoyar a otro participante", highlight: false },
             ].map((p, i) => (
               <div key={i} style={{ background: p.highlight ? "rgba(232,168,76,0.07)" : "rgba(255,255,255,0.03)", border: p.highlight ? "1px solid rgba(232,168,76,0.3)" : "0.5px solid rgba(232,168,76,0.1)", borderRadius: "16px", padding: "clamp(16px,3vw,28px) clamp(12px,2vw,20px)", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "12px" }}>{p.icon}</div>
@@ -77,12 +80,23 @@ export default function ComoFuncionaPage() {
             <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
-                Invitas a María → <strong style={{ color: "#3db89e" }}>+2 puntos</strong> para ti<br/>
-                María invita a Juan → +2 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong><br/>
-                María invita a Pedro → +2 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong>
+                Invitas a María (nueva en DC) → <strong style={{ color: "#3db89e" }}>+3 puntos</strong> para ti<br/>
+                Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+2 puntos</strong> para ti<br/>
+                María invita a Juan → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong><br/>
+                María invita a Ana → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong>
               </p>
             </div>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>Límite: puedes acumular hasta 10 puntos extra por los referidos de tus referidos en cada concurso.</p>
+          </div>
+
+          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Bonus madrugador ⚡</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Los primeros 10 participantes de cada concurso reciben +2 puntos extra automáticamente. ¡Entra rápido cuando se publique un concurso nuevo!</p>
+          </div>
+
+          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Trae amigos que ya están en DeseoComer</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Si tienes amigos que ya están registrados, puedes invitarlos a participar en cada concurso. Comparte tu link o código personal y gana +2 puntos por cada uno que participe. Tu código aparece en la página de cada concurso cuando estás participando.</p>
           </div>
 
         </section>
@@ -130,7 +144,7 @@ export default function ComoFuncionaPage() {
               { q: "¿Cómo sé que el concurso es real?", a: "Todos los locales en DeseoComer están verificados. Puedes ver el historial completo de ganadores anteriores con nombre y fecha." },
               { q: "¿Puedo participar en más de un concurso?", a: "Sí, puedes participar en todos los concursos activos al mismo tiempo con la misma cuenta." },
               { q: "¿Qué pasa si gano?", a: "Te contactamos por email dentro de las 24 horas siguientes al cierre del concurso para coordinar cómo retirar tu premio." },
-              { q: "¿Los referidos deben ser cuentas nuevas?", a: "Sí, solo cuentan registros nuevos con email verificado. No funciona con cuentas existentes ni cuentas falsas." },
+              { q: "¿Los referidos deben ser cuentas nuevas?", a: "No necesariamente. Si traes a alguien nuevo a DeseoComer ganas +3 puntos, y si invitas a un amigo que ya tiene cuenta ganas +2 puntos. En ambos casos deben usar tu link o código." },
               { q: "¿Cada cuánto puedo apoyar a un participante?", a: "Puedes darle +1 punto a cada participante una vez al día. Al día siguiente puedes volver a apoyarlo." },
               { q: "¿El premio es canjeable por efectivo?", a: "No. El premio es el producto o servicio indicado en el concurso, no es canjeable por dinero." },
             ].map((faq, i) => (
@@ -186,7 +200,8 @@ export default function ComoFuncionaPage() {
         .cf-paso-item { display: flex; flex-direction: row; align-items: flex-start; gap: 16px; padding: 20px 0; border-bottom: 1px solid rgba(232,168,76,0.06); }
         .cf-paso-item > div:first-child { margin: 0; flex-shrink: 0; }
         .cf-paso-item p { text-align: left !important; }
-        .cf-puntos { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 2vw, 20px); max-width: 680px; margin: 0 auto; }
+        .cf-puntos { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(8px, 2vw, 20px); max-width: 680px; margin: 0 auto; }
+        @media (min-width: 640px) { .cf-puntos { grid-template-columns: repeat(3, 1fr); } }
         .cf-premios { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 2vw, 20px); }
         @media (min-width: 768px) {
           .cf-pasos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 100%; align-items: start; }

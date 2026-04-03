@@ -5,6 +5,16 @@ import bcrypt from "bcryptjs";
 import * as crypto from "crypto";
 import disposableDomains from "disposable-email-domains";
 
+async function generarCodigoRef(nombre: string): Promise<string> {
+  const base = nombre.replace(/\s/g, '').slice(0, 4).toUpperCase().replace(/[^A-Z]/g, 'X');
+  for (let i = 0; i < 10; i++) {
+    const codigo = base + Math.floor(Math.random() * 900 + 100);
+    const existe = await prisma.usuario.findFirst({ where: { codigoRef: codigo } });
+    if (!existe) return codigo;
+  }
+  return base + Date.now().toString().slice(-4);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { nombre, email, password, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, estiloAlimentario, comidasFavoritas } = await req.json();
@@ -47,9 +57,10 @@ export async function POST(req: NextRequest) {
 
     const hash = await bcrypt.hash(password, 10);
     const tokenVerificacion = crypto.randomBytes(32).toString("hex");
+    const codigoRef = await generarCodigoRef(nombre);
 
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip, ...(estiloAlimentario && { estiloAlimentario }), ...(comidasFavoritas?.length && { comidasFavoritas }) },
+      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip, codigoRef, ...(estiloAlimentario && { estiloAlimentario }), ...(comidasFavoritas?.length && { comidasFavoritas }) },
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;

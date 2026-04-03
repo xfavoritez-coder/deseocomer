@@ -151,6 +151,10 @@ export default function ConcursosSection() {
                   </div>
                   {/* Premio */}
                   <div className="dc-cst-premio" style={{ fontFamily: "var(--font-cinzel)", color: "#f5d080", textTransform: "uppercase", marginBottom: "14px", lineHeight: 1.15, fontWeight: 700, letterSpacing: "0.03em", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}><span style={{ fontSize: 16 }}>🏆 </span>{c.premio}</div>
+                  {/* Badge madrugador */}
+                  {c.participantes < 10 && !ended && (
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 8 }}>⚡ +2 pts bonus primeros 10</span>
+                  )}
                   {/* Descripcion - desktop only */}
                   <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.descripcion || "Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes."}</p>
 

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -17,7 +17,12 @@ export default function Navbar() {
   const [mounted,   setMounted]   = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const [localSession, setLocalSession] = useState<{ id: string; slug?: string; nombre: string; logoUrl?: string } | null>(null);
+  const [notifCount, setNotifCount] = useState(0);
+  const [showNotifs, setShowNotifs] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [notifs, setNotifs] = useState<any[]>([]);
   const { user, isAuthenticated, logout } = useAuth();
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -61,6 +66,23 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    fetch(`/api/notificaciones?userId=${user.id}`)
+      .then(r => r.json())
+      .then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); })
+      .catch(() => {});
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!showNotifs) return;
+    const handleClick = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifs(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showNotifs]);
+
   const initials = user?.nombre
     ? user.nombre.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
     : "?";
@@ -96,6 +118,30 @@ export default function Navbar() {
               </div>
             ) : isAuthenticated && user ? (
               <div className="dc-nav-user">
+                <div ref={notifRef} style={{ position: "relative" }}>
+                  <button onClick={() => setShowNotifs(!showNotifs)} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
+                    <span style={{ fontSize: "1.1rem" }}>🔔</span>
+                    {notifCount > 0 && (
+                      <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
+                    )}
+                  </button>
+                  {showNotifs && (
+                    <div style={{ position: "absolute", top: "100%", right: 0, width: 300, maxHeight: 320, overflowY: "auto", background: "rgba(10,8,18,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 1000 }}>
+                      <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Notificaciones</span>
+                        {notifCount > 0 && <button onClick={async () => { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }); setNotifCount(0); setNotifs(n => n.map(x => ({ ...x, leida: true }))); }} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Marcar todas</button>}
+                      </div>
+                      {notifs.length === 0 ? (
+                        <p style={{ padding: 20, textAlign: "center", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)" }}>Sin notificaciones</p>
+                      ) : notifs.slice(0, 8).map(n => (
+                        <div key={n.id} onClick={async () => { if (!n.leida) { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacionId: n.id }) }); setNotifCount(c => Math.max(0, c - 1)); setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, leida: true } : x)); } setShowNotifs(false); }} style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.06)", cursor: "pointer", background: n.leida ? "transparent" : "rgba(232,168,76,0.04)" }}>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <Link href="/perfil" className="dc-nav-avatar" title={user.nombre} style={{ textDecoration: "none" }}>{initials}</Link>
                 <Link href="/perfil" className="dc-nav-username" style={{ textDecoration: "none" }}>{displayName}</Link>
                 <button onClick={logout} className="dc-nav-logout">Salir</button>

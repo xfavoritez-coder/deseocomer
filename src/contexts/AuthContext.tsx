@@ -16,6 +16,7 @@ export interface AuthUser {
   comuna?: string;
   cumpleDia?: number | null;
   cumpleMes?: number | null;
+  codigoRef?: string;
 }
 
 export interface RegisterUserData {
@@ -91,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             type: session.tipo === "local" ? "local" : "user",
             cumpleDia: session.cumpleDia ?? null,
             cumpleMes: session.cumpleMes ?? null,
+            codigoRef: session.codigoRef ?? "",
           });
         }
       }
@@ -123,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         type: "user",
         cumpleDia: data.data.cumpleDia ?? null,
         cumpleMes: data.data.cumpleMes ?? null,
+        codigoRef: data.data.codigoRef ?? "",
       };
 
       // Cerrar sesión de local si existe
@@ -140,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loggedIn: true,
         cumpleDia: data.data.cumpleDia ?? null,
         cumpleMes: data.data.cumpleMes ?? null,
+        codigoRef: data.data.codigoRef ?? "",
       }));
 
       // Sync birthday from BD to localStorage

@@ -116,6 +116,8 @@ function ConcursoDetallePage() {
 
   const concurso = concursoData;
   const [copied, setCopied] = useState(false);
+  const [superadoToast, setSuperadoToast] = useState("");
+  const [myPrevPos, setMyPrevPos] = useState<number | null>(null);
   const [refToast, setRefToast] = useState(false);
   const [newRefToast, setNewRefToast] = useState(false);
   const [newRefCount, setNewRefCount] = useState(0);
@@ -132,6 +134,10 @@ function ConcursoDetallePage() {
   const [phoneInput, setPhoneInput] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [phoneSaving, setPhoneSaving] = useState(false);
+  const [showCodigoModal, setShowCodigoModal] = useState(false);
+  const [codigoInput, setCodigoInput] = useState("");
+  const [codigoValidacion, setCodigoValidacion] = useState<{ existe: boolean; nombre?: string } | null>(null);
+  const [validandoCodigo, setValidandoCodigo] = useState(false);
   const refProcessed = useRef(false);
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
@@ -177,10 +183,25 @@ function ConcursoDetallePage() {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
           setIsParticipating(!!me);
+          // Check if user was surpassed
+          if (isAuthenticated) {
+            const myNewIdx = newRanking.findIndex((r: { usuarioId?: string }) => r.usuarioId === user.id);
+            if (myNewIdx >= 0) {
+              const newPos = myNewIdx + 1;
+              setMyPrevPos(prev => {
+                if (prev !== null && newPos > prev) {
+                  const quienMeSuperó = newRanking[prev - 1]?.nombre?.split(/\s+/)[0] ?? "Alguien";
+                  setSuperadoToast(`¡${quienMeSuperó} te superó! Ahora estás #${newPos}`);
+                  setTimeout(() => setSuperadoToast(""), 5000);
+                }
+                return newPos;
+              });
+            }
+          }
         }
       }
     }).catch(() => {});
-  }, [slug, user]);
+  }, [slug, user, isAuthenticated]);
 
   useEffect(() => { refreshRanking(); const iid = setInterval(refreshRanking, 30_000); return () => clearInterval(iid); }, [refreshRanking]);
   useEffect(() => { if (user) setMyRefs(getRefCount(concursoId, user.id)); }, [user, concursoId]);
@@ -265,13 +286,14 @@ function ConcursoDetallePage() {
     }
     refreshRanking();
   };
-  const doJoin = async () => {
+  const doJoin = async (refOverride?: string) => {
     if (!user || joinLoading) return;
     setJoinLoading(true);
     try {
+      const ref = refOverride || refUserId || refCodeRaw || undefined;
       await fetch(`/api/concursos/${slug}/participar`, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId: user.id }),
+        body: JSON.stringify({ usuarioId: user.id, ...(ref ? { referidoPor: ref } : {}) }),
       });
       setIsParticipating(true);
       addInteraccion("concurso_participado", { id: String(concursoId || ""), localId: c?.localId || "" });
@@ -279,11 +301,29 @@ function ConcursoDetallePage() {
     } catch {} finally { setJoinLoading(false); }
   };
 
+  const doJoinWithCode = async (codigoRef?: string) => {
+    setShowCodigoModal(false);
+    let ref = refUserId || refCodeRaw || "";
+    if (codigoRef) {
+      try {
+        const r = await fetch(`/api/usuarios/codigo/${encodeURIComponent(codigoRef)}`);
+        const d = await r.json();
+        if (d.existe && d.id) ref = d.id;
+      } catch {}
+    }
+    doJoin(ref || undefined);
+  };
+
   const handleJoin = async () => {
     if (!user) return;
     // Check if user has phone number
     if (!user.telefono) {
       setShowPhoneModal(true);
+      return;
+    }
+    // If no ref in URL, show code modal
+    if (!refUserId && !refCodeRaw) {
+      setShowCodigoModal(true);
       return;
     }
     doJoin();
@@ -437,6 +477,7 @@ function ConcursoDetallePage() {
       {/* Toasts */}
       {refToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>🎉 ¡Ya estás participando! Le diste 2 puntos a {refNameFromUrl || "tu amigo"} y ganaste 1.</div>}
       {newRefToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "linear-gradient(135deg, #e8a84c, #f5c97a)", color: "#1a1008", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(232,168,76,0.45)", animation: "dc-slideUp 0.3s ease", whiteSpace: "nowrap" }}>🎉 ¡Nuevo referido! Ya tienes {newRefCount}.</div>}
+      {superadoToast && <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 200, background: "rgba(255,100,80,0.95)", color: "#fff", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", padding: "14px 28px", borderRadius: 30, boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap", animation: "dc-slideUp 0.3s ease" }}>{superadoToast}</div>}
 
       {/* Referral modal */}
       {hasRefLink && !isAuthenticated && !refBannerDismissed && !authLoading && (() => {
@@ -518,6 +559,26 @@ function ConcursoDetallePage() {
             </div>
           )}
 
+          {/* Bonus madrugador */}
+          {!isEnded && (() => {
+            const totalParts = c.participantes ?? 0;
+            const madrugadoresRestantes = Math.max(0, 10 - totalParts);
+            if (madrugadoresRestantes > 0) return (
+              <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(232,168,76,0.06))", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 14, padding: "14px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12, marginTop: 20 }}>
+                <span style={{ fontSize: 24, flexShrink: 0 }}>⚡</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", margin: 0 }}>Bonus madrugador</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", margin: "3px 0" }}>Los primeros 10 en participar reciben +2 puntos extra</p>
+                  <div style={{ background: "rgba(10,8,18,0.5)", borderRadius: 20, height: 6, overflow: "hidden", marginTop: 6 }}>
+                    <div style={{ background: "linear-gradient(to right, #e8a84c, #f5d080)", width: `${(totalParts / 10) * 100}%`, height: "100%", borderRadius: 20, transition: "width 0.3s" }} />
+                  </div>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(232,168,76,0.6)", marginTop: 4 }}>{madrugadoresRestantes} lugares restantes con bonus</p>
+                </div>
+              </div>
+            );
+            return <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)", textAlign: "center", marginBottom: 8, marginTop: 20 }}>⚡ Bonus madrugador agotado · 10/10 tomados</p>;
+          })()}
+
           {/* 3. Countdown */}
           {!isEnded && timer && (
             <div style={{ marginTop: 20 }}>
@@ -559,6 +620,16 @@ function ConcursoDetallePage() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
                     Compartir por WhatsApp
                   </button>
+                  {/* Código personal */}
+                  {user?.codigoRef && (
+                    <div style={{ marginTop: 12 }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: 6 }}>Tu código de invitación</p>
+                      <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.12em" }}>{user.codigoRef}</span>
+                      </div>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
+                    </div>
+                  )}
                 </div>
               ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
@@ -595,8 +666,15 @@ function ConcursoDetallePage() {
           {!isEnded && (
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido directo" }, { icon: "🔗🔗", pts: "+1", label: "Referidos de tus referidos" }, { icon: "💛", pts: "+1", label: "Al recibir apoyo" }].map(s => (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+                {[
+  { icon: "🎟️", pts: "+1", label: "Al registrarte" },
+  { icon: "🆕", pts: "+3", label: "Referido nuevo en DC" },
+  { icon: "👥", pts: "+2", label: "Amigo ya registrado" },
+  { icon: "⚡", pts: "+2", label: "Bonus madrugador" },
+  { icon: "🔗", pts: "+1", label: "Red de referidos" },
+  { icon: "💛", pts: "+1", label: "Al apoyar" },
+].map(s => (
                   <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
@@ -696,6 +774,31 @@ function ConcursoDetallePage() {
           {rankingBlock}
         </div>
       </div>
+
+      {/* Modal de código de invitación */}
+      {showCodigoModal && (<>
+        <div onClick={() => setShowCodigoModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
+        <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: 24, maxWidth: 340, width: "90vw" }}>
+          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8 }}>¿Alguien te invitó?</h3>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16 }}>Si un amigo te compartió su código o link, ingrésalo aquí. Él ganará puntos por tu participación.</p>
+          <input value={codigoInput} onChange={e => {
+            const val = e.target.value.toUpperCase();
+            setCodigoInput(val);
+            setCodigoValidacion(null);
+            if (val.length >= 5) {
+              setValidandoCodigo(true);
+              fetch(`/api/usuarios/codigo/${encodeURIComponent(val)}`).then(r => r.json()).then(d => setCodigoValidacion(d)).catch(() => setCodigoValidacion({ existe: false })).finally(() => setValidandoCodigo(false));
+            }
+          }} placeholder="Ej: MARI234" style={{ width: "100%", padding: 12, background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: 18, textAlign: "center", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", outline: "none", boxSizing: "border-box" }} />
+          {validandoCodigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Verificando...</p>}
+          {codigoValidacion?.existe && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#3db89e", marginTop: 6 }}>&#10003; Código de {codigoValidacion.nombre}</p>}
+          {codigoValidacion && !codigoValidacion.existe && codigoInput.length >= 5 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", marginTop: 6 }}>Código no encontrado</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+            <button disabled={codigoInput.length > 0 && (!codigoValidacion?.existe)} onClick={() => doJoinWithCode(codigoInput || undefined)} style={{ padding: 12, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", opacity: (codigoInput.length > 0 && !codigoValidacion?.existe) ? 0.5 : 1 }}>{codigoInput && codigoValidacion?.existe ? "Confirmar y participar →" : "Participar →"}</button>
+            {codigoInput.length > 0 && <button onClick={() => { setCodigoInput(""); setCodigoValidacion(null); doJoinWithCode(); }} style={{ padding: 10, background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Participar sin código</button>}
+          </div>
+        </div>
+      </>)}
 
       {/* Modal de teléfono */}
       {showPhoneModal && (<>
