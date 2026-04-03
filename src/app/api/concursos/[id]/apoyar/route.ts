@@ -56,6 +56,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         console.error("[Email primer apoyo]", emailErr);
       });
 
+    // Notification: apoyo recibido
+    const supporterUser = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { nombre: true } });
+    prisma.notificacion.create({
+      data: {
+        usuarioId: targetUsuarioId,
+        tipo: "apoyo_recibido",
+        mensaje: `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón en "${concurso.premio}". +1 pt 💛`,
+      },
+    }).catch(() => {});
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

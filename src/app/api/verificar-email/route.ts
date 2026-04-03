@@ -109,6 +109,18 @@ export async function GET(req: NextRequest) {
               puntosNivel2: { increment: 1 },
             },
           });
+          // Notification: nivel 2 point
+          const concursoData = await prisma.concurso.findUnique({ where: { id: mp.concursoId }, select: { premio: true } });
+          const refDirectoNombre = mp.referidorDirectoId
+            ? await prisma.usuario.findUnique({ where: { id: mp.referidorDirectoId }, select: { nombre: true } })
+            : null;
+          prisma.notificacion.create({
+            data: {
+              usuarioId: mp.referidorNivel2Id!,
+              tipo: "nivel2",
+              mensaje: `La red de ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} te sumó +1 punto en "${concursoData?.premio ?? "un concurso"}" 🧞`,
+            },
+          }).catch(() => {});
         }
       }
     }
