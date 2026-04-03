@@ -32,13 +32,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       // Direct referrals (people this user brought)
       const referidosDirectos = await prisma.participanteConcurso.findMany({
         where: { concursoId: p.concursoId, referidorDirectoId: id },
-        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true } } },
+        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
       });
 
       // Level 2 referrals (people brought by this user's referrals)
       const referidosNivel2 = await prisma.participanteConcurso.findMany({
         where: { concursoId: p.concursoId, referidorNivel2Id: id },
-        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true } } },
+        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
       });
 
       return {
@@ -57,10 +57,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         referidosDirectos: referidosDirectos.map(r => ({
           id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
           verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+          ipRegistro: r.usuario.ipRegistro ?? "",
         })),
         referidosNivel2: referidosNivel2.map(r => ({
           id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
           verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+          ipRegistro: r.usuario.ipRegistro ?? "",
         })),
       };
     }));

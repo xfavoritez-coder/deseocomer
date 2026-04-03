@@ -17,6 +17,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
     if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
+    // Increment view count (fire and forget)
+    prisma.local.update({ where: { id: local.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
     const { password: _, ...safe } = local;
     return NextResponse.json(safe);
   } catch {

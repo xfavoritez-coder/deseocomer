@@ -616,7 +616,7 @@ export default function LocalDetailPage() {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-const bodyStyle: React.CSSProperties = { fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 };
+const bodyStyle: React.CSSProperties = { fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, whiteSpace: "pre-wrap" };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

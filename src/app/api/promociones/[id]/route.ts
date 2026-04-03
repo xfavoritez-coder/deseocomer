@@ -7,10 +7,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const promocion = await prisma.promocion.findUnique({
       where: { id },
       include: {
-        local: { select: { id: true, nombre: true, comuna: true, categoria: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true } },
+        local: { select: { id: true, slug: true, nombre: true, comuna: true, categoria: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true, direccion: true, linkPedido: true } },
       },
     });
     if (!promocion) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+    // Increment view count (fire and forget)
+    prisma.promocion.update({ where: { id }, data: { vistas: { increment: 1 } } }).catch(() => {});
     return NextResponse.json(promocion);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

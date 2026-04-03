@@ -8,7 +8,7 @@ interface PromoDB { id: string; localId: string; tipo: string; titulo: string; d
 const I: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const B: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, padding: "12px 24px", borderRadius: "12px", border: "none", cursor: "pointer" };
-const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo", "Cumpleaños"];
+const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Combo", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
 const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "", tieneVencimiento: false, fechaVencimiento: "", modalidad: [] as string[] };
@@ -50,7 +50,7 @@ export default function PanelPromociones() {
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: sel ? 700 : 400 });
 
-  const canPublish = form.titulo.trim() && form.tipo && form.imagenUrl;
+  const canPublish = form.titulo.trim() && form.tipo && form.imagenUrl && (form.tipo !== "Descuento %" || form.descuento);
 
   const publish = async () => {
     if (!canPublish || saving) return;
@@ -139,7 +139,7 @@ export default function PanelPromociones() {
         <div><label style={L}>Foto de la promoción *</label><SubirFoto folder="promociones" preview={form.imagenUrl || null} label="Subir foto" height="140px" onUpload={url => set("imagenUrl", url)} />{!form.imagenUrl && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff8080", marginTop: "4px" }}>La foto es obligatoria</p>}</div>
         <div><label style={L}>Descripción</label><textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={form.descripcion} onChange={e => set("descripcion", e.target.value)} placeholder="Describe la promoción..." /></div>
         <div><label style={L}>Condiciones (opcional)</label><textarea style={{ ...I, resize: "vertical", minHeight: "50px" }} value={form.condiciones} onChange={e => set("condiciones", e.target.value)} placeholder="Ej: Válido presentando esta pantalla." rows={3} /></div>
-        {form.tipo === "Descuento %" && <div><label style={L}>% de descuento</label><input style={I} value={form.descuento} onChange={e => set("descuento", e.target.value)} placeholder="20" /></div>}
+        {form.tipo === "Descuento %" && <div><label style={L}>% de descuento</label><input style={I} value={form.descuento} onChange={e => set("descuento", e.target.value)} placeholder="20" />{!form.descuento && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff8080", marginTop: "4px" }}>El porcentaje es obligatorio para descuentos</p>}</div>}
         <div>
           <label style={L}>Días de la semana</label>
           <div style={{ display: "flex", gap: "6px" }}>

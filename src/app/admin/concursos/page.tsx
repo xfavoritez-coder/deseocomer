@@ -262,7 +262,7 @@ export default function AdminConcursos() {
       )}
 
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead><tr>{["Premio", "Local", "Participantes", "Inicio", "Fin", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+        <thead><tr>{["Premio", "Local", "Participantes", "Vistas", "Inicio", "Fin", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
         <tbody>
           {concursos.map(c => {
             const ended = new Date(c.fechaFin) <= new Date();
@@ -283,7 +283,7 @@ export default function AdminConcursos() {
                 <td style={TD}>{c.premio}</td>
                 <td style={TD}>{c.local?.nombre ?? "—"}</td>
                 <td style={{ ...TD, textAlign: "center" }}>{c._count?.participantes ?? 0}</td>
-                {/* Badge sospechosos se muestra al abrir detalle */}
+                <td style={{ ...TD, textAlign: "center", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)" }}>{c.vistas ?? 0}</td>
                 <td style={{ ...TD, fontSize: "0.82rem" }}>{new Date(c.fechaInicio ?? c.createdAt).toLocaleDateString("es-CL")}</td>
                 <td style={{ ...TD, fontSize: "0.82rem" }}>{new Date(c.fechaFin).toLocaleDateString("es-CL")}</td>
                 <td style={TD}><span style={{ color, fontSize: "0.82rem", fontWeight: 700 }}>{status}</span></td>

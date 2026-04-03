@@ -78,6 +78,7 @@ model Local {
   registroRapido                Boolean  @default(false)
   verificado                    Boolean  @default(false)
   activo                        Boolean  @default(true)
+  vistas                        Int      @default(0)
   primerParticipanteNotificado  Boolean  @default(false)
   activadoAt                    DateTime?
   recordatorio2d                Boolean  @default(false)
@@ -128,6 +129,7 @@ model Concurso {
   descripcion  String?
   condiciones  String?
   imagenUrl    String?
+  vistas       Int      @default(0)
   fechaInicio  DateTime @default(now())
   fechaFin     DateTime
 
@@ -207,6 +209,7 @@ model Promocion {
   activa              Boolean  @default(true)
   esCumpleanos        Boolean  @default(false)
   imagenUrl           String?
+  vistas              Int      @default(0)
   modalidad           String[] @default([])
   fechaVencimiento    DateTime?
   createdAt           DateTime @default(now())

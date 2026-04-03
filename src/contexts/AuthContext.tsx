@@ -43,6 +43,7 @@ interface AuthResult {
   success: boolean;
   error?: string;
   userId?: string;
+  alertaIP?: boolean;
   codigo?: string;
 }
 
@@ -195,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loggedIn: true,
       }));
 
-      return { success: true, userId: result.id };
+      return { success: true, userId: result.id, alertaIP: result.alertaIP };
     } catch {
       return { success: false, error: "Error de conexión." };
     }

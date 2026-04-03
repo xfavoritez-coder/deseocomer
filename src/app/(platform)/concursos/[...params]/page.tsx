@@ -643,7 +643,7 @@ function ConcursoDetallePage() {
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Descripción del premio</p>
               <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "14px 16px" }}>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.55, margin: 0 }}>{c.descripcionPremio}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.55, margin: 0, whiteSpace: "pre-wrap" }}>{c.descripcionPremio}</p>
               </div>
             </div>
           )}

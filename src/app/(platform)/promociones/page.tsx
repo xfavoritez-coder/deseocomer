@@ -22,7 +22,7 @@ function formatDias(dias: number[]): string {
   if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
   return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", combo: "Combo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   const t = promo.tipo?.toLowerCase() ?? "";
@@ -32,6 +32,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
   if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
   if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
+  if (t === "combo") return { text: "COMBO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }

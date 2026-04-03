@@ -15,6 +15,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
+    // Increment view count (fire and forget)
+    prisma.concurso.update({ where: { id: concurso.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
+
     // Lazy close: if contest ended but still "activo", close it now and send emails
     if (concurso.estado === "activo" && new Date(concurso.fechaFin) <= new Date() && concurso.participantes.length > 0) {
       const crypto = await import("crypto");

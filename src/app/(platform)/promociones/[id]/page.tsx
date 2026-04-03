@@ -26,6 +26,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
   if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
   if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
+  if (t === "combo") return { text: "COMBO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }
@@ -76,6 +77,9 @@ export default function PromocionDetailPage() {
     direccion: dbPromo.local?.direccion,
     telefono: dbPromo.local?.telefono ?? dbPromo.local?.instagram,
     logoUrl: dbPromo.local?.logoUrl,
+    instagram: dbPromo.local?.instagram,
+    linkPedido: dbPromo.local?.linkPedido,
+    localSlug: dbPromo.local?.slug,
   } : null) as Promocion | null;
 
   const { addInteraccion } = useGenie();
@@ -230,7 +234,7 @@ export default function PromocionDetailPage() {
             {/* Descripción */}
             <div className="dc-pd-card">
               <h2 className="dc-pd-card-title">Sobre esta promoción</h2>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "var(--text-primary)", lineHeight: 1.75 }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "var(--text-primary)", lineHeight: 1.75, whiteSpace: "pre-wrap" }}>
                 {promo.descripcion}
               </p>
 
@@ -283,7 +287,7 @@ export default function PromocionDetailPage() {
               <h2 className="dc-pd-card-title">{"\ud83d\udccb"} Condiciones</h2>
               <ul style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
                 {promo.condiciones ? promo.condiciones.split(".").filter(c => c.trim()).map((condicion, i) => (
-                  <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>{condicion.trim()}</li>
+                  <li key={i} style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{condicion.trim()}</li>
                 )) : (
                   <li style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.6 }}>Sujeto a disponibilidad</li>
                 )}
@@ -346,11 +350,11 @@ export default function PromocionDetailPage() {
               </div>
             )}
 
-            {/* Sobre el local */}
+            {/* Ficha del local */}
             {(promo.descripcionLocal || promo.localId) && (
               <div className="dc-pd-card">
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "14px" }}>Publicado por</p>
-                <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: promo.descripcionLocal ? "14px" : 0 }}>
+                <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: "14px" }}>
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(promo as any).logoUrl ? (
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -369,7 +373,56 @@ export default function PromocionDetailPage() {
                 {promo.descripcionLocal && (
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{promo.descripcionLocal}</p>
                 )}
-                <Link href={`/locales/${promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>
+
+                {/* Local info details */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "16px" }}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(promo as any).direccion && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontSize: "0.9rem", flexShrink: 0 }}>{"\ud83d\udccd"}</span>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((promo as any).direccion + (promo.comuna ? ", " + promo.comuna : ""))}`} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", textDecoration: "underline", textDecorationColor: "rgba(240,234,214,0.2)" }}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {(promo as any).direccion}{promo.comuna ? `, ${promo.comuna}` : ""}
+                      </a>
+                    </div>
+                  )}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(promo as any).telefono && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontSize: "0.9rem", flexShrink: 0 }}>{"\ud83d\udcde"}</span>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <a href={`tel:${(promo as any).telefono}`} style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", textDecoration: "none" }}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {(promo as any).telefono}
+                      </a>
+                    </div>
+                  )}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(promo as any).instagram && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span style={{ fontSize: "0.9rem", flexShrink: 0 }}>{"\ud83d\udcf7"}</span>
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      <a href={`https://instagram.com/${(promo as any).instagram.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.7)", textDecoration: "none" }}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        @{(promo as any).instagram.replace(/^@/, "")}
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action buttons */}
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "14px" }}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(promo as any).linkPedido && (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    <a href={(promo as any).linkPedido} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", background: "linear-gradient(135deg, #25D366, #128C7E)", color: "#fff", padding: "10px 20px", borderRadius: "24px", textDecoration: "none", fontWeight: 700 }}>
+                      Pedir / WhatsApp
+                    </a>
+                  )}
+                </div>
+
+                <Link href={`/locales/${(promo as any).localSlug || promo.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none" }}>
                   Ver perfil completo {"\u2192"}
                 </Link>
               </div>

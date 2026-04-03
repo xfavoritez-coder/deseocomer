@@ -29,8 +29,38 @@ function RegistroContent() {
   const [success, setSuccess] = useState(false);
   const [refMsg, setRefMsg] = useState("");
   const [emailBlockedMsg, setEmailBlockedMsg] = useState("");
+  const [emailSugerido, setEmailSugerido] = useState("");
+  const [alertaIPMsg, setAlertaIPMsg] = useState("");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
+
+  function checkEmailTypo(email: string): string {
+    const lower = email.toLowerCase().trim();
+    const corrections: [RegExp, string][] = [
+      [/@gm[ai]{0,2}l\.c[co]m$/i, "@gmail.com"],
+      [/@gmial\.com$/i, "@gmail.com"],
+      [/@gmal\.com$/i, "@gmail.com"],
+      [/@gamil\.com$/i, "@gmail.com"],
+      [/@hotmal\.com$/i, "@hotmail.com"],
+      [/@homail\.com$/i, "@hotmail.com"],
+      [/@outlok\.com$/i, "@outlook.com"],
+      [/@yaho\.com$/i, "@yahoo.com"],
+      [/\.ccom$/i, ""],
+      [/\.comm$/i, ""],
+    ];
+    for (const [pattern, fix] of corrections) {
+      if (pattern.test(lower)) {
+        if (fix) return lower.replace(pattern, fix);
+        return lower.replace(/\.c+om$/i, ".com");
+      }
+    }
+    return "";
+  }
+
+  const handleEmailBlur = () => {
+    const suggested = checkEmailTypo(form.email);
+    setEmailSugerido(suggested);
+  };
 
   const BLOCKED_DOMAINS = ["tempmail.com", "guerrillamail.com", "mailinator.com", "throwaway.email", "yopmail.com", "10minutemail.com", "trashmail.com", "fakeinbox.com", "sharklasers.com", "guerrillamailblock.com", "grr.la", "dispostable.com", "maildrop.cc", "temp-mail.org"];
   const checkDisposableEmail = (email: string) => {
@@ -56,6 +86,7 @@ function RegistroContent() {
     const res = await register({ type: "user", nombre: form.nombre.trim(), email: form.email.trim(), password: form.password, comuna: "" });
     setLoading(false);
     if (res.success) {
+      if (res.alertaIP) setAlertaIPMsg("Detectamos que ya existen cuentas registradas desde tu ubicación. Recuerda que crear múltiples cuentas puede resultar en la descalificación de concursos.");
       const pending = getPendingRef(); let msg = ""; let redirectTo = "/";
       if (pending && res.userId && pending.refCode !== res.userId) {
         const em = form.email.trim().toLowerCase();
@@ -94,7 +125,7 @@ function RegistroContent() {
       <div style={cardS}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}><div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div><p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p></div>
         {success ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}><div style={{ fontSize: "2rem", marginBottom: "12px" }}>✨</div><h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "8px" }}>¡Bienvenido/a!</h2><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>{refMsg || "Tu cuenta ha sido creada. Redirigiendo..."}</p></div>
+          <div style={{ textAlign: "center", padding: "20px 0" }}><div style={{ fontSize: "2rem", marginBottom: "12px" }}>✨</div><h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "8px" }}>¡Bienvenido/a!</h2><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>{refMsg || "Tu cuenta ha sido creada. Redirigiendo..."}</p>{alertaIPMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#e8a84c", marginTop: "12px", lineHeight: 1.5, opacity: 0.85 }}>{alertaIPMsg}</p>}</div>
         ) : (
           <>
             <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Crea tu cuenta</h1>
@@ -102,7 +133,11 @@ function RegistroContent() {
             {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div><label style={labelS}>Nombre completo</label><input style={inputS} type="text" placeholder="Nombre y apellido" value={form.nombre} onChange={e => set("nombre", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-              <div><label style={labelS}>Email</label><input style={inputS} type="email" placeholder="tu@email.com" value={form.email} onChange={e => { set("email", e.target.value); setEmailBlockedMsg(""); }} onFocus={fi} onBlur={fo} />{emailBlockedMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "#e05555", marginTop: "6px", lineHeight: 1.4 }}>{emailBlockedMsg}</p>}</div>
+              <div><label style={labelS}>Email</label><input style={inputS} type="email" placeholder="tu@email.com" value={form.email} onChange={e => { set("email", e.target.value); setEmailBlockedMsg(""); setEmailSugerido(""); }} onFocus={fi} onBlur={e => { fo(e); handleEmailBlur(); }} />{emailSugerido && (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#e8a84c", marginTop: "4px" }}>
+                    ¿Quisiste decir <button onClick={() => { setForm(f => ({ ...f, email: emailSugerido })); setEmailSugerido(""); }} style={{ background: "none", border: "none", color: "#3db89e", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: "pointer", textDecoration: "underline", padding: 0 }}>{emailSugerido}</button>?
+                  </p>
+                )}{emailBlockedMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "#e05555", marginTop: "6px", lineHeight: 1.4 }}>{emailBlockedMsg}</p>}</div>
               <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><OjoIcon visible={showPw} /></button></div></div>
               <div><label style={labelS}>Confirmar</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showConf ? "text" : "password"} placeholder="Repite contraseña" value={form.confirm} onChange={e => set("confirm", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowConf(s => !s)} style={eyeS}><OjoIcon visible={showConf} /></button></div></div>
               <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}><input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px", marginTop: "2px", flexShrink: 0 }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>Acepto los <a href="/terminos" style={{ color: "var(--accent)", textDecoration: "none" }}>Términos</a> y <a href="/privacidad" style={{ color: "var(--accent)", textDecoration: "none" }}>Privacidad</a></span></label>

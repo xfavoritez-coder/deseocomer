@@ -68,7 +68,14 @@ export async function POST(req: NextRequest) {
     // Link to lista espera comunas if exists
     try { await prisma.listaEsperaComuna.updateMany({ where: { email }, data: { usuarioId: usuario.id } }); } catch {}
 
-    return NextResponse.json(usuarioSinPassword, { status: 201 });
+    // Check for multiple accounts with same IP
+    let alertaIP = false;
+    if (ip && ip !== "unknown") {
+      const cuentasMismaIP = await prisma.usuario.count({ where: { ipRegistro: ip } });
+      if (cuentasMismaIP >= 2) alertaIP = true;
+    }
+
+    return NextResponse.json({ ...usuarioSinPassword, alertaIP }, { status: 201 });
   } catch (error) {
     console.error("[API /usuarios] Error:", error);
     const msg = error instanceof Error ? error.message : "Error desconocido";

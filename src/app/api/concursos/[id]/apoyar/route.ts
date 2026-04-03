@@ -33,10 +33,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { puntos: { increment: 1 } },
     });
 
-    // Email primer apoyo recibido (una sola vez por usuario)
-    try {
-      const targetUser = await prisma.usuario.findUnique({ where: { id: targetUsuarioId }, select: { nombre: true, email: true, primerApoyoNotificado: true } });
-      if (targetUser && !targetUser.primerApoyoNotificado) {
+    // Email primer apoyo recibido (una sola vez por usuario, fire-and-forget)
+    // Set flag FIRST to prevent duplicate sends from rapid clicks,
+    // then send email without awaiting to avoid blocking the response.
+    prisma.usuario.findUnique({ where: { id: targetUsuarioId }, select: { nombre: true, email: true, primerApoyoNotificado: true } })
+      .then(async (targetUser) => {
+        if (!targetUser || targetUser.primerApoyoNotificado) return;
+        // Set flag immediately to prevent race conditions from rapid clicks
+        await prisma.usuario.update({ where: { id: targetUsuarioId }, data: { primerApoyoNotificado: true } });
         await resend.emails.send({
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: targetUser.email,
@@ -47,11 +51,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             nombreLocal: concurso.local?.nombre ?? "un local",
           }),
         });
-        await prisma.usuario.update({ where: { id: targetUsuarioId }, data: { primerApoyoNotificado: true } });
-      }
-    } catch (emailErr) {
-      console.error("[Email primer apoyo]", emailErr);
-    }
+      })
+      .catch((emailErr: unknown) => {
+        console.error("[Email primer apoyo]", emailErr);
+      });
 
     return NextResponse.json({ ok: true });
   } catch {

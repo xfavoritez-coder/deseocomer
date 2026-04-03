@@ -9,10 +9,23 @@ export default function BirthdayBanner() {
 
   useEffect(() => {
     try {
+      // Check birthday from localStorage OR from the user object (server-side data)
+      let dia: number | null = null;
+      let mes: number | null = null;
+
       const birthday = JSON.parse(localStorage.getItem("deseocomer_user_birthday") || "{}");
-      if (!birthday?.dia || !birthday?.mes) return;
+      if (birthday?.dia && birthday?.mes) {
+        dia = Number(birthday.dia);
+        mes = Number(birthday.mes);
+      } else if (user?.cumpleDia && user?.cumpleMes) {
+        dia = Number(user.cumpleDia);
+        mes = Number(user.cumpleMes);
+      }
+
+      if (!dia || !mes) return;
+
       const hoy = new Date();
-      const esCumple = hoy.getDate() === Number(birthday.dia) && (hoy.getMonth() + 1) === Number(birthday.mes);
+      const esCumple = hoy.getDate() === dia && (hoy.getMonth() + 1) === mes;
       if (esCumple) {
         const dismissKey = `cumple_banner_dismissed_${hoy.toISOString().slice(0, 10)}`;
         if (localStorage.getItem(dismissKey)) return;

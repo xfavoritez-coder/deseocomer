@@ -6,7 +6,7 @@ import SubirFoto from "@/components/SubirFoto";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type P = any;
 
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", combo: "Combo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 const DIAS_NOMBRE = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 export default function AdminPromociones() {
@@ -241,7 +241,7 @@ export default function AdminPromociones() {
 
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "600px" }}>
-          <thead><tr>{["Título", "Tipo", "Local", "Horario", "Días", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
+          <thead><tr>{["Título", "Tipo", "Local", "Horario", "Días", "Vistas", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
           <tbody>
             {filtradas.map(p => (
               <tr key={p.id} onClick={() => abrirDetalle(p)} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)", cursor: "pointer", transition: "background 0.15s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(232,168,76,0.06)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
@@ -250,6 +250,7 @@ export default function AdminPromociones() {
                 <td style={TD}>{p.local?.nombre ?? "—"}</td>
                 <td style={{ ...TD, fontSize: "0.8rem" }}>{p.horaInicio} – {p.horaFin}</td>
                 <td style={{ ...TD, fontSize: "0.8rem" }}>{formatDias(p.diasSemana)}</td>
+                <td style={{ ...TD, textAlign: "center", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)" }}>{p.vistas ?? 0}</td>
                 <td style={TD}><span style={{ color: p.activa ? "#3db89e" : "#ff6b6b", fontSize: "0.82rem", fontWeight: 700 }}>{p.activa ? "Activa" : "Inactiva"}</span></td>
                 <td style={TD} onClick={e => e.stopPropagation()}>
                   <div style={{ display: "flex", gap: "6px" }}>

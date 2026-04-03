@@ -5,7 +5,7 @@ import SubirFoto from "@/components/SubirFoto";
 const SESSION_KEY = "deseocomer_local_session";
 
 
-const DURACIONES = [{ l: "3 días", v: 3 }, { l: "7 días", v: 7 }, { l: "14 días", v: 14 }, { l: "30 días", v: 30 }];
+const DURACIONES = [{ l: "1 día", v: 1 }, { l: "3 días", v: 3 }];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Concurso = any;
@@ -23,7 +23,7 @@ export default function PanelConcursos() {
   const [premio, setPremio] = useState("");
 
 
-  const [dur, setDur] = useState(7);
+  const [dur, setDur] = useState(3);
   const [imagenConcurso, setImagenConcurso] = useState("");
   const [descripcionPremio, setDescripcionPremio] = useState("");
   const [condiciones, setCondiciones] = useState("");
@@ -453,7 +453,7 @@ export default function PanelConcursos() {
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{getSession().nombre ?? "Tu local"}</span>
             </div>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "#f5d080", lineHeight: 1.2, marginBottom: "8px" }}>🏆 {pFinal}</p>
-            {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px" }}>{descripcionPremio}</p>}
+            {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px", whiteSpace: "pre-wrap" }}>{descripcionPremio}</p>}
             <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Termina en</p>
               <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
@@ -474,7 +474,7 @@ export default function PanelConcursos() {
         {condiciones && (
           <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "14px", marginBottom: "24px" }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>Condiciones</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5 }}>{condiciones}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{condiciones}</p>
           </div>
         )}
         <div style={{ display: "flex", gap: "12px" }}>
