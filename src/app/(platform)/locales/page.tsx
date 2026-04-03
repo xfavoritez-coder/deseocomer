@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { boostScore } from "@/lib/personalizacion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
@@ -32,7 +33,7 @@ export default function LocalesPage() {
   const [soloAbiertos, setSoloAbiertos] = useState(false);
   const [soloConConcursos, setSoloConConcursos] = useState(false);
   const [soloConPromociones, setSoloConPromociones] = useState(false);
-  const [ordenamiento, setOrdenamiento] = useState("rating");
+  const [ordenamiento, setOrdenamiento] = useState("para_ti");
 
   useEffect(() => {
     fetch("/api/locales")
@@ -84,9 +85,17 @@ export default function LocalesPage() {
       return true;
     })
     .sort((a, b) => {
-      if (ordenamiento === "rating") return (b.rating ?? 0) - (a.rating ?? 0);
+      const boostDiff = boostScore(b.categoria, b.comuna, b.tags) - boostScore(a.categoria, a.comuna, a.tags);
+      if (ordenamiento === "para_ti") return boostDiff;
+      if (ordenamiento === "rating") {
+        const diff = (b.rating ?? 0) - (a.rating ?? 0);
+        return diff !== 0 ? diff : boostDiff;
+      }
       if (ordenamiento === "nuevo") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (ordenamiento === "favoritos") return (b._count?.favoritos ?? 0) - (a._count?.favoritos ?? 0);
+      if (ordenamiento === "favoritos") {
+        const diff = (b._count?.favoritos ?? 0) - (a._count?.favoritos ?? 0);
+        return diff !== 0 ? diff : boostDiff;
+      }
       return 0;
     });
 
@@ -153,6 +162,7 @@ export default function LocalesPage() {
             ⚡ Con promociones
           </button>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
             <option value="nuevo" style={{ background: "#0a0812", color: "#f0ead6" }}>🆕 Más nuevos</option>
             <option value="favoritos" style={{ background: "#0a0812", color: "#f0ead6" }}>❤️ Más guardados</option>

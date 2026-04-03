@@ -12,6 +12,7 @@ import {
   normalizeTipo,
   type Promocion,
 } from "@/lib/mockPromociones";
+import { boostScore } from "@/lib/personalizacion";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface PromoFromDB { id: string; localId: string; local: string; logoUrl: string; comuna: string; tipo: string; imagenUrl: string; titulo: string; descripcion: string; porcentajeDescuento: number | null; precioOriginal: number | null; precioDescuento: number | null; diasSemana: boolean[]; horaInicio: string; horaFin: string; activa: boolean; esCumpleanos: boolean; condiciones: string | null; }
@@ -64,7 +65,8 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
 
   // Map server data immediately — no client fetch needed
   const allPromos = initialData.map(mapDBToPromocion);
-  const promos = allPromos.slice(0, 3);
+  const promosSorted = [...allPromos].sort((a, b) => boostScore(null, b.comuna) - boostScore(null, a.comuna));
+  const promos = promosSorted.slice(0, 3);
 
   const [timers, setTimers]     = useState<Record<string, TimerState>>({});
   const [activasAhora, setActivasAhora] = useState(0);

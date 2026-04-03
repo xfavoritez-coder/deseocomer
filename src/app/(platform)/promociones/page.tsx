@@ -4,6 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { boostScore } from "@/lib/personalizacion";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, normalizeTipo, type Promocion } from "@/lib/mockPromociones";
 
 const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
@@ -100,7 +101,7 @@ export default function PromocionesPage() {
 
   // Birthday: show birthday promos first
   const promosCumple = esCumple ? filtered.filter(p => p.esCumpleanos) : [];
-  const promosNormales = esCumple ? filtered.filter(p => !p.esCumpleanos) : filtered;
+  const promosNormales = (esCumple ? filtered.filter(p => !p.esCumpleanos) : [...filtered]).sort((a, b) => boostScore(null, b.comuna) - boostScore(null, a.comuna));
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>

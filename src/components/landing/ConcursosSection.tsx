@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
 import { useAuth } from "@/contexts/AuthContext";
+import { boostScore } from "@/lib/personalizacion";
 
 
 
@@ -30,7 +31,9 @@ export default function ConcursosSection() {
           const uA = rA <= 86400000, uB = rB <= 86400000;
           if (uA && !uB) return -1; if (!uA && uB) return 1;
           if (uA && uB) return rA - rB;
-          return (b._count?.participantes ?? 0) - (a._count?.participantes ?? 0);
+          const partDiff = (b._count?.participantes ?? 0) - (a._count?.participantes ?? 0);
+          const boostDiff = boostScore(b.local?.categoria, b.local?.comuna) - boostScore(a.local?.categoria, a.local?.comuna);
+          return partDiff + boostDiff * 10;
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setConcursos(sorted.slice(0, 3).map((c: any) => ({

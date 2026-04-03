@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SelloGratis from "@/components/SelloGratis";
 import { useAuth } from "@/contexts/AuthContext";
+import { boostScore } from "@/lib/personalizacion";
 
 import {
   CONCURSOS,
@@ -44,6 +45,8 @@ export default function ConcursosPage() {
           participantes: c._count?.participantes ?? 0,
           endsAt: new Date(c.fechaFin).getTime(),
           createdAt: c.createdAt ?? c.fechaInicio ?? null,
+          localCategoria: c.local?.categoria ?? "",
+          localComuna: c.local?.comuna ?? "",
           ranking: (c.participantes ?? []).slice(0, 3).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", refs: p.puntos ?? 0 })),
         })));
       }
@@ -91,6 +94,10 @@ export default function ConcursosPage() {
     score += Math.min(c.participantes, 50) * 2;
     const diasTotales = (c.endsAt - new Date((createdAt as string) ?? Date.now()).getTime()) / 86400000;
     if (diasTotales > 5 && participantesRecientes === 0) score -= 500;
+    // Personalization boost
+    const cat = (c as any).localCategoria;
+    const com = (c as any).localComuna;
+    score += boostScore(cat, com) * 50;
     return score;
   }
 

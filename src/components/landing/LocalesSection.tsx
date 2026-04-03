@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BotonFavorito from "@/components/BotonFavorito";
+import { boostScore } from "@/lib/personalizacion";
 
 const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
 
@@ -33,14 +34,17 @@ export default function LocalesSection() {
     fetch("/api/locales").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setLocales(data.slice(0, 6).map((l: any) => ({
+        const mapped = data.map((l: any) => ({
           id: l.slug || l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
           barrio: l.comuna ?? "Santiago", emoji: "🍽️",
           rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,
           descripcion: l.descripcion ?? "",
           imagenUrl: l.portadaUrl ?? null,
           logoUrl: l.logoUrl ?? null,
-        })));
+        }));
+        // Sort by personalization
+        mapped.sort((a: any, b: any) => boostScore(b.categoria, b.barrio) - boostScore(a.categoria, a.barrio));
+        setLocales(mapped.slice(0, 6));
       }
     }).catch(() => {});
   }, []);
