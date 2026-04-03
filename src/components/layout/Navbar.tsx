@@ -163,6 +163,14 @@ export default function Navbar() {
         </button>
       </nav>
 
+      {isAuthenticated && user && !user.emailVerificado && (
+        <div style={{ background: "rgba(255,140,0,0.1)", borderBottom: "1px solid rgba(255,140,0,0.3)", padding: "8px 20px", textAlign: "center", position: "fixed", top: "68px", left: 0, right: 0, zIndex: 99 }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff8c00", margin: 0 }}>
+            ⚠️ Tu cuenta no está verificada. <a href="/verificar-email" style={{ color: "#e8a84c", fontWeight: 700, textDecoration: "underline" }}>Reenviar email de verificación</a>
+          </p>
+        </div>
+      )}
+
       {/* Mobile drawer */}
       {menuOpen && (
         <>

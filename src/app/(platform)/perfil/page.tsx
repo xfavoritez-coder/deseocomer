@@ -114,6 +114,22 @@ export default function PerfilPage() {
           </div>
         </div>
 
+        {user && !(user as any).emailVerificado && (
+          <div style={{ background: "rgba(255,140,0,0.08)", border: "1px solid rgba(255,140,0,0.25)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff8c00", margin: 0, lineHeight: 1.5 }}>
+              ⚠️ Tu cuenta no está verificada. Revisa tu email para activarla y poder participar en concursos.
+            </p>
+            <button onClick={async () => {
+              try {
+                await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email }) });
+                alert("Email de verificación enviado. Revisa tu bandeja de entrada.");
+              } catch {}
+            }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "#e8a84c", background: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 14px", cursor: "pointer", marginTop: 8 }}>
+              Reenviar email de verificación
+            </button>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="dc-pf-tabs">
           {TABS.map(t => (

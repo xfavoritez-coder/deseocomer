@@ -17,6 +17,7 @@ export interface AuthUser {
   cumpleDia?: number | null;
   cumpleMes?: number | null;
   codigoRef?: string;
+  emailVerificado?: boolean;
 }
 
 export interface RegisterUserData {
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             cumpleDia: session.cumpleDia ?? null,
             cumpleMes: session.cumpleMes ?? null,
             codigoRef: session.codigoRef ?? "",
+            emailVerificado: session.emailVerificado ?? false,
           });
         }
       }
@@ -126,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cumpleDia: data.data.cumpleDia ?? null,
         cumpleMes: data.data.cumpleMes ?? null,
         codigoRef: data.data.codigoRef ?? "",
+        emailVerificado: data.data.emailVerificado ?? false,
       };
 
       // Cerrar sesión de local si existe
@@ -146,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         codigoRef: data.data.codigoRef ?? "",
         estiloAlimentario: data.data.estiloAlimentario ?? "",
         comidasFavoritas: data.data.comidasFavoritas ?? [],
+        emailVerificado: data.data.emailVerificado ?? false,
       }));
 
       // Sync birthday from BD to localStorage

@@ -9,6 +9,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { usuarioId, referidoPor } = await req.json();
     if (!usuarioId) return NextResponse.json({ error: "Falta usuarioId" }, { status: 400 });
 
+    // Verify user has confirmed email
+    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { emailVerificado: true } });
+    if (!usuario?.emailVerificado) {
+      return NextResponse.json({ error: "Debes verificar tu email para participar. Revisa tu bandeja de entrada.", codigo: "EMAIL_NO_VERIFICADO" }, { status: 403 });
+    }
+
     const concurso = await prisma.concurso.findFirst({
       where: { OR: [{ id }, { slug: id }], activo: true },
     });
