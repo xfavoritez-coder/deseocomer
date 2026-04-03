@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const promociones = await prisma.promocion.findMany({
       where: localId
         ? { localId }
-        : { activa: true, local: { activo: true, direccion: { not: "" }, categoria: { not: null } }, OR: [{ fechaVencimiento: null }, { fechaVencimiento: { gte: new Date() } }] },
+        : { activa: true, local: { activo: true }, OR: [{ fechaVencimiento: null }, { fechaVencimiento: { gte: new Date() } }] },
       include: { local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true } } },
       orderBy: { createdAt: "desc" },
     });

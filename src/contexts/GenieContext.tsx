@@ -196,7 +196,8 @@ export function GenieProvider({ children }: { children: ReactNode }) {
 
         const yaSolicitado = localStorage.getItem(CUMPLE_SOLICITADO_KEY);
         const yaTieneFecha = localStorage.getItem("deseocomer_user_birthday");
-        if (visitas >= 2 && !yaSolicitado && !yaTieneFecha) {
+        const userTieneCumple = user?.cumpleDia && user?.cumpleMes;
+        if (visitas >= 2 && !yaSolicitado && !yaTieneFecha && !userTieneCumple) {
           setTimeout(() => {
             setToastActivo({
               id: "cumpleanos",

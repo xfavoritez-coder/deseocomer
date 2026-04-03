@@ -172,10 +172,10 @@ export default function PanelPromociones() {
           <label style={L}>Modalidad</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
             {[
-              { value: "en_local", label: "En local", show: true },
-              { value: "delivery", label: "Delivery", show: localInfo.tieneDelivery },
-              { value: "retiro", label: "Retiro", show: localInfo.tieneRetiro },
-            ].filter(m => m.show).map(m => {
+              { value: "en_local", label: "En local" },
+              { value: "delivery", label: "Delivery" },
+              { value: "retiro", label: "Retiro" },
+            ].map(m => {
               const sel = form.modalidad.includes(m.value);
               return (
                 <button key={m.value} type="button" onClick={() => set("modalidad", sel ? form.modalidad.filter((x: string) => x !== m.value) : [...form.modalidad, m.value])} style={{ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: sel ? 700 : 400 }}>{m.label}</button>

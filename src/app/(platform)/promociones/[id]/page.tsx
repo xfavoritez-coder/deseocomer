@@ -64,7 +64,7 @@ export default function PromocionDetailPage() {
     porcentajeDescuento: dbPromo.porcentajeDescuento ?? undefined,
     precioOriginal: dbPromo.precioOriginal ?? undefined,
     precioDescuento: dbPromo.precioDescuento ?? undefined,
-    diasSemana: Array.isArray(dbPromo.diasSemana) ? dbPromo.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
+    diasSemana: Array.isArray(dbPromo.diasSemana) ? dbPromo.diasSemana.map((v: boolean, i: number) => v ? i : -1).filter((n: number) => n >= 0) : [],
     horaInicio: dbPromo.horaInicio ?? "12:00",
     horaFin: dbPromo.horaFin ?? "22:00",
     fechaVencimiento: dbPromo.fechaVencimiento ? new Date(dbPromo.fechaVencimiento).toLocaleDateString("es-CL") : null,

@@ -26,7 +26,7 @@ function mapDBToPromocion(p: PromoFromDB): Promocion {
     porcentajeDescuento: p.porcentajeDescuento ?? undefined,
     precioOriginal: p.precioOriginal ?? undefined,
     precioDescuento: p.precioDescuento ?? undefined,
-    diasSemana: Array.isArray(p.diasSemana) ? p.diasSemana.map((v: boolean, i: number) => v ? (i + 1) % 7 : -1).filter((n: number) => n >= 0) : [],
+    diasSemana: Array.isArray(p.diasSemana) ? p.diasSemana.map((v: boolean, i: number) => v ? i : -1).filter((n: number) => n >= 0) : [],
     horaInicio: p.horaInicio, horaFin: p.horaFin,
     fechaVencimiento: "2099-12-31", activa: p.activa,
     esCumpleanos: p.esCumpleanos,

@@ -14,6 +14,8 @@ export interface AuthUser {
   type: UserType;
   nombreLocal?: string;
   comuna?: string;
+  cumpleDia?: number | null;
+  cumpleMes?: number | null;
 }
 
 export interface RegisterUserData {
@@ -86,6 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             fotoUrl: session.fotoUrl || "",
             telefono: session.telefono || null,
             type: session.tipo === "local" ? "local" : "user",
+            cumpleDia: session.cumpleDia ?? null,
+            cumpleMes: session.cumpleMes ?? null,
           });
         }
       }
@@ -116,6 +120,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fotoUrl: data.data.fotoUrl || "",
         telefono: data.data.telefono || null,
         type: "user",
+        cumpleDia: data.data.cumpleDia ?? null,
+        cumpleMes: data.data.cumpleMes ?? null,
       };
 
       // Cerrar sesión de local si existe
@@ -131,6 +137,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         telefono: data.data.telefono || "",
         tipo: "usuario",
         loggedIn: true,
+        cumpleDia: data.data.cumpleDia ?? null,
+        cumpleMes: data.data.cumpleMes ?? null,
       }));
 
       // Sync birthday from BD to localStorage
