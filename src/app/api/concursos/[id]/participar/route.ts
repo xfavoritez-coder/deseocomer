@@ -21,9 +21,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
     if (existing) return NextResponse.json({ error: "Ya participas en este concurso" }, { status: 400 });
 
+    // Build referral chain
+    let referidorDirectoId: string | null = null;
+    let referidorNivel2Id: string | null = null;
+
+    if (referidoPor) {
+      referidorDirectoId = referidoPor;
+      // Check if the direct referrer has their own referrer (level 2)
+      const refDirecto = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
+      });
+      if (refDirecto?.referidorDirectoId) {
+        referidorNivel2Id = refDirecto.referidorDirectoId;
+      }
+    }
+
     // Create participation (+1 por unirse)
     const participante = await prisma.participanteConcurso.create({
-      data: { concursoId: concurso.id, usuarioId, referidoPor, puntos: 1 },
+      data: { concursoId: concurso.id, usuarioId, referidoPor, puntos: 1, referidorDirectoId, referidorNivel2Id },
     });
 
     // Email al local: primer participante (una sola vez por cuenta de local)

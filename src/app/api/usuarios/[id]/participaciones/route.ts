@@ -6,9 +6,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
     const participaciones = await prisma.participanteConcurso.findMany({
       where: { usuarioId: id },
-      select: { concursoId: true },
+      select: {
+        concursoId: true,
+        puntos: true,
+        puntosNivel2: true,
+        puntosNivel2Pendientes: true,
+      },
     });
-    return NextResponse.json(participaciones.map(p => p.concursoId));
+    return NextResponse.json(participaciones.map(p => ({
+      concursoId: p.concursoId,
+      puntos: p.puntos,
+      puntosNivel2: p.puntosNivel2 ?? 0,
+      puntosNivel2Pendientes: p.puntosNivel2Pendientes ?? 0,
+    })));
   } catch {
     return NextResponse.json([]);
   }

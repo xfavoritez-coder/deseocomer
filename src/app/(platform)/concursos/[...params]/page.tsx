@@ -414,6 +414,9 @@ function ConcursoDetallePage() {
     "Se requiere cuenta verificada en DeseoComer para participar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
     "Queda estrictamente prohibido el uso de correos temporales, cuentas falsas o cualquier método fraudulento para acumular puntos.",
     "El local organizador y DeseoComer se reservan el derecho de descalificar a cualquier participante que presente patrones sospechosos de fraude, sin necesidad de justificación previa.",
+    "Los referidos directos suman +2 puntos al participante que los invitó, una vez verificado su correo electrónico.",
+    "Los referidos de tus referidos suman +1 punto adicional para ti, con un máximo de 10 puntos acumulables por esta vía en cada concurso.",
+    "Los puntos de segundo nivel no se acreditan si se detecta que los registros provienen de la misma dirección IP o si fueron realizados en menos de 1 hora entre sí.",
     "DeseoComer actúa como plataforma intermediaria. La entrega del premio es responsabilidad exclusiva del local organizador.",
     "La participación en este concurso implica la aceptación total de estos términos y los Términos y Condiciones de DeseoComer.",
   ];
@@ -590,13 +593,27 @@ function ConcursoDetallePage() {
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido" }, { icon: "❤️", pts: "+1", label: "Al recibir apoyo" }, { icon: "👤", pts: "+1", label: "Registro directo" }].map(s => (
+                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido directo" }, { icon: "🔗🔗", pts: "+1", label: "Referidos de tus referidos" }, { icon: "❤️", pts: "+1", label: "Al recibir apoyo" }].map(s => (
                   <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
                     <div style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
                   </div>
                 ))}
+              </div>
+              <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 12, padding: "14px 16px", marginTop: 12 }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Cadena de referidos</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#3db89e", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 8, padding: "4px 10px" }}>Tú</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#e8a84c" }}>+2 pts</span>
+                  <span style={{ color: "rgba(240,234,214,0.3)" }}>→</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.6)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "4px 10px" }}>Tu referido</span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#e8a84c" }}>+1 pt</span>
+                  <span style={{ color: "rgba(240,234,214,0.3)" }}>→</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#3db89e", background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 8, padding: "4px 10px" }}>Tú</span>
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, margin: 0 }}>Cuando invitas a alguien y ellos a su vez invitan a otros, tú también ganas +1 punto por cada persona que traigan tus referidos.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 8, fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel por concurso.</p>
               </div>
             </div>
           )}

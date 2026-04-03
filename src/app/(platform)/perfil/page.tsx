@@ -217,12 +217,20 @@ function TabFavoritos() {
 
 // ─── Tab: Concursos ──────────────────────────────────────────────────────────
 
+interface ParticipacionAPI {
+  concursoId: string | number;
+  puntos: number;
+  puntosNivel2: number;
+  puntosNivel2Pendientes: number;
+}
+
 function TabConcursos({ userId, userName }: { userId: string; userName: string }) {
   const [refCounts, setRefCounts] = useState<Array<{ concursoId: string | number; count: number }>>([]);
   const [copied, setCopied] = useState<string | number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ganados, setGanados] = useState<any[]>([]);
   const [ganadosLoading, setGanadosLoading] = useState(true);
+  const [participacionesAPI, setParticipacionesAPI] = useState<ParticipacionAPI[]>([]);
 
   useEffect(() => { setRefCounts(getAllRefCounts(userId)); }, [userId]);
 
@@ -232,6 +240,13 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
       .then(data => { if (Array.isArray(data)) setGanados(data); })
       .catch(() => {})
       .finally(() => setGanadosLoading(false));
+  }, [userId]);
+
+  useEffect(() => {
+    fetch(`/api/usuarios/${userId}/participaciones`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { if (Array.isArray(data)) setParticipacionesAPI(data); })
+      .catch(() => {});
   }, [userId]);
 
   const copyLink = async (concursoId: string | number) => {
@@ -297,39 +312,71 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
             {refCounts.map(({ concursoId, count }) => {
               const info = CONCURSOS.find(x => x.id === concursoId) ?? CONCURSOS_FINALIZADOS.find(x => x.id === concursoId);
               const isActive = CONCURSOS.some(c => c.id === concursoId);
+              const apiData = participacionesAPI.find(p => String(p.concursoId) === String(concursoId));
+              const totalPts = apiData?.puntos ?? count;
+              const nivel2 = apiData?.puntosNivel2 ?? 0;
+              const nivel2Pend = apiData?.puntosNivel2Pendientes ?? 0;
+              const registro = 1;
+              const referidosDirectos = Math.max(0, totalPts - registro - nivel2);
               return (
                 <div key={concursoId} style={{
                   background: "var(--bg-secondary)", border: "1px solid var(--border-color)",
                   borderRadius: "16px", padding: "18px 20px",
-                  display: "flex", alignItems: "center", gap: "14px",
                 }}>
-                  <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <Link href={`/concursos/${concursoId}`} style={{
-                      fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
-                      color: "var(--accent)", textDecoration: "none",
-                    }}>
-                      {info?.premio ?? `Concurso #${concursoId}`}
-                    </Link>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                      {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
-                        {isActive ? "Activo" : "Finalizado"}
-                      </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                    <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <Link href={`/concursos/${concursoId}`} style={{
+                        fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
+                        color: "var(--accent)", textDecoration: "none",
+                      }}>
+                        {info?.premio ?? `Concurso #${concursoId}`}
+                      </Link>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                        {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
+                          {isActive ? "Activo" : "Finalizado"}
+                        </span>
+                      </p>
+                    </div>
+                    <div style={{ textAlign: "center", flexShrink: 0 }}>
+                      <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{totalPts}</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
+                    </div>
+                    {isActive && (
+                      <button onClick={() => copyLink(concursoId)} style={{
+                        background: "none", border: "1px solid var(--border-color)",
+                        borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
+                        fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
+                      }}>
+                        {copied === concursoId ? "✓" : "📋"}
+                      </button>
+                    )}
+                  </div>
+                  {/* Points breakdown */}
+                  <div style={{
+                    marginTop: "12px", paddingTop: "10px",
+                    borderTop: "1px solid var(--border-color)",
+                  }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>
+                      Tus puntos: {totalPts}
                     </p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "3px", paddingLeft: "8px" }}>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
+                        Registro: <span style={{ color: "var(--accent)" }}>+1</span>
+                      </p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
+                        Referidos directos: <span style={{ color: "var(--accent)" }}>+{referidosDirectos}</span>
+                      </p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
+                        Red de referidos: <span style={{ color: "var(--accent)" }}>+{nivel2}</span>
+                      </p>
+                      {nivel2Pend > 0 && (
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>
+                          En verificaci&oacute;n: +{nivel2Pend} pts
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ textAlign: "center", flexShrink: 0 }}>
-                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{count}</p>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
-                  </div>
-                  {isActive && (
-                    <button onClick={() => copyLink(concursoId)} style={{
-                      background: "none", border: "1px solid var(--border-color)",
-                      borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
-                      fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
-                    }}>
-                      {copied === concursoId ? "✓" : "📋"}
-                    </button>
-                  )}
                 </div>
               );
             })}

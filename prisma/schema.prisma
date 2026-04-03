@@ -175,6 +175,10 @@ model ParticipanteConcurso {
   concursoId  String
   usuarioId   String
   referidoPor      String?
+  referidorDirectoId    String?
+  referidorNivel2Id     String?
+  puntosNivel2          Int      @default(0)
+  puntosNivel2Pendientes Int     @default(0)
   puntos           Int      @default(1)
   puntosPendientes Int      @default(0)
   estado           String   @default("activo")

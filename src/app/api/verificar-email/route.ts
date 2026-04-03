@@ -30,6 +30,65 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // --- NIVEL 2: Acreditar puntos por referidos de referidos ---
+    // Find all participations where this user was referred by someone
+    const misParticipaciones = await prisma.participanteConcurso.findMany({
+      where: { usuarioId: usuario.id },
+      select: { concursoId: true, referidorDirectoId: true, referidorNivel2Id: true },
+    });
+
+    for (const mp of misParticipaciones) {
+      if (!mp.referidorNivel2Id) continue;
+
+      // Get the concurso to check if active
+      const concurso = await prisma.concurso.findUnique({
+        where: { id: mp.concursoId },
+        select: { activo: true, fechaFin: true },
+      });
+      if (!concurso?.activo || new Date(concurso.fechaFin) <= new Date()) continue;
+
+      // Get the nivel 2 referrer's participation
+      const nivel2Participante = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId: mp.concursoId, usuarioId: mp.referidorNivel2Id } },
+      });
+      if (!nivel2Participante) continue;
+
+      // Get the direct referrer's user data for antifraude check
+      const referidorDirecto = mp.referidorDirectoId
+        ? await prisma.usuario.findUnique({ where: { id: mp.referidorDirectoId }, select: { ipRegistro: true, createdAt: true } })
+        : null;
+      const referidorNivel2 = await prisma.usuario.findUnique({
+        where: { id: mp.referidorNivel2Id },
+        select: { ipRegistro: true },
+      });
+
+      // Antifraude checks
+      const mismaIP = (usuario.ipRegistro && usuario.ipRegistro !== "unknown" && usuario.ipRegistro !== "") &&
+        (usuario.ipRegistro === referidorDirecto?.ipRegistro || usuario.ipRegistro === referidorNivel2?.ipRegistro);
+      const menosDeUnaHora = referidorDirecto?.createdAt
+        ? (Date.now() - new Date(referidorDirecto.createdAt).getTime()) < 3600000
+        : false;
+
+      if (mismaIP || menosDeUnaHora) {
+        // Mark as pending for review
+        await prisma.participanteConcurso.update({
+          where: { id: nivel2Participante.id },
+          data: { puntosNivel2Pendientes: { increment: 1 } },
+        });
+      } else {
+        // Check limit of 10 nivel 2 points
+        if ((nivel2Participante.puntosNivel2 ?? 0) < 10) {
+          await prisma.participanteConcurso.update({
+            where: { id: nivel2Participante.id },
+            data: {
+              puntos: { increment: 1 },
+              puntosNivel2: { increment: 1 },
+            },
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

@@ -71,6 +71,20 @@ export default function ComoFuncionaPage() {
             ))}
           </div>
 
+          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>El poder de tu red</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>No solo ganas por las personas que tú invitas directamente. Si tus referidos también invitan a sus amigos, tú también sumas puntos.</p>
+            <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
+                <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
+                Invitas a María → <strong style={{ color: "#3db89e" }}>+2 puntos</strong> para ti<br/>
+                María invita a Juan → +2 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong><br/>
+                María invita a Pedro → +2 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong>
+              </p>
+            </div>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>Límite: puedes acumular hasta 10 puntos extra por los referidos de tus referidos en cada concurso.</p>
+          </div>
+
         </section>
 
         {/* Premios reales */}

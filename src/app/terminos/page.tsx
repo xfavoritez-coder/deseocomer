@@ -44,6 +44,9 @@ export default function TerminosPage() {
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.5 Cancelación:</strong> El local puede cancelar un concurso solo si no tiene participantes activos. Con participantes, la cancelación debe gestionarse con el equipo de DeseoComer.</p>
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.6 Aceptación:</strong> Participar en un concurso implica la aceptación plena de estas condiciones y las específicas del local organizador.</p>
 
+          <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.7 Sistema de referidos multinivel:</strong> DeseoComer implementa un sistema de referidos de dos niveles. Los participantes obtienen +2 puntos por cada referido directo verificado y +1 punto adicional por cada referido que traigan sus referidos directos, con un máximo de 10 puntos acumulables por esta segunda capa.</p>
+          <p style={SUB}>Los puntos de segundo nivel quedan sujetos a verificación antifraude y no se acreditan si se detectan registros desde la misma IP o en intervalos de tiempo sospechosamente cortos. DeseoComer se reserva el derecho de anular puntos obtenidos mediante prácticas fraudulentas en cualquier nivel de la cadena de referidos.</p>
+
           <h2 style={H2}>6. Entrega de premios</h2>
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.1 Selección del ganador:</strong> El ganador es determinado automáticamente por el sistema según los puntos acumulados al cierre del concurso, sujeto a verificación antifraude.</p>
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>6.2 Plazo de reclamo:</strong> El ganador tiene 7 días desde la notificación por email para confirmar la recepción de su premio. Si no lo hace, el premio pasa al segundo lugar.</p>
