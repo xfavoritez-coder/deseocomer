@@ -677,7 +677,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     setGustosLoading(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const p = loadProfile();
     p.telefono = form.telefono;
     p.cumpleanos = form.cumpleDia && form.cumpleMes ? { dia: form.cumpleDia, mes: form.cumpleMes, ano: form.cumpleAno || undefined } : undefined;
@@ -686,6 +686,17 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     p.notifCumple = form.notifCumple;
     p.notifUrgente = form.notifUrgente;
     saveProfile(p);
+    // Persist birthday to DB
+    if (form.cumpleDia && form.cumpleMes) {
+      try {
+        const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+        if (session.id) {
+          await fetch("/api/usuarios/cumpleanos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: session.id, dia: form.cumpleDia, mes: form.cumpleMes, anio: form.cumpleAno || null }) });
+          localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: form.cumpleDia, mes: form.cumpleMes }));
+          localStorage.setItem("genio_cumple_solicitado", "true");
+        }
+      } catch {}
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

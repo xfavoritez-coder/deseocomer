@@ -98,7 +98,7 @@ export default function Navbar() {
     <>
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
-      {!isHome && <BannerVerificacion />}
+      <BannerVerificacion />
       <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
         <Link href="/" className="dc-nav-logo" onClick={() => { if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" }); }}>🏮 DeseoComer</Link>
 
