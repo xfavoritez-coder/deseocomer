@@ -264,6 +264,45 @@ export function GenieProvider({ children }: { children: ReactNode }) {
           if (f) c.filtrosUsados = [...c.filtrosUsados.slice(-19), f];
           break;
         }
+        case "concurso_participado": {
+          const cat = String(datos.categoria ?? "").toLowerCase();
+          const com = String(datos.comuna ?? "").toLowerCase();
+          if (cat) g.categorias[cat] = (g.categorias[cat] ?? 0) + 5;
+          if (com) g.comunas[com] = (g.comunas[com] ?? 0) + 3;
+          break;
+        }
+        case "concurso_visto": {
+          const cat = String(datos.categoria ?? "").toLowerCase();
+          const com = String(datos.comuna ?? "").toLowerCase();
+          if (cat) g.categorias[cat] = (g.categorias[cat] ?? 0) + 1;
+          if (com) g.comunas[com] = (g.comunas[com] ?? 0) + 1;
+          const cid = String(datos.id ?? "");
+          if (cid && !c.concursosVistos.includes(cid)) c.concursosVistos = [...c.concursosVistos.slice(-49), cid];
+          break;
+        }
+        case "promocion_vista": {
+          const cat = String(datos.categoria ?? "").toLowerCase();
+          const com = String(datos.comuna ?? "").toLowerCase();
+          if (cat) g.categorias[cat] = (g.categorias[cat] ?? 0) + 2;
+          if (com) g.comunas[com] = (g.comunas[com] ?? 0) + 1;
+          const pid = String(datos.id ?? "");
+          if (pid && !c.promocionesAbiertas.includes(pid)) c.promocionesAbiertas = [...c.promocionesAbiertas.slice(-49), pid];
+          break;
+        }
+        case "concurso_compartido": {
+          const cat = String(datos.categoria ?? "").toLowerCase();
+          if (cat) g.categorias[cat] = (g.categorias[cat] ?? 0) + 3;
+          break;
+        }
+        case "busqueda": {
+          const q = String(datos.query ?? "").toLowerCase();
+          if (q) {
+            g.atributos[q] = (g.atributos[q] ?? 0) + 2;
+            const catMatch = Object.keys(g.categorias).find(k => q.includes(k));
+            if (catMatch) g.categorias[catMatch] = (g.categorias[catMatch] ?? 0) + 2;
+          }
+          break;
+        }
       }
 
       // Track horario

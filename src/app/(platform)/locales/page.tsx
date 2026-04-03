@@ -5,6 +5,7 @@ import { boostScore } from "@/lib/personalizacion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
+import { useGenie } from "@/contexts/GenieContext";
 
 const CATEGORIAS = [
   "Todos", "Pizza", "Sushi", "Hamburguesa",
@@ -25,6 +26,7 @@ function getInitials(nombre: string): string {
 const localesMock: any[] = [];
 
 export default function LocalesPage() {
+  const { addInteraccion } = useGenie();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [locales, setLocales] = useState<any[]>(localesMock);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,15 @@ export default function LocalesPage() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (busqueda.length >= 3) {
+      const timer = setTimeout(() => {
+        addInteraccion("busqueda", { query: busqueda });
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const localesFiltrados = locales
     .filter(l => {

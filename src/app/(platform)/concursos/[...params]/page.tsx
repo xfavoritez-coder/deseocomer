@@ -29,6 +29,7 @@ import {
   hasSupportedToday,
   supportUser,
 } from "@/lib/referrals";
+import { useGenie } from "@/contexts/GenieContext";
 
 export default function ConcursoDetalleWrapper() {
   return <Suspense><ConcursoDetallePage /></Suspense>;
@@ -41,6 +42,8 @@ function ConcursoDetallePage() {
 
   const segments = rawParams.params ?? [];
   const slug = segments[0] ?? "";
+
+  const { addInteraccion } = useGenie();
 
   const [refUserId, setRefUserId] = useState<string | null>(null);
   const [refNameFromUrl, setRefNameFromUrl] = useState<string | null>(null);
@@ -206,6 +209,13 @@ function ConcursoDetallePage() {
     setSupportedMap(map);
   }, [user, concursoId, ranking]);
 
+  // ── Track concurso_visto ──
+  useEffect(() => {
+    if (concursoData && concursoData.localId) {
+      addInteraccion("concurso_visto", { id: String(concursoData.id || ""), localId: concursoData.localId || "" });
+    }
+  }, [concursoData?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Loading skeleton ──
   if (dbLoading) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar />
     <div className="dc-skeleton-wrap">
@@ -236,7 +246,7 @@ function ConcursoDetallePage() {
   const refLink = isAuthenticated && user && c
     ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
     : null;
-  const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); } catch {} };
+  const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); addInteraccion("concurso_compartido", { id: String(concursoId || ""), localId: c?.localId || "" }); } catch {} };
   const handleSupport = async (targetName: string, targetId: string, targetUsuarioId: string) => {
     if (!user) return;
     const ok = supportUser(concursoId, user.id, targetId);
@@ -263,6 +273,7 @@ function ConcursoDetallePage() {
         body: JSON.stringify({ usuarioId: user.id }),
       });
       setIsParticipating(true);
+      addInteraccion("concurso_participado", { id: String(concursoId || ""), localId: c?.localId || "" });
       refreshRanking();
     } catch {} finally { setJoinLoading(false); }
   };

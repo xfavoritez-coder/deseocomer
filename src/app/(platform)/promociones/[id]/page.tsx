@@ -16,6 +16,7 @@ import {
   normalizeTipo,
   type Promocion,
 } from "@/lib/mockPromociones";
+import { useGenie } from "@/contexts/GenieContext";
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   const t = promo.tipo?.toLowerCase() ?? "";
@@ -76,6 +77,14 @@ export default function PromocionDetailPage() {
     telefono: dbPromo.local?.telefono ?? dbPromo.local?.instagram,
     logoUrl: dbPromo.local?.logoUrl,
   } : null) as Promocion | null;
+
+  const { addInteraccion } = useGenie();
+
+  useEffect(() => {
+    if (promo) {
+      addInteraccion("promocion_vista", { id: String(promo.id || ""), categoria: (promo as any).categoriaLocal || "", comuna: promo.comuna || "" });
+    }
+  }, [promo?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mounted, setMounted] = useState(false);
   const [isActiva, setIsActiva] = useState(false);

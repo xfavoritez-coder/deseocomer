@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { boostScore } from "@/lib/personalizacion";
+import { useGenie } from "@/contexts/GenieContext";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, normalizeTipo, type Promocion } from "@/lib/mockPromociones";
 
 const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
@@ -36,6 +37,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
 }
 
 export default function PromocionesPage() {
+  const { addInteraccion } = useGenie();
   const { isAuthenticated } = useAuth();
   const [promos, setPromos] = useState<Promocion[]>(PROMOCIONES.filter(p => p.activa));
   const [busqueda, setBusqueda] = useState("");
@@ -83,6 +85,15 @@ export default function PromocionesPage() {
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    if (busqueda.length >= 3) {
+      const timer = setTimeout(() => {
+        addInteraccion("busqueda", { query: busqueda });
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTipo = (t: string) => setFiltrosTipo(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
 
