@@ -344,36 +344,68 @@ function ConcursoDetallePage() {
             <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", textDecoration: "none", marginTop: 8, letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
           )}
         </div>
-      ) : ranking.map((r, i) => {
-        const isMe = isAuthenticated && user && r.nombre.startsWith(user.nombre.split(" ")[0]);
-        const posColors = [
-          { bg: "rgba(232,168,76,0.2)", color: "#e8a84c", border: "rgba(232,168,76,0.4)" },
-          { bg: "rgba(180,180,180,0.08)", color: "rgba(220,220,220,0.6)", border: "rgba(180,180,180,0.15)" },
-          { bg: "rgba(180,100,50,0.12)", color: "rgba(200,140,80,0.7)", border: "rgba(180,100,50,0.2)" },
-        ][i] ?? { bg: "rgba(255,255,255,0.03)", color: "rgba(240,234,214,0.3)", border: "rgba(255,255,255,0.06)" };
-        const rAny = r as { usuarioId?: string };
-        const supportKey = rAny.usuarioId || `mock_${r.nombre}`;
-        const alreadySupported = supportedMap[supportKey];
+      ) : (() => {
+        const conMasDe1 = ranking.filter(r => r.referidos > 1);
+        const con1 = ranking.filter(r => r.referidos <= 1);
+        const visibles = conMasDe1.length > 0 ? conMasDe1 : ranking.slice(0, 5);
+        const ocultos = conMasDe1.length > 0 ? con1 : ranking.slice(5);
+        const myName = user?.nombre?.split(" ")[0] ?? "";
+        const myIndex = ranking.findIndex(r => isAuthenticated && user && r.nombre.startsWith(myName));
+        const myEntry = myIndex >= 0 ? ranking[myIndex] : null;
+        const meVisible = myEntry ? visibles.includes(myEntry) : false;
+
+        const renderRow = (r: RankingEntry, i: number) => {
+          const isMe = isAuthenticated && user && r.nombre.startsWith(myName);
+          const posColors = [
+            { bg: "rgba(232,168,76,0.2)", color: "#e8a84c", border: "rgba(232,168,76,0.4)" },
+            { bg: "rgba(180,180,180,0.08)", color: "rgba(220,220,220,0.6)", border: "rgba(180,180,180,0.15)" },
+            { bg: "rgba(180,100,50,0.12)", color: "rgba(200,140,80,0.7)", border: "rgba(180,100,50,0.2)" },
+          ][i] ?? { bg: "rgba(255,255,255,0.03)", color: "rgba(240,234,214,0.3)", border: "rgba(255,255,255,0.06)" };
+          const rAny = r as { usuarioId?: string };
+          const supportKey = rAny.usuarioId || `mock_${r.nombre}`;
+          const alreadySupported = supportedMap[supportKey];
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
+              <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
+              {r.fotoUrl ? (
+                <img src={r.fotoUrl} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
+              ) : (
+                <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{r.nombre.charAt(0).toUpperCase()}</div>
+              )}
+              <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
+              {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+              {isAuthenticated && !isMe && (
+                <button onClick={() => handleSupport(r.nombre, supportKey, rAny.usuarioId || "")} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+                </button>
+              )}
+              {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 14, background: "rgba(30,20,5,0.96)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 10, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap", zIndex: 10, fontWeight: 700 }}>❤️ ¡+1 punto a {r.nombre.split(/\s+/)[0]}!</div>}
+            </div>
+          );
+        };
+
         return (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
-            <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
-            {r.fotoUrl ? (
-              <img src={r.fotoUrl} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
-            ) : (
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{r.nombre.charAt(0).toUpperCase()}</div>
+          <>
+            {visibles.map((r, i) => renderRow(r, i))}
+            {ocultos.length > 0 && (
+              <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
+                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {ocultos.length} participante{ocultos.length !== 1 ? "s" : ""} más con 1 punto</span>
+              </div>
             )}
-            <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
-            {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
-            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
-            {isAuthenticated && !isMe && (
-              <button onClick={() => handleSupport(r.nombre, supportKey, rAny.usuarioId || "")} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
-              </button>
+            {myEntry && !meVisible && (
+              <div style={{ padding: "10px 14px", background: "rgba(61,184,158,0.06)", borderTop: "1px solid rgba(61,184,158,0.15)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>{myIndex + 1}</div>
+                  <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "#3db89e" }}>Tu posición</span>
+                  <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+                </div>
+              </div>
             )}
-            {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 14, background: "rgba(30,20,5,0.96)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 10, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap", zIndex: 10, fontWeight: 700 }}>❤️ ¡+1 punto a {r.nombre.split(/\s+/)[0]}!</div>}
-          </div>
+          </>
         );
-      })}
+      })()}
     </div>
   );
 
