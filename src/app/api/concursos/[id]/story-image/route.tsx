@@ -25,7 +25,7 @@ export async function GET(
   let latoBold: ArrayBuffer;
   try {
     [cinzelBold, latoBold] = await Promise.all([
-      fetch("https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgTYo.ttf").then((r) => { if (!r.ok) throw new Error(`Cinzel font: ${r.status}`); return r.arrayBuffer(); }),
+      fetch("https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgfY3lDQ.woff2").then((r) => { if (!r.ok) throw new Error(`Cinzel font: ${r.status}`); return r.arrayBuffer(); }),
       fetch("https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2").then((r) => { if (!r.ok) throw new Error(`Lato font: ${r.status}`); return r.arrayBuffer(); }),
     ]);
   } catch (fontErr) {
