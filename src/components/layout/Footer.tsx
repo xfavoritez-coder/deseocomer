@@ -35,6 +35,7 @@ export default function Footer() {
                 { label: "Inicio",               href: "/" },
                 { label: "¿Qué es DeseoComer?",  href: "/que-es-deseocomer" },
                 { label: "Concursos",             href: "/concursos" },
+                { label: "Ganadores",             href: "/concursos/ganadores" },
                 { label: "Promociones",           href: "/promociones" },
                 { label: "Locales",               href: "/locales" },
               ],
@@ -57,7 +58,7 @@ export default function Footer() {
             {
               titulo: "Legal",
               links: [
-                { label: "Términos y condiciones", href: "/terminos-y-condiciones" },
+                { label: "Términos y condiciones", href: "/terminos" },
                 { label: "Privacidad",             href: "/privacidad" },
                 { label: "Contacto",               href: "/contacto" },
               ],

@@ -20,17 +20,27 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  // Load fonts from Google Fonts (ttf for broad compat)
+  // Load fonts dynamically via Google Fonts CSS API (always returns valid URLs)
+  async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
+    const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`;
+    const css = await fetch(cssUrl, { headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10)" } }).then(r => r.text());
+    const match = css.match(/url\(([^)]+\.ttf)\)/);
+    if (!match) throw new Error(`No TTF URL found for ${family}`);
+    const res = await fetch(match[1]);
+    if (!res.ok) throw new Error(`Font fetch failed: ${res.status}`);
+    return res.arrayBuffer();
+  }
+
   let cinzelBold: ArrayBuffer;
   let latoBold: ArrayBuffer;
   try {
     [cinzelBold, latoBold] = await Promise.all([
-      fetch("https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgfY3lDQ.woff2").then((r) => { if (!r.ok) throw new Error(`Cinzel font: ${r.status}`); return r.arrayBuffer(); }),
-      fetch("https://fonts.gstatic.com/s/lato/v24/S6u9w4BMUTPHh6UVSwiPGQ3q5d0.woff2").then((r) => { if (!r.ok) throw new Error(`Lato font: ${r.status}`); return r.arrayBuffer(); }),
+      fetchFont("Cinzel", 700),
+      fetchFont("Lato", 700),
     ]);
   } catch (fontErr) {
     console.error("[story-image] Font load error:", fontErr);
-    return new Response("Font load failed", { status: 500 });
+    return new Response(`Font load failed: ${fontErr}`, { status: 500 });
   }
 
   const fonts = [

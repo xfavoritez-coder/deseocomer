@@ -1,4 +1,3 @@
-import * as React from "react";
 import { resend } from "@/lib/resend";
 
 const FROM = () =>
@@ -6,50 +5,24 @@ const FROM = () =>
     ? `DeseoComer <${process.env.FROM_EMAIL}>`
     : "DeseoComer <onboarding@resend.dev>";
 
-// ─── Shared email wrapper ───────────────────────────────────────────────────
+// ─── HTML email builder ─────────────────────────────────────────────────────
 
-function emailWrapper(children: React.ReactElement[], accentColor = "rgba(232,168,76,0.25)") {
-  return React.createElement("html", null,
-    React.createElement("body", { style: { backgroundColor: "#1a0e05", fontFamily: "Georgia, serif", margin: 0, padding: 0 } },
-      React.createElement("div", { style: { maxWidth: "560px", margin: "0 auto", padding: "40px 24px" } },
-        React.createElement("div", { style: { textAlign: "center", marginBottom: "32px" } },
-          React.createElement("p", { style: { fontSize: "28px", margin: "0 0 8px" } }, "🧞"),
-          React.createElement("h1", { style: { color: "#e8a84c", fontSize: "20px", letterSpacing: "0.3em", textTransform: "uppercase", margin: 0 } }, "DeseoComer"),
-        ),
-        React.createElement("div", { style: { backgroundColor: "#2d1a08", borderRadius: "20px", border: `1px solid ${accentColor}`, padding: "40px 32px" } },
-          ...children,
-        ),
-        React.createElement("div", { style: { textAlign: "center", marginTop: "32px" } },
-          React.createElement("p", { style: { color: "#5a4028", fontSize: "12px" } }, "Hecho con ❤️ y mucha hambre · DeseoComer.com"),
-        ),
-      ),
-    ),
-  );
+function wrap(content: string, accentBorder = "rgba(232,168,76,0.25)") {
+  return `<html><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:40px 24px">
+<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
+<div style="background-color:#2d1a08;border-radius:20px;border:1px solid ${accentBorder};padding:40px 32px">${content}</div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+</div></body></html>`;
 }
 
-function h2(text: string, color = "#e8a84c") {
-  return React.createElement("h2", { style: { color, fontSize: "22px", marginTop: 0, marginBottom: "16px" } }, text);
-}
-function p(text: string) {
-  return React.createElement("p", { style: { color: "#c0a060", fontSize: "16px", lineHeight: "1.7", marginBottom: "16px" } }, text);
-}
-function strong(text: string) {
-  return React.createElement("p", { style: { color: "#f5d080", fontSize: "18px", fontWeight: "bold", marginBottom: "16px", textAlign: "center", letterSpacing: "0.1em" } }, text);
-}
-function divider() {
-  return React.createElement("hr", { style: { border: "none", borderTop: "1px solid rgba(232,168,76,0.15)", margin: "20px 0" } });
-}
-function btn(href: string, label: string, bg = "#e8a84c") {
-  return React.createElement("div", { style: { textAlign: "center", marginBottom: "16px" } },
-    React.createElement("a", { href, style: { backgroundColor: bg, color: bg === "#e8a84c" ? "#1a0e05" : "#fff", fontSize: "14px", fontWeight: "bold", letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "16px 40px", borderRadius: "12px", display: "inline-block" } }, label),
-  );
-}
-function section(title: string, content: string) {
-  return React.createElement("div", { style: { marginBottom: "12px" } },
-    React.createElement("p", { style: { color: "#c0a060", fontSize: "14px", lineHeight: "1.7", margin: 0 } },
-      React.createElement("strong", { style: { color: "#e8a84c" } }, `${title}: `), content),
-  );
-}
+const h2 = (t: string, c = "#e8a84c") => `<h2 style="color:${c};font-size:22px;margin-top:0;margin-bottom:16px">${t}</h2>`;
+const p = (t: string) => `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">${t}</p>`;
+const strong = (t: string) => `<p style="color:#f5d080;font-size:18px;font-weight:bold;margin-bottom:16px;text-align:center;letter-spacing:0.1em">${t}</p>`;
+const divider = () => `<hr style="border:none;border-top:1px solid rgba(232,168,76,0.15);margin:20px 0"/>`;
+const btn = (href: string, label: string, bg = "#e8a84c") => `<div style="text-align:center;margin-bottom:16px"><a href="${href}" style="background-color:${bg};color:${bg === "#e8a84c" ? "#1a0e05" : "#fff"};font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">${label}</a></div>`;
+const section = (title: string, content: string) => `<p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0 0 4px"><strong style="color:#e8a84c">${title}: </strong>${content}</p>`;
+const sectionTitle = (t: string) => `<p style="color:#e8a84c;font-size:14px;font-weight:bold;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">${t}</p>`;
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -86,7 +59,7 @@ export async function emailGanador(
     from: FROM(),
     to: ganador.email,
     subject: `🏆 ¡Ganaste ${data.premio} en ${data.local.nombre}!`,
-    react: emailWrapper([
+    html: wrap([
       h2("🏆 ¡Felicitaciones, ganaste!"),
       p(`Hola ${ganador.nombre},`),
       p(`¡Eres el ganador del concurso "${data.titulo}" organizado por ${data.local.nombre}!`),
@@ -95,35 +68,17 @@ export async function emailGanador(
       strong(`TU CÓDIGO: ${data.codigoEntrega}`),
       p("Guarda este email, lo necesitarás para retirar tu premio."),
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "DATOS DEL LOCAL"),
-        section("Nombre", data.local.nombre),
-        ...(data.local.direccion ? [section("Dirección", data.local.direccion)] : []),
-        ...(data.local.comuna ? [section("Comuna", data.local.comuna)] : []),
-        ...(data.local.telefono ? [section("Teléfono", data.local.telefono)] : []),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("DATOS DEL LOCAL")}${section("Nombre", data.local.nombre)}${data.local.direccion ? section("Dirección", data.local.direccion) : ""}${data.local.comuna ? section("Comuna", data.local.comuna) : ""}${data.local.telefono ? section("Teléfono", data.local.telefono) : ""}</div>`,
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "IMPORTANTE"),
-        p(`• Tienes hasta el ${fechaExp} para reclamar tu premio`),
-        p("• Si no lo reclamas en ese plazo, el premio pasará al segundo lugar"),
-        p("• El local coordinará contigo la entrega"),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("IMPORTANTE")}${p(`• Tienes hasta el ${fechaExp} para reclamar tu premio`)}${p("• Si no lo reclamas en ese plazo, el premio pasará al segundo lugar")}${p("• El local coordinará contigo la entrega")}</div>`,
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "CONSEJOS PARA RETIRAR TU PREMIO"),
-        p("• Guarda este email, es tu comprobante"),
-        p(`• Lleva tu código ${data.codigoEntrega} al local`),
-        p("• Si el local no te contacta en 48 horas, preséntate directamente con tu código"),
-        p(`• Tienes hasta el ${fechaExp} para reclamarlo`),
-        p("• Si hay algún problema, escríbenos de inmediato en deseocomer.com/contacto"),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("CONSEJOS PARA RETIRAR TU PREMIO")}${p("• Guarda este email, es tu comprobante")}${p(`• Lleva tu código ${data.codigoEntrega} al local`)}${p("• Si el local no te contacta en 48 horas, preséntate directamente con tu código")}${p(`• Tienes hasta el ${fechaExp} para reclamarlo`)}${p("• Si hay algún problema, escríbenos en deseocomer.com/contacto")}</div>`,
       divider(),
       p("¿Recibiste tu premio?"),
       btn(confirmUrl, "Sí, recibí mi premio", "#3db89e"),
       btn(disputaUrl, "No lo recibí", "#ff6b6b"),
       p("El equipo de DeseoComer 🧞"),
-    ]),
+    ].join("")),
   });
 }
 
@@ -138,38 +93,21 @@ export async function emailLocal(
     from: FROM(),
     to: localEmail,
     subject: `🏆 Tu concurso terminó — El ganador es ${ganador.nombre}`,
-    react: emailWrapper([
+    html: wrap([
       h2("🏆 Tu concurso ha finalizado"),
       p(`Hola ${data.local.nombre},`),
       p(`Tu concurso "${data.titulo}" ha finalizado.`),
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "GANADOR"),
-        section("Nombre", ganador.nombre),
-        section("Email", ganador.email),
-        ...(ganador.telefono ? [section("Teléfono", ganador.telefono)] : []),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("GANADOR")}${section("Nombre", ganador.nombre)}${section("Email", ganador.email)}${ganador.telefono ? section("Teléfono", ganador.telefono) : ""}</div>`,
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "PRÓXIMOS PASOS"),
-        p("1. Contacta al ganador en las próximas 48 horas"),
-        p("2. Coordina con él la entrega del premio"),
-        p("3. Si el ganador se presenta sin que lo contactes, verificará su identidad con el código de abajo"),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("PRÓXIMOS PASOS")}${p("1. Contacta al ganador en las próximas 48 horas")}${p("2. Coordina con él la entrega del premio")}${p("3. Si el ganador se presenta sin que lo contactes, verificará su identidad con el código de abajo")}</div>`,
       strong(`CÓDIGO DE VERIFICACIÓN: ${data.codigoEntrega}`),
       p("Si el ganador se presenta, pídele este código para verificar que es la persona correcta."),
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "CONSEJOS PARA LA ENTREGA"),
-        p("• Contacta al ganador a la brevedad"),
-        p(`• Verifica su identidad con el código ${data.codigoEntrega}`),
-        p("• Si el ganador no responde, espera que se presente directamente en tu local"),
-        p("• Cualquier problema repórtalo en deseocomer.com/contacto"),
-        p("• Recuerda que esto genera confianza en tu local y más participación en futuros concursos"),
-      ),
-      btn("https://deseocomer.com/panel/concursos", "Ir al panel →"),
+      `<div style="margin-bottom:16px">${sectionTitle("CONSEJOS PARA LA ENTREGA")}${p("• Contacta al ganador a la brevedad")}${p(`• Verifica su identidad con el código ${data.codigoEntrega}`)}${p("• Si el ganador no responde, espera que se presente directamente en tu local")}${p("• Cualquier problema repórtalo en deseocomer.com/contacto")}${p("• Recuerda que esto genera confianza en tu local y más participación en futuros concursos")}</div>`,
+      btn("https://deseocomer.com/panel/concursos", "Ir al panel"),
       p("El equipo de DeseoComer 🧞"),
-    ]),
+    ].join("")),
   });
 }
 
@@ -185,22 +123,17 @@ export async function emailAcreditacion(
     from: FROM(),
     to: ganador.email,
     subject: `Tu código para retirar tu premio en ${data.local.nombre}`,
-    react: emailWrapper([
+    html: wrap([
       h2("Tu código de acreditación"),
       p(`Hola ${ganador.nombre},`),
       p("Han pasado 48 horas desde que ganaste el concurso. Preséntate directamente en el local para retirar tu premio."),
       strong(`TU CÓDIGO: ${data.codigoEntrega}`),
       p("Muestra este email al llegar al local."),
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "DÓNDE IR"),
-        section("Local", data.local.nombre),
-        ...(data.local.direccion ? [section("Dirección", `${data.local.direccion}${data.local.comuna ? `, ${data.local.comuna}` : ""}`)] : []),
-        ...(data.local.telefono ? [section("Teléfono", data.local.telefono)] : []),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("DÓNDE IR")}${section("Local", data.local.nombre)}${data.local.direccion ? section("Dirección", `${data.local.direccion}${data.local.comuna ? `, ${data.local.comuna}` : ""}`) : ""}${data.local.telefono ? section("Teléfono", data.local.telefono) : ""}</div>`,
       p(`Recuerda que tienes hasta el ${fechaExp} para reclamar tu premio.`),
       p("El equipo de DeseoComer 🧞"),
-    ]),
+    ].join("")),
   });
 }
 
@@ -218,28 +151,22 @@ export async function emailNuevoGanador(
     from: FROM(),
     to: ganador.email,
     subject: `🎉 ¡El premio es tuyo! Quedaste en ${orden}° lugar`,
-    react: emailWrapper([
-      h2(`🎉 ¡El premio es tuyo!`),
+    html: wrap([
+      h2("🎉 ¡El premio es tuyo!"),
       p(`Hola ${ganador.nombre},`),
-      p(`¡Buenas noticias! El ganador original no reclamó su premio y ahora el premio es tuyo.`),
+      p("¡Buenas noticias! El ganador original no reclamó su premio y ahora el premio es tuyo."),
       p(`Quedaste en ${orden}° lugar del concurso "${data.titulo}".`),
       strong(`PREMIO: ${data.premio}`),
       p(`Tienes ${diasParaReclamar} días para reclamarlo.`),
       strong(`TU CÓDIGO: ${data.codigoEntrega}`),
       divider(),
-      React.createElement("div", { style: { marginBottom: "16px" } },
-        React.createElement("p", { style: { color: "#e8a84c", fontSize: "14px", fontWeight: "bold", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.1em" } }, "DATOS DEL LOCAL"),
-        section("Nombre", data.local.nombre),
-        ...(data.local.direccion ? [section("Dirección", data.local.direccion)] : []),
-        ...(data.local.comuna ? [section("Comuna", data.local.comuna)] : []),
-        ...(data.local.telefono ? [section("Teléfono", data.local.telefono)] : []),
-      ),
+      `<div style="margin-bottom:16px">${sectionTitle("DATOS DEL LOCAL")}${section("Nombre", data.local.nombre)}${data.local.direccion ? section("Dirección", data.local.direccion) : ""}${data.local.comuna ? section("Comuna", data.local.comuna) : ""}${data.local.telefono ? section("Teléfono", data.local.telefono) : ""}</div>`,
       divider(),
       p("¿Recibiste tu premio?"),
       btn(confirmUrl, "Sí, recibí mi premio", "#3db89e"),
       btn(disputaUrl, "No lo recibí", "#ff6b6b"),
       p("El equipo de DeseoComer 🧞"),
-    ]),
+    ].join("")),
   });
 }
 
@@ -250,14 +177,14 @@ export async function emailConfirmacion(ganador: GanadorData) {
     from: FROM(),
     to: ganador.email,
     subject: "¡Gracias por confirmar! Premio entregado en DeseoComer",
-    react: emailWrapper([
+    html: wrap([
       h2("🎉 ¡Premio confirmado!"),
       p(`Hola ${ganador.nombre},`),
       p("Gracias por confirmar que recibiste tu premio. ¡Que lo disfrutes!"),
       p("Aparecerás en nuestra página de ganadores."),
       btn("https://deseocomer.com/concursos/ganadores", "Ver ganadores"),
       p("El equipo de DeseoComer 🧞"),
-    ]),
+    ].join("")),
   });
 }
 
@@ -268,13 +195,13 @@ export async function emailDisputa(ganador: GanadorData) {
     from: FROM(),
     to: ganador.email,
     subject: "Abrimos una investigación por tu premio",
-    react: emailWrapper([
+    html: wrap([
       h2("Investigación en curso"),
       p(`Hola ${ganador.nombre},`),
       p("Recibimos tu reporte. Investigaremos el caso con el local en las próximas 48 horas."),
       p("Te mantendremos informado."),
       p("El equipo de DeseoComer 🧞"),
-    ], "rgba(255,80,80,0.25)"),
+    ].join(""), "rgba(255,80,80,0.25)"),
   });
 }
 
@@ -288,14 +215,14 @@ export async function emailExpiracion(
     from: FROM(),
     to: ganador.email,
     subject: "Tu premio en DeseoComer expiró",
-    react: emailWrapper([
+    html: wrap([
       h2("Premio expirado"),
       p(`Hola ${ganador.nombre},`),
       p(`Lamentablemente el plazo para reclamar tu premio "${premio}" expiró sin que lo confirmaras.`),
       p("Participa en nuestros próximos concursos:"),
       btn("https://deseocomer.com/concursos", "Ver concursos activos"),
       p("El equipo de DeseoComer 🧞"),
-    ], "rgba(255,255,255,0.15)"),
+    ].join(""), "rgba(255,255,255,0.15)"),
   });
 }
 
@@ -310,7 +237,7 @@ export async function emailDisputaAdmin(
     from: FROM(),
     to: adminEmail,
     subject: `⚠️ DISPUTA: ${ganador.nombre} reporta no recibir premio en ${data.local.nombre}`,
-    react: emailWrapper([
+    html: wrap([
       h2("⚠️ Disputa de premio", "#ff6b6b"),
       p(`El ganador ${ganador.nombre} (${ganador.email}) reporta NO haber recibido su premio.`),
       section("Concurso", data.titulo),
@@ -318,6 +245,6 @@ export async function emailDisputaAdmin(
       section("Local", data.local.nombre),
       section("Código", data.codigoEntrega),
       btn("https://deseocomer.com/admin/concursos", "Ir al admin"),
-    ], "rgba(255,80,80,0.4)"),
+    ].join(""), "rgba(255,80,80,0.4)"),
   });
 }

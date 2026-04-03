@@ -277,7 +277,7 @@ export default function PromocionesPage() {
                     </div>
 
                     <div style={{ width: "100%", background: isHH ? "linear-gradient(135deg, #c8850a, #d4a017)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", borderRadius: "16px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#07040f", fontWeight: 700, minHeight: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      Ver promoción →
+                      Ver promoción
                     </div>
                   </div>
                 </a>

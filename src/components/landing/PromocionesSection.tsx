@@ -363,7 +363,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
                       pointerEvents: "none",
                     }}
                   >
-                    Ver promoción →
+                    Ver promoción
                   </div>
                 </div>
               </a>

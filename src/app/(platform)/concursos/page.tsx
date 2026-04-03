@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SelloGratis from "@/components/SelloGratis";
+import { useAuth } from "@/contexts/AuthContext";
 
 import {
   CONCURSOS,
@@ -20,6 +21,7 @@ interface TimeLeft { dias: number; horas: number; minutos: number; segundos: num
 
 export default function ConcursosPage() {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
   const [filter, setFilter] = useState<Filter>("todos");
   const [timers, setTimers] = useState<Record<string, TimeLeft>>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,6 +30,7 @@ export default function ConcursosPage() {
   const [finalizados, setFinalizados] = useState<any[]>([]);
   const [finalizadosLoading, setFinalizadosLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [misConcursos, setMisConcursos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
@@ -46,6 +49,14 @@ export default function ConcursosPage() {
       }
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    fetch(`/api/usuarios/${user.id}/participaciones`)
+      .then(r => r.ok ? r.json() : [])
+      .then(ids => { if (Array.isArray(ids)) setMisConcursos(new Set(ids)); })
+      .catch(() => {});
+  }, [isAuthenticated, user?.id]);
 
   const updateTimers = useCallback(() => {
     const next: Record<string, TimeLeft> = {};
@@ -236,11 +247,11 @@ export default function ConcursosPage() {
           <div className="dc-cp-grid">
             {sorted.map(c => {
               const t = timers[c.id];
-              const soon = isSoonEnding(c.endsAt);
+              const ended = t?.ended ?? (c.endsAt <= Date.now());
+              const soon = !ended && isSoonEnding(c.endsAt);
               const urg = "#e05555";
               const localInitial = c.local?.[0] ?? "L";
               const horasRestantes = (c.endsAt - Date.now()) / 3600000;
-              const ended = t?.ended ?? false;
               const createdAt = (c as unknown as Record<string, unknown>).createdAt;
               const horasDesdeCreacion = createdAt ? (Date.now() - new Date(createdAt as string).getTime()) / 3600000 : 999;
               const esTerminaHoy = !ended && horasRestantes <= 24;
@@ -343,14 +354,27 @@ export default function ConcursosPage() {
                     )}
 
                     {/* CTA */}
+                    {!ended ? (
                     <button onClick={e => { e.stopPropagation(); router.push(`/concursos/${c.slug}`); }} style={{
                       width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
                       fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase",
                       letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      background: soon ? urg : "#e8a84c", border: "none", color: soon ? "#fff" : "#0a0812",
+                      background: misConcursos.has(c.id) ? "rgba(61,184,158,0.15)" : soon ? urg : "#e8a84c",
+                      border: misConcursos.has(c.id) ? "1px solid rgba(61,184,158,0.4)" : "none",
+                      color: misConcursos.has(c.id) ? "#3db89e" : soon ? "#fff" : "#0a0812",
                     }}>
-                      {soon ? "¡Participar ya! →" : "Participar →"}
+                      {misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                     </button>
+                    ) : (
+                    <button onClick={e => { e.stopPropagation(); router.push(`/concursos/${c.slug}`); }} style={{
+                      width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
+                      fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase",
+                      letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)",
+                    }}>
+                      Ver resultado
+                    </button>
+                    )}
                   </div>
                 </div>
               );

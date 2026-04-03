@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
+import { emailGanador, emailLocal } from "@/lib/emails/concurso-cierre";
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -7,13 +11,65 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const concurso = await prisma.concurso.findFirst({
       where: { OR: [{ id }, { slug: id }] },
       include: {
-        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true } },
-        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true } } }, orderBy: { puntos: "desc" } },
+        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true } },
+        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true, email: true, telefono: true } } }, orderBy: { puntos: "desc" } },
         ganadorActual: { select: { id: true, nombre: true } },
         _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
       },
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+
+    // Lazy close: if contest ended but still "activo", close it now and send emails
+    if (concurso.estado === "activo" && new Date(concurso.fechaFin) <= new Date() && concurso.participantes.length > 0) {
+      const [p1, p2, p3] = concurso.participantes;
+      const codigo = `DC-${concurso.id.slice(-6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+      const token = crypto.randomUUID();
+      const esSospechoso = p1.estado === "sospechoso";
+
+      await prisma.concurso.update({
+        where: { id: concurso.id },
+        data: {
+          estado: esSospechoso ? "en_revision" : "finalizado",
+          activo: false,
+          ganador1Id: p1.usuario.id,
+          ganador2Id: p2?.usuario.id ?? null,
+          ganador3Id: p3?.usuario.id ?? null,
+          ganadorActualId: p1.usuario.id,
+          codigoEntrega: codigo,
+          confirmacionToken: token,
+          ...(!esSospechoso ? { ganadorNotificadoAt: new Date(), localNotificadoAt: new Date() } : {}),
+        },
+      });
+
+      if (!esSospechoso) {
+        const emailData = {
+          concursoId: concurso.id, titulo: concurso.premio, premio: concurso.premio, codigoEntrega: codigo,
+          local: { nombre: concurso.local.nombre, direccion: concurso.local.direccion, comuna: concurso.local.comuna, telefono: concurso.local.telefono },
+        };
+        const ganador = { nombre: p1.usuario.nombre, email: p1.usuario.email!, telefono: p1.usuario.telefono };
+        const urls = {
+          confirm: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=si`,
+          disputa: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=no`,
+        };
+        try {
+          await emailGanador(emailData, ganador, urls.confirm, urls.disputa);
+          await emailLocal(emailData, concurso.local.email!, ganador);
+        } catch (e) { console.error("[Lazy close email]", e); }
+      }
+
+      // Re-fetch with updated data
+      const updated = await prisma.concurso.findFirst({
+        where: { id: concurso.id },
+        include: {
+          local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true } },
+          participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true } } }, orderBy: { puntos: "desc" } },
+          ganadorActual: { select: { id: true, nombre: true } },
+          _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
+        },
+      });
+      return NextResponse.json(updated);
+    }
+
     return NextResponse.json(concurso);
   } catch (error) {
     console.error("[API /concursos/[id]] Error:", error);

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import SelloGratis from "@/components/SelloGratis";
+import { useAuth } from "@/contexts/AuthContext";
 
 
 
@@ -8,9 +9,11 @@ interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: 
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
+  const { user, isAuthenticated } = useAuth();
   const [concursos, setConcursos] = useState(concursosMock);
   const [loading, setLoading] = useState(true);
   const [tiempos, setTiempos] = useState<Record<string, {d:number,h:number,m:number,s:number}>>({});
+  const [misConcursos, setMisConcursos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
@@ -41,6 +44,14 @@ export default function ConcursosSection() {
       }
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id) return;
+    fetch(`/api/usuarios/${user.id}/participaciones`)
+      .then(r => r.ok ? r.json() : [])
+      .then(ids => { if (Array.isArray(ids)) setMisConcursos(new Set(ids)); })
+      .catch(() => {});
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     const calcular = () => {
@@ -180,11 +191,11 @@ export default function ConcursosSection() {
                       <span className={esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
                         fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
-                        border: `1px solid ${esUrgente ? urgColor : "var(--accent)"}`,
-                        color: esUrgente ? urgColor : "var(--accent)",
+                        border: `1px solid ${misConcursos.has(c.id) ? "rgba(61,184,158,0.4)" : esUrgente ? urgColor : "var(--accent)"}`,
+                        color: misConcursos.has(c.id) ? "#3db89e" : esUrgente ? urgColor : "var(--accent)",
                         background: "transparent",
                       }}>
-                        Participar →
+                        {misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                       </span>
                     )}
                   </div>
