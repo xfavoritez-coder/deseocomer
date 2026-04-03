@@ -5,6 +5,7 @@ export type CategoriaPromocion = "almuerzo" | "cena" | "desayuno" | "bebidas" | 
 
 export interface Promocion {
   id: number;
+  slug?: string;
   localId: string;
   local: string;
   comuna: string;

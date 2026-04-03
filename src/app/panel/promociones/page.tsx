@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import SubirFoto from "@/components/SubirFoto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface PromoDB { id: string; localId: string; tipo: string; titulo: string; descripcion: string | null; condiciones: string | null; porcentajeDescuento: number | null; diasSemana: any; horaInicio: string; horaFin: string; imagenUrl: string | null; activa: boolean }
+interface PromoDB { id: string; slug: string | null; localId: string; tipo: string; titulo: string; descripcion: string | null; condiciones: string | null; porcentajeDescuento: number | null; diasSemana: any; horaInicio: string; horaFin: string; imagenUrl: string | null; activa: boolean }
 
 const I: React.CSSProperties = { width: "100%", padding: "12px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" };
 const L: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-label, var(--text-muted))", marginBottom: "6px", display: "block" };
 const B: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", background: "var(--accent)", color: "var(--bg-primary)", fontWeight: 700, padding: "12px 24px", borderRadius: "12px", border: "none", cursor: "pointer" };
-const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Combo", "Regalo", "Cumpleaños"];
+const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Promo", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
 const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "", tieneVencimiento: false, fechaVencimiento: "", modalidad: [] as string[] };
@@ -219,14 +219,14 @@ export default function PanelPromociones() {
             {/* Top row: image + info */}
             <div style={{ display: "flex", alignItems: "center" }}>
               {p.imagenUrl ? (
-                <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
+                <a href={`/promociones/${p.slug || p.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
                   <img src={p.imagenUrl} alt="" style={{ width: 80, height: 80, objectFit: "cover", display: "block" }} />
                 </a>
               ) : (
-                <a href={`/promociones/${p.id}`} target="_blank" rel="noopener noreferrer" style={{ width: 80, height: 80, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", flexShrink: 0, textDecoration: "none" }}>⚡</a>
+                <a href={`/promociones/${p.slug || p.id}`} target="_blank" rel="noopener noreferrer" style={{ width: 80, height: 80, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", flexShrink: 0, textDecoration: "none" }}>⚡</a>
               )}
               <div style={{ flex: 1, padding: "12px 16px", minWidth: 0 }}>
-                <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo}</p>
+                <a href={`/promociones/${p.slug || p.id}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", textDecoration: "none" }}>{p.titulo}</a>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                   <span style={{ background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "#e8a84c", fontWeight: 700, letterSpacing: "0.05em" }}>{p.porcentajeDescuento ? `Descuento` : p.tipo}</span>
                   <span style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)" }}>{p.horaInicio} - {p.horaFin}</span>

@@ -18,3 +18,14 @@ export function makeLocalSlug(nombre: string, comuna?: string): string {
 export function makeConcursoSlug(premio: string, localNombre: string): string {
   return slugify(`${premio} ${localNombre}`);
 }
+
+export function makePromoSlug(titulo: string, localNombre: string): string {
+  const text = `${titulo} ${localNombre}`;
+  return text.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 60)
+    .replace(/^-|-$/g, "");
+}

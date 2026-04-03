@@ -44,6 +44,7 @@ export interface LocalRecomendado {
   comunasDelivery?: string[];
   tieneRetiro?: boolean;
   linkPedido?: string;
+  tags?: string[];
 }
 
 interface GenieContextType {
@@ -163,6 +164,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
           comunasDelivery: (l.comunasDelivery as string[]) ?? [],
           tieneRetiro: (l.tieneRetiro as boolean) ?? false,
           linkPedido: (l.linkPedido as string) ?? "",
+          tags: (l.tags as string[]) ?? [],
         })));
       }
     }).catch(() => {});

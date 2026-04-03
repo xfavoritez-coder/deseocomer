@@ -24,9 +24,9 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
   if (t === "2x1") return { text: "2×1", color: "#3db89e" };
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
-  if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
+  if (t === "cupon" || t === "cupón") return { text: "PROMO", color: "#e8a84c" };
   if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
-  if (t === "combo") return { text: "COMBO", color: "#e8a84c" };
+  if (t === "combo" || t === "promo") return { text: "PROMO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }
@@ -461,7 +461,7 @@ export default function PromocionDetailPage() {
                 const relSello = getSello(rel);
                 const relActiva = isPromocionActivaAhora(rel);
                 return (
-                  <Link key={rel.id} href={`/promociones/${rel.id}`} className="dc-pd-related-card" style={{ textDecoration: "none", display: "block" }}>
+                  <Link key={rel.id} href={`/promociones/${(rel as any).slug || rel.id}`} className="dc-pd-related-card" style={{ textDecoration: "none", display: "block" }}>
                     {rel.imagenUrl && (
                       <div style={{ position: "relative", height: "120px", overflow: "hidden", borderRadius: "14px 14px 0 0" }}>
                         <img src={rel.imagenUrl} alt={rel.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />

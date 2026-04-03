@@ -4,15 +4,15 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const promocion = await prisma.promocion.findUnique({
-      where: { id },
+    const promocion = await prisma.promocion.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
       include: {
         local: { select: { id: true, slug: true, nombre: true, comuna: true, categoria: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true, direccion: true, linkPedido: true } },
       },
     });
     if (!promocion) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
     // Increment view count (fire and forget)
-    prisma.promocion.update({ where: { id }, data: { vistas: { increment: 1 } } }).catch(() => {});
+    prisma.promocion.update({ where: { id: promocion.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
     return NextResponse.json(promocion);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

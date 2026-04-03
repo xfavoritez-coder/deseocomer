@@ -65,7 +65,7 @@ function getColor(name: string): string {
 }
 
 type Tab = "Información" | "Reseñas" | "Concursos" | "Promociones";
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -124,6 +124,7 @@ export default function LocalDetailPage() {
     tieneRetiro: (dbLocal.tieneRetiro as boolean) ?? false,
     sirveEnMesa: (dbLocal.sirveEnMesa as boolean) ?? true,
     linkPedido: (dbLocal.linkPedido as string) ?? "",
+    tags: (dbLocal.tags as string[]) ?? [],
   } : null);
 
   // Detect owner / local session
@@ -262,6 +263,15 @@ export default function LocalDetailPage() {
                   </div>
                 </>)}
               </div>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {Array.isArray((local as any).tags) && (local as any).tags.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(local as any).tags.slice(0, 4).map((tag: string) => (
+                    <span key={tag} style={{ padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(232,168,76,0.08)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)" }}>{tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -341,7 +351,7 @@ export default function LocalDetailPage() {
                     return (
                       <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Promoción activa</p>
-                        <Link href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
+                        <Link href={`/promociones/${(p as any).slug || p.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
                           {p.imagenUrl ? (
                             <img src={p.imagenUrl as string} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
                           ) : (
@@ -523,7 +533,7 @@ export default function LocalDetailPage() {
                       : [];
                     const diasTexto = diasActivos.length === 7 ? "Todos los días" : diasActivos.length > 0 ? diasActivos.join(", ") : "";
                     return (
-                      <Link key={p.id as string} href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "14px 16px", textDecoration: "none" }}>
+                      <Link key={p.id as string} href={`/promociones/${(p as any).slug || p.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "14px 16px", textDecoration: "none" }}>
                         {p.imagenUrl ? (
                           <img src={p.imagenUrl as string} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
                         ) : (

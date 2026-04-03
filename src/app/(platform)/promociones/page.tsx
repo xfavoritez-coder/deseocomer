@@ -22,7 +22,7 @@ function formatDias(dias: number[]): string {
   if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
   return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", combo: "Combo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   const t = promo.tipo?.toLowerCase() ?? "";
@@ -30,9 +30,9 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
   if (t === "2x1") return { text: "2×1", color: "#3db89e" };
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
-  if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
+  if (t === "cupon" || t === "cupón") return { text: "PROMO", color: "#e8a84c" };
   if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
-  if (t === "combo") return { text: "COMBO", color: "#e8a84c" };
+  if (t === "combo" || t === "promo") return { text: "PROMO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }
@@ -50,8 +50,10 @@ export default function PromocionesPage() {
   });
   const [esCumple, setEsCumple] = useState(false);
   const [filtroComuna, setFiltroComuna] = useState("");
+  const [filtroCategoria, setFiltroCategoria] = useState("");
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
   const comunasDisponibles = [...new Set(promos.map(p => p.comuna).filter(Boolean))].sort();
+  const categoriasComida = [...new Set(promos.map(p => (p as any).localCategoria).filter(Boolean))].sort();
 
   // Fetch from BD
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function PromocionesPage() {
       if (Array.isArray(data) && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mapped = data.map((p: any) => ({
-          id: p.id, localId: p.localId, local: p.local?.nombre ?? "Local",
+          id: p.id, slug: p.slug ?? null, localId: p.localId, local: p.local?.nombre ?? "Local",
           logoUrl: p.local?.logoUrl ?? "",
           comuna: p.local?.comuna ?? "", tipo: normalizeTipo(p.tipo ?? ""),
           categoria: "cena" as const, imagen: "⚡", imagenUrl: p.imagenUrl ?? "",
@@ -74,6 +76,7 @@ export default function PromocionesPage() {
           condiciones: p.condiciones ?? undefined,
           modalidad: Array.isArray(p.modalidad) ? p.modalidad : [],
           vistas: p.vistas ?? 0,
+          localCategoria: p.local?.categoria ?? "",
         }));
         setPromos(mapped);
       }
@@ -107,6 +110,10 @@ export default function PromocionesPage() {
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
     if (filtroComuna && p.comuna?.toLowerCase() !== filtroComuna.toLowerCase()) return false;
+    if (filtroCategoria) {
+      const catLower = filtroCategoria.toLowerCase();
+      if (!(p as any).localCategoria?.toLowerCase().includes(catLower)) return false;
+    }
     // Day filter
     if (diaSeleccionado !== "Todos") {
       const diaIndex: Record<string, number> = { "Lun": 0, "Mar": 1, "Mié": 2, "Jue": 3, "Vie": 4, "Sáb": 5, "Dom": 6 };
@@ -157,7 +164,7 @@ export default function PromocionesPage() {
             { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
             { key: "descuento", label: "Descuento", color: "#ff6644" },
             { key: "2x1", label: "2\u00d71", color: "#3db89e" },
-            { key: "cupon", label: "Cupón", color: "#8040d0" },
+            { key: "promo", label: "Promo", color: "#e8a84c" },
             { key: "precio_especial", label: "Especial", color: "#e8a84c" },
             { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
           ].map(({ key, label, color }) => {
@@ -191,6 +198,10 @@ export default function PromocionesPage() {
             <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>Todas las comunas</option>
             {comunasDisponibles.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
           </select>
+          <select value={filtroCategoria} onChange={e => setFiltroCategoria(e.target.value)} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: filtroCategoria ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.02)", color: filtroCategoria ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.06em", cursor: "pointer", outline: "none" }}>
+            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>Tipo de comida</option>
+            {categoriasComida.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
+          </select>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.02)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.06em", cursor: "pointer", outline: "none", marginLeft: "auto" }}>
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>Para ti ✨</option>
             <option value="nuevas" style={{ background: "#0a0812", color: "#f0ead6" }}>Más nuevas</option>
@@ -199,9 +210,9 @@ export default function PromocionesPage() {
         </div>
 
         {/* Fila 5 — Limpiar */}
-        {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna) && (
+        {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna || filtroCategoria) && (
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setDiaSeleccionado("Hoy"); setFiltroComuna(""); setOrdenamiento("para_ti"); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setDiaSeleccionado("Hoy"); setFiltroComuna(""); setFiltroCategoria(""); setOrdenamiento("para_ti"); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
           </div>
         )}
       </div>
@@ -247,7 +258,7 @@ export default function PromocionesPage() {
               const logoUrl = (promo as unknown as Record<string, unknown>).logoUrl as string | undefined;
               const cumpleBorder = esCumple ? "1px solid rgba(224,80,144,0.35)" : "";
               return (
-                <a key={promo.id} href={`/promociones/${promo.id}`} style={{
+                <a key={promo.id} href={`/promociones/${(promo as any).slug || promo.id}`} style={{
                   backgroundColor: "rgba(45,26,8,0.85)",
                   border: cumpleBorder || (isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)"),
                   borderRadius: "20px", cursor: "pointer", position: "relative", overflow: "hidden",

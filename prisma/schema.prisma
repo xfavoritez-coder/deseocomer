@@ -208,6 +208,7 @@ model ParticipanteConcurso {
 
 model Promocion {
   id                  String   @id @default(cuid())
+  slug                String?  @unique
   localId             String
   tipo                String
   titulo              String

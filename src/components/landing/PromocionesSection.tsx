@@ -15,11 +15,11 @@ import {
 import { boostScore } from "@/lib/personalizacion";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface PromoFromDB { id: string; localId: string; local: string; logoUrl: string; comuna: string; tipo: string; imagenUrl: string; titulo: string; descripcion: string; porcentajeDescuento: number | null; precioOriginal: number | null; precioDescuento: number | null; diasSemana: boolean[]; horaInicio: string; horaFin: string; activa: boolean; esCumpleanos: boolean; condiciones: string | null; }
+interface PromoFromDB { id: string; slug?: string | null; localId: string; local: string; logoUrl: string; comuna: string; tipo: string; imagenUrl: string; titulo: string; descripcion: string; porcentajeDescuento: number | null; precioOriginal: number | null; precioDescuento: number | null; diasSemana: boolean[]; horaInicio: string; horaFin: string; activa: boolean; esCumpleanos: boolean; condiciones: string | null; }
 
 function mapDBToPromocion(p: PromoFromDB): Promocion {
   return {
-    id: p.id as unknown as number, localId: p.localId, local: p.local,
+    id: p.id as unknown as number, slug: p.slug ?? undefined, localId: p.localId, local: p.local,
     comuna: p.comuna, tipo: normalizeTipo(p.tipo),
     categoria: "cena" as const, imagen: "⚡", imagenUrl: p.imagenUrl,
     titulo: p.titulo, descripcion: p.descripcion,
@@ -180,11 +180,11 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
               : tLower === "descuento" || tLower === "descuento %" || promo.porcentajeDescuento
               ? { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" }
               : tLower === "cupon" || tLower === "cupón"
-              ? { text: "CUPÓN", color: "#8040d0" }
+              ? { text: "PROMO", color: "#e8a84c" }
               : tLower === "precio_especial" || tLower === "especial"
               ? { text: "ESPECIAL", color: "#e8a84c" }
-              : tLower === "combo"
-              ? { text: "COMBO", color: "#e8a84c" }
+              : tLower === "combo" || tLower === "promo"
+              ? { text: "PROMO", color: "#e8a84c" }
               : tLower === "regalo"
               ? { text: "REGALO", color: "#e8a84c" }
               : null;
@@ -192,7 +192,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
             return (
               <a
                 key={promo.id}
-                href={`/promociones/${promo.id}`}
+                href={`/promociones/${(promo as any).slug || promo.id}`}
                 className={`dc-ps-card${isHH ? " dc-ps-card--hh" : ""}${isUltimas ? " dc-ps-card--urgent" : ""}`}
                 style={{
                   backgroundColor: "rgba(45,26,8,0.85)",

@@ -339,7 +339,7 @@ export default function GeniePanel() {
               {(promoActiva || concursoActivo) && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "12px" }}>
                   {promoActiva && (
-                    <Link href={`/promociones/${promoActiva.id}`} onClick={() => setIsOpen(false)} style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.22)", borderRadius: "8px", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
+                    <Link href={`/promociones/${promoActiva.slug || promoActiva.id}`} onClick={() => setIsOpen(false)} style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.22)", borderRadius: "8px", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
                       <span style={{ fontSize: "14px" }}>🏷️</span>
                       <div style={{ flex: 1 }}>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "#3db89e", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>Promoción activa</p>

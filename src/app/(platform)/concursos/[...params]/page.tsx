@@ -126,6 +126,13 @@ function ConcursoDetallePage() {
   const [refBannerDismissed, setRefBannerDismissed] = useState(false);
   const [tooltipActivo, setTooltipActivo] = useState<string | null>(null);
   const [showAllRanking, setShowAllRanking] = useState(false);
+  const [infoTooltip, setInfoTooltip] = useState<string | null>(null);
+  useEffect(() => {
+    if (!infoTooltip) return;
+    const handler = (e: MouseEvent) => { if (!(e.target as Element).closest('.info-btn-concurso')) setInfoTooltip(null); };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, [infoTooltip]);
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
@@ -668,19 +675,32 @@ function ConcursoDetallePage() {
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                 {[
-  { icon: "🎟️", pts: "+1", label: "Al registrarte" },
-  { icon: "🆕", pts: "+3", label: "Referido nuevo en DC" },
-  { icon: "👥", pts: "+2", label: "Amigo ya registrado" },
-  { icon: "⚡", pts: "+2", label: "Bonus madrugador" },
-  { icon: "🔗", pts: "+1", label: "Red de referidos" },
-  { icon: "💛", pts: "+1", label: "Al apoyar" },
-].map(s => (
-                  <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
+  { icon: "🎟️", pts: "+1", label: "Al registrarte", id: "tt1", ttTitle: "Al registrarte", ttText: "Solo por unirte a este concurso ya ganas 1 punto automáticamente.", ttPts: "+1 punto" },
+  { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ganas 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos" },
+  { icon: "👥", pts: "+2", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 2 puntos por cada uno.", ttPts: "+2 puntos" },
+  { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
+  { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando alguien que tú invitaste invita a otros, también sumas 1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
+  { icon: "💛", pts: "+1", label: "Al apoyar", id: "tt6", ttTitle: "Al apoyar a otro", ttText: "Toca el corazón junto a cualquier participante en el ranking para darle +1 punto. Puedes apoyar una vez cada 24 horas.", ttPts: "+1 punto al otro" },
+].map((s, idx) => {
+                  const isTop = idx < 3;
+                  const col = idx % 3;
+                  return (
+                  <div key={s.label} className="info-btn-concurso" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center", position: "relative" }}>
+                    <button className="info-btn-concurso" onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === s.id ? null : s.id); }} style={{ position: "absolute", top: 6, right: 6, width: 16, height: 16, borderRadius: "50%", background: infoTooltip === s.id ? "rgba(232,168,76,0.2)" : "rgba(232,168,76,0.12)", border: infoTooltip === s.id ? "1px solid rgba(232,168,76,0.5)" : "1px solid rgba(232,168,76,0.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, fontWeight: 800, color: infoTooltip === s.id ? "#e8a84c" : "rgba(232,168,76,0.6)", fontStyle: "italic", padding: 0, lineHeight: 1 }}>i</button>
+                    {infoTooltip === s.id && (
+                      <div style={{ position: "absolute", width: 200, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, ...(isTop ? { bottom: "calc(100% + 8px)", top: "auto" } : { top: "calc(100% + 8px)", bottom: "auto" }), ...(col === 0 ? { left: 0, transform: "none" } : col === 2 ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
+                        <div style={{ position: "absolute", ...(isTop ? { top: "100%", borderTop: "6px solid rgba(232,168,76,0.3)", borderBottom: "none" } : { bottom: "100%", borderBottom: "6px solid rgba(232,168,76,0.3)", borderTop: "none" }), left: "50%", transform: "translateX(-50%)", borderLeft: "6px solid transparent", borderRight: "6px solid transparent" }} />
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 5 }}>{s.ttTitle}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>{s.ttText}</p>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#3db89e", marginTop: 6, fontWeight: 700 }}>{s.ttPts}</p>
+                      </div>
+                    )}
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
                     <div style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
               <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 16, padding: 20, marginTop: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
