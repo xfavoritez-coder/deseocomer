@@ -14,8 +14,6 @@ export async function GET(req: NextRequest) {
         activo: true,
         local: {
           activo: true,
-          direccion: { not: "" },
-          categoria: { not: null },
         },
       },
       include: {
