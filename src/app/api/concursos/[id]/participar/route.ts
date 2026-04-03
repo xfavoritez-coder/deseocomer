@@ -51,8 +51,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Create participation (+1 por unirse, +2 bonus madrugador si aplica)
     const participante = await prisma.participanteConcurso.create({
       data: {
-        concursoId: concurso.id, usuarioId, referidoPor, puntos: esMadrugador ? 3 : 1,
-        referidorDirectoId, referidorNivel2Id,
+        concursoId: concurso.id, usuarioId, referidoPor: referidoPor || null, puntos: esMadrugador ? 3 : 1,
+        referidorDirectoId: referidorDirectoId || null, referidorNivel2Id: referidorNivel2Id || null,
         esMadrugador, puntosMadrugador: esMadrugador ? 2 : 0,
       },
     });
