@@ -6,18 +6,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+ try {
   const { id } = await params;
 
-  let concurso;
-  try {
-    concurso = await prisma.concurso.findFirst({
-      where: { OR: [{ id }, { slug: id }] },
-      include: { local: { select: { nombre: true } } },
-    });
-  } catch (dbErr) {
-    console.error("[story-image] DB error:", dbErr);
-    return new Response(`DB error: ${dbErr}`, { status: 500 });
-  }
+  const concurso = await prisma.concurso.findFirst({
+    where: { OR: [{ id }, { slug: id }] },
+    include: { local: { select: { nombre: true } } },
+  });
 
   if (!concurso) {
     return new Response("Not found", { status: 404 });
@@ -271,4 +266,8 @@ export async function GET(
       fonts,
     }
   );
+ } catch (err) {
+  console.error("[story-image] Error:", err);
+  return new Response(`Story image error: ${err instanceof Error ? err.message : String(err)}`, { status: 500 });
+ }
 }
