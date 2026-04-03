@@ -49,6 +49,9 @@ export default function PromocionesPage() {
     return dias[new Date().getDay()];
   });
   const [esCumple, setEsCumple] = useState(false);
+  const [filtroComuna, setFiltroComuna] = useState("");
+  const [ordenamiento, setOrdenamiento] = useState("para_ti");
+  const comunasDisponibles = [...new Set(promos.map(p => p.comuna).filter(Boolean))].sort();
 
   // Fetch from BD
   useEffect(() => {
@@ -70,6 +73,7 @@ export default function PromocionesPage() {
           esCumpleanos: p.esCumpleanos ?? false,
           condiciones: p.condiciones ?? undefined,
           modalidad: Array.isArray(p.modalidad) ? p.modalidad : [],
+          vistas: p.vistas ?? 0,
         }));
         setPromos(mapped);
       }
@@ -102,6 +106,7 @@ export default function PromocionesPage() {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
     if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
+    if (filtroComuna && p.comuna?.toLowerCase() !== filtroComuna.toLowerCase()) return false;
     // Day filter
     if (diaSeleccionado !== "Todos") {
       const diaIndex: Record<string, number> = { "Lun": 0, "Mar": 1, "Mié": 2, "Jue": 3, "Vie": 4, "Sáb": 5, "Dom": 6 };
@@ -113,7 +118,13 @@ export default function PromocionesPage() {
 
   // Birthday: show birthday promos first
   const promosCumple = esCumple ? filtered.filter(p => p.esCumpleanos) : [];
-  const promosNormales = (esCumple ? filtered.filter(p => !p.esCumpleanos) : [...filtered]).sort((a, b) => boostScore(null, b.comuna) - boostScore(null, a.comuna));
+  const promosNormales = (esCumple ? filtered.filter(p => !p.esCumpleanos) : [...filtered]).sort((a, b) => {
+    const boostDiff = boostScore(null, b.comuna) - boostScore(null, a.comuna);
+    if (ordenamiento === "para_ti") return boostDiff;
+    if (ordenamiento === "nuevas") return 0; // already sorted by createdAt desc from API
+    if (ordenamiento === "visitadas") return ((b as unknown as Record<string, number>).vistas ?? 0) - ((a as unknown as Record<string, number>).vistas ?? 0);
+    return boostDiff;
+  });
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -174,10 +185,23 @@ export default function PromocionesPage() {
           })}
         </div>
 
-        {/* Fila 4 — Limpiar */}
-        {(filtrosTipo.length > 0 || filtroActivas || busqueda) && (
+        {/* Fila 4 — Comuna + Ordenamiento */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "12px", flexWrap: "wrap" }}>
+          <select value={filtroComuna} onChange={e => setFiltroComuna(e.target.value)} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: filtroComuna ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.02)", color: filtroComuna ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.06em", cursor: "pointer", outline: "none" }}>
+            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>Todas las comunas</option>
+            {comunasDisponibles.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
+          </select>
+          <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 14px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.02)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.06em", cursor: "pointer", outline: "none", marginLeft: "auto" }}>
+            <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>Para ti ✨</option>
+            <option value="nuevas" style={{ background: "#0a0812", color: "#f0ead6" }}>Más nuevas</option>
+            <option value="visitadas" style={{ background: "#0a0812", color: "#f0ead6" }}>Más visitadas</option>
+          </select>
+        </div>
+
+        {/* Fila 5 — Limpiar */}
+        {(filtrosTipo.length > 0 || filtroActivas || busqueda || filtroComuna) && (
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setDiaSeleccionado("Hoy"); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
+            <button onClick={() => { setFiltrosTipo([]); setFiltroActivas(false); setBusqueda(""); setDiaSeleccionado("Hoy"); setFiltroComuna(""); setOrdenamiento("para_ti"); }} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", cursor: "pointer", whiteSpace: "nowrap", letterSpacing: "0.08em" }}>✕ Limpiar</button>
           </div>
         )}
       </div>

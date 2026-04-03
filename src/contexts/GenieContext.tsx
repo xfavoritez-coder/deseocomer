@@ -198,6 +198,10 @@ export function GenieProvider({ children }: { children: ReactNode }) {
         const yaSolicitado = localStorage.getItem(CUMPLE_SOLICITADO_KEY);
         const yaTieneFecha = localStorage.getItem("deseocomer_user_birthday");
         const userTieneCumple = user?.cumpleDia && user?.cumpleMes;
+        // Auto-mark as solicited if user already has birthday data
+        if ((yaTieneFecha || userTieneCumple) && !yaSolicitado) {
+          localStorage.setItem(CUMPLE_SOLICITADO_KEY, "true");
+        }
         if (visitas >= 2 && !yaSolicitado && !yaTieneFecha && !userTieneCumple) {
           setTimeout(() => {
             setToastActivo({

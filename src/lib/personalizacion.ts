@@ -37,23 +37,30 @@ export function boostScore(categoria?: string | null, comuna?: string | null, ta
 
   let score = 0;
 
+  // Helper: case-insensitive lookup in a record
+  const lookup = (record: Record<string, number>, key: string): number => {
+    const lower = key.toLowerCase();
+    for (const [k, v] of Object.entries(record)) {
+      if (k.toLowerCase() === lower) return v;
+    }
+    return 0;
+  };
+
   // Category match (strongest signal)
   if (categoria) {
-    const catScore = gustos.categorias[categoria] ?? 0;
-    score += catScore * 3;
+    score += lookup(gustos.categorias, categoria) * 3;
   }
 
   // Tags match (check each tag against categories)
   if (tags && tags.length > 0) {
     for (const tag of tags) {
-      score += (gustos.categorias[tag] ?? 0) * 1.5;
+      score += lookup(gustos.categorias, tag) * 1.5;
     }
   }
 
   // Comuna match
   if (comuna) {
-    const comScore = gustos.comunas[comuna] ?? 0;
-    score += comScore * 2;
+    score += lookup(gustos.comunas, comuna) * 2;
   }
 
   return score;
