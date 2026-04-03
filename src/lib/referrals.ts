@@ -151,3 +151,12 @@ export function supportUser(concursoId: string | number, supporterId: string, ta
     return true;
   } catch { return false; }
 }
+
+/** Revert a support action from localStorage (when API rejects it) */
+export function unsupportUser(concursoId: string | number, supporterId: string, targetId: string): void {
+  try {
+    const store = JSON.parse(localStorage.getItem(SUPPORT_KEY) ?? "{}") as Record<string, boolean>;
+    delete store[`${concursoId}_${supporterId}_${targetId}_${todayStr()}`];
+    localStorage.setItem(SUPPORT_KEY, JSON.stringify(store));
+  } catch {}
+}

@@ -28,6 +28,7 @@ import {
   findUserByRefCode,
   hasSupportedToday,
   supportUser,
+  unsupportUser,
 } from "@/lib/referrals";
 import { useGenie } from "@/contexts/GenieContext";
 
@@ -288,7 +289,7 @@ function ConcursoDetallePage() {
         const res = await fetch(`/api/concursos/${slug}/apoyar`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ supporterId: user.id, targetUsuarioId }) });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
-          if (res.status === 403) { setSupportError(data.error ?? "Debes verificar tu correo para apoyar."); setTimeout(() => setSupportError(""), 5000); setSupportedMap(m => { const n = { ...m }; delete n[targetId]; return n; }); }
+          setSupportError(data.error ?? "No se pudo enviar el apoyo."); setTimeout(() => setSupportError(""), 5000); unsupportUser(concursoId, user.id, targetId); setSupportedMap(m => { const n = { ...m }; delete n[targetId]; return n; });
         }
       } catch {}
     }
