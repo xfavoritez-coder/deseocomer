@@ -210,8 +210,10 @@ export function GenieProvider({ children }: { children: ReactNode }) {
             } else {
               // BD does NOT have birthday → clear stale localStorage data
               localStorage.removeItem("deseocomer_user_birthday");
-              localStorage.removeItem(CUMPLE_SOLICITADO_KEY);
-              if (visitas >= 2 && !yaSolicitado) {
+              // Only ask once per session, not on every page load
+              const yaPreguntadoSesion = sessionStorage.getItem("cumple_preguntado");
+              if (visitas >= 2 && !yaSolicitado && !yaPreguntadoSesion) {
+                sessionStorage.setItem("cumple_preguntado", "1");
                 setToastActivo({
                   id: "cumpleanos",
                   mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
