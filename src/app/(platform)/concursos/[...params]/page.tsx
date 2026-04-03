@@ -122,6 +122,10 @@ function ConcursoDetallePage() {
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [phoneSaving, setPhoneSaving] = useState(false);
   const refProcessed = useRef(false);
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
@@ -248,11 +252,6 @@ function ConcursoDetallePage() {
     }
     refreshRanking();
   };
-  const [showPhoneModal, setShowPhoneModal] = useState(false);
-  const [phoneInput, setPhoneInput] = useState("");
-  const [phoneError, setPhoneError] = useState("");
-  const [phoneSaving, setPhoneSaving] = useState(false);
-
   const doJoin = async () => {
     if (!user || joinLoading) return;
     setJoinLoading(true);
