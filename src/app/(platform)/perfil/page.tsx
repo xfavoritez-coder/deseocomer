@@ -646,7 +646,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
       if (Array.isArray(s.comidasFavoritas) && s.comidasFavoritas.length > 0) setComidasFavoritas(s.comidasFavoritas);
       // If not in localStorage, fetch from DB
       if (s.id && (!s.estiloAlimentario && (!s.comidasFavoritas || s.comidasFavoritas.length === 0))) {
-        fetch(`/api/usuarios/${s.id}`).then(r => r.ok ? r.json() : null).then(data => {
+        fetch(`/api/usuarios/${s.id}/perfil`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
             if (data.estiloAlimentario) { setEstiloAlimentario(data.estiloAlimentario); s.estiloAlimentario = data.estiloAlimentario; }
             if (Array.isArray(data.comidasFavoritas) && data.comidasFavoritas.length > 0) { setComidasFavoritas(data.comidasFavoritas); s.comidasFavoritas = data.comidasFavoritas; }
@@ -768,7 +768,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Estilo alimentario</span>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {[
-              { value: "omnivoro", emoji: "🍽️", label: "Omnívoro" },
+              { value: "omnivoro", emoji: "🍽️", label: "Como de todo" },
               { value: "carnivoro", emoji: "🥩", label: "Carnívoro" },
               { value: "vegetariano", emoji: "🌱", label: "Vegetariano" },
               { value: "vegano", emoji: "🌿", label: "Vegano" },

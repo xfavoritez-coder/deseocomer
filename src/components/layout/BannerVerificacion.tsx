@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function BannerVerificacion() {
@@ -7,21 +7,14 @@ export default function BannerVerificacion() {
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState(false);
-  const [hidden, setHidden] = useState(true); // hidden by default to avoid flash
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-    // Check multiple sources for verification status
-    if (user.emailVerificado) { setHidden(true); return; }
-    try {
-      const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
-      if (session.emailVerificado === true) { setHidden(true); return; }
-    } catch {}
-    // Not verified from any local source → show banner
-    setHidden(false);
-  }, [isAuthenticated, user]);
+  if (!isAuthenticated || !user || user.emailVerificado) return null;
 
-  if (hidden || !user) return null;
+  // Also check localStorage in case session was updated after verification
+  try {
+    const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+    if (session.emailVerificado === true) return null;
+  } catch {}
 
   const reenviar = async () => {
     if (enviando || enviado) return;
@@ -33,7 +26,7 @@ export default function BannerVerificacion() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: user.email }),
       });
-      if (!res.ok) throw new Error("Error al enviar");
+      if (!res.ok) throw new Error();
       setEnviado(true);
       setTimeout(() => setEnviado(false), 5000);
     } catch {
@@ -56,6 +49,8 @@ export default function BannerVerificacion() {
       justifyContent: "center",
       gap: 10,
       flexWrap: "wrap",
+      position: "relative",
+      zIndex: 1,
     }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e05555", textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>Verifica tu cuenta</span>

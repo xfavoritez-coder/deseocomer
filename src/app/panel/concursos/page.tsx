@@ -550,7 +550,7 @@ export default function PanelConcursos() {
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>No hay concursos en esta categoría</p>
       </div>
     ) : (
-      <div className="dc-panel-concursos-list" style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden" }}>
         {concursosFiltrados.map(c => {
           const restMs = Math.max(0, new Date(c.fechaFin).getTime() - Date.now());
           const ended = restMs <= 0;
@@ -582,10 +582,10 @@ export default function PanelConcursos() {
                   </p>
                 </div>
               </div>
-              <div className="dc-panel-concurso-actions" style={{ display: "flex", gap: 6, padding: "0 12px 12px", justifyContent: "flex-end" }}>
-                {(c.estado !== "cancelado" && !c.cancelado) && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>📸 Compartir</button>}
-                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
-                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
+              <div style={{ display: "flex", gap: 6, padding: "0 12px 12px", flexWrap: "wrap" }}>
+                {(c.estado !== "cancelado" && !c.cancelado) && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>📸 Compartir</button>}
+                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
+                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
             </div>
           );

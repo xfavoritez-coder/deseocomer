@@ -143,7 +143,7 @@ export default function AdminUsuarios() {
           <div style={{ padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "rgba(240,234,214,0.55)" }}>Estilo</span>
             <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#e8a84c" }}>
-              {sel.estiloAlimentario === "carnivoro" ? "🥩 Carnívoro" : sel.estiloAlimentario === "vegetariano" ? "🌱 Vegetariano" : sel.estiloAlimentario === "vegano" ? "🌿 Vegano" : "🍽️ Omnívoro"}
+              {sel.estiloAlimentario === "carnivoro" ? "🥩 Carnívoro" : sel.estiloAlimentario === "vegetariano" ? "🌱 Vegetariano" : sel.estiloAlimentario === "vegano" ? "🌿 Vegano" : "🍽️ Como de todo"}
             </span>
           </div>
         )}
@@ -400,7 +400,7 @@ export default function AdminUsuarios() {
               <option value="carnivoro">Carnívoro</option>
               <option value="vegetariano">Vegetariano</option>
               <option value="vegano">Vegano</option>
-              <option value="omnivoro">Omnívoro</option>
+              <option value="omnivoro">Como de todo</option>
             </select>
           </div>
           <div style={{ marginBottom: "10px" }}>

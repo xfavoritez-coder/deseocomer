@@ -198,37 +198,37 @@ export function GenieProvider({ children }: { children: ReactNode }) {
         sessionStorage.setItem("genio_visita_logueado_contada", "1");
 
         const yaSolicitado = localStorage.getItem(CUMPLE_SOLICITADO_KEY);
-        if (!yaSolicitado) {
-          // Check from multiple sources: localStorage, user object, AND DB
-          const yaTieneFecha = localStorage.getItem("deseocomer_user_birthday");
-          const userTieneCumple = user?.cumpleDia && user?.cumpleMes;
-          if (yaTieneFecha || userTieneCumple) {
-            localStorage.setItem(CUMPLE_SOLICITADO_KEY, "true");
-          } else if (user?.id) {
-            // Final check: query DB to see if birthday exists there
-            fetch(`/api/usuarios/${user.id}/cumpleanos-check`).then(r => r.json()).then(d => {
-              if (d.tieneCumple) {
-                localStorage.setItem(CUMPLE_SOLICITADO_KEY, "true");
-                if (d.dia && d.mes) {
-                  localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: d.dia, mes: d.mes }));
-                }
-              } else if (visitas >= 2) {
+        // Always verify with DB when user is logged in
+        if (user?.id) {
+          fetch(`/api/usuarios/${user.id}/cumpleanos-check`).then(r => r.json()).then(d => {
+            if (d.tieneCumple) {
+              // BD has birthday → sync to localStorage and mark as solicited
+              localStorage.setItem(CUMPLE_SOLICITADO_KEY, "true");
+              if (d.dia && d.mes) {
+                localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: d.dia, mes: d.mes }));
+              }
+            } else {
+              // BD does NOT have birthday → clear stale localStorage data
+              localStorage.removeItem("deseocomer_user_birthday");
+              localStorage.removeItem(CUMPLE_SOLICITADO_KEY);
+              if (visitas >= 2 && !yaSolicitado) {
                 setToastActivo({
                   id: "cumpleanos",
                   mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
                   opciones: ["Cuéntale al Genio 🧞", "Después"],
                 });
               }
-            }).catch(() => {});
-          } else if (visitas >= 2) {
-            setTimeout(() => {
-              setToastActivo({
-                id: "cumpleanos",
-                mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
-                opciones: ["Cuéntale al Genio 🧞", "Después"],
-              });
-            }, 5000);
-          }
+            }
+          }).catch(() => {});
+        } else if (!yaSolicitado && visitas >= 2) {
+          // Not logged in, no solicited flag → show toast
+          setTimeout(() => {
+            setToastActivo({
+              id: "cumpleanos",
+              mensaje: "¿Cuándo es tu cumpleaños? 🎂 Así te aviso cuando los restaurantes tengan ofertas especiales para celebrar",
+              opciones: ["Cuéntale al Genio 🧞", "Después"],
+            });
+          }, 5000);
         }
       }
     }

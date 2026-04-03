@@ -86,6 +86,7 @@ export default function RootLayout({
           <ThemeProvider>
             <AuthProvider>
               <GenieProvider>
+                <BannerVerificacion />
                 {children}
                 <GenieLampara />
                 <GenieContextual />

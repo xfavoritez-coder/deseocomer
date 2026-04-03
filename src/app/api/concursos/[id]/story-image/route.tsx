@@ -8,13 +8,16 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const concurso = await prisma.concurso.findFirst({
-    where: {
-      OR: [{ id }, { slug: id }],
-      estado: { not: "cancelado" },
-    },
-    include: { local: true },
-  });
+  let concurso;
+  try {
+    concurso = await prisma.concurso.findFirst({
+      where: { OR: [{ id }, { slug: id }] },
+      include: { local: { select: { nombre: true } } },
+    });
+  } catch (dbErr) {
+    console.error("[story-image] DB error:", dbErr);
+    return new Response(`DB error: ${dbErr}`, { status: 500 });
+  }
 
   if (!concurso) {
     return new Response("Not found", { status: 404 });
