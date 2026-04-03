@@ -549,7 +549,7 @@ export default function PanelConcursos() {
                 </div>
               </div>
               <div className="dc-panel-concurso-actions" style={{ display: "flex", gap: 6, padding: "0 12px 12px", justifyContent: "flex-end" }}>
-                {c.activo && !c.cancelado && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
+                {(c.estado !== "cancelado" && !c.cancelado) && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸</button>}
                 <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
                 <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
