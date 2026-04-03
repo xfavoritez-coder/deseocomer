@@ -727,7 +727,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(232,168,76,0.7)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Tú</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: "2px 8px" }}>+2 pts</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: "2px 8px" }}>+3 pts</span>
                     <span style={{ color: "rgba(232,168,76,0.4)", fontSize: 16 }}>→</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
@@ -743,7 +743,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
                   </div>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Invitas a alguien → <strong style={{ color: "rgba(240,234,214,0.8)" }}>+2 puntos</strong> para ti. Cuando tu referido invita a otros → <strong style={{ color: "rgba(240,234,214,0.8)" }}>+1 punto</strong> adicional para ti por cada uno que traiga.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Invitas a alguien nuevo → <strong style={{ color: "#e8a84c" }}>+3 puntos</strong> para ti. Cuando tu referido invita a otros → <strong style={{ color: "#e8a84c" }}>+1 punto</strong> adicional para ti por cada uno que traigan.</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.28)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
