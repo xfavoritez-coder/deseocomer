@@ -134,35 +134,6 @@ export async function GET(
           </span>
         </div>
 
-        {/* Logo DeseoComer arriba derecha */}
-        <div
-          style={{
-            position: "absolute",
-            top: "72px",
-            right: "72px",
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            backgroundColor: "rgba(10,8,18,0.55)",
-            border: "2px solid rgba(232,168,76,0.2)",
-            borderRadius: "80px",
-            padding: "20px 40px",
-          }}
-        >
-          <span style={{ fontSize: "52px" }}>&#x1F9DE;</span>
-          <span
-            style={{
-              fontFamily: "Cinzel",
-              fontSize: "40px",
-              fontWeight: 700,
-              color: "rgba(232,168,76,0.9)",
-              letterSpacing: "0.06em",
-            }}
-          >
-            DeseoComer
-          </span>
-        </div>
-
         {/* Contenido inferior */}
         <div
           style={{
@@ -190,17 +161,27 @@ export async function GET(
           </span>
 
           {/* Label PREMIO */}
-          <span
+          <div
             style={{
-              fontFamily: "Cinzel",
-              fontSize: "36px",
-              fontWeight: 700,
-              color: "#e8a84c",
-              letterSpacing: "0.18em",
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
             }}
           >
-            PREMIO
-          </span>
+            <span style={{ fontSize: "52px" }}>&#x1F3C6;</span>
+            <span
+              style={{
+                fontFamily: "Lato",
+                fontSize: "40px",
+                fontWeight: 800,
+                color: "#e8a84c",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}
+            >
+              Gana gratis este premio
+            </span>
+          </div>
 
           {/* Titulo del premio */}
           <span

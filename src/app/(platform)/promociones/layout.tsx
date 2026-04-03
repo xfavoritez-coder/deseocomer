@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     siteName: "DeseoComer",
     type: "website",
     locale: "es_CL",
+    images: [{ url: "/api/og?title=Promociones+y+Ofertas&subtitle=Descuentos+y+happy+hours+de+los+mejores+restaurantes+de+Santiago", width: 1200, height: 630 }],
   },
 };
 

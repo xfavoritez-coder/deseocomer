@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     siteName: "DeseoComer",
     type: "website",
     locale: "es_CL",
+    images: [{ url: "/api/og?title=Haz+crecer+tu+local&subtitle=Publica+concursos+y+promociones+para+llegar+a+m%C3%A1s+clientes", width: 1200, height: 630 }],
   },
 };
 

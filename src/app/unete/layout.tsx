@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     siteName: "DeseoComer",
     type: "website",
     locale: "es_CL",
+    images: [{ url: "/api/og?title=Registra+tu+local+gratis&subtitle=Llega+a+miles+de+personas+que+buscan+d%C3%B3nde+comer+en+Santiago", width: 1200, height: 630 }],
   },
 };
 

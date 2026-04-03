@@ -36,6 +36,21 @@ export const metadata: Metadata = {
       { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
   },
+  openGraph: {
+    title: "DeseoComer — El genio que cumple tu deseo de comer 🧞",
+    description: "Gana comida gratis, descubre los mejores locales y promociones de tu ciudad.",
+    url: "https://deseocomer.com",
+    siteName: "DeseoComer",
+    type: "website",
+    locale: "es_CL",
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "DeseoComer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DeseoComer — El genio que cumple tu deseo de comer 🧞",
+    description: "Gana comida gratis, descubre los mejores locales y promociones de tu ciudad.",
+    images: ["/api/og"],
+  },
 };
 
 export default function RootLayout({

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     siteName: "DeseoComer",
     type: "website",
     locale: "es_CL",
+    images: [{ url: "/api/og?title=Descubre+d%C3%B3nde+comer&subtitle=Los+mejores+restaurantes+y+locales+de+comida+de+Santiago", width: 1200, height: 630 }],
   },
 };
 

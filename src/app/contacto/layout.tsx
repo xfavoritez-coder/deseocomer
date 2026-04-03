@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     siteName: "DeseoComer",
     type: "website",
     locale: "es_CL",
+    images: [{ url: "/api/og?title=Cont%C3%A1ctanos&subtitle=%C2%BFTienes+dudas%3F+Escr%C3%ADbenos+y+te+respondemos+en+24+horas", width: 1200, height: 630 }],
   },
 };
 

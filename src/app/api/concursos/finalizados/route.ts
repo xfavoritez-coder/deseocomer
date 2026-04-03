@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const concursos = await prisma.concurso.findMany({
       where: {
-        estado: { in: ["finalizado", "en_revision", "completado", "expirado"] },
+        estado: { in: ["finalizado", "en_revision", "completado", "expirado", "en_disputa"] },
       },
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true } },
