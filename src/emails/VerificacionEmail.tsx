@@ -20,7 +20,7 @@ export function VerificacionEmail({ nombre, verificationUrl }: Props) {
             </div>
             <p style={{ color: "#5a4028", fontSize: "13px", lineHeight: "1.6" }}>El link expira en 24 horas. Si no creaste esta cuenta, ignora este email.</p>
           </div>
-          <div style={{ textAlign: "center", marginTop: "32px" }}><p style={{ color: "#5a4028", fontSize: "12px" }}>Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+          <div style={{ textAlign: "center", marginTop: "32px" }}><p style={{ color: "#5a4028", fontSize: "12px" }}>Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
         </div>
       </body>
     </html>

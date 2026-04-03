@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 <div style="text-align:center;margin-bottom:24px"><span style="background-color:rgba(232,168,76,0.15);color:#e8a84c;font-size:32px;font-weight:bold;letter-spacing:0.3em;padding:16px 32px;border-radius:12px;display:inline-block">${code}</span></div>
 <p style="color:#5a4028;font-size:13px;line-height:1.6;margin-bottom:0">Este código expira en 10 minutos. Si no solicitaste este cambio, ignora este email.</p>
 </div>
-<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,
       });
 

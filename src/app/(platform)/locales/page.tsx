@@ -176,7 +176,7 @@ export default function LocalesPage() {
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
             <option value="nuevo" style={{ background: "#0a0812", color: "#f0ead6" }}>🆕 Más nuevos</option>
-            <option value="favoritos" style={{ background: "#0a0812", color: "#f0ead6" }}>❤️ Más guardados</option>
+            <option value="favoritos" style={{ background: "#0a0812", color: "#f0ead6" }}>💛 Más guardados</option>
           </select>
           {hayFiltros && (
             <button onClick={limpiarFiltros} style={{ padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,100,100,0.3)", background: "rgba(255,100,100,0.08)", color: "#ff8080", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center" }}>

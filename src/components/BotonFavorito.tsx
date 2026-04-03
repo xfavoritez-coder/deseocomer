@@ -28,7 +28,7 @@ export default function BotonFavorito({ localId, localData, size = "md", style }
         ...style,
       }}
     >
-      {activo ? "❤️" : "🤍"}
+      {activo ? "💛" : "🤍"}
     </button>
   );
 }

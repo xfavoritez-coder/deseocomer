@@ -21,7 +21,7 @@ export function ResetPasswordEmail({ nombre, resetUrl }: Props) {
             <p style={{ color: "#5a4028", fontSize: "13px", lineHeight: "1.6", marginBottom: 0 }}>Si no solicitaste este cambio, ignora este email. Tu contraseña no será modificada.</p>
           </div>
           <div style={{ textAlign: "center", marginTop: "32px" }}>
-            <p style={{ color: "#5a4028", fontSize: "12px" }}>Hecho con ❤️ y mucha hambre · DeseoComer.com</p>
+            <p style={{ color: "#5a4028", fontSize: "12px" }}>Hecho con 💛 y mucha hambre · DeseoComer.com</p>
           </div>
         </div>
       </body>

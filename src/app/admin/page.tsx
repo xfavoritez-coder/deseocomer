@@ -19,7 +19,7 @@ export default function AdminDashboard() {
     { icon: "🏠", label: "Locales activos", value: `${stats.localesActivos}/${stats.totalLocales}` },
     { icon: "🏆", label: "Concursos activos", value: stats.concursosActivos },
     { icon: "⚡", label: "Promociones", value: stats.totalPromociones },
-    { icon: "❤️", label: "Favoritos", value: stats.totalFavoritos },
+    { icon: "💛", label: "Favoritos", value: stats.totalFavoritos },
     { icon: "⭐", label: "Reseñas", value: stats.totalResenas },
     { icon: "📋", label: "Lista espera", value: stats.listaEspera },
     { icon: "📅", label: "Total concursos", value: stats.totalConcursos },

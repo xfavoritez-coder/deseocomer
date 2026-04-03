@@ -12,7 +12,7 @@ function wrap(content: string, accentBorder = "rgba(232,168,76,0.25)") {
 <div style="max-width:560px;margin:0 auto;padding:40px 24px">
 <div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
 <div style="background-color:#2d1a08;border-radius:20px;border:1px solid ${accentBorder};padding:40px 32px">${content}</div>
-<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`;
 }
 

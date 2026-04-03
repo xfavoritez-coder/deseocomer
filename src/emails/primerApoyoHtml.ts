@@ -12,7 +12,7 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: 
 
   <div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
     <div style="text-align:center;margin-bottom:24px">
-      <p style="font-size:40px;margin:0 0 12px">❤️</p>
+      <p style="font-size:40px;margin:0 0 12px">💛</p>
       <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:8px;line-height:1.3">¡${primerNombre}, alguien te apoya!</h2>
       <p style="color:#8a7040;font-size:14px;margin:0;font-style:italic">Has recibido tu primer punto de apoyo</p>
     </div>
@@ -38,7 +38,7 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: 
   </div>
 
   <div style="text-align:center;margin-top:32px">
-    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con ❤️ y mucha hambre · DeseoComer.com<br/>Santiago de Chile</p>
+    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con 💛 y mucha hambre · DeseoComer.com<br/>Santiago de Chile</p>
   </div>
 
 </div>

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Tu cuenta en DeseoComer ha sido creada. Ya puedes explorar los mejores restaurantes, participar en concursos y aprovechar promociones exclusivas.</p>
 <div style="text-align:center;margin-bottom:24px"><a href="https://deseocomer.com" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Explorar DeseoComer →</a></div>
 </div>
-<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,
     });
     return NextResponse.json({ ok: true });

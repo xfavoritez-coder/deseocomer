@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 <div style="text-align:center;margin-bottom:24px"><a href="${resetUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Restablecer contraseña →</a></div>
 <p style="color:#5a4028;font-size:13px;line-height:1.6;margin-bottom:0">Si no solicitaste este cambio, ignora este email. El enlace expira en 1 hora.</p>
 </div>
-<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con ❤️ y mucha hambre · DeseoComer.com</p></div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,
     });
 

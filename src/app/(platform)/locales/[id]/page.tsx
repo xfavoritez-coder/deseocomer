@@ -233,7 +233,7 @@ export default function LocalDetailPage() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.1) 0%, rgba(10,8,18,0.95) 100%)" }} />
         <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Locales</Link>
         <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "20px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {esFavorito(String(local.id)) ? "❤️" : "🤍"}
+          {esFavorito(String(local.id)) ? "💛" : "🤍"}
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
           <div className="dc-hero-inner" style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>

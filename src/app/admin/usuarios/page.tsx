@@ -178,7 +178,7 @@ export default function AdminUsuarios() {
       <div style={cardS}>
         <p style={cardTitleS}>Actividad</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
-          {[["❤️", sel._count?.favoritos ?? 0, "Favs"], ["⭐", sel._count?.resenas ?? 0, "Reseñas"], ["🏆", sel._count?.participaciones ?? 0, "Concursos"]].map(([icon, val, label]) => (
+          {[["💛", sel._count?.favoritos ?? 0, "Favs"], ["⭐", sel._count?.resenas ?? 0, "Reseñas"], ["🏆", sel._count?.participaciones ?? 0, "Concursos"]].map(([icon, val, label]) => (
             <div key={String(label)} style={{ textAlign: "center", padding: "14px 10px", background: "rgba(255,255,255,0.03)", borderRadius: "10px" }}>
               <p style={{ fontSize: "1.3rem", margin: "0 0 4px" }}>{icon}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "1.3rem", color: "#e8a84c", margin: 0 }}>{val}</p>

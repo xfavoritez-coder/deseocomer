@@ -40,7 +40,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         await resend.emails.send({
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: targetUser.email,
-          subject: `❤️ ¡Alguien te apoya en tu concurso! — ${concurso.premio}`,
+          subject: `💛 ¡Alguien te apoya en tu concurso! — ${concurso.premio}`,
           html: primerApoyoHtml({
             nombreUsuario: targetUser.nombre,
             premioConcurso: concurso.premio,

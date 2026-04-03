@@ -14,7 +14,7 @@ import { CONCURSOS, CONCURSOS_FINALIZADOS, getRefCode } from "@/lib/mockConcurso
 // ─── Types & helpers ─────────────────────────────────────────────────────────
 
 const TABS = [
-  { key: "favoritos", icon: "❤️", label: "Favoritos" },
+  { key: "favoritos", icon: "💛", label: "Favoritos" },
   { key: "concursos", icon: "🏆", label: "Concursos" },
   { key: "historial", icon: "🕐", label: "Historial" },
   { key: "logros",    icon: "🎖️", label: "Logros" },
@@ -435,7 +435,7 @@ function TabLogros() {
 
   const badges = [
     { icon: "🏮", name: "Primer Deseo", desc: "Completaste el flujo del Genio", unlocked: perfil.respuestasGenio.length > 0 },
-    { icon: "❤️", name: "Guardador", desc: "Guardaste tu primer favorito", unlocked: (() => { try { return JSON.parse(localStorage.getItem(FAVS_KEY) ?? "[]").length > 0; } catch { return false; } })() },
+    { icon: "💛", name: "Guardador", desc: "Guardaste tu primer favorito", unlocked: (() => { try { return JSON.parse(localStorage.getItem(FAVS_KEY) ?? "[]").length > 0; } catch { return false; } })() },
     { icon: "🏆", name: "Concursante", desc: "Participaste en tu primer concurso", unlocked: (() => { try { return Object.keys(JSON.parse(localStorage.getItem("dc_refs") ?? "{}")).length > 0; } catch { return false; } })() },
     { icon: "🔥", name: "Explorador", desc: "Visitaste 5 locales distintos", unlocked: new Set(visits.map(v => v.id)).size >= 5 },
     { icon: "🎂", name: "Cumpleañero", desc: "Registraste tu fecha de cumpleaños", unlocked: !!(profile.cumpleanos as Record<string, unknown>)?.mes },

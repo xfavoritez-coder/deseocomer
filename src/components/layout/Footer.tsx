@@ -124,7 +124,7 @@ export default function Footer() {
             letterSpacing: "0.15em",
             color: "var(--text-muted)",
           }}>
-            Hecho con ❤️ y mucha hambre
+            Hecho con 💛 y mucha hambre
           </p>
         </div>
       </div>

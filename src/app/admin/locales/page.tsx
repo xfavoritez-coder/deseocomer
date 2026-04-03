@@ -104,7 +104,7 @@ export default function AdminLocales() {
       <div style={cardS}>
         <p style={cardTitleS}>Estadísticas</p>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
-          {[["🏆", sel._count?.concursos ?? 0, "Concursos"], ["⚡", sel._count?.promociones ?? 0, "Promos"], ["❤️", sel._count?.favoritos ?? 0, "Favs"]].map(([icon, val, label]) => (
+          {[["🏆", sel._count?.concursos ?? 0, "Concursos"], ["⚡", sel._count?.promociones ?? 0, "Promos"], ["💛", sel._count?.favoritos ?? 0, "Favs"]].map(([icon, val, label]) => (
             <div key={String(label)} style={{ textAlign: "center", padding: "10px", background: "rgba(255,255,255,0.03)", borderRadius: "8px" }}>
               <p style={{ fontSize: "1rem", margin: "0 0 2px" }}>{icon}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#e8a84c", margin: 0 }}>{val}</p>

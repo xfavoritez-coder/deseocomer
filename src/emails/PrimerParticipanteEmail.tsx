@@ -48,7 +48,7 @@ export function primerParticipanteHtml({ nombreLocal, premioConcurso, nombrePart
   </div>
 
   <div style="text-align:center;margin-top:32px">
-    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con ❤️ y mucha hambre · DeseoComer.com<br/>Santiago de Chile</p>
+    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con 💛 y mucha hambre · DeseoComer.com<br/>Santiago de Chile</p>
   </div>
 
 </div>

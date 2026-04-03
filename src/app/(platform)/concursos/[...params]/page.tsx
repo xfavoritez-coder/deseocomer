@@ -381,7 +381,7 @@ function ConcursoDetallePage() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
                 </button>
               )}
-              {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 14, background: "rgba(30,20,5,0.96)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 10, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap", zIndex: 10, fontWeight: 700 }}>❤️ ¡+1 punto a {r.nombre.split(/\s+/)[0]}!</div>}
+              {tooltipActivo === supportKey && <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 14, background: "rgba(30,20,5,0.96)", border: "1px solid rgba(232,168,76,0.5)", borderRadius: 10, padding: "8px 14px", fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap", zIndex: 10, fontWeight: 700 }}>💛 ¡+1 punto a {r.nombre.split(/\s+/)[0]}!</div>}
             </div>
           );
         };
@@ -596,7 +596,7 @@ function ConcursoDetallePage() {
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido directo" }, { icon: "🔗🔗", pts: "+1", label: "Referidos de tus referidos" }, { icon: "❤️", pts: "+1", label: "Al recibir apoyo" }].map(s => (
+                {[{ icon: "🎟️", pts: "+1", label: "Al unirte" }, { icon: "🔗", pts: "+2", label: "Por referido directo" }, { icon: "🔗🔗", pts: "+1", label: "Referidos de tus referidos" }, { icon: "💛", pts: "+1", label: "Al recibir apoyo" }].map(s => (
                   <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center" }}>
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
@@ -604,19 +604,36 @@ function ConcursoDetallePage() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 12, padding: "14px 16px", marginTop: 12 }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>Cadena de referidos</p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#3db89e", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 8, padding: "4px 10px" }}>Tú</span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#e8a84c" }}>+2 pts</span>
-                  <span style={{ color: "rgba(240,234,214,0.3)" }}>→</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.6)", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "4px 10px" }}>Tu referido</span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#e8a84c" }}>+1 pt</span>
-                  <span style={{ color: "rgba(240,234,214,0.3)" }}>→</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#3db89e", background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 8, padding: "4px 10px" }}>Tú</span>
+              <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 16, padding: 20, marginTop: 12 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                  <div style={{ flex: 1, height: 1, background: "rgba(232,168,76,0.2)" }} />
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.14em", textTransform: "uppercase" }}>Cadena de referidos</span>
+                  <div style={{ flex: 1, height: 1, background: "rgba(232,168,76,0.2)" }} />
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, margin: 0 }}>Cuando invitas a alguien y ellos a su vez invitan a otros, tú también ganas +1 punto por cada persona que traigan tus referidos.</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 8, fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel por concurso.</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(232,168,76,0.2)", border: "2px solid rgba(232,168,76,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c" }}>TÚ</div>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(232,168,76,0.7)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Tú</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: "2px 8px" }}>+2 pts</span>
+                    <span style={{ color: "rgba(232,168,76,0.4)", fontSize: 16 }}>→</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(61,184,158,0.15)", border: "2px solid rgba(61,184,158,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#3db89e" }}>R1</div>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Tu referido</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: 20, padding: "2px 8px" }}>+1 pt para ti</span>
+                    <span style={{ color: "rgba(61,184,158,0.4)", fontSize: 16 }}>→</span>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(61,184,158,0.08)", border: "2px solid rgba(61,184,158,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "rgba(61,184,158,0.6)" }}>R2</div>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
+                  </div>
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Invitas a alguien → <strong style={{ color: "rgba(240,234,214,0.8)" }}>+2 puntos</strong> para ti. Cuando tu referido invita a otros → <strong style={{ color: "rgba(240,234,214,0.8)" }}>+1 punto</strong> adicional para ti por cada uno que traiga.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.28)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
           )}

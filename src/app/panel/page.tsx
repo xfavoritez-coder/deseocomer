@@ -86,7 +86,7 @@ function DashboardContent() {
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "12px", marginBottom: "24px" }}>
         {[
-          { label: "Favoritos", value: stats.favoritos, icon: "❤️" },
+          { label: "Favoritos", value: stats.favoritos, icon: "💛" },
           { label: "Reseñas", value: stats.resenas, icon: "⭐" },
           { label: "Concursos", value: stats.concursos, icon: "🏆" },
           { label: "Promociones", value: stats.promociones, icon: "⚡" },

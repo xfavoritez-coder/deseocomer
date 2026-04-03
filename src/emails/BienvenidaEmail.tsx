@@ -21,7 +21,7 @@ export function BienvenidaEmail({ nombre }: Props) {
             </div>
           </div>
           <div style={{ textAlign: "center", marginTop: "32px" }}>
-            <p style={{ color: "#5a4028", fontSize: "12px", lineHeight: "1.6" }}>Hecho con ❤️ y mucha hambre · DeseoComer.com<br />Santiago de Chile</p>
+            <p style={{ color: "#5a4028", fontSize: "12px", lineHeight: "1.6" }}>Hecho con 💛 y mucha hambre · DeseoComer.com<br />Santiago de Chile</p>
           </div>
         </div>
       </body>
