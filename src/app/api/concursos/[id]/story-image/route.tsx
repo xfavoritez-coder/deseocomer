@@ -222,27 +222,28 @@ export async function GET(
           {/* Boton sticker */}
           <div
             style={{
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
+              alignSelf: "flex-start",
               gap: "32px",
               backgroundColor: "rgba(20,20,28,0.85)",
               border: "2px solid rgba(255,255,255,0.15)",
-              borderRadius: "48px",
-              padding: "40px 56px",
+              borderRadius: "36px",
+              padding: "28px 40px",
               marginTop: "8px",
             }}
           >
             <div
               style={{
-                width: "112px",
-                height: "112px",
+                width: "80px",
+                height: "80px",
                 borderRadius: "50%",
                 backgroundColor: "rgba(232,168,76,0.15)",
                 border: "2px solid rgba(232,168,76,0.3)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "52px",
+                fontSize: "40px",
               }}
             >
               &#x1F517;
@@ -250,21 +251,12 @@ export async function GET(
             <span
               style={{
                 fontFamily: "Lato",
-                fontSize: "52px",
+                fontSize: "44px",
                 fontWeight: 700,
                 color: "rgba(240,234,214,0.85)",
-                flex: 1,
               }}
             >
               Participar gratis
-            </span>
-            <span
-              style={{
-                fontSize: "52px",
-                color: "rgba(240,234,214,0.3)",
-              }}
-            >
-              &#x2192;
             </span>
           </div>
         </div>
