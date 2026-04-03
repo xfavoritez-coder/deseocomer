@@ -51,6 +51,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,
         galeria: body.galeria, tieneMenu: body.tieneMenu,
         ...(body.tags !== undefined && { tags: body.tags }),
+        ...(body.sirveEnMesa !== undefined && { sirveEnMesa: body.sirveEnMesa }),
         ...(body.tieneDelivery !== undefined && { tieneDelivery: body.tieneDelivery }),
         ...(body.comunasDelivery !== undefined && { comunasDelivery: body.comunasDelivery }),
         ...(body.tieneRetiro !== undefined && { tieneRetiro: body.tieneRetiro }),

@@ -366,7 +366,7 @@ export default function PanelConcursos() {
               </div>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Descripción del premio</label>
-                <input style={I} value={editDescripcion} onChange={e => setEditDescripcion(e.target.value)} placeholder="Descripción (opcional)" />
+                <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={editDescripcion} onChange={e => setEditDescripcion(e.target.value)} placeholder="Descripción del premio (opcional)" />
               </div>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Fecha de cierre</label>
@@ -374,7 +374,7 @@ export default function PanelConcursos() {
               </div>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Condiciones</label>
-                <textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Condiciones (opcional)" maxLength={500} />
+                <textarea style={{ ...I, resize: "vertical", minHeight: "60px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Condiciones (opcional)" />
               </div>
               <div>
                 <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px", display: "block" }}>Foto del concurso</label>
@@ -413,14 +413,14 @@ export default function PanelConcursos() {
       <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[1, 2].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
 
       {step === 1 && (<div>
-        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>¿Qué vas a regalar?</h2>
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Nuevo concurso</h2>
 
         {labelReq("Premio")}
         <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, etc" maxLength={50} />
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", marginTop: "4px", textAlign: "right" }}>{premio.length}/50</p>
 
         {labelReq("Descripción del premio")}
-        <input style={I} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
+        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
 
         {labelReq("Duración")}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
@@ -429,8 +429,7 @@ export default function PanelConcursos() {
         <SubirFoto folder="concursos" preview={imagenConcurso || null} label="Subir foto del premio" height="140px" onUpload={url => setImagenConcurso(url)} />
 
         {labelReq("Condiciones", false)}
-        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: solo para retiro en local, días de canje, etc" maxLength={500} />
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.3)", marginTop: "6px" }}>{condiciones.length}/500</p>
+        <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={condiciones} onChange={e => setCondiciones(e.target.value)} placeholder="Ej: solo para retiro en local, días de canje, etc" />
 
         <button onClick={() => pFinal.trim() && descripcionPremio.trim() && imagenConcurso && setStep(2)} disabled={!pFinal.trim() || !descripcionPremio.trim() || !imagenConcurso} style={{ ...B, marginTop: "28px", opacity: pFinal.trim() && descripcionPremio.trim() && imagenConcurso ? 1 : 0.5 }}>Siguiente →</button>
       </div>)}

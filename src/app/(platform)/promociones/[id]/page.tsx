@@ -18,12 +18,15 @@ import {
 } from "@/lib/mockPromociones";
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
-  if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
-  if (promo.tipo === "cumpleanos") return { text: "CUMPLEA\u00d1OS", color: "#e05090" };
-  if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
-  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
-  if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };
-  return { text: "REGALO", color: "#e8a84c" };
+  const t = promo.tipo?.toLowerCase() ?? "";
+  if (t === "happy_hour" || t === "happy hour") return { text: "HAPPY HOUR", color: "#d4a017" };
+  if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
+  if (t === "2x1") return { text: "2×1", color: "#3db89e" };
+  if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
+  if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
+  if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
+  if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
+  return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }
 
 export default function PromocionDetailPage() {

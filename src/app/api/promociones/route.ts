@@ -21,10 +21,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana, esCumpleanos, imagenUrl, fechaVencimiento } = await req.json();
+    const { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana, esCumpleanos, imagenUrl, fechaVencimiento, modalidad } = await req.json();
     if (!localId || !tipo || !titulo || !horaInicio || !horaFin) return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     const promocion = await prisma.promocion.create({
-      data: { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana: diasSemana || [], esCumpleanos: esCumpleanos || false, imagenUrl, ...(fechaVencimiento && { fechaVencimiento: new Date(fechaVencimiento) }) },
+      data: { localId, tipo, titulo, descripcion, condiciones, porcentajeDescuento, precioOriginal, precioDescuento, horaInicio, horaFin, diasSemana: diasSemana || [], esCumpleanos: esCumpleanos || false, imagenUrl, modalidad: modalidad || [], ...(fechaVencimiento && { fechaVencimiento: new Date(fechaVencimiento) }) },
     });
     return NextResponse.json(promocion, { status: 201 });
   } catch {

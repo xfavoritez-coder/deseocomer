@@ -11,7 +11,7 @@ const B: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.
 const TIPOS = ["Descuento %", "2x1", "Happy Hour", "Cupón", "Regalo", "Cumpleaños"];
 const DIAS_LABEL = ["L", "M", "M", "J", "V", "S", "D"];
 
-const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "", tieneVencimiento: false, fechaVencimiento: "" };
+const emptyForm = { tipo: "", titulo: "", descripcion: "", condiciones: "", descuento: "", dias: [true, true, true, true, true, false, false], horaInicio: "12:00", horaFin: "22:00", imagenUrl: "", tieneVencimiento: false, fechaVencimiento: "", modalidad: [] as string[] };
 
 export default function PanelPromociones() {
   const [promos, setPromos] = useState<PromoDB[]>([]);
@@ -21,6 +21,7 @@ export default function PanelPromociones() {
   const [form, setForm] = useState({ ...emptyForm });
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
+  const [localInfo, setLocalInfo] = useState<{ tieneDelivery: boolean; tieneRetiro: boolean }>({ tieneDelivery: false, tieneRetiro: false });
 
   const loadPromos = () => {
     try {
@@ -34,6 +35,17 @@ export default function PanelPromociones() {
   };
 
   useEffect(() => { loadPromos(); }, []);
+
+  useEffect(() => {
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (session.id) {
+        fetch(`/api/locales/${session.id}`).then(r => r.json()).then(data => {
+          if (data) setLocalInfo({ tieneDelivery: !!data.tieneDelivery, tieneRetiro: !!data.tieneRetiro });
+        }).catch(() => {});
+      }
+    } catch {}
+  }, []);
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }));
   const chip = (sel: boolean): React.CSSProperties => ({ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: sel ? 700 : 400 });
@@ -55,6 +67,7 @@ export default function PanelPromociones() {
             condiciones: form.condiciones || null, porcentajeDescuento: form.descuento ? parseInt(form.descuento) : null,
             horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias, imagenUrl: form.imagenUrl || null,
             fechaVencimiento: form.tieneVencimiento && form.fechaVencimiento ? new Date(form.fechaVencimiento).toISOString() : null,
+            modalidad: form.modalidad,
           }),
         });
       } else {
@@ -67,6 +80,7 @@ export default function PanelPromociones() {
             horaInicio: form.horaInicio, horaFin: form.horaFin, diasSemana: form.dias,
             esCumpleanos: false, imagenUrl: form.imagenUrl || null,
             fechaVencimiento: form.tieneVencimiento && form.fechaVencimiento ? new Date(form.fechaVencimiento).toISOString() : null,
+            modalidad: form.modalidad,
           }),
         });
       }
@@ -87,6 +101,8 @@ export default function PanelPromociones() {
       tieneVencimiento: !!(p as any).fechaVencimiento,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       fechaVencimiento: (p as any).fechaVencimiento ? new Date((p as any).fechaVencimiento).toISOString().split("T")[0] : "",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      modalidad: Array.isArray((p as any).modalidad) ? (p as any).modalidad : [],
     });
     setEditId(p.id);
     setShowForm(true);
@@ -151,6 +167,21 @@ export default function PanelPromociones() {
           {form.tieneVencimiento && (
             <div style={{ marginTop: 8 }}><input type="date" style={I} value={form.fechaVencimiento} onChange={e => set("fechaVencimiento", e.target.value)} /></div>
           )}
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <label style={L}>Modalidad</label>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "6px" }}>
+            {[
+              { value: "en_local", label: "En local", show: true },
+              { value: "delivery", label: "Delivery", show: localInfo.tieneDelivery },
+              { value: "retiro", label: "Retiro", show: localInfo.tieneRetiro },
+            ].filter(m => m.show).map(m => {
+              const sel = form.modalidad.includes(m.value);
+              return (
+                <button key={m.value} type="button" onClick={() => set("modalidad", sel ? form.modalidad.filter((x: string) => x !== m.value) : [...form.modalidad, m.value])} style={{ padding: "8px 16px", borderRadius: "20px", cursor: "pointer", background: sel ? "rgba(232,168,76,0.15)" : "transparent", border: sel ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: sel ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: sel ? 700 : 400 }}>{m.label}</button>
+              );
+            })}
+          </div>
         </div>
         <button onClick={publish} disabled={!canPublish || saving} style={{ ...B, marginTop: "8px", opacity: canPublish ? 1 : 0.5 }}>{saving ? "Guardando..." : editId ? "Guardar cambios" : "Publicar promoción"}</button>
       </div>

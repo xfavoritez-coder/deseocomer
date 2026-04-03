@@ -218,7 +218,7 @@ export default function AdminUsuarios() {
       {editMode && (
         <div style={cardS}>
           <p style={cardTitleS}>Editar datos</p>
-          {[["nombre", "Nombre"], ["telefono", "Teléfono"], ["tipo", "Tipo (usuario/admin)"], ["fotoUrl", "URL foto de perfil"], ["cumpleDia", "Día cumpleaños"], ["cumpleMes", "Mes cumpleaños"], ["cumpleAnio", "Año cumpleaños"]].map(([key, label]) => (
+          {[["nombre", "Nombre"], ["email", "Email"], ["telefono", "Teléfono"], ["tipo", "Tipo (usuario/admin)"], ["fotoUrl", "URL foto de perfil"], ["cumpleDia", "Día cumpleaños"], ["cumpleMes", "Mes cumpleaños"], ["cumpleAnio", "Año cumpleaños"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
@@ -266,7 +266,7 @@ export default function AdminUsuarios() {
 
       {!editMode && !passMode && !deleteConfirm && !descalificarConfirm && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", telefono: sel.telefono ?? "", tipo: sel.tipo ?? "usuario", fotoUrl: sel.fotoUrl ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? ""), cumpleAnio: String(sel.cumpleAnio ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", email: sel.email ?? "", telefono: sel.telefono ?? "", tipo: sel.tipo ?? "usuario", fotoUrl: sel.fotoUrl ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? ""), cumpleAnio: String(sel.cumpleAnio ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           {sel.fotoUrl && <button onClick={async () => { if (await action("resetear-foto")) { setSel({ ...sel, fotoUrl: "" }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, fotoUrl: "" } : u)); show("✓ Foto de perfil eliminada"); } }} disabled={loading} style={btnOutlineS}>🖼️ Resetear foto de perfil</button>}
           {!sel.emailVerificado && (

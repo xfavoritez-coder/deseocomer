@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/adminFetch";
+import SubirFoto from "@/components/SubirFoto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type P = any;
@@ -24,6 +25,45 @@ export default function AdminPromociones() {
   const [editError, setEditError] = useState("");
   const [toast, setToast] = useState("");
   const [filtro, setFiltro] = useState<"todas" | "activas" | "inactivas">("todas");
+  const [creando, setCreando] = useState(false);
+  const [crearForm, setCrearForm] = useState({ localId: "", tipo: "happy_hour", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false] as boolean[], porcentajeDescuento: "", imagenUrl: "" });
+  const [localesList, setLocalesList] = useState<{ id: string; nombre: string }[]>([]);
+  const [crearError, setCrearError] = useState("");
+
+  useEffect(() => {
+    if (creando) {
+      adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocalesList(Array.isArray(d) ? d : [])).catch(() => {});
+    }
+  }, [creando]);
+
+  const crearPromocion = async () => {
+    setCrearError("");
+    if (!crearForm.localId || !crearForm.titulo.trim()) { setCrearError("Local y titulo son obligatorios"); return; }
+    try {
+      const res = await adminFetch("/api/promociones", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          localId: crearForm.localId,
+          tipo: crearForm.tipo,
+          titulo: crearForm.titulo,
+          descripcion: crearForm.descripcion.trim() || null,
+          condiciones: crearForm.condiciones.trim() || null,
+          horaInicio: crearForm.horaInicio,
+          horaFin: crearForm.horaFin,
+          diasSemana: crearForm.diasSemana,
+          porcentajeDescuento: crearForm.porcentajeDescuento ? parseInt(crearForm.porcentajeDescuento) : null,
+          imagenUrl: crearForm.imagenUrl || null,
+        }),
+      });
+      if (!res.ok) { const d = await res.json(); setCrearError(d.error ?? "Error al crear"); return; }
+      const nuevo = await res.json();
+      setPromos(prev => [nuevo, ...prev]);
+      setCreando(false);
+      setCrearForm({ localId: "", tipo: "happy_hour", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false], porcentajeDescuento: "", imagenUrl: "" });
+      setToast("Promocion creada");
+      setTimeout(() => setToast(""), 3000);
+    } catch { setCrearError("Error de conexion"); }
+  };
 
   useEffect(() => {
     fetch("/api/promociones?all=1").then(r => r.json()).then(d => {
@@ -130,13 +170,74 @@ export default function AdminPromociones() {
       {toast && <div style={{ position: "fixed", bottom: "32px", left: "50%", transform: "translateX(-50%)", zIndex: 2000, background: "rgba(61,184,158,0.95)", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.82rem", padding: "14px 28px", borderRadius: "30px", boxShadow: "0 8px 32px rgba(0,0,0,0.4)", whiteSpace: "nowrap" }}>{toast}</div>}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-        <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c" }}>Promociones ({filtradas.length})</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <h1 style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#e8a84c" }}>Promociones ({filtradas.length})</h1>
+          <button onClick={() => setCreando(!creando)} style={{ background: creando ? "none" : "#e8a84c", border: creando ? "1px solid rgba(232,168,76,0.3)" : "none", borderRadius: "8px", color: creando ? "#e8a84c" : "#0a0812", fontFamily: "Georgia", fontSize: "0.82rem", fontWeight: 700, padding: "8px 18px", cursor: "pointer" }}>{creando ? "Cancelar" : "+ Crear promocion"}</button>
+        </div>
         <div style={{ display: "flex", gap: "6px" }}>
           {(["todas", "activas", "inactivas"] as const).map(f => (
             <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 14px", borderRadius: "20px", border: filtro === f ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: filtro === f ? "rgba(232,168,76,0.12)" : "transparent", color: filtro === f ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.75rem", cursor: "pointer", textTransform: "capitalize" }}>{f}</button>
           ))}
         </div>
       </div>
+
+      {creando && (
+        <div style={{ marginBottom: "24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", padding: "16px" }}>
+          <h3 style={{ fontFamily: "Georgia", fontSize: "0.88rem", letterSpacing: "0.18em", color: "rgba(240,234,214,0.45)", textTransform: "uppercase", marginBottom: "12px" }}>Crear promocion</h3>
+          {crearError && <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#ff6b6b", marginBottom: "10px" }}>⚠️ {crearError}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
+              <label style={LBL}>Local</label>
+              <select style={INP} value={crearForm.localId} onChange={e => setCrearForm(f => ({ ...f, localId: e.target.value }))}>
+                <option value="">Seleccionar local...</option>
+                {localesList.map(l => <option key={l.id} value={l.id}>{l.nombre}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={LBL}>Tipo</label>
+              <select style={INP} value={crearForm.tipo} onChange={e => setCrearForm(f => ({ ...f, tipo: e.target.value }))}>
+                {Object.entries(TIPO_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={LBL}>Titulo</label>
+              <input style={INP} value={crearForm.titulo} onChange={e => setCrearForm(f => ({ ...f, titulo: e.target.value }))} placeholder="Ej: 2x1 en pizzas" />
+            </div>
+            <div>
+              <label style={LBL}>Descripcion</label>
+              <textarea style={{ ...INP, resize: "vertical", minHeight: "50px" }} value={crearForm.descripcion} onChange={e => setCrearForm(f => ({ ...f, descripcion: e.target.value }))} placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={LBL}>Condiciones</label>
+              <textarea style={{ ...INP, resize: "vertical", minHeight: "50px" }} value={crearForm.condiciones} onChange={e => setCrearForm(f => ({ ...f, condiciones: e.target.value }))} placeholder="Opcional" />
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ flex: 1 }}><label style={LBL}>Hora inicio</label><input style={INP} type="time" value={crearForm.horaInicio} onChange={e => setCrearForm(f => ({ ...f, horaInicio: e.target.value }))} /></div>
+              <div style={{ flex: 1 }}><label style={LBL}>Hora fin</label><input style={INP} type="time" value={crearForm.horaFin} onChange={e => setCrearForm(f => ({ ...f, horaFin: e.target.value }))} /></div>
+            </div>
+            <div>
+              <label style={LBL}>Dias de la semana</label>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                {DIAS_NOMBRE.map((d, i) => (
+                  <button key={d} type="button" onClick={() => setCrearForm(f => ({ ...f, diasSemana: f.diasSemana.map((v, j) => j === i ? !v : v) }))} style={{ padding: "6px 12px", borderRadius: "8px", border: crearForm.diasSemana[i] ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: crearForm.diasSemana[i] ? "rgba(232,168,76,0.15)" : "transparent", color: crearForm.diasSemana[i] ? "#e8a84c" : "rgba(240,234,214,0.4)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer" }}>{d}</button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label style={LBL}>% Descuento</label>
+              <input style={INP} type="number" value={crearForm.porcentajeDescuento} onChange={e => setCrearForm(f => ({ ...f, porcentajeDescuento: e.target.value }))} placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={LBL}>Imagen</label>
+              <SubirFoto folder="promociones" preview={crearForm.imagenUrl || null} label="Subir foto" height="100px" onUpload={url => setCrearForm(f => ({ ...f, imagenUrl: url }))} />
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => { setCreando(false); setCrearError(""); }} style={{ flex: 1, background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>Cancelar</button>
+              <button onClick={crearPromocion} disabled={!crearForm.localId || !crearForm.titulo.trim()} style={{ flex: 2, background: "#e8a84c", border: "none", borderRadius: "6px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.78rem", fontWeight: 700, padding: "8px", cursor: "pointer", opacity: crearForm.localId && crearForm.titulo.trim() ? 1 : 0.5 }}>Crear promocion</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "600px" }}>

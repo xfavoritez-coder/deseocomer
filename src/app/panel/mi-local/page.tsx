@@ -64,7 +64,7 @@ export default function MiLocalPage() {
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
-            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng, tieneDelivery: data.tieneDelivery ?? local.tieneDelivery ?? false, comunasDelivery: data.comunasDelivery ?? local.comunasDelivery ?? [], tieneRetiro: data.tieneRetiro ?? local.tieneRetiro ?? false, linkPedido: data.linkPedido ?? local.linkPedido ?? "" };
+            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng, sirveEnMesa: data.sirveEnMesa ?? local.sirveEnMesa ?? true, tieneDelivery: data.tieneDelivery ?? local.tieneDelivery ?? false, comunasDelivery: data.comunasDelivery ?? local.comunasDelivery ?? [], tieneRetiro: data.tieneRetiro ?? local.tieneRetiro ?? false, linkPedido: data.linkPedido ?? local.linkPedido ?? "" };
             setD(merged); save(merged);
           }
         }).catch(() => {});
@@ -279,6 +279,21 @@ export default function MiLocalPage() {
       {/* Pedidos y modalidades */}
       <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "20px", marginBottom: "20px" }}>
         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Pedidos y modalidades</p>
+
+        {/* Toggle Sirve en mesa */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Atienden en mesa?</span>
+          <button onClick={() => {
+            const v = !(d.sirveEnMesa as boolean ?? true);
+            set("sirveEnMesa", v);
+            try {
+              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sirveEnMesa: v }) });
+            } catch {}
+          }} style={{ width: "48px", height: "26px", borderRadius: "13px", border: "none", cursor: "pointer", background: (d.sirveEnMesa as boolean ?? true) ? "#3db89e" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#fff", position: "absolute", top: "3px", left: (d.sirveEnMesa as boolean ?? true) ? "25px" : "3px", transition: "left 0.2s" }} />
+          </button>
+        </div>
 
         {/* Toggle Delivery */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>

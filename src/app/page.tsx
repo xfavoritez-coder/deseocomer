@@ -10,7 +10,7 @@ import { prisma } from "@/lib/prisma";
 async function getPromociones() {
   try {
     const data = await prisma.promocion.findMany({
-      where: { activa: true, local: { activo: true, direccion: { not: "" }, categoria: { not: null } } },
+      where: { activa: true, local: { activo: true }, OR: [{ fechaVencimiento: null }, { fechaVencimiento: { gte: new Date() } }] },
       include: { local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true } } },
       orderBy: { createdAt: "desc" },
     });

@@ -122,6 +122,7 @@ export default function LocalDetailPage() {
     tieneDelivery: (dbLocal.tieneDelivery as boolean) ?? false,
     comunasDelivery: (dbLocal.comunasDelivery as string[]) ?? [],
     tieneRetiro: (dbLocal.tieneRetiro as boolean) ?? false,
+    sirveEnMesa: (dbLocal.sirveEnMesa as boolean) ?? true,
     linkPedido: (dbLocal.linkPedido as string) ?? "",
   } : null);
 
@@ -179,7 +180,10 @@ export default function LocalDetailPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dbConcursos = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).concursos) ? ((dbLocal as Record<string, unknown>).concursos as any[]).filter((c: any) => !c.cancelado) : [];
   const concursosLocal: any[] = dbConcursos.length > 0 ? dbConcursos : CONCURSOS.filter(c => c.local === local.nombre);
-  const promosLocal = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).promociones) ? (dbLocal as Record<string, unknown>).promociones as Record<string, unknown>[] : [];
+  const concursosActivos = concursosLocal.filter((c: any) => c.activo && new Date(c.fechaFin) > new Date());
+  const concursosFinalizados = concursosLocal.filter((c: any) => !c.activo || new Date(c.fechaFin) <= new Date());
+  const promosLocal = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).promociones) ? ((dbLocal as Record<string, unknown>).promociones as Record<string, unknown>[]).filter((p: Record<string, unknown>) => p.activa) : [];
+  const DIAS_NOMBRE_FICHA = ["L", "M", "M", "J", "V", "S", "D"];
   const similares = LOCALES.filter(l => l.categoria === local.categoria && l.id !== local.id).slice(0, 3);
   const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
@@ -270,7 +274,7 @@ export default function LocalDetailPage() {
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
           { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
-          { key: "Concursos" as Tab, label: "Concursos", count: concursosLocal.length > 0 ? concursosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c" },
+          { key: "Concursos" as Tab, label: "Concursos", count: concursosActivos.length > 0 ? concursosActivos.length : (concursosLocal.length > 0 ? concursosLocal.length : null), countColor: concursosActivos.length > 0 ? "#1a0e05" : "rgba(240,234,214,0.5)", countBg: concursosActivos.length > 0 ? "#e8a84c" : "rgba(255,255,255,0.1)" },
           { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#c97060" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
@@ -306,9 +310,9 @@ export default function LocalDetailPage() {
                     )}
                   </div>
 
-                  {/* Concurso destacado (solo el más reciente) */}
-                  {concursosLocal.length > 0 && (() => {
-                    const c = concursosLocal[0];
+                  {/* Concurso destacado (solo si hay activos) */}
+                  {concursosActivos.length > 0 && (() => {
+                    const c = concursosActivos[0];
                     return (
                       <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concurso activo</p>
@@ -324,8 +328,8 @@ export default function LocalDetailPage() {
                           </div>
                           <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
                         </Link>
-                        {concursosLocal.length > 1 && (
-                          <button onClick={() => setTab("Concursos")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todos ({concursosLocal.length}) →</button>
+                        {concursosActivos.length > 1 && (
+                          <button onClick={() => setTab("Concursos")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todos ({concursosActivos.length}) →</button>
                         )}
                       </div>
                     );
@@ -421,9 +425,9 @@ export default function LocalDetailPage() {
                     </div>
                     {/* Modalidades */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
-                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e" }}>Delivery disponible</span>}
+                      {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", color: "#a070e0" }}>Servicio en mesa</span>}
+                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e" }}>Delivery</span>}
                       {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", color: "rgba(232,168,76,0.8)" }}>Retiro en local</span>}
-                      {!local.tieneDelivery && !local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)" }}>Solo en local</span>}
                     </div>
                     {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
                       <div style={{ marginBottom: "12px" }}>
@@ -456,11 +460,15 @@ export default function LocalDetailPage() {
             {tab === "Concursos" && (
               concursosLocal.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {concursosLocal.map(c => (
+                  {concursosActivos.length > 0 && (
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "#3db89e", marginBottom: "4px" }}>Activos</p>
+                  )}
+                  {concursosActivos.map(c => (
                     <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{
                       display: "flex", alignItems: "center", gap: "14px",
-                      background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)",
+                      background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.25)",
                       borderRadius: "14px", padding: "14px 16px", textDecoration: "none",
+                      boxShadow: "0 0 12px rgba(232,168,76,0.08)",
                     }}>
                       {c.imagenUrl ? (
                         <img src={c.imagenUrl} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
@@ -471,12 +479,36 @@ export default function LocalDetailPage() {
                         <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
                         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
                       </div>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "#3db89e", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "10px", padding: "4px 10px", flexShrink: 0 }}>Participar →</span>
                     </Link>
                   ))}
+                  {concursosFinalizados.length > 0 && (
+                    <>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", marginTop: "8px", marginBottom: "4px" }}>Finalizados</p>
+                      {concursosFinalizados.map(c => (
+                        <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{
+                          display: "flex", alignItems: "center", gap: "14px",
+                          background: "rgba(45,26,8,0.4)", border: "1px solid rgba(255,255,255,0.05)",
+                          borderRadius: "14px", padding: "14px 16px", textDecoration: "none",
+                          opacity: 0.6,
+                        }}>
+                          {c.imagenUrl ? (
+                            <img src={c.imagenUrl} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0, filter: "grayscale(0.5)" }} />
+                          ) : (
+                            <div style={{ width: 56, height: 56, borderRadius: 10, background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>🏆</div>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "rgba(240,234,214,0.5)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
+                          </div>
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>Finalizado</span>
+                        </Link>
+                      ))}
+                    </>
+                  )}
                 </div>
               ) : (
-                <EmptyState icon="🏆" title="Sin concursos" text="No hay concursos activos en este momento" />
+                <EmptyState icon="🏆" title="Sin concursos" text="Este local no tiene concursos por el momento" />
               )
             )}
 
@@ -484,20 +516,28 @@ export default function LocalDetailPage() {
             {tab === "Promociones" && (
               promosLocal.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {promosLocal.map((p: Record<string, unknown>) => (
-                    <Link key={p.id as string} href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "14px 16px", textDecoration: "none" }}>
-                      {p.imagenUrl ? (
-                        <img src={p.imagenUrl as string} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
-                      ) : (
-                        <div style={{ width: 56, height: 56, borderRadius: 10, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>⚡</div>
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo as string}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{TIPO_LABEL[p.tipo as string] || p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
-                      </div>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
-                    </Link>
-                  ))}
+                  {promosLocal.map((p: Record<string, unknown>) => {
+                    const dias = Array.isArray(p.diasSemana) ? p.diasSemana : [];
+                    const diasActivos = dias.length === 7 && typeof dias[0] === "boolean"
+                      ? dias.map((v: boolean, i: number) => v ? DIAS_NOMBRE_FICHA[i] : null).filter(Boolean)
+                      : [];
+                    const diasTexto = diasActivos.length === 7 ? "Todos los días" : diasActivos.length > 0 ? diasActivos.join(", ") : "";
+                    return (
+                      <Link key={p.id as string} href={`/promociones/${p.id}`} style={{ display: "flex", alignItems: "center", gap: "14px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "14px 16px", textDecoration: "none" }}>
+                        {p.imagenUrl ? (
+                          <img src={p.imagenUrl as string} alt="" style={{ width: 56, height: 56, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+                        ) : (
+                          <div style={{ width: 56, height: 56, borderRadius: 10, background: "rgba(232,168,76,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>⚡</div>
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.titulo as string}</p>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 2 }}>{TIPO_LABEL[p.tipo as string] || p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
+                          {diasTexto && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(61,184,158,0.7)" }}>{diasTexto}</p>}
+                        </div>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", flexShrink: 0 }}>Ver →</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               ) : (
                 <EmptyState icon="⚡" title="Sin promociones activas" text="Este local no tiene promociones activas en este momento." />

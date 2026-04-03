@@ -21,6 +21,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         where: { id },
         data: {
           ...(body.nombre !== undefined && { nombre: body.nombre }),
+          ...(body.email !== undefined && { email: body.email }),
           ...(body.ciudad !== undefined && { ciudad: body.ciudad }),
           ...(body.telefono !== undefined && { telefono: body.telefono || null }),
           ...(body.fotoUrl !== undefined && { fotoUrl: body.fotoUrl }),

@@ -22,6 +22,10 @@ export default function AdminConcursos() {
   const [editFechaFin, setEditFechaFin] = useState("");
   const [editError, setEditError] = useState("");
   const [accionLoading, setAccionLoading] = useState("");
+  const [creando, setCreando] = useState(false);
+  const [crearForm, setCrearForm] = useState({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "" });
+  const [localesList, setLocalesList] = useState<{ id: string; nombre: string }[]>([]);
+  const [crearError, setCrearError] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -33,6 +37,29 @@ export default function AdminConcursos() {
       setConcursos(Array.isArray(merged) ? merged : []);
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (creando) {
+      adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocalesList(Array.isArray(d) ? d : [])).catch(() => {});
+    }
+  }, [creando]);
+
+  const crearConcurso = async () => {
+    setCrearError("");
+    if (!crearForm.localId || !crearForm.premio.trim()) { setCrearError("Local y premio son obligatorios"); return; }
+    const fechaFin = new Date(Date.now() + parseInt(crearForm.duracion) * 86400000).toISOString();
+    try {
+      const res = await adminFetch("/api/concursos", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ localId: crearForm.localId, premio: crearForm.premio, descripcion: crearForm.descripcion.trim() || null, condiciones: crearForm.condiciones.trim() || null, fechaFin, imagenUrl: crearForm.imagenUrl || null }),
+      });
+      if (!res.ok) { const d = await res.json(); setCrearError(d.error ?? "Error al crear"); return; }
+      const nuevo = await res.json();
+      setConcursos(prev => [nuevo, ...prev]);
+      setCreando(false);
+      setCrearForm({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "" });
+    } catch { setCrearError("Error de conexión"); }
+  };
 
   useEffect(() => {
     adminFetch("/api/admin/concursos/atencion").then(r => r.json()).then(d => { if (Array.isArray(d)) setAtencion(d); }).catch(() => {});
@@ -184,7 +211,56 @@ export default function AdminConcursos() {
         </div>
       )}
 
-      <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "20px" }}>Concursos ({concursos.length})</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
+        <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c" }}>Concursos ({concursos.length})</h1>
+        <button onClick={() => setCreando(!creando)} style={{ background: creando ? "none" : "#e8a84c", border: creando ? "1px solid rgba(232,168,76,0.3)" : "none", borderRadius: "8px", color: creando ? "#e8a84c" : "#0a0812", fontFamily: "Georgia", fontSize: "0.82rem", fontWeight: 700, padding: "8px 18px", cursor: "pointer" }}>{creando ? "Cancelar" : "+ Crear concurso"}</button>
+      </div>
+
+      {creando && (
+        <div style={{ marginBottom: "24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", padding: "16px" }}>
+          <h3 style={{ fontFamily: "Georgia", fontSize: "0.88rem", letterSpacing: "0.18em", color: "rgba(240,234,214,0.45)", textTransform: "uppercase", marginBottom: "12px" }}>Crear concurso</h3>
+          {crearError && <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#ff6b6b", marginBottom: "10px" }}>⚠️ {crearError}</p>}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Local</label>
+              <select style={EDIT_INPUT} value={crearForm.localId} onChange={e => setCrearForm(f => ({ ...f, localId: e.target.value }))}>
+                <option value="">Seleccionar local...</option>
+                {localesList.map(l => <option key={l.id} value={l.id}>{l.nombre}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Premio</label>
+              <input style={EDIT_INPUT} value={crearForm.premio} onChange={e => setCrearForm(f => ({ ...f, premio: e.target.value }))} placeholder="Ej: Cena para dos" />
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Descripcion</label>
+              <textarea style={{ ...EDIT_INPUT, resize: "vertical", minHeight: "50px" }} value={crearForm.descripcion} onChange={e => setCrearForm(f => ({ ...f, descripcion: e.target.value }))} placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>
+              <textarea style={{ ...EDIT_INPUT, resize: "vertical", minHeight: "50px" }} value={crearForm.condiciones} onChange={e => setCrearForm(f => ({ ...f, condiciones: e.target.value }))} placeholder="Opcional" />
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Duracion</label>
+              <select style={EDIT_INPUT} value={crearForm.duracion} onChange={e => setCrearForm(f => ({ ...f, duracion: e.target.value }))}>
+                <option value="3">3 dias</option>
+                <option value="7">7 dias</option>
+                <option value="14">14 dias</option>
+                <option value="30">30 dias</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Imagen</label>
+              <SubirFoto folder="concursos" preview={crearForm.imagenUrl || null} label="Subir foto" height="100px" onUpload={url => setCrearForm(f => ({ ...f, imagenUrl: url }))} />
+            </div>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <button onClick={() => { setCreando(false); setCrearError(""); }} style={{ flex: 1, background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "6px", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>Cancelar</button>
+              <button onClick={crearConcurso} disabled={!crearForm.localId || !crearForm.premio.trim()} style={{ flex: 2, background: "#e8a84c", border: "none", borderRadius: "6px", color: "#0a0812", fontFamily: "Georgia", fontSize: "0.78rem", fontWeight: 700, padding: "8px", cursor: "pointer", opacity: crearForm.localId && crearForm.premio.trim() ? 1 : 0.5 }}>Crear concurso</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead><tr>{["Premio", "Local", "Participantes", "Inicio", "Fin", "Estado", "Acción"].map(h => <th key={h} style={TH}>{h}</th>)}</tr></thead>
         <tbody>

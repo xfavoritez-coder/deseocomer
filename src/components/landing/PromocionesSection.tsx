@@ -168,17 +168,20 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
             const timer        = timers[promo.id];
             const isHH         = promo.tipo === "happy_hour";
             const accentColor  = isHH ? "#d4a017" : "var(--accent)";
-            const badge        = isHH
+            const tLower       = promo.tipo?.toLowerCase() ?? "";
+            const badge        = isHH || tLower === "happy hour"
               ? { text: "HAPPY HOUR", color: "#d4a017" }
-              : promo.tipo === "cumpleanos"
-              ? { text: "CUMPLEA\u00d1OS", color: "#e05090" }
-              : promo.tipo === "2x1"
-              ? { text: "2\u00d71", color: "#3db89e" }
-              : promo.porcentajeDescuento
-              ? { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" }
-              : promo.tipo === "cupon"
-              ? { text: "CUP\u00d3N", color: "#8040d0" }
-              : promo.tipo === "precio_especial"
+              : tLower === "cumpleanos" || tLower === "cumpleaños"
+              ? { text: "CUMPLEAÑOS", color: "#e05090" }
+              : tLower === "2x1"
+              ? { text: "2×1", color: "#3db89e" }
+              : tLower === "descuento" || tLower === "descuento %" || promo.porcentajeDescuento
+              ? { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" }
+              : tLower === "cupon" || tLower === "cupón"
+              ? { text: "CUPÓN", color: "#8040d0" }
+              : tLower === "precio_especial" || tLower === "especial"
+              ? { text: "ESPECIAL", color: "#e8a84c" }
+              : tLower === "regalo"
               ? { text: "REGALO", color: "#e8a84c" }
               : null;
 

@@ -124,6 +124,7 @@ function ConcursoDetallePage() {
   const [isParticipating, setIsParticipating] = useState(false);
   const [joinLoading, setJoinLoading] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  const [showCondiciones, setShowCondiciones] = useState(false);
   const [phoneInput, setPhoneInput] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [phoneSaving, setPhoneSaving] = useState(false);
@@ -374,7 +375,9 @@ function ConcursoDetallePage() {
     "La participación en este concurso implica la aceptación total de estos términos y los Términos y Condiciones de DeseoComer.",
   ];
   const allRules: string[] = [];
-  if (c.condiciones) allRules.push(c.condiciones);
+  const condicionesLocal = c.condiciones || "";
+  const condicionesCortas = condicionesLocal.length > 200 ? condicionesLocal.slice(0, 200) + "..." : condicionesLocal;
+  if (condicionesLocal) allRules.push(condicionesCortas);
   allRules.push("Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre con tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso.");
   allRules.push(...condicionesSistema);
 
@@ -577,6 +580,25 @@ function ConcursoDetallePage() {
               ))}
             </div>
           </div>}
+          {condicionesLocal.length > 200 && (
+            <>
+              <div style={{ textAlign: "center", marginTop: "-8px", marginBottom: "16px" }}>
+                <button onClick={() => setShowCondiciones(true)} style={{ background: "none", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer", letterSpacing: "0.08em" }}>Leer condiciones completas</button>
+              </div>
+              {showCondiciones && (
+                <>
+                  <div onClick={() => setShowCondiciones(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
+                  <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", zIndex: 9999, background: "#1a0e05", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "16px", padding: "24px", maxWidth: "500px", width: "90vw", maxHeight: "70vh", overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#e8a84c", letterSpacing: "0.1em", textTransform: "uppercase", margin: 0 }}>Condiciones del local</h3>
+                      <button onClick={() => setShowCondiciones(false)} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.5)", fontSize: "1.2rem", cursor: "pointer", padding: "4px" }}>✕</button>
+                    </div>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{condicionesLocal}</p>
+                  </div>
+                </>
+              )}
+            </>
+          )}
 
           {/* 8. Ficha del local */}
           <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 12, padding: "12px 14px", display: "flex", gap: 12, alignItems: "center" }}>

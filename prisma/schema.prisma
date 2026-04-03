@@ -70,6 +70,7 @@ model Local {
   tieneDelivery     Boolean  @default(false)
   comunasDelivery   String[] @default([])
   tieneRetiro       Boolean  @default(false)
+  sirveEnMesa       Boolean  @default(true)
   linkPedido        String?  @default("")
   resetToken        String?
   resetTokenExpira  DateTime?
@@ -201,6 +202,7 @@ model Promocion {
   activa              Boolean  @default(true)
   esCumpleanos        Boolean  @default(false)
   imagenUrl           String?
+  modalidad           String[] @default([])
   fechaVencimiento    DateTime?
   createdAt           DateTime @default(now())
 

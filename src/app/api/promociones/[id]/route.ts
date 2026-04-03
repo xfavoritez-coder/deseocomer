@@ -34,6 +34,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.imagenUrl !== undefined && { imagenUrl: body.imagenUrl }),
         ...(body.condiciones !== undefined && { condiciones: body.condiciones }),
         ...(body.activa !== undefined && { activa: body.activa }),
+        ...(body.modalidad !== undefined && { modalidad: body.modalidad }),
         ...(body.fechaVencimiento !== undefined && { fechaVencimiento: body.fechaVencimiento ? new Date(body.fechaVencimiento) : null }),
       },
     });

@@ -23,12 +23,15 @@ function formatDias(dias: number[]): string {
 const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", cupon: "Cupón", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
-  if (promo.tipo === "happy_hour") return { text: "HAPPY HOUR", color: "#d4a017" };
-  if (promo.tipo === "cumpleanos") return { text: "CUMPLEA\u00d1OS", color: "#e05090" };
-  if (promo.tipo === "2x1") return { text: "2\u00d71", color: "#3db89e" };
-  if (promo.porcentajeDescuento) return { text: `-${promo.porcentajeDescuento}%`, color: "#ff6644" };
-  if (promo.tipo === "cupon") return { text: "CUP\u00d3N", color: "#8040d0" };
-  return { text: "REGALO", color: "#e8a84c" };
+  const t = promo.tipo?.toLowerCase() ?? "";
+  if (t === "happy_hour" || t === "happy hour") return { text: "HAPPY HOUR", color: "#d4a017" };
+  if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
+  if (t === "2x1") return { text: "2×1", color: "#3db89e" };
+  if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
+  if (t === "cupon" || t === "cupón") return { text: "CUPÓN", color: "#8040d0" };
+  if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
+  if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
+  return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }
 
 export default function PromocionesPage() {
@@ -62,6 +65,7 @@ export default function PromocionesPage() {
           fechaVencimiento: "2099-12-31", activa: p.activa ?? true,
           esCumpleanos: p.esCumpleanos ?? false,
           condiciones: p.condiciones ?? undefined,
+          modalidad: Array.isArray(p.modalidad) ? p.modalidad : [],
         }));
         setPromos(mapped);
       }
@@ -249,6 +253,17 @@ export default function PromocionesPage() {
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                         {promo.descripcion}
                       </p>
+                    )}
+
+                    {/* Modalidad badges */}
+                    {Array.isArray((promo as any).modalidad) && (promo as any).modalidad.length > 0 && (
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
+                        {(promo as any).modalidad.map((m: string) => (
+                          <span key={m} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", padding: "3px 10px", borderRadius: "12px", background: m === "delivery" ? "rgba(61,184,158,0.12)" : m === "retiro" ? "rgba(128,64,208,0.12)" : "rgba(232,168,76,0.12)", border: `1px solid ${m === "delivery" ? "rgba(61,184,158,0.3)" : m === "retiro" ? "rgba(128,64,208,0.3)" : "rgba(232,168,76,0.3)"}`, color: m === "delivery" ? "#3db89e" : m === "retiro" ? "#a070e0" : "#e8a84c", textTransform: "uppercase" }}>
+                            {m === "en_local" ? "En local" : m === "delivery" ? "Delivery" : "Retiro"}
+                          </span>
+                        ))}
+                      </div>
                     )}
 
                     {/* Días + Horario */}
