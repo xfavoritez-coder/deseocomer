@@ -441,7 +441,8 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* 4. Link de participación */}
+          {/* 4. Link de participación (solo activos) / CTA concursos (finalizados) */}
+          {!isEnded ? (
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
@@ -461,12 +462,12 @@ function ConcursoDetallePage() {
                     Compartir por WhatsApp
                   </button>
                 </div>
-              ) : isAuthenticated && !isParticipating && !isEnded ? (
+              ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
                   <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "🎉 Entrar a concurso"}</button>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Únete gratis y comienza a sumar puntos para ganar</p>
                 </div>
-              ) : !isAuthenticated && !isEnded ? (
+              ) : !isAuthenticated ? (
                 <div style={{ marginTop: 16 }}>
                   <Link className="dc-cd-cta-btn" href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, textDecoration: "none", textAlign: "center", letterSpacing: "0.06em" }}>Iniciar sesión para participar</Link>
                 </div>
@@ -476,6 +477,16 @@ function ConcursoDetallePage() {
               <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
             </div>
           </div>
+          ) : (
+          /* Concurso finalizado: CTA a concursos activos */
+          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, padding: "20px", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Este concurso ya no acepta participantes</p>
+            <Link href="/concursos" style={{ display: "inline-block", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: "12px 28px", borderRadius: 10, textDecoration: "none", letterSpacing: "0.06em" }}>Ver concursos activos →</Link>
+            <div style={{ marginTop: 12 }}>
+              <Link href="/concursos/ganadores" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>Ver ganadores anteriores →</Link>
+            </div>
+          </div>
+          )}
 
           {/* 5. Ranking (mobile) — hidden on desktop where sidebar shows */}
           <div className="dc-cd-ranking-mobile">
@@ -508,8 +519,8 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* 7. Reglas y condiciones */}
-          <div>
+          {/* 7. Reglas y condiciones (solo activos) */}
+          {!isEnded && <div>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Reglas del concurso</p>
             <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "14px 16px" }}>
               {allRules.map((rule, i) => (
@@ -519,7 +530,7 @@ function ConcursoDetallePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
 
           {/* 8. Ficha del local */}
           <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 12, padding: "12px 14px", display: "flex", gap: 12, alignItems: "center" }}>
