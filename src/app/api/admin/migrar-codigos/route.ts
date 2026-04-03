@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const usuarios = await prisma.usuario.findMany({
-      where: { OR: [{ codigoRef: "" }, { codigoRef: null as unknown as string }] },
+      where: { codigoRef: "" },
       select: { id: true, nombre: true },
     });
 
