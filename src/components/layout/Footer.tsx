@@ -43,7 +43,7 @@ export default function Footer() {
             {
               titulo: "Para Locales",
               links: [
-                { label: "Registra tu local",  href: "/registro-local" },
+                { label: "Registra tu local",  href: "/unete" },
                 { label: "Iniciar sesión",     href: "/login-local" },
                 { label: "Panel de control",   href: "/panel" },
               ],

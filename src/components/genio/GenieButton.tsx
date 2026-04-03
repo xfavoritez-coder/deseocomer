@@ -193,7 +193,7 @@ export default function GenieLampara() {
         const s = gs[period as keyof typeof gs] ?? gs.noche;
         return (
           <div style={{
-            position: "fixed", bottom: "calc(80px + 56px + 12px)", right: "16px", zIndex: 951,
+            position: "fixed", bottom: "calc(24px + 56px + 12px)", right: "16px", zIndex: 951,
             background: s.bg, border: `2px solid ${s.border}`,
             boxShadow: s.shadow, backdropFilter: "blur(8px)",
             borderRadius: "12px", padding: "10px 18px", whiteSpace: "nowrap",
@@ -212,7 +212,7 @@ export default function GenieLampara() {
         onClick={handleClick}
         aria-label="Abrir El Genio"
         style={{
-          position: "fixed", bottom: "80px", right: "16px", zIndex: 950,
+          position: "fixed", bottom: "24px", right: "16px", zIndex: 950,
           width: "56px", height: "56px", borderRadius: "50%",
           background: "linear-gradient(135deg, #c4853a, #e8a84c, #f5d080)",
           border: "2px solid rgba(245,208,128,0.6)",

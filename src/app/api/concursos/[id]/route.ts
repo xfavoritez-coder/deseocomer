@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
 
       const [p1, p2, p3] = concurso.participantes;
-      const codigo = `DC-${concurso.id.slice(-6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+      const codigo = `DC-${Math.floor(100000 + Math.random() * 900000)}`;
       const token = crypto.randomUUID();
       const esSospechoso = p1.estado === "sospechoso";
 

@@ -14,8 +14,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://deseocomer.com";
 // Días para reclamar según posición: 1° = 7d, 2° = 5d, 3° = 3d
 const DIAS_RECLAMO: Record<number, number> = { 1: 7, 2: 5, 3: 3 };
 
-function generarCodigo(concursoId: string) {
-  return `DC-${concursoId.slice(-6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+function generarCodigo() {
+  const num = Math.floor(100000 + Math.random() * 900000);
+  return `DC-${num}`;
 }
 
 function generarToken() {
@@ -103,7 +104,7 @@ export async function GET(req: NextRequest) {
       }
 
       const [p1, p2, p3] = c.participantes;
-      const codigo = generarCodigo(c.id);
+      const codigo = generarCodigo();
       const token = generarToken();
 
       // Check for fraud on winner

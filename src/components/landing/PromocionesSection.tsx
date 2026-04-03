@@ -419,7 +419,9 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
 
         @media (max-width: 767px) {
           .dc-ps-section   { padding: 72px 20px 48px; }
-          .dc-ps-grid      { grid-template-columns: 1fr; gap: 16px; }
+          .dc-ps-grid      { display: flex !important; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; scrollbar-width: none; }
+          .dc-ps-grid::-webkit-scrollbar { display: none; }
+          .dc-ps-card      { flex-shrink: 0 !important; width: 300px !important; }
           .dc-ps-card-inner { padding: 20px; }
         }
         @media (min-width: 768px) and (max-width: 1279px) {

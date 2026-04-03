@@ -20,7 +20,7 @@ export async function GET() {
         imagenUrl: g.imagenUrl,
         local: g.local.nombre,
         categoria: g.local.categoria,
-        ganador: g.ganadorActual?.nombre ?? "Ganador",
+        ganador: (() => { const n = g.ganadorActual?.nombre ?? "Ganador"; const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; })(),
         fechaFin: g.premioConfirmadoAt?.toLocaleDateString("es-CL") ?? "",
         participantes: 0,
       })),

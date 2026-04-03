@@ -101,7 +101,8 @@ function ConcursoDetallePage() {
             reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
-          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ?? null, premioConfirmadoAt: data.premioConfirmadoAt ?? null });
+          const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
+          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
         }
         setDbLoading(false);

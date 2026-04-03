@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useGenie, type LocalRecomendado } from "@/contexts/GenieContext";
 
@@ -14,10 +14,7 @@ const COMUNAS = [
   "Melipilla", "Talagante", "Puente Alto", "Pirque", "Bellavista",
 ];
 
-const COMUNAS_CON_COBERTURA = [
-  "Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura",
-  "San Miguel", "Maipú", "Bellavista", "La Reina", "Lo Barnechea",
-];
+// COMUNAS_CON_COBERTURA se obtiene dinámicamente del context
 
 const CATEGORIAS = [
   { emoji: "🍕", label: "Pizza" }, { emoji: "🍣", label: "Sushi" },
@@ -64,7 +61,8 @@ const PREGUNTA: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSi
 const CHIP: React.CSSProperties = { background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" };
 
 export default function GeniePanel() {
-  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount } = useGenie();
+  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales } = useGenie();
+  const COMUNAS_CON_COBERTURA = useMemo(() => comunasConLocales, [comunasConLocales]);
 
   const [stepActual, setStepActual] = useState<number | string>(1);
   const [ocasion, setOcasion] = useState("");
@@ -121,7 +119,7 @@ export default function GeniePanel() {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: "calc(80px + 56px + 12px)", right: "16px", width: "min(320px, 90vw)", maxHeight: "70vh", overflowY: "auto", background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: "20px", boxShadow: "0 0 40px rgba(0,0,0,0.7), 0 0 20px rgba(232,168,76,0.1)", zIndex: 950, animation: "genieSlideUp 0.3s ease both", padding: stepActual === 4 ? "0" : "20px" }}>
+    <div style={{ position: "fixed", bottom: "calc(24px + 56px + 12px)", right: "16px", width: "min(320px, 90vw)", maxHeight: "70vh", overflowY: "auto", background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: "20px", boxShadow: "0 0 40px rgba(0,0,0,0.7), 0 0 20px rgba(232,168,76,0.1)", zIndex: 950, animation: "genieSlideUp 0.3s ease both", padding: stepActual === 4 ? "0" : "20px" }}>
 
       {/* Steps 1-3 wrapper */}
       {stepActual !== 4 && (

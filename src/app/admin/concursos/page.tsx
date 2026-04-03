@@ -22,7 +22,16 @@ export default function AdminConcursos() {
   const [editError, setEditError] = useState("");
   const [accionLoading, setAccionLoading] = useState("");
 
-  useEffect(() => { fetch("/api/concursos").then(r => r.json()).then(d => setConcursos(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/concursos").then(r => r.json()),
+      fetch("/api/concursos/finalizados").then(r => r.json()),
+    ]).then(([activos, finalizados]) => {
+      const ids = new Set((activos ?? []).map((c: C) => c.id));
+      const merged = [...(activos ?? []), ...(finalizados ?? []).filter((c: C) => !ids.has(c.id))];
+      setConcursos(Array.isArray(merged) ? merged : []);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     adminFetch("/api/admin/concursos/atencion").then(r => r.json()).then(d => { if (Array.isArray(d)) setAtencion(d); }).catch(() => {});
@@ -130,7 +139,7 @@ export default function AdminConcursos() {
                 {/* Info del ganador */}
                 <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "12px" }}>
                   <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6" }}>
-                    Ganador actual: <strong style={{ color: "#e8a84c" }}>{c.ganadorActual?.nombre ?? "—"}</strong>
+                    Ganador actual: <strong style={{ color: "#e8a84c" }}>{(() => { const n = c.ganadorActual?.nombre ?? "—"; if (n === "—") return n; const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; })()}</strong>
                     {c.ganadorActual?.email && <span style={{ color: "rgba(240,234,214,0.4)", marginLeft: "8px" }}>{c.ganadorActual.email}</span>}
                   </p>
                   {c.ganador2 && <p style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", marginTop: "4px" }}>2° lugar: {c.ganador2.nombre}</p>}

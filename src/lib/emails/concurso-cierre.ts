@@ -232,7 +232,7 @@ export async function emailDisputaAdmin(
   data: ConcursoEmailData,
   ganador: GanadorData,
 ) {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.FROM_EMAIL || "admin@deseocomer.com";
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.FROM_EMAIL || "favoritez@gmail.com";
   await resend.emails.send({
     from: FROM(),
     to: adminEmail,

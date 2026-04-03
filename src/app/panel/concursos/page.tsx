@@ -264,7 +264,8 @@ export default function PanelConcursos() {
             const ganador = (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0];
             const ganadorNombre = ganador?.usuario?.nombre ?? "Sin participantes";
             const estado = detalle.estado ?? (detalle.premioEntregado ? "completado" : "finalizado");
-            const ganadorActualNombre = detalle.ganadorActual?.nombre ?? ganadorNombre;
+            const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
+            const ganadorActualNombre = detalle.ganadorActual?.nombre ? _fn(detalle.ganadorActual.nombre) : _fn(ganadorNombre);
             const codigo = detalle.codigoEntrega;
 
             if (estado === "completado") {

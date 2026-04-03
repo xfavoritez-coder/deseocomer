@@ -166,7 +166,8 @@ export default function ConcursosPage() {
                   expirado: { label: "Expirado", color: "rgba(240,234,214,0.4)", bg: "rgba(255,255,255,0.03)", border: "rgba(255,255,255,0.1)" },
                 };
                 const est = estadoConfig[estado] ?? estadoConfig.finalizado;
-                const ganadorNombre = c.ganadorActual?.nombre ?? null;
+                const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
+                const ganadorNombre = c.ganadorActual?.nombre ? _fn(c.ganadorActual.nombre) : null;
                 const localInitial = c.local?.nombre?.[0] ?? "L";
 
                 return (
