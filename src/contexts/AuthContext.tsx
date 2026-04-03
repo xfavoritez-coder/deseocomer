@@ -144,6 +144,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cumpleDia: data.data.cumpleDia ?? null,
         cumpleMes: data.data.cumpleMes ?? null,
         codigoRef: data.data.codigoRef ?? "",
+        estiloAlimentario: data.data.estiloAlimentario ?? "",
+        comidasFavoritas: data.data.comidasFavoritas ?? [],
       }));
 
       // Sync birthday from BD to localStorage

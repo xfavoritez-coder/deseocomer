@@ -626,7 +626,17 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     try {
       const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
       if (s.estiloAlimentario) setEstiloAlimentario(s.estiloAlimentario);
-      if (Array.isArray(s.comidasFavoritas)) setComidasFavoritas(s.comidasFavoritas);
+      if (Array.isArray(s.comidasFavoritas) && s.comidasFavoritas.length > 0) setComidasFavoritas(s.comidasFavoritas);
+      // If not in localStorage, fetch from DB
+      if (s.id && (!s.estiloAlimentario && (!s.comidasFavoritas || s.comidasFavoritas.length === 0))) {
+        fetch(`/api/usuarios/${s.id}`).then(r => r.ok ? r.json() : null).then(data => {
+          if (data) {
+            if (data.estiloAlimentario) { setEstiloAlimentario(data.estiloAlimentario); s.estiloAlimentario = data.estiloAlimentario; }
+            if (Array.isArray(data.comidasFavoritas) && data.comidasFavoritas.length > 0) { setComidasFavoritas(data.comidasFavoritas); s.comidasFavoritas = data.comidasFavoritas; }
+            localStorage.setItem("deseocomer_session", JSON.stringify(s));
+          }
+        }).catch(() => {});
+      }
     } catch { /* noop */ }
   }, []);
 

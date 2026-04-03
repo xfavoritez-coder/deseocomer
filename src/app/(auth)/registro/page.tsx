@@ -122,6 +122,9 @@ function RegistroContent() {
       setRefMsg(msg);
       setRegisteredUserId(res.userId ?? "");
       setRedirectTo(redirectToPath);
+      // Clear stale data from previous account
+      localStorage.removeItem("deseocomer_user_birthday");
+      localStorage.removeItem("genio_cumple_solicitado");
       setOnboardingStep(1);
     } else { setError(res.error ?? "Error al crear la cuenta."); }
   };
@@ -193,6 +196,13 @@ function RegistroContent() {
                   try {
                     await fetch("/api/usuarios/preferencias", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: registeredUserId, estiloAlimentario: estilo, comidasFavoritas: comidasSel }) });
                   } catch {}
+                  // Save to localStorage session too
+                  try {
+                    const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+                    session.estiloAlimentario = estilo;
+                    session.comidasFavoritas = comidasSel;
+                    localStorage.setItem("deseocomer_session", JSON.stringify(session));
+                  } catch {}
                   try {
                     const perfil = JSON.parse(localStorage.getItem("deseocomer_genio_perfil") ?? "{}");
                     if (!perfil.gustos) perfil.gustos = { categorias: {}, comunas: {}, ocasiones: {}, atributos: {}, precioPreferido: null, horario: {} };
@@ -205,9 +215,21 @@ function RegistroContent() {
                     localStorage.setItem("deseocomer_genio_perfil", JSON.stringify(perfil));
                   } catch {}
                 }
-                router.push(redirectTo);
+                setOnboardingStep(3);
               }} style={btnS}>{comidasSel.length > 0 ? "¡Listo, vamos!" : "Continuar"}</button>
-              <button onClick={() => router.push(redirectTo)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
+              <button onClick={() => setOnboardingStep(3)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
+            </div>
+          ) : onboardingStep === 3 ? (
+            // Step 3: Verification reminder
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: "2rem", marginBottom: "12px" }}>📧</div>
+              <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "12px" }}>Activa tu cuenta</h2>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "8px" }}>Te enviamos un email a <strong style={{ color: "var(--accent)" }}>{form.email}</strong></p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", lineHeight: 1.6, marginBottom: "24px" }}>Revisa tu bandeja de entrada y haz click en el link para activar tu cuenta. Sin esto no podrás participar en concursos.</p>
+              {refMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#3db89e", marginBottom: "16px" }}>{refMsg}</p>}
+              {alertaIPMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#e8a84c", marginTop: "8px", lineHeight: 1.5, opacity: 0.85 }}>{alertaIPMsg}</p>}
+              <button onClick={() => router.push(redirectTo)} style={btnS}>Entrar a DeseoComer →</button>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.25)", marginTop: "12px" }}>¿No te llegó? Revisa tu carpeta de spam</p>
             </div>
           ) : null
         ) : (
