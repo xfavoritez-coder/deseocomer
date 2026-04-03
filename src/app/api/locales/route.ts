@@ -8,6 +8,10 @@ export async function GET() {
     const locales = await prisma.local.findMany({
       where: {
         activo: true,
+        nombre: { not: "" },
+        categoria: { not: null },
+        direccion: { not: "" },
+        comuna: { not: "" },
       },
       include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
