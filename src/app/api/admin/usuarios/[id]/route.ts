@@ -148,6 +148,40 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         where: { id: { in: participaciones.map(p => p.id) } },
         data: { estado: "descalificado", puntos: 0 },
       });
+
+      // Send descalificacion email
+      try {
+        const concursosAfectados = await prisma.participanteConcurso.findMany({
+          where: { id: { in: participaciones.map(p => p.id) } },
+          include: { concurso: { select: { premio: true, local: { select: { nombre: true } } } } },
+        });
+        const listaConcursos = concursosAfectados.map(p => `• ${p.concurso.premio} (${p.concurso.local.nombre})`).join("\n");
+
+        await resend.emails.send({
+          from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
+          to: usuario.email,
+          subject: "Aviso importante sobre tu participación · DeseoComer",
+          html: `<html><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:40px 24px">
+<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
+<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
+<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">Aviso sobre tu participación</h2>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Hola ${usuario.nombre.split(" ")[0]},</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Lamentamos informarte que tu participación ha sido descalificada en los siguientes concursos por incumplimiento de las reglas de la plataforma:</p>
+<div style="background-color:rgba(255,80,80,0.08);border:1px solid rgba(255,80,80,0.2);border-radius:12px;padding:16px;margin-bottom:16px">
+<p style="color:#ff8080;font-size:14px;line-height:1.7;margin:0;white-space:pre-line">${listaConcursos}</p>
+</div>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Esto puede deberse a:</p>
+<p style="color:#c0a060;font-size:14px;line-height:1.8;margin-bottom:16px">• Uso de cuentas múltiples o correos temporales<br/>• Registros desde la misma dirección IP<br/>• Patrones sospechosos de actividad<br/>• Otras violaciones a los términos y condiciones</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:0">Si crees que esto es un error, puedes contactarnos respondiendo a este correo.</p>
+</div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
+</div></body></html>`,
+        });
+      } catch (emailErr) {
+        console.error("[Email descalificacion]", emailErr);
+      }
+
       return NextResponse.json({ ok: true, descalificados: participaciones.length });
     }
 

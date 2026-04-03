@@ -64,28 +64,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       console.error("[Email primer participante] Error:", emailErr);
     }
 
-    // Acreditar +2 al referidor si existe
+    // Guardar +2 como PENDIENTES al referidor (se acreditan cuando el referido verifica email)
     if (referidoPor) {
-      const referidor = await prisma.usuario.findUnique({ where: { id: referidoPor } });
-      if (referidor) {
-        const refParticipante = await prisma.participanteConcurso.findUnique({
-          where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
+      const refParticipante = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
+      });
+      if (refParticipante) {
+        await prisma.participanteConcurso.update({
+          where: { id: refParticipante.id },
+          data: { puntosPendientes: { increment: 2 } },
         });
-        if (refParticipante) {
-          if (referidor.emailVerificado) {
-            // Acreditar puntos directamente
-            await prisma.participanteConcurso.update({
-              where: { id: refParticipante.id },
-              data: { puntos: { increment: 2 } },
-            });
-          } else {
-            // Guardar como pendientes hasta verificación
-            await prisma.participanteConcurso.update({
-              where: { id: refParticipante.id },
-              data: { puntosPendientes: { increment: 2 } },
-            });
-          }
-        }
       }
     }
 

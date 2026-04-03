@@ -30,6 +30,30 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Acreditar +2 al referidor directo ahora que este usuario verificó email
+    const misParticipaciones2 = await prisma.participanteConcurso.findMany({
+      where: { usuarioId: usuario.id, referidorDirectoId: { not: null } },
+      select: { concursoId: true, referidorDirectoId: true },
+    });
+    for (const mp of misParticipaciones2) {
+      if (!mp.referidorDirectoId) continue;
+      const conc = await prisma.concurso.findUnique({
+        where: { id: mp.concursoId },
+        select: { activo: true, fechaFin: true },
+      });
+      if (!conc?.activo || new Date(conc.fechaFin) <= new Date()) continue;
+
+      const refPart = await prisma.participanteConcurso.findUnique({
+        where: { concursoId_usuarioId: { concursoId: mp.concursoId, usuarioId: mp.referidorDirectoId } },
+      });
+      if (refPart && refPart.puntosPendientes >= 2) {
+        await prisma.participanteConcurso.update({
+          where: { id: refPart.id },
+          data: { puntos: { increment: 2 }, puntosPendientes: { decrement: 2 } },
+        });
+      }
+    }
+
     // --- NIVEL 2: Acreditar puntos por referidos de referidos ---
     // Find all participations where this user was referred by someone
     const misParticipaciones = await prisma.participanteConcurso.findMany({
