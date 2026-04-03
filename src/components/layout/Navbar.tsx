@@ -164,10 +164,13 @@ export default function Navbar() {
       </nav>
 
       {isAuthenticated && user && !user.emailVerificado && (
-        <div style={{ background: "rgba(255,140,0,0.1)", borderBottom: "1px solid rgba(255,140,0,0.3)", padding: "8px 20px", textAlign: "center", position: "fixed", top: "68px", left: 0, right: 0, zIndex: 99 }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff8c00", margin: 0 }}>
-            ⚠️ Tu cuenta no está verificada. <a href="/verificar-email" style={{ color: "#e8a84c", fontWeight: 700, textDecoration: "underline" }}>Reenviar email de verificación</a>
-          </p>
+        <div style={{ background: "rgba(45,26,8,0.98)", borderTop: "3px solid #e8a84c", borderBottom: "1px solid rgba(232,168,76,0.2)", padding: "12px 20px", display: "flex", alignItems: "center", gap: 12, width: "100%", position: "fixed", top: "68px", left: 0, right: 0, zIndex: 99, boxSizing: "border-box" }}>
+          <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>✉️</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.04em", margin: "0 0 2px" }}>Verifica tu cuenta</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", lineHeight: 1.4, margin: 0 }}>Necesitas verificar tu email para participar en concursos y sumar puntos.</p>
+          </div>
+          <button id="btn-reenviar-verif" onClick={async (e) => { const btn = e.currentTarget; try { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user.email }) }); btn.textContent = "✓ Enviado"; btn.style.background = "#3db89e"; setTimeout(() => { btn.textContent = "Reenviar →"; btn.style.background = "#e8a84c"; }, 3000); } catch {} }} style={{ background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", border: "none", borderRadius: 20, padding: "6px 14px", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>Reenviar →</button>
         </div>
       )}
 
