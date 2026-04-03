@@ -12,7 +12,8 @@ export default function AdminUsuarios() {
   const [toast, setToast] = useState("");
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editData, setEditData] = useState<Record<string, string>>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [editData, setEditData] = useState<Record<string, any>>({});
   const [passMode, setPassMode] = useState(false);
   const [newPass, setNewPass] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -119,6 +120,24 @@ export default function AdminUsuarios() {
       <div style={cardS}>
         <p style={cardTitleS}>Información</p>
         {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })], ["Cuenta activada", sel.emailVerificadoAt ? new Date(sel.emailVerificadoAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : (sel.emailVerificado ? "Sí (fecha no registrada)" : "No")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {sel.estiloAlimentario && (
+          <div style={{ padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "rgba(240,234,214,0.55)" }}>Estilo</span>
+            <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#e8a84c" }}>
+              {sel.estiloAlimentario === "carnivoro" ? "🥩 Carnívoro" : sel.estiloAlimentario === "vegetariano" ? "🌱 Vegetariano" : sel.estiloAlimentario === "vegano" ? "🌿 Vegano" : "🍽️ Omnívoro"}
+            </span>
+          </div>
+        )}
+        {sel.comidasFavoritas?.length > 0 && (
+          <div style={{ padding: "8px 0" }}>
+            <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "rgba(240,234,214,0.55)", display: "block", marginBottom: "6px" }}>Comidas favoritas</span>
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {sel.comidasFavoritas.map((c: string) => (
+                <span key={c} style={{ fontFamily: "Georgia", fontSize: "0.82rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(232,168,76,0.1)", color: "#e8a84c" }}>{c}</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Perfil del Genio */}
@@ -355,6 +374,30 @@ export default function AdminUsuarios() {
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
             </div>
           ))}
+          <div key="estiloAlimentario" style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Estilo alimentario</label>
+            <select style={inputS} value={editData.estiloAlimentario ?? ""} onChange={e => setEditData(d => ({ ...d, estiloAlimentario: e.target.value }))}>
+              <option value="">Sin definir</option>
+              <option value="carnivoro">Carnívoro</option>
+              <option value="vegetariano">Vegetariano</option>
+              <option value="vegano">Vegano</option>
+              <option value="omnivoro">Omnívoro</option>
+            </select>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Comidas favoritas (máx. 3)</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Pastas", "Pollo", "Parrilla", "Mariscos", "Café", "Saludable", "Postres", "Brunch"].map(c => {
+                const comidas: string[] = Array.isArray(editData.comidasFavoritas) ? editData.comidasFavoritas : [];
+                const sel = comidas.includes(c);
+                const maxed = comidas.length >= 3 && !sel;
+                return <button key={c} type="button" disabled={maxed} onClick={() => {
+                  const cur: string[] = Array.isArray(editData.comidasFavoritas) ? editData.comidasFavoritas : [];
+                  setEditData(d => ({ ...d, comidasFavoritas: sel ? cur.filter(x => x !== c) : [...cur, c] }));
+                }} style={{ padding: "4px 10px", borderRadius: "10px", border: sel ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.15)", background: sel ? "rgba(232,168,76,0.15)" : "transparent", color: sel ? "#e8a84c" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: maxed ? "default" : "pointer" }}>{c}</button>;
+              })}
+            </div>
+          </div>
           <div style={{ display: "flex", gap: "8px" }}>
             <button onClick={async () => { if (await action("editar", editData)) { setSel({ ...sel, ...editData }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, ...editData } : u)); setEditMode(false); show("✓ Datos actualizados"); } }} disabled={loading} style={btnPrimaryS}>{loading ? "..." : "Guardar"}</button>
             <button onClick={() => setEditMode(false)} style={btnSecS}>Cancelar</button>
@@ -397,7 +440,7 @@ export default function AdminUsuarios() {
 
       {!editMode && !passMode && !deleteConfirm && !descalificarConfirm && (
         <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "16px" }}>
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", email: sel.email ?? "", telefono: sel.telefono ?? "", tipo: sel.tipo ?? "usuario", fotoUrl: sel.fotoUrl ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? ""), cumpleAnio: String(sel.cumpleAnio ?? "") }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", email: sel.email ?? "", telefono: sel.telefono ?? "", tipo: sel.tipo ?? "usuario", fotoUrl: sel.fotoUrl ?? "", cumpleDia: String(sel.cumpleDia ?? ""), cumpleMes: String(sel.cumpleMes ?? ""), cumpleAnio: String(sel.cumpleAnio ?? ""), estiloAlimentario: sel.estiloAlimentario ?? "", comidasFavoritas: sel.comidasFavoritas ?? [] }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           {sel.fotoUrl && <button onClick={async () => { if (await action("resetear-foto")) { setSel({ ...sel, fotoUrl: "" }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, fotoUrl: "" } : u)); show("✓ Foto de perfil eliminada"); } }} disabled={loading} style={btnOutlineS}>🖼️ Resetear foto de perfil</button>}
           {!sel.emailVerificado && (

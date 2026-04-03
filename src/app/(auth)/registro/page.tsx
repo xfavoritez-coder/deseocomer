@@ -31,6 +31,11 @@ function RegistroContent() {
   const [emailBlockedMsg, setEmailBlockedMsg] = useState("");
   const [emailSugerido, setEmailSugerido] = useState("");
   const [alertaIPMsg, setAlertaIPMsg] = useState("");
+  const [onboardingStep, setOnboardingStep] = useState(0); // 0=success msg, 1=estilo, 2=comidas
+  const [estilo, setEstilo] = useState("");
+  const [comidasSel, setComidasSel] = useState<string[]>([]);
+  const [registeredUserId, setRegisteredUserId] = useState("");
+  const [redirectTo, setRedirectTo] = useState("/");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
 
@@ -87,7 +92,7 @@ function RegistroContent() {
     setLoading(false);
     if (res.success) {
       if (res.alertaIP) setAlertaIPMsg("Detectamos que ya existen cuentas registradas desde tu ubicación. Recuerda que crear múltiples cuentas puede resultar en la descalificación de concursos.");
-      const pending = getPendingRef(); let msg = ""; let redirectTo = "/";
+      const pending = getPendingRef(); let msg = ""; let redirectToPath = "/";
       if (pending && res.userId && pending.refCode !== res.userId) {
         const em = form.email.trim().toLowerCase();
         if (!hasEmailCounted(pending.concursoId, pending.refCode, em)) {
@@ -108,14 +113,16 @@ function RegistroContent() {
           const fn = getRefUserName(pending.refCode);
           const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
           msg = refName ? `✅ Le sumaste 2 puntos a ${refName} y ganaste 1 punto.` : "✅ Le sumaste 2 puntos a tu amigo y ganaste 1 punto.";
-          redirectTo = `/concursos/${pending.concursoId}`;
+          redirectToPath = `/concursos/${pending.concursoId}`;
         } clearPendingRef();
       }
       setRefMsg(msg); setSuccess(true);
       // Show verification message
       if (!msg) msg = "Revisa tu email para verificar tu cuenta.";
       setRefMsg(msg);
-      setTimeout(() => router.push(redirectTo), 2500);
+      setRegisteredUserId(res.userId ?? "");
+      setRedirectTo(redirectToPath);
+      setOnboardingStep(1);
     } else { setError(res.error ?? "Error al crear la cuenta."); }
   };
 
@@ -125,7 +132,84 @@ function RegistroContent() {
       <div style={cardS}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}><div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div><p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p></div>
         {success ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}><div style={{ fontSize: "2rem", marginBottom: "12px" }}>✨</div><h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "8px" }}>¡Bienvenido/a!</h2><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>{refMsg || "Tu cuenta ha sido creada. Redirigiendo..."}</p>{alertaIPMsg && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#e8a84c", marginTop: "12px", lineHeight: 1.5, opacity: 0.85 }}>{alertaIPMsg}</p>}</div>
+          onboardingStep === 0 ? (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: "2rem", marginBottom: "12px" }}>✨</div>
+              <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "8px" }}>¡Bienvenido/a!</h2>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>{refMsg}</p>
+            </div>
+          ) : onboardingStep === 1 ? (
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "2rem", marginBottom: "12px" }}>🍽️</div>
+              <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Cuál es tu estilo?</h2>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Así te mostramos lo que más te gusta</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
+                {[
+                  { value: "carnivoro", label: "Carnívoro", emoji: "🥩" },
+                  { value: "vegetariano", label: "Vegetariano", emoji: "🌱" },
+                  { value: "vegano", label: "Vegano", emoji: "🌿" },
+                  { value: "omnivoro", label: "Como de todo", emoji: "🍽️" },
+                ].map(e => (
+                  <button key={e.value} onClick={() => { setEstilo(e.value); setOnboardingStep(2); }} style={{
+                    display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px",
+                    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(232,168,76,0.15)",
+                    borderRadius: "12px", cursor: "pointer", textAlign: "left", width: "100%",
+                  }}>
+                    <span style={{ fontSize: "1.5rem" }}>{e.emoji}</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--text-primary)" }}>{e.label}</span>
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => { setOnboardingStep(2); }} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
+            </div>
+          ) : onboardingStep === 2 ? (
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "2rem", marginBottom: "12px" }}>😋</div>
+              <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Qué te encanta comer?</h2>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "20px" }}>
+                {(() => {
+                  const TODAS = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Pastas", "Pollo", "Parrilla", "Mariscos", "Café", "Saludable", "Postres", "Brunch", "Árabe", "Peruano", "Italiano"];
+                  const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : [];
+                  const opciones = TODAS.filter(c => !excluir.includes(c));
+                  return opciones.map(c => {
+                    const sel = comidasSel.includes(c);
+                    const maxed = comidasSel.length >= 3 && !sel;
+                    return (
+                      <button key={c} disabled={maxed} onClick={() => setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c])} style={{
+                        padding: "8px 16px", borderRadius: "20px", cursor: maxed ? "default" : "pointer",
+                        background: sel ? "rgba(232,168,76,0.15)" : "transparent",
+                        border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)",
+                        color: sel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)",
+                        fontFamily: "var(--font-lato)", fontSize: "0.85rem",
+                      }}>{c}</button>
+                    );
+                  });
+                })()}
+              </div>
+              {comidasSel.length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length}/3 seleccionadas</p>}
+              <button onClick={async () => {
+                if (registeredUserId && (estilo || comidasSel.length > 0)) {
+                  try {
+                    await fetch("/api/usuarios/preferencias", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: registeredUserId, estiloAlimentario: estilo, comidasFavoritas: comidasSel }) });
+                  } catch {}
+                  try {
+                    const perfil = JSON.parse(localStorage.getItem("deseocomer_genio_perfil") ?? "{}");
+                    if (!perfil.gustos) perfil.gustos = { categorias: {}, comunas: {}, ocasiones: {}, atributos: {}, precioPreferido: null, horario: {} };
+                    for (const c of comidasSel) {
+                      const k = c.toLowerCase();
+                      perfil.gustos.categorias[k] = (perfil.gustos.categorias[k] ?? 0) + 5;
+                    }
+                    if (estilo) perfil.gustos.atributos[estilo] = (perfil.gustos.atributos[estilo] ?? 0) + 5;
+                    perfil.updatedAt = Date.now();
+                    localStorage.setItem("deseocomer_genio_perfil", JSON.stringify(perfil));
+                  } catch {}
+                }
+                router.push(redirectTo);
+              }} style={btnS}>{comidasSel.length > 0 ? "¡Listo, vamos!" : "Continuar"}</button>
+              <button onClick={() => router.push(redirectTo)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
+            </div>
+          ) : null
         ) : (
           <>
             <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Crea tu cuenta</h1>

@@ -98,6 +98,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           ...(body.cumpleDia !== undefined && { cumpleDia: body.cumpleDia ? Number(body.cumpleDia) : null }),
           ...(body.cumpleMes !== undefined && { cumpleMes: body.cumpleMes ? Number(body.cumpleMes) : null }),
           ...(body.cumpleAnio !== undefined && { cumpleAnio: body.cumpleAnio ? Number(body.cumpleAnio) : null }),
+          ...(body.estiloAlimentario !== undefined && { estiloAlimentario: body.estiloAlimentario }),
+          ...(body.comidasFavoritas !== undefined && { comidasFavoritas: body.comidasFavoritas }),
         },
       });
       const { password: _, ...safe } = updated;

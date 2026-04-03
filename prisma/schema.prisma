@@ -18,6 +18,8 @@ model Usuario {
   cumpleDia   Int?
   cumpleMes   Int?
   cumpleAnio  Int?
+  estiloAlimentario     String   @default("")
+  comidasFavoritas      String[] @default([])
   fotoUrl             String    @default("")
   tipo                String    @default("usuario")
   emailVerificado     Boolean   @default(false)

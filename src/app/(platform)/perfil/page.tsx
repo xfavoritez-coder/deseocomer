@@ -568,7 +568,7 @@ function TabGenio() {
 
 // ─── Tab: Mi Perfil (Editar) ─────────────────────────────────────────────────
 
-function TabPerfil({ user, logout, router }: { user: { nombre: string; email: string }; logout: () => void; router: ReturnType<typeof useRouter> }) {
+function TabPerfil({ user, logout, router }: { user: { nombre: string; email: string; id?: string }; logout: () => void; router: ReturnType<typeof useRouter> }) {
   const [form, setForm] = useState(() => {
     const p = loadProfile();
     const c = p.cumpleanos as { dia?: number; mes?: number; ano?: number } | undefined;
@@ -586,6 +586,40 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     };
   });
   const [saved, setSaved] = useState(false);
+
+  // Food preferences
+  const [estiloAlimentario, setEstiloAlimentario] = useState("");
+  const [comidasFavoritas, setComidasFavoritas] = useState<string[]>([]);
+  const [gustosSaved, setGustosSaved] = useState(false);
+  const [gustosLoading, setGustosLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (s.estiloAlimentario) setEstiloAlimentario(s.estiloAlimentario);
+      if (Array.isArray(s.comidasFavoritas)) setComidasFavoritas(s.comidasFavoritas);
+    } catch { /* noop */ }
+  }, []);
+
+  const saveGustos = async () => {
+    setGustosLoading(true);
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      const res = await fetch("/api/usuarios/preferencias", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuarioId: s.id, estiloAlimentario, comidasFavoritas }),
+      });
+      if (res.ok) {
+        s.estiloAlimentario = estiloAlimentario;
+        s.comidasFavoritas = comidasFavoritas;
+        localStorage.setItem("deseocomer_session", JSON.stringify(s));
+        setGustosSaved(true);
+        setTimeout(() => setGustosSaved(false), 2500);
+      }
+    } catch { /* noop */ }
+    setGustosLoading(false);
+  };
 
   const handleSave = () => {
     const p = loadProfile();
@@ -657,6 +691,65 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
         {edad !== null && edad > 0 && (
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "4px" }}>({edad} años)</p>
         )}
+      </div>
+
+      {/* Mis gustos */}
+      <div style={{ marginTop: "16px", background: "var(--bg-secondary)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "20px" }}>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", display: "block", marginBottom: "14px" }}>Mis gustos</span>
+
+        <div style={{ marginBottom: "16px" }}>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Estilo alimentario</span>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {[
+              { value: "omnivoro", emoji: "🍽️", label: "Omnívoro" },
+              { value: "carnivoro", emoji: "🥩", label: "Carnívoro" },
+              { value: "vegetariano", emoji: "🌱", label: "Vegetariano" },
+              { value: "vegano", emoji: "🌿", label: "Vegano" },
+            ].map(opt => (
+              <button key={opt.value} type="button" onClick={() => setEstiloAlimentario(estiloAlimentario === opt.value ? "" : opt.value)} style={{
+                padding: "8px 14px", borderRadius: "12px", cursor: "pointer",
+                border: estiloAlimentario === opt.value ? "1px solid var(--accent)" : "1px solid var(--border-color)",
+                background: estiloAlimentario === opt.value ? "rgba(232,168,76,0.12)" : "transparent",
+                color: estiloAlimentario === opt.value ? "var(--accent)" : "var(--text-muted)",
+                fontFamily: "var(--font-lato)", fontSize: "0.82rem",
+              }}>
+                {opt.emoji} {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: "14px" }}>
+          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Comidas favoritas (máx. 3)</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+            {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Pastas", "Pollo", "Parrilla", "Mariscos", "Café", "Saludable", "Postres", "Brunch"].map(c => {
+              const isSel = comidasFavoritas.includes(c);
+              const maxed = comidasFavoritas.length >= 3 && !isSel;
+              return (
+                <button key={c} type="button" disabled={maxed} onClick={() => {
+                  setComidasFavoritas(prev => isSel ? prev.filter(x => x !== c) : [...prev, c]);
+                }} style={{
+                  padding: "5px 12px", borderRadius: "12px", cursor: maxed ? "default" : "pointer",
+                  border: isSel ? "1px solid var(--accent)" : "1px solid var(--border-color)",
+                  background: isSel ? "rgba(232,168,76,0.12)" : "transparent",
+                  color: isSel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "var(--text-muted)",
+                  fontFamily: "var(--font-lato)", fontSize: "0.78rem",
+                }}>
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <button onClick={saveGustos} disabled={gustosLoading} style={{
+          background: "var(--accent)", color: "var(--bg-primary)",
+          border: "none", borderRadius: "10px", padding: "10px 20px",
+          fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700,
+          letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer",
+        }}>
+          {gustosSaved ? "✓ Guardado" : gustosLoading ? "..." : "Guardar gustos"}
+        </button>
       </div>
 
       {/* Notifications */}

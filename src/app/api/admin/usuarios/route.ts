@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
         id: true, nombre: true, email: true, tipo: true, telefono: true, fotoUrl: true,
         emailVerificado: true, emailVerificadoAt: true, geniePerfil: true, ipRegistro: true,
         cumpleDia: true, cumpleMes: true, cumpleAnio: true, createdAt: true,
+        estiloAlimentario: true, comidasFavoritas: true,
         _count: { select: { favoritos: true, resenas: true, participaciones: true } },
         participaciones: {
           select: {

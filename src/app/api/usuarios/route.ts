@@ -7,7 +7,7 @@ import disposableDomains from "disposable-email-domains";
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, email, password, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio } = await req.json();
+    const { nombre, email, password, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, estiloAlimentario, comidasFavoritas } = await req.json();
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const tokenVerificacion = crypto.randomBytes(32).toString("hex");
 
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip },
+      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip, ...(estiloAlimentario && { estiloAlimentario }), ...(comidasFavoritas?.length && { comidasFavoritas }) },
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;
