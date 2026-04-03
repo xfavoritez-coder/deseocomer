@@ -245,7 +245,9 @@ export default function GeniePanel() {
               {r.portadaUrl || r.foto ? (
                 <img src={(r.portadaUrl || r.foto)!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               ) : (
-                <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.6 }} />
+                <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #2d1a08 0%, #1a0e05 40%, #0a0812 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: "2.5rem", opacity: 0.2 }}>🍽️</span>
+                </div>
               )}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0) 30%, rgba(10,8,18,0.82) 100%)" }} />
               <div style={{ position: "absolute", bottom: "10px", left: "12px", display: "flex", alignItems: "center", gap: "8px" }}>

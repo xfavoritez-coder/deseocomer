@@ -38,7 +38,7 @@ export default function LocalesSection() {
           barrio: l.comuna ?? "Santiago", emoji: "🍽️",
           rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,
           descripcion: l.descripcion ?? "",
-          imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+          imagenUrl: l.portadaUrl ?? null,
           logoUrl: l.logoUrl ?? null,
         })));
       }
@@ -123,7 +123,13 @@ export default function LocalesSection() {
               display: "block",
             }}>
               <div style={{ height: "120px", overflow: "hidden", borderRadius: "20px 20px 0 0", flexShrink: 0, position: "relative" }}>
-                <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                {local.imagenUrl ? (
+                  <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                ) : (
+                  <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #2d1a08 0%, #1a0e05 40%, #0a0812 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <span style={{ fontSize: "2.5rem", opacity: 0.3 }}>🍽️</span>
+                  </div>
+                )}
                 <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categoria, comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
               </div>
               <div style={{ padding: local.descripcion ? "16px 20px 20px" : "16px 20px 16px" }}>

@@ -110,7 +110,7 @@ export default function LocalDetailPage() {
     precio: "$$",
     isOpen: true,
     totalFavoritos: (dbLocal._count as Record<string, number>)?.favoritos ?? 0,
-    imagenPortada: dbLocal.portadaUrl as string ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200",
+    imagenPortada: (dbLocal.portadaUrl as string) || null,
     imagenLogo: dbLocal.logoUrl as string ?? null,
     galeria: (dbLocal.galeria as string[]) ?? [],
     tieneMenu: dbLocal.tieneMenu as boolean ?? false,
@@ -213,7 +213,15 @@ export default function LocalDetailPage() {
 
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
-        <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
+        {local.imagenPortada ? (
+          <img src={local.imagenPortada} alt={local.nombre} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.65 }} />
+        ) : (
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, #2d1a08 0%, #1a0e05 30%, #0a0812 70%, #080d18 100%)" }}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.15 }}>
+              <span style={{ fontSize: "6rem" }}>🍽️</span>
+            </div>
+          </div>
+        )}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.1) 0%, rgba(10,8,18,0.95) 100%)" }} />
         <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Locales</Link>
         <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "20px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>

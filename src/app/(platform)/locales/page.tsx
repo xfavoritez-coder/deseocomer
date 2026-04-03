@@ -48,7 +48,7 @@ export default function LocalesPage() {
             comuna: l.comuna ?? "Santiago",
             rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
             precio: "",
-            imagenUrl: l.portadaUrl ?? "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600",
+            imagenUrl: l.portadaUrl ?? null,
             logoUrl: l.logoUrl,
             descripcion: l.descripcion ?? "",
             horarios: l.horarios,
@@ -221,7 +221,13 @@ export default function LocalesPage() {
                   <Link key={local.id} href={linkHref} className="dc-loc-card" style={{ textDecoration: "none", display: "block", color: "inherit" }}>
                     {/* Photo */}
                     <div style={{ position: "relative", height: "160px", overflow: "hidden" }}>
-                      <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      {local.imagenUrl ? (
+                        <img src={local.imagenUrl} alt={local.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                      ) : (
+                        <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #2d1a08 0%, #1a0e05 40%, #0a0812 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: "3rem", opacity: 0.25 }}>🍽️</span>
+                        </div>
+                      )}
                       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 50%, rgba(8,13,24,0.5) 100%)" }} />
 
                       {/* Badges top-left */}

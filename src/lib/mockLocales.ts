@@ -45,7 +45,7 @@ export interface Local {
   precio: string;
   isOpen: boolean;
   totalFavoritos: number;
-  imagenPortada: string;
+  imagenPortada: string | null;
   imagenLogo: string | null;
   galeria: string[];
   tieneMenu: boolean;
