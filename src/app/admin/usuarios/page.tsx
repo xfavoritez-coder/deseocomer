@@ -28,8 +28,27 @@ export default function AdminUsuarios() {
   const [ajustarEnviarCorreo, setAjustarEnviarCorreo] = useState(true);
   const [ajustarLoading, setAjustarLoading] = useState(false);
   const [userHistory, setUserHistory] = useState<U[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsuarios, setTotalUsuarios] = useState(0);
+  const [loadingList, setLoadingList] = useState(true);
+  const [busqDebounced, setBusqDebounced] = useState("");
 
-  useEffect(() => { adminFetch("/api/admin/usuarios").then(r => r.json()).then(d => setUsuarios(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  const fetchUsuarios = (p: number, q: string) => {
+    setLoadingList(true);
+    const params = new URLSearchParams({ page: String(p), limit: "20" });
+    if (q) params.set("busq", q);
+    adminFetch(`/api/admin/usuarios?${params}`).then(r => r.json()).then(d => {
+      setUsuarios(d.usuarios ?? []);
+      setTotalPages(d.totalPages ?? 1);
+      setTotalUsuarios(d.total ?? 0);
+      setPage(d.page ?? 1);
+    }).catch(() => {}).finally(() => setLoadingList(false));
+  };
+
+  useEffect(() => { fetchUsuarios(1, ""); }, []);
+  useEffect(() => { const t = setTimeout(() => { setBusqDebounced(busq); }, 400); return () => clearTimeout(t); }, [busq]);
+  useEffect(() => { fetchUsuarios(1, busqDebounced); }, [busqDebounced]);
 
   const show = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
@@ -463,15 +482,17 @@ export default function AdminUsuarios() {
   return (
     <div>
       {toast && <div style={toastS}>{toast}</div>}
-      <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({usuarios.length})</h1>
+      <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({totalUsuarios})</h1>
       <input style={{ ...inputS, marginBottom: "14px", maxWidth: "500px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
 
       <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}>
         <input type="checkbox" checked={soloIPsDuplicadas} onChange={e => setSoloIPsDuplicadas(e.target.checked)} style={{ accentColor: "#ff8c00", width: "18px", height: "18px" }} />
         <span style={{ fontFamily: "Georgia", fontSize: "0.95rem", color: "rgba(240,234,214,0.55)" }}>Mostrar solo IPs duplicadas</span>
-        {soloIPsDuplicadas && <span style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#ff8c00" }}>({filtered.length})</span>}
       </label>
 
+      {loadingList ? (
+        <p style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: "40px" }}>Cargando...</p>
+      ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(u => (
           <div key={u.id} onClick={() => { setSel(u); resetModes(); }} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", cursor: "pointer" }}>
@@ -491,6 +512,16 @@ export default function AdminUsuarios() {
           </div>
         ))}
       </div>
+      )}
+
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "20px" }}>
+          <button disabled={page <= 1} onClick={() => fetchUsuarios(page - 1, busqDebounced)} style={{ padding: "6px 14px", borderRadius: "8px", border: "1px solid rgba(232,168,76,0.2)", background: page <= 1 ? "transparent" : "rgba(232,168,76,0.1)", color: page <= 1 ? "rgba(240,234,214,0.2)" : "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: page <= 1 ? "default" : "pointer" }}>← Anterior</button>
+          <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)" }}>Página {page} de {totalPages}</span>
+          <button disabled={page >= totalPages} onClick={() => fetchUsuarios(page + 1, busqDebounced)} style={{ padding: "6px 14px", borderRadius: "8px", border: "1px solid rgba(232,168,76,0.2)", background: page >= totalPages ? "transparent" : "rgba(232,168,76,0.1)", color: page >= totalPages ? "rgba(240,234,214,0.2)" : "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: page >= totalPages ? "default" : "pointer" }}>Siguiente →</button>
+        </div>
+      )}
     </div>
   );
 }
