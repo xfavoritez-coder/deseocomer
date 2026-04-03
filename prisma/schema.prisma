@@ -139,6 +139,7 @@ model Concurso {
   premioEntregadoAt DateTime?
   recordatorio48h   Boolean  @default(false)
   recordatorio7d    Boolean  @default(false)
+  recordatorio24h   Boolean  @default(false)
 
   // New estado-based fields
   estado              EstadoConcurso @default(activo)

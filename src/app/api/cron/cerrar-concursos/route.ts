@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resend } from "@/lib/resend";
 import crypto from "crypto";
 import {
   emailGanador,
@@ -72,6 +73,75 @@ export async function GET(req: NextRequest) {
   const now = new Date();
 
   try {
+    // ════════════════════════════════════════════════════════════════════════
+    // PASO 0: Recordatorio 24h a participantes de concursos que terminan hoy
+    // ════════════════════════════════════════════════════════════════════════
+
+    const en24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const concursosTerminanHoy = await prisma.concurso.findMany({
+      where: {
+        estado: "activo",
+        recordatorio24h: false,
+        fechaFin: { gt: now, lte: en24h },
+      },
+      include: {
+        local: { select: { nombre: true } },
+        participantes: {
+          where: { estado: { not: "descalificado" } },
+          include: { usuario: { select: { id: true, nombre: true, email: true } } },
+          orderBy: { puntos: "desc" },
+        },
+        _count: { select: { participantes: true } },
+      },
+    });
+
+    for (const c of concursosTerminanHoy) {
+      if (c._count.participantes < 3) {
+        log.push(`[24H_SKIP] ${c.id} - menos de 3 participantes`);
+        continue;
+      }
+
+      const lider = c.participantes[0];
+      const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
+      let enviados = 0;
+
+      for (const p of c.participantes) {
+        const pos = c.participantes.findIndex(x => x.id === p.id) + 1;
+        const esLider = pos === 1;
+        try {
+          await resend.emails.send({
+            from,
+            to: p.usuario.email,
+            subject: `⏰ ¡Última oportunidad! "${c.premio}" cierra hoy`,
+            html: `<html><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:40px 24px">
+<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
+<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
+<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">⏰ ¡El concurso cierra hoy!</h2>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Hola ${p.usuario.nombre.split(" ")[0]},</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">El concurso <strong style="color:#f5d080">"${c.premio}"</strong> de <strong style="color:#e8a84c">${c.local.nombre}</strong> cierra en pocas horas.</p>
+<div style="background-color:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+<p style="color:rgba(240,234,214,0.5);font-size:14px;margin:0 0 4px">Tu posición actual</p>
+<p style="color:#e8a84c;font-size:28px;font-weight:bold;margin:0">#${pos}</p>
+<p style="color:rgba(240,234,214,0.5);font-size:14px;margin:4px 0 0">${p.puntos} puntos</p>
+${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder tiene ${lider.puntos} puntos</p>` : `<p style="color:#3db89e;font-size:13px;margin:8px 0 0">¡Vas primero! No bajes la guardia</p>`}
+</div>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">${esLider ? "Mantén tu ventaja compartiendo tu link. Cada referido verificado te da +2 puntos." : "Todavía puedes ganar. Comparte tu link con amigos — cada referido verificado te da +2 puntos."}</p>
+<div style="text-align:center"><a href="${BASE_URL}/concursos/${c.slug || c.id}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>
+</div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
+</div></body></html>`,
+          });
+          enviados++;
+        } catch (emailErr) {
+          log.push(`[24H_ERR] ${c.id} - ${p.usuario.email}: ${emailErr}`);
+        }
+      }
+
+      await prisma.concurso.update({ where: { id: c.id }, data: { recordatorio24h: true } });
+      log.push(`[24H_OK] ${c.id} "${c.premio}" - ${enviados}/${c.participantes.length} emails enviados`);
+    }
+
     // ════════════════════════════════════════════════════════════════════════
     // PASO 1: Cerrar concursos que terminaron
     // ════════════════════════════════════════════════════════════════════════
