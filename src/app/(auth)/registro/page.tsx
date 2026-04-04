@@ -129,7 +129,7 @@ function RegistroContent() {
           } catch {}
           const fn = getRefUserName(pending.refCode);
           const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
-          msg = refName ? `✅ Le sumaste 2 puntos a ${refName} y ganaste 1 punto.` : "✅ Le sumaste 2 puntos a tu amigo y ganaste 1 punto.";
+          msg = refName ? `📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a ${refName} y empezar a participar.` : "📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a tu amigo y empezar a participar.";
           redirectToPath = `/concursos/${pending.concursoId}`;
         } clearPendingRef();
       }
@@ -202,7 +202,7 @@ function RegistroContent() {
                   const usarDB = categoriasDB.length > 0;
                   const opciones = usarDB
                     ? categoriasDB.filter(c => !c.estiloExcluido.includes(estilo)).map(c => c.nombre)
-                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : []; return [...CATEGORIAS_MASTER].filter(c => !excluir.includes(c)); })();
+                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Carnes / Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Carnes / Parrilla"] : []; return [...CATEGORIAS_MASTER].filter(c => !excluir.includes(c)); })();
                   const totalSel = comidasSel.length + customComidas.length;
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);

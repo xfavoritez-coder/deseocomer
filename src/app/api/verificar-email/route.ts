@@ -30,7 +30,9 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Acreditar +2 al referidor directo ahora que este usuario verificó email
+    // Acreditar puntos al referidor directo ahora que este usuario verificó email
+    let referidorNombre: string | null = null;
+    let concursoSlug: string | null = null;
     const misParticipaciones2 = await prisma.participanteConcurso.findMany({
       where: { usuarioId: usuario.id, referidorDirectoId: { not: null } },
       select: { concursoId: true, referidorDirectoId: true },
@@ -39,7 +41,7 @@ export async function GET(req: NextRequest) {
       if (!mp.referidorDirectoId) continue;
       const conc = await prisma.concurso.findUnique({
         where: { id: mp.concursoId },
-        select: { activo: true, fechaFin: true },
+        select: { activo: true, fechaFin: true, premio: true, slug: true },
       });
       if (!conc?.activo || new Date(conc.fechaFin) <= new Date()) continue;
 
@@ -51,6 +53,19 @@ export async function GET(req: NextRequest) {
           where: { id: refPart.id },
           data: { puntos: { increment: refPart.puntosPendientes }, puntosPendientes: 0 },
         });
+
+        // Notificar al referidor directo que se le acreditaron los puntos
+        const refUser = await prisma.usuario.findUnique({ where: { id: mp.referidorDirectoId }, select: { nombre: true } });
+        referidorNombre = refUser?.nombre?.split(" ")[0] ?? null;
+        concursoSlug = conc.slug ?? mp.concursoId;
+        const nombreReferido = usuario.nombre?.split(" ")[0] ?? "Alguien";
+        prisma.notificacion.create({
+          data: {
+            usuarioId: mp.referidorDirectoId,
+            tipo: "referido",
+            mensaje: `${nombreReferido} activó su cuenta. ¡+${refPart.puntosPendientes} puntos para ti en "${conc.premio}"! 🎉`,
+          },
+        }).catch(() => {});
       }
     }
 
@@ -125,7 +140,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email });
+    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email, referidorNombre, concursoSlug });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }

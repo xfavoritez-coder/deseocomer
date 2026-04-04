@@ -29,7 +29,7 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: 
     </p>
 
     <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:28px">
-      Recuerda: por cada persona que se registre con tu link, tú ganas <strong style="color:#e8a84c">+2 puntos</strong>. Compártelo y acércate al premio.
+      Recuerda: por cada persona que se registre con tu link, tú ganas <strong style="color:#e8a84c">hasta +3 puntos</strong>. Compártelo y acércate al premio.
     </p>
 
     <div style="text-align:center;margin-bottom:8px">

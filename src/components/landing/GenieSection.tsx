@@ -5,7 +5,7 @@ const opciones = [
   { imgUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=120", label: "Antojo de pizza" },
   { imgUrl: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=120", label: "Algo diferente" },
   { imgUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=120", label: "Algo liviano" },
-  { imgUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=120", label: "Japonés" },
+  { imgUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=120", label: "Sushi" },
   { imgUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=120", label: "Contundente" },
   { imgUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=120", label: "Café y algo rico" },
 ];

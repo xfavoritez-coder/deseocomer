@@ -74,7 +74,7 @@ const LOCALES_DB: LocalRecomendado[] = [
   { id: "3", nombre: "BurgerCraft", categoria: "hamburguesa", categorias: ["Hamburguesa"], comuna: "Las Condes", rating: 4.7, descuento: 15, foto: null },
   { id: "4", nombre: "Verde Natural", categoria: "saludable", categorias: ["Saludable", "Vegano"], comuna: "Providencia", rating: 4.6, descuento: 0, foto: null },
   { id: "5", nombre: "Tacos & Co", categoria: "mexicano", categorias: ["Mexicano"], comuna: "Santiago Centro", rating: 4.4, descuento: 10, foto: null },
-  { id: "6", nombre: "Pasta Fresca Nonna", categoria: "pastas", categorias: ["Pastas", "Italiano"], comuna: "Ñuñoa", rating: 4.6, descuento: 0, foto: null },
+  { id: "6", nombre: "Pasta Fresca Nonna", categoria: "pastas", categorias: ["Pastas"], comuna: "Ñuñoa", rating: 4.6, descuento: 0, foto: null },
   { id: "7", nombre: "El Pollo Dorado", categoria: "pollo", categorias: ["Pollo"], comuna: "Maipú", rating: 4.3, descuento: 5, foto: null },
 ];
 

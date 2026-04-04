@@ -815,7 +815,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
         <div style={{ marginBottom: "14px" }}>
           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Comidas favoritas (máx. 3)</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-            {(categoriasPerfilDB.length > 0 ? categoriasPerfilDB : ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"]).map(c => {
+            {(categoriasPerfilDB.length > 0 ? categoriasPerfilDB : ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Carnes / Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"]).map(c => {
               const isSel = comidasFavoritas.includes(c);
               const totalSel = comidasFavoritas.length + comidasCustomPerfil.length;
               const maxed = totalSel >= 3 && !isSel;

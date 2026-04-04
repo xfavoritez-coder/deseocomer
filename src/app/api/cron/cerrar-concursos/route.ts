@@ -126,7 +126,7 @@ export async function GET(req: NextRequest) {
 <p style="color:rgba(240,234,214,0.5);font-size:14px;margin:4px 0 0">${p.puntos} puntos</p>
 ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder tiene ${lider.puntos} puntos</p>` : `<p style="color:#3db89e;font-size:13px;margin:8px 0 0">¡Vas primero! No bajes la guardia</p>`}
 </div>
-<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">${esLider ? "Mantén tu ventaja compartiendo tu link. Cada referido verificado te da +2 puntos." : "Todavía puedes ganar. Comparte tu link con amigos — cada referido verificado te da +2 puntos."}</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">${esLider ? "Mantén tu ventaja compartiendo tu link. Cada referido verificado te da hasta +3 puntos." : "Todavía puedes ganar. Comparte tu link con amigos — cada referido verificado te da hasta +3 puntos."}</p>
 <div style="text-align:center"><a href="${BASE_URL}/concursos/${c.slug || c.id}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>
 </div>
 <div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>

@@ -16,7 +16,7 @@ const CATEGORIAS_INICIALES = [
   // Tags (solo aparecen en tags y preferencias)
   { nombre: "Vegetariano", slug: "vegetariano", emoji: "🌱", tipo: "tag", orden: 11 },
   { nombre: "Saludable", slug: "saludable", emoji: "🥗", tipo: "tag", orden: 12 },
-  { nombre: "Parrilla", slug: "parrilla", emoji: "🥩", tipo: "tag", orden: 13, estiloExcluido: ["vegano", "vegetariano"] },
+  { nombre: "Carnes / Parrilla", slug: "carnes-parrilla", emoji: "🥩", tipo: "tag", orden: 13, estiloExcluido: ["vegano", "vegetariano"] },
   { nombre: "Árabe", slug: "arabe", emoji: "🧆", tipo: "tag", orden: 14 },
   { nombre: "Peruano", slug: "peruano", emoji: "🇵🇪", tipo: "tag", orden: 15 },
   { nombre: "India", slug: "india", emoji: "🍛", tipo: "tag", orden: 16 },

@@ -12,6 +12,8 @@ function VerificarContent() {
   const token = params.get("token");
   const [status, setStatus] = useState<"loading" | "ok" | "error">("loading");
   const [nombre, setNombre] = useState("");
+  const [referidorNombre, setReferidorNombre] = useState<string | null>(null);
+  const [concursoSlug, setConcursoSlug] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) { setStatus("error"); return; }
@@ -21,6 +23,8 @@ function VerificarContent() {
         if (data.ok) {
           setStatus("ok");
           setNombre(data.nombre ?? "");
+          setReferidorNombre(data.referidorNombre ?? null);
+          setConcursoSlug(data.concursoSlug ?? null);
           // Auto-login: save session with emailVerificado
           try {
             const existingSession = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
@@ -45,13 +49,40 @@ function VerificarContent() {
         {status === "ok" && (
           <>
             <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>✨</div>
-            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", marginBottom: "12px" }}>¡Email verificado!</h1>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>
-              {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa. Ya puedes participar en concursos y guardar favoritos.
-            </p>
-            <a href="/" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
-              Entrar a DeseoComer →
-            </a>
+            <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.5rem", color: "var(--accent)", marginBottom: "12px" }}>¡Cuenta activada!</h1>
+            {referidorNombre ? (
+              <>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "8px" }}>
+                  {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa.
+                </p>
+                <div style={{ background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.25)", borderRadius: 12, padding: "14px 18px", marginBottom: "20px" }}>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#3db89e", lineHeight: 1.6, margin: 0 }}>
+                    🎉 ¡Le sumaste <strong>3 puntos</strong> a <strong>{referidorNombre}</strong>!
+                  </p>
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "20px" }}>
+                  Tú también puedes participar y ganar comida gratis. Comparte tu link e invita amigos para sumar puntos.
+                </p>
+                <a href={concursoSlug ? `/concursos/${concursoSlug}` : "/concursos"} style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none", marginBottom: "10px" }}>
+                  Ver concursos →
+                </a>
+                <a href="/" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", textDecoration: "none", marginTop: "8px" }}>
+                  Ir al inicio
+                </a>
+              </>
+            ) : (
+              <>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>
+                  {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa. Ya puedes participar en concursos y guardar favoritos.
+                </p>
+                <a href="/concursos" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
+                  Ver concursos →
+                </a>
+                <a href="/" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", textDecoration: "none", marginTop: "12px" }}>
+                  Ir al inicio
+                </a>
+              </>
+            )}
           </>
         )}
         {status === "error" && <ErrorVerificacion />}
