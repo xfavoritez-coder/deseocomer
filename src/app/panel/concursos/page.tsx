@@ -487,8 +487,14 @@ export default function PanelConcursos() {
             </div>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem, 3vw, 1.4rem)", color: "#f5d080", lineHeight: 1.2, marginBottom: "8px" }}>🏆 {pFinal}</p>
             {descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "12px", whiteSpace: "pre-wrap" }}>{descripcionPremio}</p>}
+            {activacion === "programar" && fechaActivacion && (
+              <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "8px", textAlign: "center" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#a78bfa", marginBottom: "4px" }}>🔮 Se activa el</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#a78bfa" }}>{new Date(fechaActivacion).toLocaleDateString("es-CL")} a las {new Date(fechaActivacion).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}</p>
+              </div>
+            )}
             <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", padding: "12px", marginBottom: "12px" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Termina en</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>{activacion === "programar" && fechaActivacion ? "Duración" : "Termina en"}</p>
               <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                 {[{ v: dur, l: "días" }, { v: 0, l: "hrs" }, { v: 0, l: "min" }].map((t, i) => (
                   <div key={i} style={{ textAlign: "center" }}>
@@ -499,8 +505,8 @@ export default function PanelConcursos() {
               </div>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 0 participantes</span>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.08em", color: "var(--accent)" }}>Participar →</span>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>{activacion === "programar" && fechaActivacion ? "🔔 Lista de espera" : "👥 0 participantes"}</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", letterSpacing: "0.08em", color: activacion === "programar" && fechaActivacion ? "#a78bfa" : "var(--accent)" }}>{activacion === "programar" && fechaActivacion ? "Avisarme →" : "Participar →"}</span>
             </div>
           </div>
         </div>

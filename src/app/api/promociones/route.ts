@@ -11,8 +11,15 @@ export async function GET(req: NextRequest) {
       where: localId
         ? { localId }
         : { activa: true, local: { activo: true }, OR: [{ fechaVencimiento: null }, { fechaVencimiento: { gte: new Date() } }] },
-      include: { local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true, categoria: true } } },
+      select: {
+        id: true, slug: true, localId: true, tipo: true, titulo: true, descripcion: true,
+        condiciones: true, porcentajeDescuento: true, precioOriginal: true, precioDescuento: true,
+        horaInicio: true, horaFin: true, diasSemana: true, activa: true, esCumpleanos: true,
+        imagenUrl: true, vistas: true, modalidad: true, createdAt: true,
+        local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true, categoria: true } },
+      },
       orderBy: { createdAt: "desc" },
+      take: 100,
     });
     return NextResponse.json(promociones);
   } catch {

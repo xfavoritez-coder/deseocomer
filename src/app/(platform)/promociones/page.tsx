@@ -41,6 +41,7 @@ export default function PromocionesPage() {
   const { addInteraccion } = useGenie();
   const { isAuthenticated } = useAuth();
   const [promos, setPromos] = useState<Promocion[]>(PROMOCIONES.filter(p => p.activa));
+  const [promosLoading, setPromosLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
@@ -80,7 +81,7 @@ export default function PromocionesPage() {
         }));
         setPromos(mapped);
       }
-    }).catch(() => {});
+    }).catch(() => {}).finally(() => setPromosLoading(false));
   }, []);
 
   // Detect birthday
@@ -236,7 +237,25 @@ export default function PromocionesPage() {
 
       {/* Grid */}
       <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 80px" }}>
-        {promosNormales.length === 0 && promosCumple.length === 0 ? (
+        {promosLoading ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "20px" }}>
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} style={{ background: "rgba(20,12,35,0.95)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 20, overflow: "hidden" }}>
+                <div className="dc-sk" style={{ height: 180 }} />
+                <div style={{ padding: "16px 18px" }}>
+                  <div className="dc-sk" style={{ height: 14, width: "40%", marginBottom: 10, borderRadius: 6 }} />
+                  <div className="dc-sk" style={{ height: 20, width: "80%", marginBottom: 8, borderRadius: 6 }} />
+                  <div className="dc-sk" style={{ height: 14, width: "60%", marginBottom: 16, borderRadius: 6 }} />
+                  <div className="dc-sk" style={{ height: 40, borderRadius: 10 }} />
+                </div>
+              </div>
+            ))}
+            <style>{`
+              .dc-sk { background: linear-gradient(90deg, rgba(232,168,76,0.06) 25%, rgba(232,168,76,0.12) 50%, rgba(232,168,76,0.06) 75%); background-size: 200% 100%; animation: dcShimmer 1.5s ease-in-out infinite; }
+              @keyframes dcShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+            `}</style>
+          </div>
+        ) : promosNormales.length === 0 && promosCumple.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
             <p style={{ fontSize: "2.5rem", marginBottom: "16px" }}>🔍</p>
             <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--color-title)", marginBottom: "10px" }}>Sin resultados</p>
@@ -300,17 +319,6 @@ export default function PromocionesPage() {
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5, marginBottom: "4px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                         {promo.descripcion}
                       </p>
-                    )}
-
-                    {/* Modalidad badges */}
-                    {Array.isArray((promo as any).modalidad) && (promo as any).modalidad.length > 0 && (
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "8px" }}>
-                        {(promo as any).modalidad.map((m: string) => (
-                          <span key={m} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", padding: "3px 10px", borderRadius: "12px", background: m === "delivery" ? "rgba(61,184,158,0.12)" : m === "retiro" ? "rgba(128,64,208,0.12)" : "rgba(232,168,76,0.12)", border: `1px solid ${m === "delivery" ? "rgba(61,184,158,0.3)" : m === "retiro" ? "rgba(128,64,208,0.3)" : "rgba(232,168,76,0.3)"}`, color: m === "delivery" ? "#3db89e" : m === "retiro" ? "#a070e0" : "#e8a84c", textTransform: "uppercase" }}>
-                            {m === "en_local" ? "En local" : m === "delivery" ? "Delivery" : "Retiro"}
-                          </span>
-                        ))}
-                      </div>
                     )}
 
                     {/* Días + Horario */}

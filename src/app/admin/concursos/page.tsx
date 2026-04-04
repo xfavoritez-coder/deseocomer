@@ -267,6 +267,7 @@ export default function AdminConcursos() {
           {concursos.map(c => {
             const ended = new Date(c.fechaFin) <= new Date();
             const estadoMap: Record<string, { label: string; color: string }> = {
+              programado: { label: "🔮 Programado", color: "#a78bfa" },
               activo: { label: "Activo", color: "#3db89e" },
               finalizado: { label: "Finalizado", color: "#e8a84c" },
               en_revision: { label: "En revisión", color: "#e8a84c" },
