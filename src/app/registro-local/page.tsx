@@ -11,6 +11,7 @@ function generarPassword(): string {
 
 export default function RegistroLocalPage() {
   const [nombreLocal, setNombreLocal] = useState("");
+  const [ciudad, setCiudad] = useState("Santiago");
   const [nombreDueno, setNombreDueno] = useState("");
   const [email, setEmail] = useState("");
   const [registroExitoso, setRegistroExitoso] = useState(false);
@@ -36,7 +37,7 @@ export default function RegistroLocalPage() {
           password,
           passwordPlain: password,
           registroRapido: true,
-          ciudad: "Santiago",
+          ciudad: ciudad || "Santiago",
         }),
       });
       const data = await res.json();
@@ -74,7 +75,7 @@ export default function RegistroLocalPage() {
         ) : (
         <>
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "6px" }}>Solo 3 datos. Listo en 30 segundos.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "6px" }}>Listo en 30 segundos.</p>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
 
           {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
@@ -83,6 +84,12 @@ export default function RegistroLocalPage() {
             <div>
               <label style={labelS}>Nombre del local</label>
               <input style={inputS} type="text" placeholder="Ej: Pizza Napoli" value={nombreLocal} onChange={e => setNombreLocal(e.target.value)} onFocus={fi} onBlur={fo} />
+            </div>
+            <div>
+              <label style={labelS}>Ciudad</label>
+              <select style={{ ...inputS, background: "var(--bg-primary)", cursor: "pointer" }} value={ciudad} onChange={e => setCiudad(e.target.value)}>
+                {["Santiago","Valparaíso","Viña del Mar","Concepción","Antofagasta","La Serena","Coquimbo","Temuco","Rancagua","Talca","Arica","Iquique","Puerto Montt","Osorno","Valdivia","Chillán","Los Ángeles","Calama","Copiapó","Punta Arenas","Puerto Natales","Curicó","Linares","San Fernando","Ovalle","Quillota","San Antonio","Melipilla"].map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
+              </select>
             </div>
             <div>
               <label style={labelS}>Tu nombre</label>
@@ -94,7 +101,7 @@ export default function RegistroLocalPage() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.25)", marginTop: "6px" }}>Te enviaremos tus datos de acceso a este correo</p>
             </div>
 
-            <button type="submit" disabled={loading} style={{ ...btnS, opacity: loading ? 0.6 : 1 }}>{loading ? "Registrando..." : "Registrar mi local gratis →"}</button>
+            <button type="submit" disabled={loading} style={{ ...btnS, opacity: loading ? 0.6 : 1 }}>{loading ? "Registrando..." : "Registrar mi local gratis"}</button>
           </form>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
