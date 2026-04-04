@@ -106,7 +106,8 @@ export default function ConcursosPage() {
 
   const sorted = [...concursos].filter(c => {
     const ended = getTimeLeft(c.endsAt).ended;
-    const soon = isSoonEnding(c.endsAt);
+    const sa = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() : null;
+    const soon = isSoonEnding(c.endsAt, sa);
     if (filter === "activos") return !ended && !soon && c.estado !== "programado";
     if (filter === "por_terminar") return !ended && soon && c.estado !== "programado";
     if (filter === "finalizados") return false;
@@ -262,13 +263,14 @@ export default function ConcursosPage() {
             {sorted.map(c => {
               const t = timers[c.id];
               const ended = t?.ended ?? (c.endsAt <= Date.now());
-              const soon = !ended && isSoonEnding(c.endsAt);
+              const soon = !ended && isSoonEnding(c.endsAt, c.fechaActivacion ? new Date(c.fechaActivacion).getTime() : null);
               const urg = "#e05555";
               const localInitial = c.local?.[0] ?? "L";
               const horasRestantes = (c.endsAt - Date.now()) / 3600000;
               const createdAt = (c as unknown as Record<string, unknown>).createdAt;
               const horasDesdeCreacion = createdAt ? (Date.now() - new Date(createdAt as string).getTime()) / 3600000 : 999;
-              const esTerminaHoy = !ended && horasRestantes <= 24;
+              const saCard = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() : null;
+              const esTerminaHoy = !ended && isSoonEnding(c.endsAt, saCard);
               const esNuevo = !ended && !esTerminaHoy && horasDesdeCreacion <= 24;
 
               return (

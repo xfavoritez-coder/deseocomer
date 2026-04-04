@@ -401,8 +401,15 @@ export function getTimeLeft(endsAt: number) {
   };
 }
 
-export function isSoonEnding(endsAt: number) {
-  return endsAt - Date.now() <= 24 * 3_600_000;
+export function isSoonEnding(endsAt: number, startsAt?: number | null) {
+  const msRestantes = endsAt - Date.now();
+  if (startsAt) {
+    const duracionMs = endsAt - startsAt;
+    // Concursos de 1 día (~30h): urgencia en últimas 6 horas
+    if (duracionMs <= 30 * 3_600_000) return msRestantes <= 6 * 3_600_000;
+  }
+  // Concursos de 3+ días: urgencia en últimas 24 horas
+  return msRestantes <= 24 * 3_600_000;
 }
 
 export function pad2(n: number) {

@@ -125,7 +125,10 @@ export default function ConcursosSection() {
             const msRestantes = new Date(c.fechaFin).getTime() - Date.now();
             const ended = msRestantes <= 0;
             const esProgramado = c.estado === "programado";
-            const esUrgente = !ended && !esProgramado && msRestantes <= 24 * 3600000;
+            const startAt = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() : null;
+            const duracionMs = startAt ? new Date(c.fechaFin).getTime() - startAt : null;
+            const umbralUrgencia = duracionMs && duracionMs <= 30 * 3600000 ? 6 * 3600000 : 24 * 3600000;
+            const esUrgente = !ended && !esProgramado && msRestantes <= umbralUrgencia;
             const urgColor = "#e05555";
             const numColor = esUrgente ? urgColor : "rgba(240,234,214,0.9)";
             const sepColor = esUrgente ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)";

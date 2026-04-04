@@ -335,7 +335,9 @@ function ConcursoDetallePage() {
     } catch {}
     setListaLoading(false);
   };
-  const soon = concurso ? isSoonEnding(concurso.endsAt) : false;
+  const fechaActDetail = (concursoData as any)?.fechaActivacion;
+  const startsAtDetail = fechaActDetail ? new Date(fechaActDetail).getTime() : null;
+  const soon = concurso ? isSoonEnding(concurso.endsAt, startsAtDetail) : false;
   const urgColor = "#e05555";
   const refLink = isAuthenticated && user && c
     ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
