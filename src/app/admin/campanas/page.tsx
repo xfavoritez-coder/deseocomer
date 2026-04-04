@@ -100,16 +100,27 @@ export default function AdminCampanas() {
     setCreating(false);
   };
 
+  const [envioProgress, setEnvioProgress] = useState<{ enviados: number; pendientes: number; errores: number } | null>(null);
+
   const enviarCampana = async (id: string) => {
     setEnviando(id);
-    try {
-      const res = await adminFetch(`/api/admin/campanas/${id}/enviar`, { method: "POST" });
-      const data = await res.json();
-      if (data.ok) show(`Enviados: ${data.enviados}, Errores: ${data.errores}`);
-      else show("Error: " + (data.error || "desconocido"));
-      fetchData();
-    } catch { show("Error de conexión"); }
+    setEnvioProgress(null);
+    let completada = false;
+    while (!completada) {
+      try {
+        const res = await adminFetch(`/api/admin/campanas/${id}/enviar`, { method: "POST" });
+        const data = await res.json();
+        if (!data.ok) { show("Error: " + (data.error || "desconocido")); break; }
+        setEnvioProgress({ enviados: data.enviados, pendientes: data.pendientes, errores: data.errores });
+        completada = data.completada;
+        if (completada) {
+          show(`Campaña completada: ${data.enviados} enviados, ${data.errores} errores`);
+          fetchData();
+        }
+      } catch { show("Error de conexión — puedes reintentar, continuará donde quedó"); break; }
+    }
     setEnviando(null);
+    setEnvioProgress(null);
   };
 
   const enviarPrueba = async (campanaId: string) => {
@@ -237,12 +248,25 @@ export default function AdminCampanas() {
                   </div>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => { setPruebaId(pruebaId === c.id ? null : c.id); setPruebaEmail(""); }} style={{ ...S.btn, background: "rgba(167,139,250,0.12)", color: "#a78bfa" }}>🧪 Prueba</button>
-                    {c.estado === "borrador" && (
-                      <button onClick={() => { if (confirm(`¿Enviar a ${c.totalContactos} contactos?`)) enviarCampana(c.id); }} disabled={enviando === c.id} style={{ ...S.btn, background: "#3db89e", color: "#0a0812" }}>{enviando === c.id ? "Enviando..." : "Enviar"}</button>
+                    {(c.estado === "borrador" || c.estado === "enviando") && (
+                      <button onClick={() => { if (c.estado === "borrador" && !confirm(`¿Enviar a ${c.totalContactos} contactos?`)) return; enviarCampana(c.id); }} disabled={enviando === c.id} style={{ ...S.btn, background: "#3db89e", color: "#0a0812" }}>{enviando === c.id ? "Enviando..." : c.estado === "enviando" ? "Continuar envío" : "Enviar"}</button>
                     )}
                     <button onClick={() => verDetalle(c)} style={{ ...S.btn, background: "rgba(255,255,255,0.05)", color: "rgba(240,234,214,0.5)" }}>Detalle</button>
+                    <button onClick={async () => { if (!confirm(`¿Eliminar campaña "${c.asunto}"?`)) return; try { const res = await adminFetch("/api/admin/campanas", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: c.id }) }); if ((await res.json()).ok) { show("Campaña eliminada"); fetchData(); } } catch {} }} style={{ ...S.btn, background: "rgba(255,80,80,0.08)", color: "#ff6b6b" }}>🗑</button>
                   </div>
                 </div>
+                {enviando === c.id && envioProgress && (
+                  <div style={{ marginBottom: 10, padding: 10, background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontFamily: "var(--font-lato)", fontSize: "0.78rem" }}>
+                      <span style={{ color: "#3db89e" }}>Enviando... {envioProgress.enviados} de {envioProgress.enviados + envioProgress.pendientes}</span>
+                      <span style={{ color: "rgba(240,234,214,0.4)" }}>{envioProgress.pendientes} pendientes</span>
+                    </div>
+                    <div style={{ height: 6, borderRadius: 3, background: "rgba(0,0,0,0.3)" }}>
+                      <div style={{ height: "100%", borderRadius: 3, background: "#3db89e", width: `${pct(envioProgress.enviados, envioProgress.enviados + envioProgress.pendientes)}%`, transition: "width 0.5s" }} />
+                    </div>
+                    {envioProgress.errores > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "#ff6b6b", marginTop: 4 }}>{envioProgress.errores} errores</p>}
+                  </div>
+                )}
                 {pruebaId === c.id && (
                   <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 10, padding: 10, background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.15)", borderRadius: 8 }}>
                     <input type="email" placeholder="Email de prueba" value={pruebaEmail} onChange={e => setPruebaEmail(e.target.value)} style={{ ...S.input, flex: 1, fontSize: "0.82rem", padding: "8px 12px" }} />

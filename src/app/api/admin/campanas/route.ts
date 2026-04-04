@@ -72,3 +72,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e.message || "Error interno" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+  try {
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: "ID requerido" }, { status: 400 });
+    await prisma.contactoCampana.deleteMany({ where: { campanaId: id } });
+    await prisma.campana.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Error al eliminar" }, { status: 500 });
+  }
+}
