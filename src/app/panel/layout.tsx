@@ -56,7 +56,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 if (!info.ciudad) missing.push("Ciudad");
                 if (!info.comuna) missing.push("Comuna");
                 if (!info.direccion) missing.push("Dirección");
-                if (!info.categoria) missing.push("Categoría");
+                if (!info.categoria && (!info.categorias || info.categorias.length === 0)) missing.push("Categoría");
                 const hrs = info.horarios as { activo: boolean }[] | null;
                 if (!hrs || !Array.isArray(hrs) || !hrs.some(h => h.activo)) missing.push("Horario");
                 setFaltantes(missing);

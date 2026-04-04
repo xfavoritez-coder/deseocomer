@@ -20,7 +20,7 @@ function getPerfilChecks(p: any): PerfilCheck[] {
     { label: "Foto de portada", done: !!p.portadaUrl },
     { label: "Dirección", done: !!p.direccion },
     { label: "Horarios", done: p.horarios?.length > 0 || (Array.isArray(p.horarios) && p.horarios.length > 0) },
-    { label: "Categoría", done: !!p.categoria },
+    { label: "Categoría", done: !!p.categoria || (Array.isArray(p.categorias) && p.categorias.length > 0) },
   ];
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
