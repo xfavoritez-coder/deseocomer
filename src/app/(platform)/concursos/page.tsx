@@ -444,7 +444,7 @@ export default function ConcursosPage() {
 
       <style>{`
         .dc-cp-hero { position: relative; overflow: hidden; padding: 140px 60px 80px; text-align: center; }
-        .dc-cp-content { padding: 0 60px 60px; max-width: 900px; margin: 0 auto; }
+        .dc-cp-content { padding: 0 60px 60px; max-width: 1200px; margin: 0 auto; }
         .dc-cp-filters { display: flex; gap: 10px; flex-wrap: nowrap; justify-content: center; margin-bottom: 40px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
         .dc-cp-filters::-webkit-scrollbar { display: none; }
         .dc-cp-fbtn { font-family: var(--font-cinzel); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 20px; border-radius: 30px; cursor: pointer; border: 1px solid var(--border-color); background: transparent; color: var(--text-muted); transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; min-height: 44px; flex-shrink: 0; }
