@@ -99,37 +99,39 @@ function DashboardContent() {
         ))}
       </div>
 
-      {/* Profile progress */}
-      <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px 24px", marginBottom: "24px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-primary)" }}>Tu perfil está {pct}% completo</span>
-          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>{pct}%</span>
-        </div>
-        <div style={{ height: "8px", borderRadius: "4px", background: "rgba(0,0,0,0.3)" }}>
-          <div style={{ height: "100%", borderRadius: "4px", background: "var(--accent)", width: `${pct}%`, transition: "width 0.5s" }} />
-        </div>
-        {pct < 100 && checks.length > 0 && (
-          <div style={{ marginTop: "14px" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Te falta:</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {checks.filter(c => !c.done).map(c => (
-                <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ width: 16, height: 16, borderRadius: "50%", border: "1px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "rgba(232,168,76,0.4)", flexShrink: 0 }}>○</span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{c.label}</span>
-                </div>
-              ))}
-            </div>
-            <Link href="/panel/mi-local" style={{ display: "inline-block", marginTop: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", textDecoration: "none", letterSpacing: "0.05em" }}>Completar ahora →</Link>
+      {/* Profile progress - only show when not 100% complete */}
+      {pct < 100 && (
+        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", padding: "20px 24px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-primary)" }}>Tu perfil está {pct}% completo</span>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--accent)" }}>{pct}%</span>
           </div>
-        )}
-      </div>
+          <div style={{ height: "8px", borderRadius: "4px", background: "rgba(0,0,0,0.3)" }}>
+            <div style={{ height: "100%", borderRadius: "4px", background: "var(--accent)", width: `${pct}%`, transition: "width 0.5s" }} />
+          </div>
+          {checks.length > 0 && (
+            <div style={{ marginTop: "14px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Te falta:</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                {checks.filter(c => !c.done).map(c => (
+                  <div key={c.label} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ width: 16, height: 16, borderRadius: "50%", border: "1px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.6rem", color: "rgba(232,168,76,0.4)", flexShrink: 0 }}>○</span>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{c.label}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/panel/mi-local" style={{ display: "inline-block", marginTop: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", textDecoration: "none", letterSpacing: "0.05em" }}>Completar ahora →</Link>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick actions */}
       <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px" }}>Acciones rápidas</h3>
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
         <Link href="/panel/concursos" style={actionBtn}>🏆 Nuevo concurso</Link>
         <Link href="/panel/promociones" style={actionBtn}>⚡ Nueva promoción</Link>
-        <Link href="/panel/mi-local" style={{ ...actionBtn, background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)" }}>Completar perfil</Link>
+        {pct < 100 && <Link href="/panel/mi-local" style={{ ...actionBtn, background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)" }}>Completar perfil</Link>}
       </div>
     </div>
   );

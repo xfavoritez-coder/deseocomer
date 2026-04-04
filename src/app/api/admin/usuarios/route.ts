@@ -28,14 +28,6 @@ export async function GET(req: NextRequest) {
           cumpleDia: true, cumpleMes: true, cumpleAnio: true, createdAt: true,
           estiloAlimentario: true, comidasFavoritas: true,
           _count: { select: { favoritos: true, resenas: true, participaciones: true } },
-          participaciones: {
-            select: {
-              id: true, puntos: true, estado: true, createdAt: true,
-              concurso: { select: { id: true, slug: true, premio: true, fechaFin: true, estado: true, local: { select: { nombre: true } } } },
-            },
-            orderBy: { createdAt: "desc" },
-            take: 5,
-          },
         },
       }),
       prisma.usuario.count({ where }),

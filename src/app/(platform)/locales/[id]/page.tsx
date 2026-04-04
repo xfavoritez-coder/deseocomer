@@ -65,7 +65,7 @@ function getColor(name: string): string {
 }
 
 type Tab = "Información" | "Reseñas" | "Concursos" | "Promociones";
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Combo", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Combo", combo: "Combo", Combo: "Combo", cumpleanos: "Cumpleaños", "Descuento %": "Descuento", "Happy Hour": "Happy Hour", "Cumpleaños": "Cumpleaños" };
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
@@ -92,6 +92,36 @@ export default function LocalDetailPage() {
       .then(data => { if (data) setDbLocal(data); setDbLoading(false); })
       .catch(() => { setDbLoading(false); });
   }, [id, mockLocal]);
+
+
+  // Fetch similar locals from DB
+  useEffect(() => {
+    const cat = mockLocal?.categoria ?? (dbLocal?.categoria as string | undefined);
+    const slug = typeof id === "string" ? id : "";
+    if (!cat) return;
+    fetch("/api/locales")
+      .then(r => r.json())
+      .then((data: any[]) => {
+        if (!Array.isArray(data)) return;
+        const filtered = data
+          .filter((l: any) => {
+            const matchCat = l.categoria === cat || (Array.isArray(l.tags) && l.tags.includes(cat));
+            const notSelf = (l.slug ?? l.id) !== slug && String(l.id) !== String(id);
+            return matchCat && notSelf && l.activo !== false;
+          })
+          .slice(0, 3)
+          .map((l: any) => ({
+            id: l.slug || l.id,
+            nombre: l.nombre ?? "",
+            categoria: l.categoria ?? "",
+            barrio: l.comuna ?? "",
+            rating: l._avg?.resenas?.rating ?? 0,
+            imagenPortada: l.portadaUrl ?? null,
+          }));
+        setSimilares(filtered);
+      })
+      .catch(() => {});
+  }, [mockLocal?.categoria, dbLocal?.categoria, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build a unified local object
   const local = mockLocal ?? (dbLocal ? {
@@ -184,8 +214,9 @@ export default function LocalDetailPage() {
   const concursosActivos = concursosLocal.filter((c: any) => c.activo && new Date(c.fechaFin) > new Date());
   const concursosFinalizados = concursosLocal.filter((c: any) => !c.activo || new Date(c.fechaFin) <= new Date());
   const promosLocal = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).promociones) ? ((dbLocal as Record<string, unknown>).promociones as Record<string, unknown>[]).filter((p: Record<string, unknown>) => p.activa) : [];
-  const DIAS_NOMBRE_FICHA = ["L", "M", "M", "J", "V", "S", "D"];
-  const similares = LOCALES.filter(l => l.categoria === local.categoria && l.id !== local.id).slice(0, 3);
+  const DIAS_NOMBRE_FICHA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [similares, setSimilares] = useState<any[]>([]);
   const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
   const tieneSidebar = tieneHorarios || tieneUbicacion;

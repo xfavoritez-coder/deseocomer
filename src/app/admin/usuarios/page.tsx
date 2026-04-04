@@ -245,27 +245,26 @@ export default function AdminUsuarios() {
         </div>
       </div>
 
-      {/* Concursos del usuario */}
-      {(sel.participaciones?.length ?? 0) > 0 && (
+      {/* Concursos del usuario (from referral network data) */}
+      {redReferidos.length > 0 && (
         <div style={cardS}>
-          <p style={cardTitleS}>Concursos ({sel.participaciones.length})</p>
-          {sel.participaciones.map((p: { id: string; puntos: number; estado: string; createdAt: string; concurso: { id: string; slug: string | null; premio: string; fechaFin: string; estado: string; local: { nombre: string } } }) => {
-            const c = p.concurso;
-            const ended = new Date(c.fechaFin) <= new Date();
+          <p style={cardTitleS}>Concursos ({redReferidos.length})</p>
+          {redReferidos.map((r: any) => {
+            const ended = new Date(r.fechaFin) <= new Date();
             const estadoColor: Record<string, string> = { activo: "#3db89e", finalizado: "#e8a84c", completado: "#3db89e", expirado: "rgba(240,234,214,0.4)", en_revision: "#e8a84c", en_disputa: "#ff6b6b", cancelado: "#ff6b6b" };
-            const color = estadoColor[c.estado] ?? (ended ? "#e8a84c" : "#3db89e");
-            const estadoLabel = c.estado === "activo" && ended ? "Terminado" : c.estado.replace("_", " ");
+            const color = estadoColor[r.estadoConcurso] ?? (ended ? "#e8a84c" : "#3db89e");
+            const estadoLabel = r.estadoConcurso === "activo" && ended ? "Terminado" : (r.estadoConcurso ?? "").replace("_", " ");
             return (
-              <div key={p.id} style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: "10px" }}>
+              <div key={r.concursoId} style={{ padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener" style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#f5d080", textDecoration: "none" }}>{c.premio}</a>
-                  <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{c.local.nombre} · <span style={{ color }}>{estadoLabel}</span></p>
+                  <a href={`/concursos/${r.slug || r.concursoId}`} target="_blank" rel="noopener" style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#f5d080", textDecoration: "none" }}>{r.premio}</a>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{r.localNombre} · <span style={{ color }}>{estadoLabel}</span></p>
                 </div>
                 <div style={{ textAlign: "center", flexShrink: 0 }}>
-                  <p style={{ fontFamily: "Georgia", fontSize: "1.1rem", color: "#e8a84c", margin: 0 }}>{p.puntos}</p>
+                  <p style={{ fontFamily: "Georgia", fontSize: "1.1rem", color: "#e8a84c", margin: 0 }}>{r.puntos}</p>
                   <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.35)", margin: 0 }}>pts</p>
                 </div>
-                {p.estado !== "activo" && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: p.estado === "descalificado" ? "#ff6b6b" : "#e8a84c", background: p.estado === "descalificado" ? "rgba(255,80,80,0.1)" : "rgba(232,168,76,0.1)", border: `1px solid ${p.estado === "descalificado" ? "rgba(255,80,80,0.3)" : "rgba(232,168,76,0.3)"}`, borderRadius: "6px", padding: "2px 8px", flexShrink: 0 }}>{p.estado}</span>}
+                {r.estado !== "activo" && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: r.estado === "descalificado" ? "#ff6b6b" : "#e8a84c", background: r.estado === "descalificado" ? "rgba(255,80,80,0.1)" : "rgba(232,168,76,0.1)", border: `1px solid ${r.estado === "descalificado" ? "rgba(255,80,80,0.3)" : "rgba(232,168,76,0.3)"}`, borderRadius: "6px", padding: "2px 8px", flexShrink: 0 }}>{r.estado}</span>}
               </div>
             );
           })}

@@ -302,6 +302,21 @@ export default function MiLocalPage() {
           </button>
         </div>
 
+        {/* Toggle Retiro */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Ofreces retiro en local?</span>
+          <button onClick={() => {
+            const v = !(d.tieneRetiro as boolean);
+            set("tieneRetiro", v);
+            try {
+              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tieneRetiro: v }) });
+            } catch {}
+          }} style={{ width: "48px", height: "26px", borderRadius: "13px", border: "none", cursor: "pointer", background: (d.tieneRetiro as boolean) ? "#3db89e" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#fff", position: "absolute", top: "3px", left: (d.tieneRetiro as boolean) ? "25px" : "3px", transition: "left 0.2s" }} />
+          </button>
+        </div>
+
         {/* Toggle Delivery */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
           <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Ofreces delivery?</span>
@@ -342,21 +357,6 @@ export default function MiLocalPage() {
             </div>
           </div>
         )}
-
-        {/* Toggle Retiro */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)" }}>¿Ofreces retiro en local?</span>
-          <button onClick={() => {
-            const v = !(d.tieneRetiro as boolean);
-            set("tieneRetiro", v);
-            try {
-              const session = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
-              if (session.id) fetch(`/api/locales/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tieneRetiro: v }) });
-            } catch {}
-          }} style={{ width: "48px", height: "26px", borderRadius: "13px", border: "none", cursor: "pointer", background: (d.tieneRetiro as boolean) ? "#3db89e" : "rgba(255,255,255,0.1)", position: "relative", transition: "background 0.2s" }}>
-            <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "#fff", position: "absolute", top: "3px", left: (d.tieneRetiro as boolean) ? "25px" : "3px", transition: "left 0.2s" }} />
-          </button>
-        </div>
 
         {/* Link pedidos */}
         <div>

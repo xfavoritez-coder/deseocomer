@@ -205,6 +205,9 @@ model ParticipanteConcurso {
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
 
   @@unique([concursoId, usuarioId])
+  @@index([usuarioId])
+  @@index([referidorDirectoId])
+  @@index([referidorNivel2Id])
 }
 
 model Promocion {

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
 
-    // Get all participations with referral data
+    // 1 query: participaciones del usuario con concurso + local
     const participaciones = await prisma.participanteConcurso.findMany({
       where: { usuarioId: id },
       select: {
@@ -21,50 +21,67 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
 
-    const result = await Promise.all(participaciones.map(async (p) => {
-      // Who referred this user
-      let referidoPorNombre: string | null = null;
-      if (p.referidorDirectoId) {
-        const ref = await prisma.usuario.findUnique({ where: { id: p.referidorDirectoId }, select: { id: true, nombre: true, email: true } });
-        if (ref) referidoPorNombre = ref.nombre;
-      }
+    if (participaciones.length === 0) return NextResponse.json([]);
 
-      // Direct referrals (people this user brought)
-      const referidosDirectos = await prisma.participanteConcurso.findMany({
-        where: { concursoId: p.concursoId, referidorDirectoId: id },
-        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
-      });
+    const concursoIds = participaciones.map(p => p.concursoId);
 
-      // Level 2 referrals (people brought by this user's referrals)
-      const referidosNivel2 = await prisma.participanteConcurso.findMany({
-        where: { concursoId: p.concursoId, referidorNivel2Id: id },
-        select: { usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
-      });
+    // Collect all referrer IDs to fetch in one query
+    const referrerIds = [...new Set(participaciones.map(p => p.referidorDirectoId).filter(Boolean))] as string[];
 
-      return {
-        concursoId: p.concursoId,
-        premio: p.concurso.premio,
-        localNombre: p.concurso.local.nombre,
-        slug: p.concurso.slug,
-        estadoConcurso: p.concurso.estado,
-        fechaFin: p.concurso.fechaFin,
-        puntos: p.puntos,
-        puntosNivel2: p.puntosNivel2,
-        puntosNivel2Pendientes: p.puntosNivel2Pendientes,
-        estado: p.estado,
-        referidoPorId: p.referidorDirectoId,
-        referidoPorNombre,
-        referidosDirectos: referidosDirectos.map(r => ({
-          id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
-          verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
-          ipRegistro: r.usuario.ipRegistro ?? "",
-        })),
-        referidosNivel2: referidosNivel2.map(r => ({
-          id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
-          verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
-          ipRegistro: r.usuario.ipRegistro ?? "",
-        })),
-      };
+    // 3 queries in parallel instead of N×3
+    const [referrers, directRefs, nivel2Refs] = await Promise.all([
+      // All referrers in one query
+      referrerIds.length > 0
+        ? prisma.usuario.findMany({ where: { id: { in: referrerIds } }, select: { id: true, nombre: true, email: true } })
+        : Promise.resolve([]),
+      // All direct referrals for all concursos in one query
+      prisma.participanteConcurso.findMany({
+        where: { concursoId: { in: concursoIds }, referidorDirectoId: id },
+        select: { concursoId: true, usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
+      }),
+      // All level 2 referrals for all concursos in one query
+      prisma.participanteConcurso.findMany({
+        where: { concursoId: { in: concursoIds }, referidorNivel2Id: id },
+        select: { concursoId: true, usuarioId: true, puntos: true, estado: true, usuario: { select: { id: true, nombre: true, email: true, emailVerificado: true, ipRegistro: true } } },
+      }),
+    ]);
+
+    // Build lookup maps
+    const referrerMap = new Map(referrers.map(r => [r.id, r.nombre]));
+    const directByConc = new Map<string, typeof directRefs>();
+    for (const r of directRefs) {
+      if (!directByConc.has(r.concursoId)) directByConc.set(r.concursoId, []);
+      directByConc.get(r.concursoId)!.push(r);
+    }
+    const nivel2ByConc = new Map<string, typeof nivel2Refs>();
+    for (const r of nivel2Refs) {
+      if (!nivel2ByConc.has(r.concursoId)) nivel2ByConc.set(r.concursoId, []);
+      nivel2ByConc.get(r.concursoId)!.push(r);
+    }
+
+    const result = participaciones.map(p => ({
+      concursoId: p.concursoId,
+      premio: p.concurso.premio,
+      localNombre: p.concurso.local.nombre,
+      slug: p.concurso.slug,
+      estadoConcurso: p.concurso.estado,
+      fechaFin: p.concurso.fechaFin,
+      puntos: p.puntos,
+      puntosNivel2: p.puntosNivel2,
+      puntosNivel2Pendientes: p.puntosNivel2Pendientes,
+      estado: p.estado,
+      referidoPorId: p.referidorDirectoId,
+      referidoPorNombre: p.referidorDirectoId ? referrerMap.get(p.referidorDirectoId) ?? null : null,
+      referidosDirectos: (directByConc.get(p.concursoId) ?? []).map(r => ({
+        id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
+        verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+        ipRegistro: r.usuario.ipRegistro ?? "",
+      })),
+      referidosNivel2: (nivel2ByConc.get(p.concursoId) ?? []).map(r => ({
+        id: r.usuario.id, nombre: r.usuario.nombre, email: r.usuario.email,
+        verificado: r.usuario.emailVerificado, puntos: r.puntos, estado: r.estado,
+        ipRegistro: r.usuario.ipRegistro ?? "",
+      })),
     }));
 
     return NextResponse.json(result);
@@ -194,7 +211,6 @@ ${motivo ? `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom
     }
 
     if (accion === "descalificar") {
-      // Descalificar de todos los concursos activos
       const participaciones = await prisma.participanteConcurso.findMany({
         where: { usuarioId: id, concurso: { activo: true, cancelado: false, fechaFin: { gt: new Date() } } },
       });
@@ -204,7 +220,6 @@ ${motivo ? `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom
         data: { estado: "descalificado", puntos: 0 },
       });
 
-      // Send descalificacion email
       try {
         const concursosAfectados = await prisma.participanteConcurso.findMany({
           where: { id: { in: participaciones.map(p => p.id) } },
