@@ -1,6 +1,6 @@
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour" | "cumpleanos";
+export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour" | "cumpleanos" | "combo";
 export type CategoriaPromocion = "almuerzo" | "cena" | "desayuno" | "bebidas" | "postres";
 
 export interface Promocion {
@@ -43,6 +43,10 @@ const TIPO_MAP: Record<string, TipoPromocion> = {
   "Cupón": "cupon",
   "Regalo": "precio_especial",
   "Cumpleaños": "cumpleanos",
+  "Combo": "combo",
+  "combo": "combo",
+  "Promo": "combo",
+  "promo": "combo",
 };
 export function normalizeTipo(tipo: string): TipoPromocion {
   return TIPO_MAP[tipo] ?? "descuento";
@@ -347,6 +351,7 @@ export const TIPO_LABELS: Record<TipoPromocion, string> = {
   precio_especial: "Precio Especial",
   happy_hour: "Happy Hour",
   cumpleanos: "Cumpleaños",
+  combo: "Combo",
 };
 
 export const TIPO_ICONS: Record<TipoPromocion, string> = {
@@ -356,6 +361,7 @@ export const TIPO_ICONS: Record<TipoPromocion, string> = {
   precio_especial: "⭐",
   happy_hour: "⚡",
   cumpleanos: "🎂",
+  combo: "🍱",
 };
 
 export const CATEGORIA_LABELS: Record<CategoriaPromocion, string> = {

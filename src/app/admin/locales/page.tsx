@@ -6,8 +6,8 @@ import SubirFoto from "@/components/SubirFoto";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
 
-const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
-const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
+const CATEGORIAS_FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
+const TAGS_FALLBACK = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 export default function AdminLocales() {
   const [locales, setLocales] = useState<L[]>([]);
@@ -24,8 +24,13 @@ export default function AdminLocales() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectMotivo, setRejectMotivo] = useState("");
+  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
+  const [tagsDB, setTagsDB] = useState<string[]>([]);
+  const CATEGORIAS = categoriasDB.length > 0 ? categoriasDB : CATEGORIAS_FALLBACK;
+  const TAGS = tagsDB.length > 0 ? tagsDB : TAGS_FALLBACK;
 
   useEffect(() => { adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); setTagsDB(data.map((c: any) => c.nombre)); } }).catch(() => {}); }, []);
 
   const show = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 

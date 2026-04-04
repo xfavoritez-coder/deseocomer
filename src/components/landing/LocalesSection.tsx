@@ -4,7 +4,7 @@ import Link from "next/link";
 import BotonFavorito from "@/components/BotonFavorito";
 import { boostScore } from "@/lib/personalizacion";
 
-const categorias = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
+const categoriasFallback = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -29,6 +29,10 @@ const localesMock = [
 export default function LocalesSection() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
   const [locales, setLocales] = useState(localesMock);
+  const [categoriasDBLanding, setCategoriasDBLanding] = useState<string[]>([]);
+  const categorias = categoriasDBLanding.length > 0 ? ["Todos", ...categoriasDBLanding] : categoriasFallback;
+
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { const tops = data.filter((c: any) => c.tipo === "principal").slice(0, 6).map((c: any) => c.nombre); if (tops.length > 0) setCategoriasDBLanding(tops); } }).catch(() => {}); }, []);
 
   useEffect(() => {
     fetch("/api/locales").then(r => r.json()).then(data => {

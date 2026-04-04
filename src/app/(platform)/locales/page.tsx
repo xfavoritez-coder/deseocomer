@@ -7,11 +7,7 @@ import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
 import { useGenie } from "@/contexts/GenieContext";
 
-const CATEGORIAS = [
-  "Todos", "Pizza", "Sushi", "Hamburguesa",
-  "Vegano", "Café", "Almuerzo", "Pastas",
-  "Mexicano", "Pollo",
-];
+const CATEGORIAS_FALLBACK = ["Todos", "Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Pollo"];
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -36,6 +32,10 @@ export default function LocalesPage() {
   const [soloConConcursos, setSoloConConcursos] = useState(false);
   const [soloConPromociones, setSoloConPromociones] = useState(false);
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
+  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
+  const CATEGORIAS = categoriasDB.length > 0 ? ["Todos", ...categoriasDB] : CATEGORIAS_FALLBACK;
+
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); }).catch(() => {}); }, []);
 
   useEffect(() => {
     fetch("/api/locales")

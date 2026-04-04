@@ -22,7 +22,7 @@ function formatDias(dias: number[]): string {
   if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
   return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Combo", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", combo: "Combo", promo: "Combo", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   const t = promo.tipo?.toLowerCase() ?? "";
@@ -164,7 +164,7 @@ export default function PromocionesPage() {
             { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
             { key: "descuento", label: "Descuento", color: "#ff6644" },
             { key: "2x1", label: "2\u00d71", color: "#3db89e" },
-            { key: "promo", label: "Combo", color: "#e8a84c" },
+            { key: "combo", label: "Combo", color: "#e8a84c" },
             { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
           ].map(({ key, label, color }) => {
             const isActive = key === "activas" ? filtroActivas : filtrosTipo.includes(key);

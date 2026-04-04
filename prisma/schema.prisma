@@ -48,6 +48,7 @@ model Usuario {
   mensajesVistos  MensajeVisto[]
   toastsDismissed ToastDismissed[]
   notificaciones  Notificacion[]
+  comidasCustom   ComidaCustom[]
 }
 
 model Local {
@@ -355,4 +356,30 @@ model Notificacion {
   leida       Boolean  @default(false)
   createdAt   DateTime @default(now())
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model CategoriaComida {
+  id              String   @id @default(cuid())
+  nombre          String   @unique
+  slug            String   @unique
+  emoji           String   @default("")
+  tipo            String   @default("tag")       // "principal" | "tag"
+  estiloExcluido  String[] @default([])           // ["vegano","vegetariano"] si no aplica
+  visible         Boolean  @default(true)
+  orden           Int      @default(99)
+  creadoEn        DateTime @default(now())
+}
+
+model ComidaCustom {
+  id              String   @id @default(cuid())
+  texto           String                          // normalizado (lowercase, sin acentos)
+  textoOriginal   String                          // tal cual lo escribió el usuario
+  usuarioId       String
+  promovidaA      String?                         // id de CategoriaComida si fue promovida
+  ignorada        Boolean  @default(false)
+  creadoEn        DateTime @default(now())
+
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@index([texto])
 }

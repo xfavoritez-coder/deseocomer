@@ -16,7 +16,7 @@ const COMUNAS = [
 
 // COMUNAS_CON_COBERTURA se obtiene dinámicamente del context
 
-const CATEGORIAS = [
+const CATEGORIAS_FALLBACK = [
   { emoji: "🍕", label: "Pizza" }, { emoji: "🍣", label: "Sushi" },
   { emoji: "🍔", label: "Hamburguesa" }, { emoji: "🌮", label: "Mexicano" },
   { emoji: "🥗", label: "Saludable" }, { emoji: "🍝", label: "Pastas" },
@@ -103,7 +103,11 @@ export default function GeniePanel() {
   const [emailSinCobertura, setEmailSinCobertura] = useState("");
   const [nombreSinCobertura, setNombreSinCobertura] = useState("");
   const [emailGuardado, setEmailGuardado] = useState(false);
+  const [categoriasDBGenie, setCategoriasDBGenie] = useState<{ emoji: string; label: string }[]>([]);
+  const CATEGORIAS = categoriasDBGenie.length > 0 ? [...categoriasDBGenie, { emoji: "🎲", label: "Sorpréndeme" }] : CATEGORIAS_FALLBACK;
   const shownIds = useRef<string[]>([]);
+
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { const cats = data.filter((c: any) => c.tipo === "principal").map((c: any) => ({ emoji: c.emoji || "🍽️", label: c.nombre })); if (cats.length > 0) setCategoriasDBGenie(cats); } }).catch(() => {}); }, []);
 
   useEffect(() => {
     if (stepActual !== 4 || isLoggedIn || regDismissed) return;

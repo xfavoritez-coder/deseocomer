@@ -34,10 +34,14 @@ function RegistroContent() {
   const [onboardingStep, setOnboardingStep] = useState(0); // 0=success msg, 1=estilo, 2=comidas
   const [estilo, setEstilo] = useState("");
   const [comidasSel, setComidasSel] = useState<string[]>([]);
+  const [customComidas, setCustomComidas] = useState<string[]>([]);
+  const [customInput, setCustomInput] = useState("");
+  const [categoriasDB, setCategoriasDB] = useState<{ nombre: string; slug: string; emoji: string; tipo: string; estiloExcluido: string[] }[]>([]);
   const [registeredUserId, setRegisteredUserId] = useState("");
   const [redirectTo, setRedirectTo] = useState("/");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasDB(data); }).catch(() => {}); }, []);
 
   function checkEmailTypo(email: string): string {
     const lower = email.toLowerCase().trim();
@@ -192,14 +196,17 @@ function RegistroContent() {
               <div style={{ fontSize: "2rem", marginBottom: "12px" }}>😋</div>
               <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Qué te encanta comer?</h2>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "20px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "12px" }}>
                 {(() => {
-                  const TODAS = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"];
-                  const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : [];
-                  const opciones = TODAS.filter(c => !excluir.includes(c));
+                  const FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"];
+                  const usarDB = categoriasDB.length > 0;
+                  const opciones = usarDB
+                    ? categoriasDB.filter(c => !c.estiloExcluido.includes(estilo)).map(c => c.nombre)
+                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : []; return FALLBACK.filter(c => !excluir.includes(c)); })();
+                  const totalSel = comidasSel.length + customComidas.length;
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);
-                    const maxed = comidasSel.length >= 3 && !sel;
+                    const maxed = totalSel >= 3 && !sel;
                     return (
                       <button key={c} disabled={maxed} onClick={() => setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c])} style={{
                         padding: "8px 16px", borderRadius: "20px", cursor: maxed ? "default" : "pointer",
@@ -211,18 +218,77 @@ function RegistroContent() {
                     );
                   });
                 })()}
+                {customComidas.map(c => (
+                  <button key={`custom-${c}`} onClick={() => setCustomComidas(prev => prev.filter(x => x !== c))} style={{
+                    padding: "8px 16px", borderRadius: "20px", cursor: "pointer",
+                    background: "rgba(61,184,158,0.12)",
+                    border: "1px dashed #3db89e",
+                    color: "#3db89e",
+                    fontFamily: "var(--font-lato)", fontSize: "0.85rem",
+                  }}>{c} ✕</button>
+                ))}
               </div>
-              {comidasSel.length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length}/3 seleccionadas</p>}
+              {comidasSel.length + customComidas.length < 3 && (
+                <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "12px", maxWidth: "280px", margin: "0 auto 12px" }}>
+                  <input
+                    type="text"
+                    placeholder="¿No está? Escríbela aquí"
+                    value={customInput}
+                    onChange={e => setCustomInput(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter" && customInput.trim().length >= 2) {
+                        e.preventDefault();
+                        const val = customInput.trim();
+                        if (!customComidas.includes(val) && !comidasSel.includes(val)) {
+                          setCustomComidas(prev => [...prev, val]);
+                        }
+                        setCustomInput("");
+                      }
+                    }}
+                    style={{
+                      flex: 1, padding: "8px 12px", background: "rgba(255,255,255,0.05)",
+                      border: "1px dashed rgba(61,184,158,0.3)", borderRadius: "20px",
+                      color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.85rem",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (customInput.trim().length >= 2) {
+                        const val = customInput.trim();
+                        if (!customComidas.includes(val) && !comidasSel.includes(val)) {
+                          setCustomComidas(prev => [...prev, val]);
+                        }
+                        setCustomInput("");
+                      }
+                    }}
+                    style={{
+                      padding: "8px 14px", borderRadius: "20px", cursor: "pointer",
+                      background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)",
+                      color: "#3db89e", fontFamily: "var(--font-lato)", fontSize: "0.9rem", fontWeight: 700,
+                    }}
+                  >+</button>
+                </div>
+              )}
+              {(comidasSel.length + customComidas.length) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length + customComidas.length}/3 seleccionadas</p>}
               <button onClick={async () => {
-                if (registeredUserId && (estilo || comidasSel.length > 0)) {
+                const todasSel = comidasSel.length + customComidas.length;
+                if (registeredUserId && (estilo || todasSel > 0)) {
                   try {
                     await fetch("/api/usuarios/preferencias", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: registeredUserId, estiloAlimentario: estilo, comidasFavoritas: comidasSel }) });
                   } catch {}
+                  // Guardar comidas custom en la DB
+                  for (const texto of customComidas) {
+                    try {
+                      await fetch("/api/comidas-custom", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: registeredUserId, texto }) });
+                    } catch {}
+                  }
                   // Save to localStorage session too
                   try {
                     const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
                     session.estiloAlimentario = estilo;
                     session.comidasFavoritas = comidasSel;
+                    session.comidasCustom = customComidas;
                     localStorage.setItem("deseocomer_session", JSON.stringify(session));
                   } catch {}
                   try {
@@ -238,7 +304,7 @@ function RegistroContent() {
                   } catch {}
                 }
                 setOnboardingStep(3);
-              }} style={btnS}>{comidasSel.length > 0 ? "¡Listo, vamos!" : "Continuar"}</button>
+              }} style={btnS}>{(comidasSel.length + customComidas.length) > 0 ? "¡Listo, vamos!" : "Continuar"}</button>
               <button onClick={() => setOnboardingStep(3)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
             </div>
           ) : onboardingStep === 3 ? (

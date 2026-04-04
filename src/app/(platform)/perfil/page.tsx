@@ -636,6 +636,9 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
   // Food preferences
   const [estiloAlimentario, setEstiloAlimentario] = useState("");
   const [comidasFavoritas, setComidasFavoritas] = useState<string[]>([]);
+  const [comidasCustomPerfil, setComidasCustomPerfil] = useState<string[]>([]);
+  const [customInputPerfil, setCustomInputPerfil] = useState("");
+  const [categoriasPerfilDB, setCategoriasPerfilDB] = useState<string[]>([]);
   const [gustosSaved, setGustosSaved] = useState(false);
   const [gustosLoading, setGustosLoading] = useState(false);
 
@@ -655,6 +658,13 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
         }).catch(() => {});
       }
     } catch { /* noop */ }
+    // Fetch categorías dinámicas
+    fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasPerfilDB(data.map((c: any) => c.nombre)); }).catch(() => {});
+    // Fetch comidas custom del usuario
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (Array.isArray(s.comidasCustom) && s.comidasCustom.length > 0) setComidasCustomPerfil(s.comidasCustom);
+    } catch {}
   }, []);
 
   const saveGustos = async () => {
@@ -666,9 +676,14 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuarioId: s.id, estiloAlimentario, comidasFavoritas }),
       });
+      // Guardar comidas custom
+      for (const texto of comidasCustomPerfil) {
+        try { await fetch("/api/comidas-custom", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: s.id, texto }) }); } catch {}
+      }
       if (res.ok) {
         s.estiloAlimentario = estiloAlimentario;
         s.comidasFavoritas = comidasFavoritas;
+        s.comidasCustom = comidasCustomPerfil;
         localStorage.setItem("deseocomer_session", JSON.stringify(s));
         setGustosSaved(true);
         setTimeout(() => setGustosSaved(false), 2500);
@@ -800,9 +815,10 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
         <div style={{ marginBottom: "14px" }}>
           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Comidas favoritas (máx. 3)</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-            {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"].map(c => {
+            {(categoriasPerfilDB.length > 0 ? categoriasPerfilDB : ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"]).map(c => {
               const isSel = comidasFavoritas.includes(c);
-              const maxed = comidasFavoritas.length >= 3 && !isSel;
+              const totalSel = comidasFavoritas.length + comidasCustomPerfil.length;
+              const maxed = totalSel >= 3 && !isSel;
               return (
                 <button key={c} type="button" disabled={maxed} onClick={() => {
                   setComidasFavoritas(prev => isSel ? prev.filter(x => x !== c) : [...prev, c]);
@@ -817,7 +833,22 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
                 </button>
               );
             })}
+            {comidasCustomPerfil.map(c => (
+              <button key={`custom-${c}`} type="button" onClick={() => setComidasCustomPerfil(prev => prev.filter(x => x !== c))} style={{
+                padding: "5px 12px", borderRadius: "12px", cursor: "pointer",
+                border: "1px dashed #3db89e",
+                background: "rgba(61,184,158,0.08)",
+                color: "#3db89e",
+                fontFamily: "var(--font-lato)", fontSize: "0.78rem",
+              }}>{c} ✕</button>
+            ))}
           </div>
+          {(comidasFavoritas.length + comidasCustomPerfil.length) < 3 && (
+            <div style={{ display: "flex", gap: "6px", marginTop: "8px", maxWidth: "260px" }}>
+              <input type="text" placeholder="¿No está? Escríbela" value={customInputPerfil} onChange={e => setCustomInputPerfil(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && customInputPerfil.trim().length >= 2) { e.preventDefault(); const val = customInputPerfil.trim(); if (!comidasCustomPerfil.includes(val) && !comidasFavoritas.includes(val)) setComidasCustomPerfil(prev => [...prev, val]); setCustomInputPerfil(""); } }} style={{ flex: 1, padding: "6px 10px", background: "rgba(255,255,255,0.05)", border: "1px dashed rgba(61,184,158,0.3)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.78rem", outline: "none" }} />
+              <button type="button" onClick={() => { if (customInputPerfil.trim().length >= 2) { const val = customInputPerfil.trim(); if (!comidasCustomPerfil.includes(val) && !comidasFavoritas.includes(val)) setComidasCustomPerfil(prev => [...prev, val]); setCustomInputPerfil(""); } }} style={{ padding: "6px 10px", borderRadius: "12px", cursor: "pointer", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e", fontFamily: "var(--font-lato)", fontSize: "0.85rem", fontWeight: 700 }}>+</button>
+            </div>
+          )}
         </div>
 
         <button onClick={saveGustos} disabled={gustosLoading} style={{

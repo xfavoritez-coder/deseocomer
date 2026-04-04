@@ -7,9 +7,9 @@ const MapaUbicacion = dynamic(() => import("@/components/panel/MapaUbicacion"), 
 
 const DATA_KEY = "deseocomer_panel_local_data";
 const COMUNAS_SANTIAGO = ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort();
-const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
+const CATEGORIAS_FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
+const TAGS_FALLBACK = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 interface HorarioDia { activo: boolean; abre: string; cierra: string }
 interface MenuItem { nombre: string; descripcion: string; precio: string; destacado: boolean }
@@ -54,6 +54,13 @@ export default function MiLocalPage() {
   const [busquedaMsg, setBusquedaMsg] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sugerencias, setSugerencias] = useState<any[]>([]);
+
+  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
+  const [tagsDBList, setTagsDBList] = useState<string[]>([]);
+  const CATEGORIAS = categoriasDB.length > 0 ? categoriasDB : CATEGORIAS_FALLBACK;
+  const TAGS = tagsDBList.length > 0 ? tagsDBList : TAGS_FALLBACK;
+
+  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); setTagsDBList(data.map((c: any) => c.nombre)); } }).catch(() => {}); }, []);
 
   const showToast = (msg: string, tipo: "ok" | "error" = "ok") => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 4000); };
 
