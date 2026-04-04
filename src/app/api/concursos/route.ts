@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { localId, premio, descripcion, condiciones, imagenUrl, fechaFin, fechaActivacion } = await req.json();
+    const { localId, premio, descripcion, condiciones, imagenUrl, fechaFin, fechaActivacion, modalidadConcurso } = await req.json();
     if (!localId || !premio || !fechaFin) return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
 
     // Determine if programado
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     const concurso = await prisma.concurso.create({
       data: {
         localId, slug, premio, descripcion,
+        ...(modalidadConcurso === "sorteo" ? { modalidadConcurso: "sorteo" } : {}),
         ...(condiciones && { condiciones }),
         imagenUrl,
         fechaFin: new Date(fechaFin),

@@ -39,8 +39,6 @@ export default function ActividadUsuario() {
   const allOcasiones = Object.entries(gustos.ocasiones ?? {} as Record<string, number>).sort((a, b) => (b[1] as number) - (a[1] as number));
   const visitados: { nombre: string; categoria: string; comuna: string }[] = comp.localesVisitados ?? [];
   const filtros: string[] = comp.filtrosUsados ?? [];
-  const promos: string[] = comp.promocionesAbiertas ?? [];
-  const concursosVistos: string[] = comp.concursosVistos ?? [];
   const maxCatScore = allCats.length > 0 ? (allCats[0][1] as number) : 1;
   const maxComScore = allComunas.length > 0 ? (allComunas[0][1] as number) : 1;
 
@@ -133,25 +131,27 @@ export default function ActividadUsuario() {
           </div>
         )}
 
-        {promos.length > 0 && (
+        {(data.promocionesAbiertas?.length ?? 0) > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <p style={labelS}>Promociones abiertas ({promos.length})</p>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
-              {[...new Set(promos)].map((p, i) => (
-                <span key={i} style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>{p}</span>
-              ))}
-            </div>
+            <p style={labelS}>Promociones abiertas ({data.promocionesAbiertas.length})</p>
+            {data.promocionesAbiertas.map((p: D, i: number) => (
+              <div key={i} style={{ padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
+                <span style={valS}>{p.nombre}</span>
+                <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "#3db89e" }}>{p.veces}×</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {concursosVistos.length > 0 && (
+        {(data.concursosVistos?.length ?? 0) > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <p style={labelS}>Concursos vistos ({concursosVistos.length})</p>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }}>
-              {[...new Set(concursosVistos)].map((c, i) => (
-                <span key={i} style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(128,64,208,0.08)", color: "#a070e0" }}>{c}</span>
-              ))}
-            </div>
+            <p style={labelS}>Concursos vistos ({data.concursosVistos.length})</p>
+            {data.concursosVistos.map((c: D, i: number) => (
+              <div key={i} style={{ padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
+                <span style={valS}>{c.nombre}</span>
+                <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "#a070e0" }}>{c.veces}×</span>
+              </div>
+            ))}
           </div>
         )}
 
@@ -166,7 +166,7 @@ export default function ActividadUsuario() {
           </div>
         )}
 
-        {visitados.length === 0 && promos.length === 0 && filtros.length === 0 && (
+        {visitados.length === 0 && (data.promocionesAbiertas?.length ?? 0) === 0 && filtros.length === 0 && (data.concursosVistos?.length ?? 0) === 0 && (
           <p style={{ ...labelS, textAlign: "center", padding: 20 }}>Sin actividad de navegación registrada</p>
         )}
       </div>

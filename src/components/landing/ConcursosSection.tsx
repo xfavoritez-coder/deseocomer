@@ -6,7 +6,7 @@ import { boostScore } from "@/lib/personalizacion";
 
 
 
-interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; descripcion: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[]; estado?: string; fechaActivacion?: string; listaEspera?: number }
+interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; descripcion: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[]; estado?: string; modalidadConcurso?: string; fechaActivacion?: string; listaEspera?: number }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
@@ -49,6 +49,7 @@ export default function ConcursosSection() {
           imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
           topRanking: [],
           estado: c.estado ?? "activo",
+          modalidadConcurso: c.modalidadConcurso ?? "meritos",
           fechaActivacion: c.fechaActivacion ?? undefined,
           listaEspera: c._count?.listaEspera ?? 0,
         })));
@@ -152,6 +153,11 @@ export default function ConcursosSection() {
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: badgeDot, animation: ended ? "none" : `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: badgeColor, textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
+                  {c.modalidadConcurso === "sorteo" && (
+                    <div style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: "20px", padding: "4px 10px" }}>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
@@ -217,10 +223,10 @@ export default function ConcursosSection() {
                   {/* Footer */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                      {esProgramado ? <>🔔 {c.listaEspera ?? 0} en espera</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
+                      {esProgramado ? <>🔔 {c.listaEspera ?? 0} en espera</> : c.modalidadConcurso === "sorteo" ? <>🎟️ {c.participantes} boleto{c.participantes !== 1 ? "s" : ""}</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
                     </span>
                     {!ended && (
-                      <span className={esProgramado ? "dc-cst-btn dc-cst-btn-prog" : esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
+                      <span className={esProgramado ? "dc-cst-btn dc-cst-btn-prog" : esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : c.modalidadConcurso === "sorteo" ? "dc-cst-btn dc-cst-btn-sorteo" : "dc-cst-btn"} style={{
                         fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
                         border: `1px solid ${esProgramado ? "rgba(167,139,250,0.4)" : misConcursos.has(c.id) ? "rgba(61,184,158,0.4)" : esUrgente ? urgColor : "var(--accent)"}`,
@@ -270,6 +276,7 @@ export default function ConcursosSection() {
           .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
           .dc-cst-btn-urgent { background: #e05555 !important; color: #fff !important; border-color: #e05555 !important; }
           .dc-cst-btn-prog { background: rgba(167,139,250,0.15) !important; color: #a78bfa !important; border-color: rgba(167,139,250,0.4) !important; }
+          .dc-cst-btn-sorteo { background: rgba(236,72,153,0.15) !important; color: #ec4899 !important; border-color: rgba(236,72,153,0.4) !important; }
         }
         @media (min-width: 1024px) {
           .dc-cst-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }

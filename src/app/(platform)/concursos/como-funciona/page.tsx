@@ -64,6 +64,24 @@ export default async function ComoFuncionaPage() {
       {/* Body */}
       <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "clamp(40px,6vw,80px) clamp(20px,5vw,60px)" }}>
 
+        {/* Tipos de concurso */}
+        <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Modalidades</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(32px,5vw,56px)", lineHeight: 1.3 }}>Tipos de concurso</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 16, padding: 24 }}>
+              <p style={{ fontSize: 36, marginBottom: 8 }}>🏆</p>
+              <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#e8a84c", marginBottom: 8 }}>Concurso de méritos</h3>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Gana quien más puntos acumule al cierre. Invita más amigos, sube más en el ranking y llévate el premio.</p>
+            </div>
+            <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 16, padding: 24 }}>
+              <p style={{ fontSize: 36, marginBottom: 8 }}>🎲</p>
+              <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#ec4899", marginBottom: 8 }}>Concurso de sorteo</h3>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Se sortea entre todos los participantes. Cada punto que acumulas es un boleto — más boletos, más chances de ganar.</p>
+            </div>
+          </div>
+        </section>
+
         {/* Cómo funciona */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El proceso</p>

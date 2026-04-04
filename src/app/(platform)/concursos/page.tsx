@@ -48,6 +48,7 @@ export default function ConcursosPage() {
           localCategoria: c.local?.categoria ?? "",
           localComuna: c.local?.comuna ?? "",
           estado: c.estado ?? "activo",
+          modalidadConcurso: c.modalidadConcurso ?? "meritos",
           fechaActivacion: c.fechaActivacion ?? null,
           listaEsperaCount: c._count?.listaEspera ?? 0,
           ranking: (c.participantes ?? []).slice(0, 3).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", refs: p.puntos ?? 0 })),
@@ -308,6 +309,11 @@ export default function ConcursosPage() {
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: "#0a0812", textTransform: "uppercase" }}>🔮 Próximamente</span>
                       </div>
                     )}
+                    {c.modalidadConcurso === "sorteo" && (
+                      <div style={{ position: "absolute", bottom: 12, left: 12, zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
+                      </div>
+                    )}
 
                   </div>
 
@@ -371,8 +377,8 @@ export default function ConcursosPage() {
 
                     {/* Participantes */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>Participantes</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.participantes}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.participantes}{c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}</span>
                     </div>
 
                     {/* Top 3 */}
@@ -388,7 +394,7 @@ export default function ConcursosPage() {
                             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < c.ranking.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
                               <div style={{ width: 18, height: 18, borderRadius: "50%", background: posC.bg, border: `1px solid ${posC.bd}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: posC.c, flexShrink: 0 }}>{i + 1}</div>
                               <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.6)", textTransform: "capitalize" }}>{(() => { const parts = (r.nombre as string).trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
-                              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} refs</span>
+                              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.modalidadConcurso === "sorteo" ? "rgba(236,72,153,0.5)" : "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} {c.modalidadConcurso === "sorteo" ? "🎟️" : "refs"}</span>
                             </div>
                           );
                         })}
@@ -410,7 +416,7 @@ export default function ConcursosPage() {
                       width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
                       fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase",
                       letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                      background: misConcursos.has(c.id) ? "rgba(61,184,158,0.15)" : soon ? urg : "#e8a84c",
+                      background: misConcursos.has(c.id) ? "rgba(61,184,158,0.15)" : soon ? urg : c.modalidadConcurso === "sorteo" ? "#ec4899" : "#e8a84c",
                       border: misConcursos.has(c.id) ? "1px solid rgba(61,184,158,0.4)" : "none",
                       color: misConcursos.has(c.id) ? "#3db89e" : soon ? "#fff" : "#0a0812",
                     }}>

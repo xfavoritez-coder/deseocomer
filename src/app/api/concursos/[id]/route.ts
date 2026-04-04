@@ -24,20 +24,44 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const { emailGanador, emailLocal } = await import("@/lib/emails/concurso-cierre");
       const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
 
-      const [p1, p2, p3] = concurso.participantes;
       const codigo = `DC-${Math.floor(100000 + Math.random() * 900000)}`;
       const token = crypto.randomUUID();
-      const esSospechoso = p1.estado === "sospechoso";
+
+      let ganador1Id: string;
+      let ganador2Id: string | null = null;
+      let ganador3Id: string | null = null;
+
+      if (concurso.modalidadConcurso === "sorteo") {
+        const totalBoletos = concurso.participantes.reduce((acc, p) => acc + Math.max(1, p.puntos), 0);
+        let rand = Math.random() * totalBoletos;
+        let ganadorIdx = 0;
+        for (let i = 0; i < concurso.participantes.length; i++) {
+          rand -= Math.max(1, concurso.participantes[i].puntos);
+          if (rand <= 0) { ganadorIdx = i; break; }
+        }
+        ganador1Id = concurso.participantes[ganadorIdx].usuario.id;
+        const fallbacks = concurso.participantes.filter(p => p.usuario.id !== ganador1Id).sort((a, b) => b.puntos - a.puntos);
+        ganador2Id = fallbacks[0]?.usuario.id ?? null;
+        ganador3Id = fallbacks[1]?.usuario.id ?? null;
+      } else {
+        const [p1, p2, p3] = concurso.participantes;
+        ganador1Id = p1.usuario.id;
+        ganador2Id = p2?.usuario.id ?? null;
+        ganador3Id = p3?.usuario.id ?? null;
+      }
+
+      const ganadorPart = concurso.participantes.find(p => p.usuario.id === ganador1Id)!;
+      const esSospechoso = ganadorPart.estado === "sospechoso";
 
       await prisma.concurso.update({
         where: { id: concurso.id },
         data: {
           estado: esSospechoso ? "en_revision" : "finalizado",
           activo: false,
-          ganador1Id: p1.usuario.id,
-          ganador2Id: p2?.usuario.id ?? null,
-          ganador3Id: p3?.usuario.id ?? null,
-          ganadorActualId: p1.usuario.id,
+          ganador1Id,
+          ganador2Id,
+          ganador3Id,
+          ganadorActualId: ganador1Id,
           codigoEntrega: codigo,
           confirmacionToken: token,
           ...(!esSospechoso ? { ganadorNotificadoAt: new Date(), localNotificadoAt: new Date() } : {}),
@@ -49,7 +73,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           concursoId: concurso.id, titulo: concurso.premio, premio: concurso.premio, codigoEntrega: codigo,
           local: { nombre: concurso.local.nombre, direccion: concurso.local.direccion, comuna: concurso.local.comuna, telefono: concurso.local.telefono },
         };
-        const ganador = { nombre: p1.usuario.nombre, email: p1.usuario.email!, telefono: p1.usuario.telefono };
+        const ganador = { nombre: ganadorPart.usuario.nombre, email: ganadorPart.usuario.email!, telefono: ganadorPart.usuario.telefono };
         const urls = {
           confirm: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=si`,
           disputa: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=no`,

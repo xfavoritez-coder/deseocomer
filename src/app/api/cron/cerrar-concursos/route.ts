@@ -186,22 +186,54 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         continue;
       }
 
-      const [p1, p2, p3] = c.participantes;
       const codigo = generarCodigo();
       const token = generarToken();
 
+      let ganador1Id: string;
+      let ganador2Id: string | null = null;
+      let ganador3Id: string | null = null;
+
+      if (c.modalidadConcurso === "sorteo") {
+        // Sorteo ponderado: necesitamos todos los participantes
+        const todos = await prisma.participanteConcurso.findMany({
+          where: { concursoId: c.id, estado: { not: "descalificado" } },
+          include: { usuario: { select: { id: true, nombre: true, email: true, telefono: true } } },
+        });
+        // Calcular total de boletos y elegir con probabilidad ponderada
+        const totalBoletos = todos.reduce((acc, p) => acc + Math.max(1, p.puntos), 0);
+        let rand = Math.random() * totalBoletos;
+        let ganadorIdx = 0;
+        for (let i = 0; i < todos.length; i++) {
+          rand -= Math.max(1, todos[i].puntos);
+          if (rand <= 0) { ganadorIdx = i; break; }
+        }
+        ganador1Id = todos[ganadorIdx].usuario.id;
+        // Fallbacks por ranking (para si el ganador no reclama)
+        const fallbacks = todos.filter(p => p.usuario.id !== ganador1Id).sort((a, b) => b.puntos - a.puntos);
+        ganador2Id = fallbacks[0]?.usuario.id ?? null;
+        ganador3Id = fallbacks[1]?.usuario.id ?? null;
+        log.push(`[SORTEO] ${c.id} "${c.premio}" — ${totalBoletos} boletos, ganador: ${todos[ganadorIdx].usuario.nombre}`);
+      } else {
+        // Méritos: ranking normal
+        const [p1, p2, p3] = c.participantes;
+        ganador1Id = p1.usuario.id;
+        ganador2Id = p2?.usuario.id ?? null;
+        ganador3Id = p3?.usuario.id ?? null;
+      }
+
       // Check for fraud on winner
-      const esSospechoso = p1.estado === "sospechoso";
+      const ganadorPart = c.participantes.find(p => p.usuario.id === ganador1Id) ?? c.participantes[0];
+      const esSospechoso = ganadorPart?.estado === "sospechoso";
 
       await prisma.concurso.update({
         where: { id: c.id },
         data: {
           estado: esSospechoso ? "en_revision" : "finalizado",
           activo: false,
-          ganador1Id: p1.usuario.id,
-          ganador2Id: p2?.usuario.id ?? null,
-          ganador3Id: p3?.usuario.id ?? null,
-          ganadorActualId: p1.usuario.id,
+          ganador1Id,
+          ganador2Id,
+          ganador3Id,
+          ganadorActualId: ganador1Id,
           codigoEntrega: codigo,
           confirmacionToken: token,
         },
@@ -209,7 +241,7 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
 
       // Update winner stats
       await prisma.usuario.update({
-        where: { id: p1.usuario.id },
+        where: { id: ganador1Id },
         data: { totalConcursosGanados: { increment: 1 } }
       }).catch(() => {});
 
@@ -234,8 +266,14 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         } catch {}
       }
 
+      // Fetch winner data
+      const ganadorUser = await prisma.usuario.findUnique({
+        where: { id: ganador1Id },
+        select: { nombre: true, email: true, telefono: true },
+      });
+
       if (esSospechoso) {
-        log.push(`[EN_REVISION] ${c.id} - ganador sospechoso: ${p1.usuario.email}`);
+        log.push(`[EN_REVISION] ${c.id} - ganador sospechoso: ${ganadorUser?.email}`);
         continue;
       }
 
@@ -252,7 +290,7 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
           telefono: c.local.telefono,
         },
       };
-      const ganadorData = { nombre: p1.usuario.nombre, email: p1.usuario.email, telefono: p1.usuario.telefono };
+      const ganadorData = { nombre: ganadorUser?.nombre ?? "", email: ganadorUser?.email ?? "", telefono: ganadorUser?.telefono ?? "" };
       const urls = confirmUrls(c.id, token);
 
       try {
@@ -262,7 +300,7 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
           where: { id: c.id },
           data: { ganadorNotificadoAt: now, localNotificadoAt: now },
         });
-        log.push(`[FINALIZADO] ${c.id} - notificados: ${p1.usuario.email} y ${c.local.email}`);
+        log.push(`[FINALIZADO] ${c.id} - notificados: ${ganadorUser?.email} y ${c.local.email}`);
       } catch (emailErr) {
         log.push(`[ERROR_EMAIL] ${c.id} - ${emailErr}`);
       }

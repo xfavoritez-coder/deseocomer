@@ -21,7 +21,7 @@ export default function PanelConcursos() {
   const [detalle, setDetalle] = useState<Concurso | null>(null);
   const [step, setStep] = useState(1);
   const [premio, setPremio] = useState("");
-
+  const [modalidadConcurso, setModalidadConcurso] = useState<"meritos" | "sorteo">("meritos");
 
   const [dur, setDur] = useState(3);
   const [activacion, setActivacion] = useState<"ahora" | "programar">("ahora");
@@ -86,14 +86,14 @@ export default function PanelConcursos() {
     try {
       const res = await fetch("/api/concursos", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localId: s.id, premio: pFinal, descripcion: descripcionPremio.trim() || null, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null, fechaActivacion: esProgramado ? new Date(fechaActivacion).toISOString() : null }),
+        body: JSON.stringify({ localId: s.id, premio: pFinal, descripcion: descripcionPremio.trim() || null, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null, fechaActivacion: esProgramado ? new Date(fechaActivacion).toISOString() : null, modalidadConcurso }),
       });
       if (res.ok) {
         const nuevo = await res.json();
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion("");
+    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion(""); setModalidadConcurso("meritos");
   };
 
   const copyLink = (c: Concurso) => {
@@ -219,7 +219,11 @@ export default function PanelConcursos() {
               {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{tiempoDetalle} restantes</span>}
             </div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "4px" }}>{detalle.premio}</h2>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 {participantes} {participantes === 1 ? "participante" : "participantes"}</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", margin: 0 }}>👥 {participantes} {participantes === 1 ? "participante" : "participantes"}</p>
+              {detalle.modalidadConcurso === "sorteo" && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#ec4899", background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 20, padding: "2px 10px" }}>🎲 Sorteo</span>}
+              {detalle.modalidadConcurso !== "sorteo" && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "2px 10px" }}>🏆 Méritos</span>}
+            </div>
           </div>
         </div>
 
@@ -418,6 +422,23 @@ export default function PanelConcursos() {
 
       {step === 1 && (<div>
         <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Nuevo concurso</h2>
+
+        {labelReq("Tipo de concurso")}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+          {(["meritos", "sorteo"] as const).map(m => {
+            const sel = modalidadConcurso === m;
+            const isSorteo = m === "sorteo";
+            const c = isSorteo ? "#ec4899" : "#e8a84c";
+            const bg = isSorteo ? "rgba(236,72,153,0.12)" : "rgba(232,168,76,0.15)";
+            return (
+              <button key={m} onClick={() => setModalidadConcurso(m)} style={{ flex: 1, padding: "14px 12px", borderRadius: 12, cursor: "pointer", background: sel ? bg : "transparent", border: `1px solid ${sel ? c : "rgba(255,255,255,0.1)"}`, textAlign: "center", transition: "all 0.2s" }}>
+                <p style={{ fontSize: 24, margin: "0 0 4px" }}>{isSorteo ? "🎲" : "🏆"}</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: sel ? c : "rgba(240,234,214,0.5)", margin: 0 }}>{isSorteo ? "Sorteo" : "Méritos"}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: sel ? `${c}aa` : "rgba(240,234,214,0.3)", margin: "4px 0 0", lineHeight: 1.3 }}>{isSorteo ? "Sorteo ponderado — más puntos, más chances" : "Gana quien más puntos acumule"}</p>
+              </button>
+            );
+          })}
+        </div>
 
         {labelReq("Premio")}
         <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, etc" maxLength={50} />

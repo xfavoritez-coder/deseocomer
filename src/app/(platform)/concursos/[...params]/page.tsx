@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import AnimacionSorteo from "@/components/concursos/AnimacionSorteo";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   CONCURSOS,
@@ -112,7 +113,7 @@ function ConcursoDetallePage() {
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
-          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0 });
+          setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
         }
         setDbLoading(false);
@@ -163,6 +164,7 @@ function ConcursoDetallePage() {
   const [codigoValidacion, setCodigoValidacion] = useState<{ existe: boolean; nombre?: string } | null>(null);
   const [validandoCodigo, setValidandoCodigo] = useState(false);
   const [recienUnido, setRecienUnido] = useState(false);
+  const [mostrarSorteo, setMostrarSorteo] = useState(false);
   const refProcessed = useRef(false);
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
@@ -317,7 +319,16 @@ function ConcursoDetallePage() {
   const c = concurso ?? finalizado!;
   const dbEstado = c.estado ?? (timer?.ended ? "finalizado" : "activo");
   const isProgramado = dbEstado === "programado";
+  const esSorteo = (concursoData as any)?.modalidadConcurso === "sorteo";
   const isEnded = !isProgramado && (!!finalizado || !!timer?.ended || (dbEstado !== "activo" && dbEstado !== "programado"));
+
+  // Animación sorteo al entrar a concurso completado
+  useEffect(() => {
+    if (esSorteo && isEnded && isParticipating && (concursoData as any)?.ganadorActualNombre && concursoId) {
+      const visto = localStorage.getItem(`sorteo_visto_${concursoId}`);
+      if (!visto) setMostrarSorteo(true);
+    }
+  }, [esSorteo, isEnded, isParticipating, concursoData, concursoId]);
 
   const handleListaEspera = async () => {
     setListaLoading(true);
@@ -483,8 +494,10 @@ function ConcursoDetallePage() {
         const myEntry = myIndex >= 0 ? ranking[myIndex] : null;
         const meVisible = myEntry ? visibles.includes(myEntry) : false;
 
+        const totalBoletosRanking = esSorteo ? ranking.reduce((acc, r) => acc + Math.max(1, r.referidos), 0) : 0;
         const renderRow = (r: RankingEntry, i: number) => {
           const isMe = isAuthenticated && user && r.nombre.startsWith(myName);
+          const probPct = esSorteo && totalBoletosRanking > 0 ? Math.round((Math.max(1, r.referidos) / totalBoletosRanking) * 100) : 0;
           const posColors = [
             { bg: "rgba(232,168,76,0.2)", color: "#e8a84c", border: "rgba(232,168,76,0.4)" },
             { bg: "rgba(180,180,180,0.08)", color: "rgba(220,220,220,0.6)", border: "rgba(180,180,180,0.15)" },
@@ -503,7 +516,8 @@ function ConcursoDetallePage() {
               )}
               <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
+              {esSorteo && probPct > 0 && <span title="Probabilidad de ganar basada en tus boletos" style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(236,72,153,0.5)", cursor: "help" }}>{probPct}%</span>}
               {isAuthenticated && !isMe && (
                 <button onClick={() => handleSupport(r.nombre, supportKey, rAny.usuarioId || "")} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
@@ -527,7 +541,7 @@ function ConcursoDetallePage() {
                 )}
                 <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = myEntry.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
                 <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
               </div>
             )}
             {ocultos.length > 0 && !showAllRanking && (
@@ -593,6 +607,7 @@ function ConcursoDetallePage() {
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
         <div style={{ position: "absolute", inset: 0, background: isProgramado ? "linear-gradient(to bottom, rgba(10,8,18,0.2) 0%, rgba(10,8,18,0.96) 100%)" : "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
         {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
+        {esSorteo && <div style={{ position: "absolute", top: isProgramado ? 50 : 20, right: 14, zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#fff" }}>🎲 Sorteo</div>}
         {/* Back */}
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
@@ -795,7 +810,7 @@ function ConcursoDetallePage() {
                 </div>
               ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
-                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "🎉 Entrar a concurso"}</button>
+                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: esSorteo ? "#ec4899" : "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : esSorteo ? "🎲 Entrar al sorteo" : "🎉 Entrar a concurso"}</button>
                   {joinError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8c00", textAlign: "center", marginTop: 8 }}>{joinError}</p>}
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Únete gratis y comienza a sumar puntos para ganar</p>
                 </div>
@@ -828,7 +843,7 @@ function ConcursoDetallePage() {
           {/* 6. Cómo se gana */}
           {!isEnded && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>{esSorteo ? "Tus boletos en el sorteo" : "Cómo se gana"}</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                 {[
   { icon: "🎟️", pts: "+1", label: "Al registrarte", id: "tt1", ttTitle: "Al registrarte", ttText: "Solo por unirte a este concurso ya ganas 1 punto automáticamente.", ttPts: "+1 punto" },
@@ -892,7 +907,31 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* 6.5 Descripción completa del premio (si fue truncada en hero) */}
+          {/* 6.5 Explicación sorteo */}
+          {esSorteo && !isEnded && (
+            <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 14, padding: "14px 16px", marginTop: 12 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#ec4899", fontWeight: 700, marginBottom: 6 }}>🎲 ¿Cómo funciona el sorteo?</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, margin: 0 }}>Cada punto que acumulas es un boleto. Al finalizar el concurso, el sistema sortea UN boleto al azar — quien más boletos tenga, más chances tiene de ganar.</p>
+            </div>
+          )}
+
+          {/* Contador de boletos del usuario */}
+          {esSorteo && isParticipating && !isEnded && (() => {
+            const misPuntos = ranking.find(r => {
+              const myName = user?.nombre?.split(" ")[0] ?? "";
+              return r.nombre.startsWith(myName);
+            })?.referidos ?? 1;
+            const totalBoletos = ranking.reduce((acc, r) => acc + Math.max(1, r.referidos), 0);
+            const prob = totalBoletos > 0 ? Math.round((Math.max(1, misPuntos) / totalBoletos) * 100) : 0;
+            return (
+              <div style={{ background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 14, padding: "14px 16px", marginTop: 12, textAlign: "center" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 22, color: "#ec4899", fontWeight: 700, margin: "0 0 4px" }}>{misPuntos} boleto{misPuntos !== 1 ? "s" : ""} 🎟️</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", margin: 0 }}>Probabilidad actual: ~{prob}% · Con más boletos tienes más chances de ganar</p>
+              </div>
+            );
+          })()}
+
+          {/* 6.6 Descripción completa del premio (si fue truncada en hero) */}
           {c.descripcionPremio && c.descripcionPremio.length > 120 && (
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Descripción del premio</p>
@@ -1010,6 +1049,15 @@ function ConcursoDetallePage() {
           >{phoneSaving ? "Guardando..." : "Guardar y participar"}</button>
         </div>
       </>)}
+
+      {/* Animación sorteo */}
+      {mostrarSorteo && (concursoData as any)?.ganadorActualNombre && (
+        <AnimacionSorteo
+          ganadorNombre={(concursoData as any).ganadorActualNombre}
+          totalBoletos={ranking.reduce((acc, r) => acc + Math.max(1, r.referidos), 0)}
+          onClose={() => { setMostrarSorteo(false); localStorage.setItem(`sorteo_visto_${concursoId}`, "true"); }}
+        />
+      )}
 
       {/* Modal post-participación */}
       {recienUnido && refLink && (<>

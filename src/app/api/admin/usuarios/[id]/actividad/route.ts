@@ -42,9 +42,55 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     take: 30,
   });
 
+  // Resolver IDs de concursos vistos y promociones a nombres con conteo
+  const gp = usuario.geniePerfil as any;
+  const concursosVistosIds: string[] = gp?.comportamiento?.concursosVistos ?? [];
+  const promosIds: string[] = gp?.comportamiento?.promocionesAbiertas ?? [];
+
+  // Contar frecuencia
+  const countMap = (arr: string[]) => {
+    const m: Record<string, number> = {};
+    for (const id of arr) m[id] = (m[id] ?? 0) + 1;
+    return m;
+  };
+  const concursosVistosCount = countMap(concursosVistosIds);
+  const promosCount = countMap(promosIds);
+
+  // Resolver nombres de concursos
+  const uniqueConcursoIds = Object.keys(concursosVistosCount);
+  const concursosNombres: Record<string, string> = {};
+  if (uniqueConcursoIds.length > 0) {
+    const concursosData = await prisma.concurso.findMany({
+      where: { id: { in: uniqueConcursoIds } },
+      select: { id: true, premio: true },
+    });
+    for (const c of concursosData) concursosNombres[c.id] = c.premio;
+  }
+
+  // Resolver nombres de promociones
+  const uniquePromoIds = Object.keys(promosCount);
+  const promosNombres: Record<string, string> = {};
+  if (uniquePromoIds.length > 0) {
+    const promosData = await prisma.promocion.findMany({
+      where: { id: { in: uniquePromoIds } },
+      select: { id: true, titulo: true },
+    });
+    for (const p of promosData) promosNombres[p.id] = p.titulo;
+  }
+
+  const concursosVistosResueltos = Object.entries(concursosVistosCount)
+    .map(([cid, count]) => ({ nombre: concursosNombres[cid] ?? cid, veces: count }))
+    .sort((a, b) => b.veces - a.veces);
+
+  const promosResueltas = Object.entries(promosCount)
+    .map(([pid, count]) => ({ nombre: promosNombres[pid] ?? pid, veces: count }))
+    .sort((a, b) => b.veces - a.veces);
+
   return NextResponse.json({
     usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email },
     geniePerfil: usuario.geniePerfil,
+    concursosVistos: concursosVistosResueltos,
+    promocionesAbiertas: promosResueltas,
     concursos: participaciones.map((p) => ({
       concurso: p.concurso.premio,
       local: p.concurso.local.nombre,
