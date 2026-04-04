@@ -32,7 +32,7 @@ function getFrase(ocasion: string, categoria: string, comuna: string): string {
     const frase = oFrases[cat] || oFrases._default;
     if (frase) return frase.replace("{comuna}", comuna);
   }
-  return `En ${comuna} encontramos esto para ti 🧞`;
+  return `En ${comuna} encontramos esto para ti 👌`;
 }
 
 function getOcasiones(mod: string): string[] {
@@ -95,7 +95,41 @@ export default function GeniePanel() {
   const [emailSinCobertura, setEmailSinCobertura] = useState("");
   const [nombreSinCobertura, setNombreSinCobertura] = useState("");
   const [emailGuardado, setEmailGuardado] = useState(false);
-  const CATEGORIAS = [...CATEGORIAS_MASTER.map(c => ({ emoji: CATEGORIA_EMOJI[c] ?? "🍽️", label: c })), { emoji: "🎲", label: "Sorpréndeme" }];
+  const CATEGORIAS = useMemo(() => {
+    const all = CATEGORIAS_MASTER.map(c => ({ emoji: CATEGORIA_EMOJI[c] ?? "🍽️", label: c }));
+
+    // Excluir por estilo alimentario
+    let session: { estiloAlimentario?: string; comidasFavoritas?: string[] } = {};
+    try { session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}"); } catch {}
+    const estilo = session.estiloAlimentario ?? "";
+    const excluir = estilo === "vegano" ? ["Pollo", "Carnes / Parrilla", "Mariscos", "Vegano"]
+      : estilo === "vegetariano" ? ["Pollo", "Carnes / Parrilla", "Vegetariano"] : [];
+    const filtered = all.filter(c => !excluir.includes(c.label));
+
+    // Scores: favoritas del registro + historial del genio + hora
+    const favoritas = new Set(session.comidasFavoritas ?? []);
+    let perfil: { gustos?: { categorias?: Record<string, number> } } = {};
+    try { perfil = JSON.parse(localStorage.getItem("deseocomer_genio_perfil") ?? "{}"); } catch {}
+    const historial = perfil.gustos?.categorias ?? {};
+
+    const h = new Date().getHours();
+    const horaPref: Record<string, number> = {};
+    if (h >= 7 && h < 12) { horaPref["Café"] = 3; horaPref["Brunch"] = 2; horaPref["Saludable"] = 1; }
+    else if (h >= 12 && h < 16) { horaPref["Hamburguesa"] = 1; horaPref["Sushi"] = 1; horaPref["Pizza"] = 1; }
+    else if (h >= 16 && h < 20) { horaPref["Café"] = 2; horaPref["Postres"] = 2; }
+    else { horaPref["Pizza"] = 1; horaPref["Sushi"] = 1; horaPref["Ramen"] = 2; }
+
+    const scored = filtered.map(c => {
+      let score = 0;
+      if (favoritas.has(c.label)) score += 10;
+      score += (historial[c.label.toLowerCase()] ?? 0) * 2;
+      score += horaPref[c.label] ?? 0;
+      return { ...c, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return [...scored, { emoji: "🎲", label: "Sorpréndeme", score: 0 }];
+  }, []);
   const shownIds = useRef<string[]>([]);
 
   useEffect(() => {
@@ -303,7 +337,7 @@ export default function GeniePanel() {
                 <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: r.logoUrl ? "transparent" : "rgba(20,12,35,0.9)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", fontSize: "11px", fontWeight: 700, color: "#e8a84c" }}>
                   {r.logoUrl ? <img src={r.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : getInitials(r.nombre)}
                 </div>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "13px", color: "rgba(240,234,214,0.65)", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.05em" }}>{r.nombre}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "13px", color: "rgba(245,238,220,0.95)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em", textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>{r.nombre}</span>
               </div>
             </div>
 
