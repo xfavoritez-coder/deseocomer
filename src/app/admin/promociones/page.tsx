@@ -6,7 +6,7 @@ import SubirFoto from "@/components/SubirFoto";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type P = any;
 
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", cumpleanos: "Cumpleaños" };
 const DIAS_NOMBRE = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 export default function AdminPromociones() {

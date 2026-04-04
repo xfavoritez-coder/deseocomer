@@ -22,7 +22,7 @@ function formatDias(dias: number[]): string {
   if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
   return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", precio_especial: "Especial", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Promo", cumpleanos: "Cumpleaños" };
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
   const t = promo.tipo?.toLowerCase() ?? "";
@@ -31,7 +31,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "2x1") return { text: "2×1", color: "#3db89e" };
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
   if (t === "cupon" || t === "cupón") return { text: "PROMO", color: "#e8a84c" };
-  if (t === "precio_especial" || t === "especial") return { text: "ESPECIAL", color: "#e8a84c" };
+  if (t === "precio_especial" || t === "especial") return { text: "PROMO", color: "#e8a84c" };
   if (t === "combo" || t === "promo") return { text: "PROMO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
@@ -165,7 +165,6 @@ export default function PromocionesPage() {
             { key: "descuento", label: "Descuento", color: "#ff6644" },
             { key: "2x1", label: "2\u00d71", color: "#3db89e" },
             { key: "promo", label: "Promo", color: "#e8a84c" },
-            { key: "precio_especial", label: "Especial", color: "#e8a84c" },
             { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
           ].map(({ key, label, color }) => {
             const isActive = key === "activas" ? filtroActivas : filtrosTipo.includes(key);

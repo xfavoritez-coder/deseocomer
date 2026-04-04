@@ -182,7 +182,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
               : tLower === "cupon" || tLower === "cupón"
               ? { text: "PROMO", color: "#e8a84c" }
               : tLower === "precio_especial" || tLower === "especial"
-              ? { text: "ESPECIAL", color: "#e8a84c" }
+              ? { text: "PROMO", color: "#e8a84c" }
               : tLower === "combo" || tLower === "promo"
               ? { text: "PROMO", color: "#e8a84c" }
               : tLower === "regalo"
