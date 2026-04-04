@@ -1,38 +1,47 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-function EyeIcon({ open }: { open: boolean }) {
-  return open ? (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,208,128,0.45)" strokeWidth="2" strokeLinecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-  ) : (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(245,208,128,0.45)" strokeWidth="2" strokeLinecap="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>);
+function generarPassword(): string {
+  const chars = "abcdefghijkmnpqrstuvwxyz23456789";
+  let pw = "";
+  for (let i = 0; i < 8; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  return pw;
 }
 
-const CIUDADES = ["Santiago","Valparaíso","Viña del Mar","Concepción","Antofagasta","La Serena","Coquimbo","Temuco","Rancagua","Talca","Arica","Iquique","Puerto Montt","Osorno","Valdivia","Chillán","Los Ángeles","Calama","Copiapó","Punta Arenas","Puerto Natales","Curicó","Linares","San Fernando","Ovalle","Quillota","San Antonio","Melipilla"];
-
 export default function RegistroLocalPage() {
-  const router = useRouter();
-  const [form, setForm] = useState({ nombreLocal: "", nombreDueno: "", email: "", password: "", celular: "", ciudad: "santiago" });
+  const [nombreLocal, setNombreLocal] = useState("");
+  const [nombreDueno, setNombreDueno] = useState("");
+  const [email, setEmail] = useState("");
   const [registroExitoso, setRegistroExitoso] = useState(false);
-  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
-  const esSantiago = form.ciudad === "Santiago";
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setError("");
-    if (!form.nombreLocal.trim()) return setError("Nombre del local obligatorio.");
-    if (!form.nombreDueno.trim()) return setError("Nombre del dueño obligatorio.");
-    if (!form.email.trim() || !form.email.includes("@")) return setError("Email inválido.");
-    if (form.password.length < 8) return setError("Mínimo 8 caracteres.");
-    if (!form.celular.trim()) return setError("Celular obligatorio.");
+    e.preventDefault();
+    setError("");
+    if (!nombreLocal.trim()) return setError("El nombre del local es obligatorio.");
+    if (!nombreDueno.trim()) return setError("Tu nombre es obligatorio.");
+    if (!email.trim() || !email.includes("@")) return setError("Ingresa un email válido.");
     setLoading(true);
+    const password = generarPassword();
     try {
-      const res = await fetch("/api/locales", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: form.nombreLocal.trim(), nombreDueno: form.nombreDueno.trim(), email: form.email.trim().toLowerCase(), password: form.password, telefono: form.celular.trim(), ciudad: form.ciudad || "Santiago" }) });
+      const res = await fetch("/api/locales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nombre: nombreLocal.trim(),
+          nombreDueno: nombreDueno.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+          passwordPlain: password,
+          registroRapido: true,
+          ciudad: "Santiago",
+        }),
+      });
       const data = await res.json();
       if (!res.ok) { setLoading(false); return setError(data.error || "Error al registrarse"); }
-    } catch { setLoading(false); return setError("Error de conexión"); }
+    } catch { setLoading(false); return setError("Error de conexión. Intenta de nuevo."); }
     setLoading(false);
     setRegistroExitoso(true);
   };
@@ -50,52 +59,50 @@ export default function RegistroLocalPage() {
         {registroExitoso ? (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: "2.5rem", marginBottom: "16px" }}>✨</div>
-            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "12px" }}>¡Registro recibido!</h2>
+            <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", marginBottom: "12px" }}>¡Ya estás dentro!</h2>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: "8px" }}>
-              Hemos recibido los datos de <strong style={{ color: "var(--accent)" }}>{form.nombreLocal}</strong>.
+              Hemos registrado <strong style={{ color: "var(--accent)" }}>{nombreLocal}</strong>.
             </p>
-            {esSantiago ? (
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.7, marginBottom: "24px" }}>
-                Nuestro equipo revisará tu solicitud y te contactaremos a <strong style={{ color: "rgba(240,234,214,0.6)" }}>{form.email}</strong> dentro de las próximas 24 horas para activar tu cuenta.
-              </p>
-            ) : (
-              <>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.7, marginBottom: "12px" }}>
-                  Te contactaremos a <strong style={{ color: "rgba(240,234,214,0.6)" }}>{form.email}</strong> cuando tengamos novedades.
-                </p>
-                <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "12px", padding: "14px 16px", marginBottom: "24px" }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--accent)", lineHeight: 1.6 }}>📍 Aún no operamos en <strong>{form.ciudad}</strong>, pero estamos creciendo rápido. Serás de los primeros cuando lleguemos a tu zona.</p>
-                </div>
-              </>
-            )}
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.7, marginBottom: "24px" }}>
+              Te enviamos un correo a <strong style={{ color: "rgba(240,234,214,0.6)" }}>{email}</strong> con tus datos de acceso. Revisa tu bandeja de entrada para entrar al panel.
+            </p>
             <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: "12px", padding: "14px 16px", marginBottom: "24px" }}>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--oasis-bright)", lineHeight: 1.6 }}>💡 Mientras tanto, puedes explorar la plataforma para conocer cómo funcionan los concursos y promociones.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--oasis-bright)", lineHeight: 1.6 }}>💡 Entra al panel para completar tu perfil: agrega logo, portada, horarios y dirección para aparecer en la plataforma.</p>
             </div>
-            <Link href="/" style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--oasis-bright)", textDecoration: "none", borderBottom: "1px solid rgba(61,184,158,0.3)", paddingBottom: "2px" }}>Explorar DeseoComer →</Link>
+            <Link href="/login-local" style={{ display: "inline-block", width: "100%", padding: "14px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--bg-primary)", fontWeight: 700, textDecoration: "none", textAlign: "center", boxSizing: "border-box" }}>Ir al panel →</Link>
           </div>
         ) : (
         <>
-        <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
+          <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "6px" }}>Solo 3 datos. Listo en 30 segundos.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
 
-        {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
+          {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div><label style={labelS}>Nombre del local</label><input style={inputS} type="text" placeholder="Ej: Pizza Napoli" value={form.nombreLocal} onChange={e => set("nombreLocal", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-          <div><label style={labelS}>Nombre del dueño</label><input style={inputS} type="text" placeholder="Tu nombre completo" value={form.nombreDueno} onChange={e => set("nombreDueno", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-          <div><label style={labelS}>Email de contacto</label><input style={inputS} type="email" placeholder="hola@tulocal.cl" value={form.email} onChange={e => set("email", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-          <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><EyeIcon open={showPw} /></button></div></div>
-          <div><label style={labelS}>Teléfono</label><input style={inputS} type="tel" placeholder="+56 9 1234 5678" value={form.celular} onChange={e => set("celular", e.target.value)} onFocus={fi} onBlur={fo} /></div>
-          <div><label style={labelS}>Ciudad</label><select style={{ ...inputS, background: "var(--bg-primary)", cursor: "pointer" }} value={form.ciudad} onChange={e => set("ciudad", e.target.value)}>
-            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>Selecciona tu ciudad...</option>
-            {CIUDADES.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
-          </select></div>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div>
+              <label style={labelS}>Nombre del local</label>
+              <input style={inputS} type="text" placeholder="Ej: Pizza Napoli" value={nombreLocal} onChange={e => setNombreLocal(e.target.value)} onFocus={fi} onBlur={fo} />
+            </div>
+            <div>
+              <label style={labelS}>Tu nombre</label>
+              <input style={inputS} type="text" placeholder="Nombre y apellido" value={nombreDueno} onChange={e => setNombreDueno(e.target.value)} onFocus={fi} onBlur={fo} />
+            </div>
+            <div>
+              <label style={labelS}>Email de contacto</label>
+              <input style={inputS} type="email" placeholder="hola@tulocal.cl" value={email} onChange={e => setEmail(e.target.value)} onFocus={fi} onBlur={fo} />
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.25)", marginTop: "6px" }}>Te enviaremos tus datos de acceso a este correo</p>
+            </div>
 
-          <button type="submit" disabled={loading || !form.ciudad} style={btnS}>{loading ? "Creando..." : "Registrar mi local →"}</button>
-        </form>
+            <button type="submit" disabled={loading} style={{ ...btnS, opacity: loading ? 0.6 : 1 }}>{loading ? "Registrando..." : "Registrar mi local gratis →"}</button>
+          </form>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.2)" }}>¿Solo quieres comer?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
-        <Link href="/registro" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>Crear cuenta de usuario →</Link>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} />
+            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.2)" }}>¿Solo quieres comer?</span>
+            <div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} />
+          </div>
+          <Link href="/registro" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>Crear cuenta de usuario →</Link>
         </>
         )}
       </div>
@@ -107,6 +114,5 @@ const cardS: React.CSSProperties = { width: "100%", maxWidth: "400px", backgroun
 const labelS: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "6px", display: "block" };
 const inputS: React.CSSProperties = { width: "100%", padding: "12px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", transition: "border-color 0.2s" };
 const btnS: React.CSSProperties = { width: "100%", padding: "14px", background: "var(--accent)", border: "none", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--bg-primary)", fontWeight: 700, cursor: "pointer", marginTop: "8px" };
-const eyeS: React.CSSProperties = { position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" };
 const fi = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "var(--accent)"; };
 const fo = (e: React.FocusEvent<HTMLInputElement>) => { e.target.style.borderColor = "rgba(232,168,76,0.15)"; };
