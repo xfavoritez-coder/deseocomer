@@ -158,6 +158,7 @@ function ConcursoDetallePage() {
   const [phoneError, setPhoneError] = useState("");
   const [phoneSaving, setPhoneSaving] = useState(false);
   const [showCodigoModal, setShowCodigoModal] = useState(false);
+  const [showCodigoInput, setShowCodigoInput] = useState(false);
   const [codigoInput, setCodigoInput] = useState("");
   const [codigoValidacion, setCodigoValidacion] = useState<{ existe: boolean; nombre?: string } | null>(null);
   const [validandoCodigo, setValidandoCodigo] = useState(false);
@@ -514,6 +515,19 @@ function ConcursoDetallePage() {
         return (
           <>
             {visibles.map((r, i) => renderRow(r, i))}
+            {myEntry && !meVisible && !showAllRanking && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: "rgba(61,184,158,0.04)" }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>{myIndex + 1}</div>
+                {myEntry.fotoUrl ? (
+                  <img src={myEntry.fotoUrl} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(61,184,158,0.3)" }} />
+                ) : (
+                  <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>{myEntry.nombre.charAt(0).toUpperCase()}</div>
+                )}
+                <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = myEntry.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
+                <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+              </div>
+            )}
             {ocultos.length > 0 && !showAllRanking && (
               <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
                 <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {ocultos.length} participante{ocultos.length !== 1 ? "s" : ""} más con 1 punto</span>
@@ -521,16 +535,6 @@ function ConcursoDetallePage() {
               </div>
             )}
             {showAllRanking && ocultos.map((r, i) => renderRow(r, visibles.length + i))}
-            {myEntry && !meVisible && (
-              <div style={{ padding: "10px 14px", background: "rgba(61,184,158,0.06)", borderTop: "1px solid rgba(61,184,158,0.15)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>{myIndex + 1}</div>
-                  <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "#3db89e" }}>Tu posición</span>
-                  <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
-                </div>
-              </div>
-            )}
           </>
         );
       })()}
@@ -945,28 +949,39 @@ function ConcursoDetallePage() {
         </div>
       </div>
 
-      {/* Modal de código de invitación */}
+      {/* Modal de participación */}
       {showCodigoModal && (<>
-        <div onClick={() => setShowCodigoModal(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
+        <div onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: 24, maxWidth: 340, width: "90vw" }}>
-          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8 }}>¿Alguien te invitó?</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16 }}>Si un amigo te compartió su código o link, ingrésalo aquí. Él ganará puntos por tu participación.</p>
-          <input value={codigoInput} onChange={e => {
-            const val = e.target.value.toUpperCase();
-            setCodigoInput(val);
-            setCodigoValidacion(null);
-            if (val.length >= 5) {
-              setValidandoCodigo(true);
-              fetch(`/api/usuarios/codigo/${encodeURIComponent(val)}`).then(r => r.json()).then(d => setCodigoValidacion(d)).catch(() => setCodigoValidacion({ existe: false })).finally(() => setValidandoCodigo(false));
-            }
-          }} placeholder="Ej: MARI234" style={{ width: "100%", padding: 12, background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: 18, textAlign: "center", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", outline: "none", boxSizing: "border-box" }} />
-          {validandoCodigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Verificando...</p>}
-          {codigoValidacion?.existe && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#3db89e", marginTop: 6 }}>&#10003; Código de {codigoValidacion.nombre}</p>}
-          {codigoValidacion && !codigoValidacion.existe && codigoInput.length >= 5 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", marginTop: 6 }}>Código no encontrado</p>}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
-            <button disabled={codigoInput.length > 0 && (!codigoValidacion?.existe)} onClick={() => doJoinWithCode(codigoInput || undefined)} style={{ padding: 12, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", opacity: (codigoInput.length > 0 && !codigoValidacion?.existe) ? 0.5 : 1 }}>{codigoInput && codigoValidacion?.existe ? "Confirmar y participar →" : "Participar →"}</button>
-            {codigoInput.length > 0 && <button onClick={() => { setCodigoInput(""); setCodigoValidacion(null); doJoinWithCode(); }} style={{ padding: 10, background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Participar sin código</button>}
-          </div>
+          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>🏆 Participa en este concurso</h3>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16, textAlign: "center" }}>Únete gratis y gana el premio</p>
+
+          {!showCodigoInput ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <button onClick={() => doJoinWithCode()} style={{ padding: 14, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>Participar →</button>
+              <button onClick={() => setShowCodigoInput(true)} style={{ padding: 0, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", cursor: "pointer", textAlign: "center", lineHeight: 1.5 }}>¿Un amigo te invitó? <span style={{ textDecoration: "underline" }}>Ingresa su código y súmale puntos</span></button>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 12 }}>Ingresa el código de tu amigo. Él ganará puntos por tu participación.</p>
+              <input value={codigoInput} onChange={e => {
+                const val = e.target.value.toUpperCase();
+                setCodigoInput(val);
+                setCodigoValidacion(null);
+                if (val.length >= 5) {
+                  setValidandoCodigo(true);
+                  fetch(`/api/usuarios/codigo/${encodeURIComponent(val)}`).then(r => r.json()).then(d => setCodigoValidacion(d)).catch(() => setCodigoValidacion({ existe: false })).finally(() => setValidandoCodigo(false));
+                }
+              }} placeholder="Ej: MARI234" style={{ width: "100%", padding: 12, background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: 18, textAlign: "center", color: "var(--accent)", letterSpacing: "0.1em", textTransform: "uppercase", outline: "none", boxSizing: "border-box" }} />
+              {validandoCodigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Verificando...</p>}
+              {codigoValidacion?.existe && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#3db89e", marginTop: 6 }}>&#10003; Código de {codigoValidacion.nombre}</p>}
+              {codigoValidacion && !codigoValidacion.existe && codigoInput.length >= 5 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", marginTop: 6 }}>Código no encontrado</p>}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+                <button disabled={codigoInput.length > 0 && (!codigoValidacion?.existe)} onClick={() => doJoinWithCode(codigoInput || undefined)} style={{ padding: 12, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", opacity: (codigoInput.length > 0 && !codigoValidacion?.existe) ? 0.5 : 1 }}>{codigoInput && codigoValidacion?.existe ? `Participar con código de ${codigoValidacion.nombre} →` : "Participar →"}</button>
+                <button onClick={() => { setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ padding: 8, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", cursor: "pointer" }}>← Volver</button>
+              </div>
+            </div>
+          )}
         </div>
       </>)}
 
