@@ -79,6 +79,12 @@ function ConcursoDetallePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [concursoData, setConcursoData] = useState<any>(null);
   const [supportError, setSupportError] = useState("");
+  const [listaEsperaTotal, setListaEsperaTotal] = useState(0);
+  const [listaRegistrado, setListaRegistrado] = useState(false);
+  const [listaEmail, setListaEmail] = useState("");
+  const [listaNombre, setListaNombre] = useState("");
+  const [listaLoading, setListaLoading] = useState(false);
+  const [activationTimer, setActivationTimer] = useState<{ dias: number; horas: number; minutos: number; segundos: number } | null>(null);
   const finalizado = finalizadoMock;
 
   useEffect(() => {
@@ -255,6 +261,35 @@ function ConcursoDetallePage() {
     }
   }, [concursoData?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Lista de espera effects (must be before early returns) ──
+  const cPre = concurso ?? finalizado;
+  const isProgramadoPre = cPre ? (cPre.estado ?? (timer?.ended ? "finalizado" : "activo")) === "programado" : false;
+
+  useEffect(() => {
+    if (!isProgramadoPre || !concursoId) return;
+    fetch(`/api/concursos/${concursoId}/lista-espera`).then(r => r.json()).then(d => setListaEsperaTotal(d.total ?? 0)).catch(() => {});
+  }, [isProgramadoPre, concursoId]);
+
+  useEffect(() => {
+    if (!isProgramadoPre || !cPre?.endsAt) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fechaAct = (concursoData as any)?.fechaActivacion;
+    if (!fechaAct) return;
+    const target = new Date(fechaAct).getTime();
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      setActivationTimer({
+        dias: Math.floor(diff / 86400000),
+        horas: Math.floor((diff % 86400000) / 3600000),
+        minutos: Math.floor((diff % 3600000) / 60000),
+        segundos: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const iid = setInterval(tick, 1000);
+    return () => clearInterval(iid);
+  }, [isProgramadoPre, concursoData]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Loading skeleton ──
   if (dbLoading) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar />
     <div className="dc-skeleton-wrap">
@@ -281,39 +316,6 @@ function ConcursoDetallePage() {
   const dbEstado = c.estado ?? (timer?.ended ? "finalizado" : "activo");
   const isProgramado = dbEstado === "programado";
   const isEnded = !isProgramado && (!!finalizado || !!timer?.ended || (dbEstado !== "activo" && dbEstado !== "programado"));
-
-  // Lista de espera state for programado
-  const [listaEsperaTotal, setListaEsperaTotal] = useState(0);
-  const [listaRegistrado, setListaRegistrado] = useState(false);
-  const [listaEmail, setListaEmail] = useState("");
-  const [listaNombre, setListaNombre] = useState("");
-  const [listaLoading, setListaLoading] = useState(false);
-  const [activationTimer, setActivationTimer] = useState<{ dias: number; horas: number; minutos: number; segundos: number } | null>(null);
-
-  useEffect(() => {
-    if (!isProgramado || !concursoId) return;
-    fetch(`/api/concursos/${concursoId}/lista-espera`).then(r => r.json()).then(d => setListaEsperaTotal(d.total ?? 0)).catch(() => {});
-  }, [isProgramado, concursoId]);
-
-  useEffect(() => {
-    if (!isProgramado || !c?.endsAt) return;
-    // fechaActivacion is stored in concursoData from the API
-    const fechaAct = (concursoData as any)?.fechaActivacion;
-    if (!fechaAct) return;
-    const target = new Date(fechaAct).getTime();
-    const tick = () => {
-      const diff = Math.max(0, target - Date.now());
-      setActivationTimer({
-        dias: Math.floor(diff / 86400000),
-        horas: Math.floor((diff % 86400000) / 3600000),
-        minutos: Math.floor((diff % 3600000) / 60000),
-        segundos: Math.floor((diff % 60000) / 1000),
-      });
-    };
-    tick();
-    const iid = setInterval(tick, 1000);
-    return () => clearInterval(iid);
-  }, [isProgramado, concursoData]);
 
   const handleListaEspera = async () => {
     setListaLoading(true);
