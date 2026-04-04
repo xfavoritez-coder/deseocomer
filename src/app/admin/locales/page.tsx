@@ -7,7 +7,7 @@ import SubirFoto from "@/components/SubirFoto";
 type L = any;
 
 const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
-const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","Japonés","Italiano","Sin gluten","Café","Postres","Desayuno","Brunch","Delivery","Para llevar","Reservas"];
+const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","Japonés","Italiano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 export default function AdminLocales() {
   const [locales, setLocales] = useState<L[]>([]);
@@ -134,12 +134,12 @@ export default function AdminLocales() {
             </div>
           </div>
           <div style={{ marginBottom: "10px" }}>
-            <label style={labelS}>Etiquetas (máx. 4)</label>
+            <label style={labelS}>Etiquetas (máx. 6)</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {TAGS.map(tag => {
                 const tags: string[] = editData.tags ? (typeof editData.tags === "string" ? JSON.parse(editData.tags) : editData.tags) : [];
                 const sel2 = tags.includes(tag);
-                const maxed = tags.length >= 4 && !sel2;
+                const maxed = tags.length >= 6 && !sel2;
                 return <button key={tag} type="button" disabled={maxed} onClick={() => {
                   const cur: string[] = editData.tags ? (typeof editData.tags === "string" ? JSON.parse(editData.tags) : editData.tags) : [];
                   const next = sel2 ? cur.filter(t => t !== tag) : [...cur, tag];

@@ -406,7 +406,7 @@ export default function AdminUsuarios() {
           <div style={{ marginBottom: "10px" }}>
             <label style={labelS}>Comidas favoritas (máx. 3)</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Pastas", "Pollo", "Parrilla", "Mariscos", "Café", "Saludable", "Postres", "Brunch"].map(c => {
+              {["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "Japonés", "Italiano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"].map(c => {
                 const comidas: string[] = Array.isArray(editData.comidasFavoritas) ? editData.comidasFavoritas : [];
                 const sel = comidas.includes(c);
                 const maxed = comidas.length >= 3 && !sel;

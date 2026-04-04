@@ -194,7 +194,7 @@ function RegistroContent() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "20px" }}>
                 {(() => {
-                  const TODAS = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Pastas", "Pollo", "Parrilla", "Mariscos", "Café", "Saludable", "Postres", "Brunch", "Árabe", "Peruano", "Italiano"];
+                  const TODAS = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "Japonés", "Italiano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"];
                   const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : [];
                   const opciones = TODAS.filter(c => !excluir.includes(c));
                   return opciones.map(c => {
