@@ -521,9 +521,9 @@ export default function PanelConcursos() {
   );
 
   return (<div>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px", width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
-      <button onClick={() => setWizard(true)} style={{ ...B, padding: "10px 16px", fontSize: "0.78rem", whiteSpace: "nowrap", flexShrink: 0 }}>+ Nuevo</button>
+      <button onClick={() => setWizard(true)} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0 }}>+ Concurso</button>
     </div>
 
     {/* Filtros */}
@@ -550,7 +550,7 @@ export default function PanelConcursos() {
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)" }}>No hay concursos en esta categoría</p>
       </div>
     ) : (
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
         {concursosFiltrados.map(c => {
           const restMs = Math.max(0, new Date(c.fechaFin).getTime() - Date.now());
           const ended = restMs <= 0;
@@ -560,34 +560,42 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: 16, overflow: "hidden" }}>
-              {c.imagenUrl ? (
-                <div style={{ position: "relative", height: 120 }}>
-                  <img src={c.imagenUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(10,8,18,0.85) 100%)" }} />
-                  <div style={{ position: "absolute", bottom: 10, left: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                    {!ended ? (
-                      <span style={{ background: "rgba(10,8,18,0.7)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#3db89e", letterSpacing: "0.08em" }}>● {tiempoStr} restantes</span>
-                    ) : (
-                      <span style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${c.estado === "completado" || c.premioEntregado ? "rgba(61,184,158,0.4)" : "rgba(255,128,128,0.3)"}`, borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: c.estado === "completado" || c.premioEntregado ? "#3db89e" : "#ff8080", letterSpacing: "0.08em" }}>
-                        {c.estado === "completado" || c.premioEntregado ? "✓ Premio entregado" : c.estado === "en_disputa" ? "Disputa activa" : c.estado === "expirado" ? "Expirado" : c.estado === "en_revision" ? "En revisión" : "Pendiente de entrega"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ height: 60, background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem" }}>🏆</div>
-              )}
-              <div style={{ padding: "12px 14px" }} onClick={() => setDetalle(c)}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>
-              </div>
-              <div style={{ display: "flex", gap: 6, padding: "0 12px 12px", borderTop: "1px solid rgba(232,168,76,0.06)", paddingTop: 10 }}>
-                {c.estado !== "cancelado" && !c.cancelado && (
-                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸 Compartir</button>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", display: "flex", alignItems: "stretch", width: "100%", boxSizing: "border-box" }}>
+              <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
+                {c.imagenUrl ? (
+                  <img src={c.imagenUrl} alt="" style={{ width: 80, height: 80, objectFit: "cover", display: "block" }} />
+                ) : (
+                  <div style={{ width: 80, height: 80, background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.9))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🏆</div>
                 )}
-                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
-                <button onClick={() => setDetalle(c)} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
+              </a>
+              <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, minWidth: 0, textDecoration: "none" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>{c.premio}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  {!ended ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#3db89e" }}>
+                      <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#3db89e", flexShrink: 0, animation: "dcPulse 1.5s ease-in-out infinite" }} />
+                      {tiempoStr} restantes
+                    </span>
+                  ) : c.estado === "completado" || c.premioEntregado ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.25)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#3db89e" }}>✓ Premio entregado</span>
+                  ) : c.estado === "en_disputa" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.25)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#ff6b6b" }}>Disputa activa</span>
+                  ) : c.estado === "expirado" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)" }}>Expirado</span>
+                  ) : c.estado === "en_revision" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c" }}>En revisión</span>
+                  ) : (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(255,128,128,0.08)", border: "1px solid rgba(255,128,128,0.2)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#ff8080" }}>⏳ Pendiente</span>
+                  )}
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", margin: 0 }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>
+              </a>
+              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 5, padding: "10px 10px", borderLeft: "1px solid rgba(232,168,76,0.06)", flexShrink: 0 }}>
+                {c.estado !== "cancelado" && !c.cancelado && (
+                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer", whiteSpace: "nowrap" }}>📸 Compartir</button>
+                )}
+                <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>Editar</button>
+                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer", whiteSpace: "nowrap" }}>Detalle</button>
               </div>
             </div>
           );
