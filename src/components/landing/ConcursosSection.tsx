@@ -220,14 +220,14 @@ export default function ConcursosSection() {
                       {esProgramado ? <>🔔 {c.listaEspera ?? 0} en espera</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
                     </span>
                     {!ended && (
-                      <span className={esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
+                      <span className={esProgramado ? "dc-cst-btn dc-cst-btn-prog" : esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
                         fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
                         border: `1px solid ${esProgramado ? "rgba(167,139,250,0.4)" : misConcursos.has(c.id) ? "rgba(61,184,158,0.4)" : esUrgente ? urgColor : "var(--accent)"}`,
                         color: esProgramado ? "#a78bfa" : misConcursos.has(c.id) ? "#3db89e" : esUrgente ? urgColor : "var(--accent)",
                         background: "transparent",
                       }}>
-                        {esProgramado ? "Ver detalles" : misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
+                        {esProgramado ? "🔔 Avisarme →" : misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                       </span>
                     )}
                   </div>
@@ -269,6 +269,7 @@ export default function ConcursosSection() {
           .dc-cst-desc { display: -webkit-box !important; }
           .dc-cst-btn { background: var(--accent) !important; color: var(--bg-primary) !important; border-color: var(--accent) !important; }
           .dc-cst-btn-urgent { background: #e05555 !important; color: #fff !important; border-color: #e05555 !important; }
+          .dc-cst-btn-prog { background: rgba(167,139,250,0.15) !important; color: #a78bfa !important; border-color: rgba(167,139,250,0.4) !important; }
         }
         @media (min-width: 1024px) {
           .dc-cst-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }

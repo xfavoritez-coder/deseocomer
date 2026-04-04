@@ -756,7 +756,7 @@ function ConcursoDetallePage() {
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)" }}>Los concursos son para usuarios de DeseoComer</p>
               )}
             </div>
-          ) : !isEnded ? (
+          ) : !isEnded && !isProgramado ? (
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
