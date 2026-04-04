@@ -75,7 +75,7 @@ export default function PromocionDetailPage() {
     condiciones: dbPromo.condiciones ?? undefined,
     // Extra fields from API
     direccion: dbPromo.local?.direccion,
-    telefono: dbPromo.local?.telefono ?? dbPromo.local?.instagram,
+    telefono: dbPromo.local?.telefono ?? null,
     logoUrl: dbPromo.local?.logoUrl,
     instagram: dbPromo.local?.instagram,
     linkPedido: dbPromo.local?.linkPedido,
