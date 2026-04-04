@@ -176,7 +176,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
             data: {
               usuarioId: referidorNivel2Id,
               tipo: "nivel2",
-              mensaje: `La red de ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} te sumó +1 punto 🧞`,
+              mensaje: `+1 punto — ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} trajo a alguien a tu red 🧞`,
             },
           }).catch(() => {});
         }

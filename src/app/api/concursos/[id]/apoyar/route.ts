@@ -62,7 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: {
         usuarioId: targetUsuarioId,
         tipo: "apoyo_recibido",
-        mensaje: `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón en "${concurso.premio}". +1 pt 💛`,
+        mensaje: `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón. +1 pt 💛`,
       },
     }).catch(() => {});
 

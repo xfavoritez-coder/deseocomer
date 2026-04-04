@@ -132,7 +132,7 @@ export default function Navbar() {
             ) : isAuthenticated && user ? (
               <div className="dc-nav-user">
                 <div ref={notifRef} style={{ position: "relative" }}>
-                  <button onClick={() => setShowNotifs(!showNotifs)} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
+                  <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
                     <span style={{ fontSize: "1.1rem" }}>🔔</span>
                     {notifCount > 0 && (
                       <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
