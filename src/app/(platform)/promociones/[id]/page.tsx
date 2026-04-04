@@ -24,9 +24,9 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
   if (t === "2x1") return { text: "2×1", color: "#3db89e" };
   if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
-  if (t === "cupon" || t === "cupón") return { text: "PROMO", color: "#e8a84c" };
-  if (t === "precio_especial" || t === "especial") return { text: "PROMO", color: "#e8a84c" };
-  if (t === "combo" || t === "promo") return { text: "PROMO", color: "#e8a84c" };
+  if (t === "cupon" || t === "cupón") return { text: "COMBO", color: "#e8a84c" };
+  if (t === "precio_especial" || t === "especial") return { text: "COMBO", color: "#e8a84c" };
+  if (t === "combo" || t === "promo") return { text: "COMBO", color: "#e8a84c" };
   if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
   return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
 }

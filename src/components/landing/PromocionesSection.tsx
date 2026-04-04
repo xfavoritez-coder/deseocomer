@@ -180,11 +180,11 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
               : tLower === "descuento" || tLower === "descuento %" || promo.porcentajeDescuento
               ? { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" }
               : tLower === "cupon" || tLower === "cupón"
-              ? { text: "PROMO", color: "#e8a84c" }
+              ? { text: "COMBO", color: "#e8a84c" }
               : tLower === "precio_especial" || tLower === "especial"
-              ? { text: "PROMO", color: "#e8a84c" }
+              ? { text: "COMBO", color: "#e8a84c" }
               : tLower === "combo" || tLower === "promo"
-              ? { text: "PROMO", color: "#e8a84c" }
+              ? { text: "COMBO", color: "#e8a84c" }
               : tLower === "regalo"
               ? { text: "REGALO", color: "#e8a84c" }
               : null;
