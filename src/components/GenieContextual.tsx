@@ -97,6 +97,13 @@ function getMensajeContextual(
   return null;
 }
 
+function getSeccion(pathname: string): string {
+  if (pathname === "/concursos" || pathname.startsWith("/concursos/")) return "/concursos";
+  if (pathname === "/locales" || pathname.startsWith("/locales/")) return "/locales";
+  if (pathname === "/promociones" || pathname.startsWith("/promociones/")) return "/promociones";
+  return pathname;
+}
+
 export default function GenieContextual() {
   const pathname = usePathname();
   const { perfil, setToastActivo, toastActivo, userName, isLoggedIn } = useGenie();
@@ -109,18 +116,19 @@ export default function GenieContextual() {
     if (pathname.startsWith("/panel") || pathname.startsWith("/admin") || pathname.startsWith("/login") || pathname.startsWith("/registro") || pathname.startsWith("/reset-password") || pathname.startsWith("/verificar-email") || pathname.startsWith("/login-local")) return;
     if (pathname === "/") return;
     if (pathname.startsWith("/concursos/como-funciona")) return;
-    if (yaVisto(pathname)) return;
-    try { const d = JSON.parse(localStorage.getItem("genio_toasts_dismissed") ?? "{}"); if (d["contextual_" + pathname]) return; } catch {}
+    const seccion = getSeccion(pathname);
+    if (yaVisto(seccion)) return;
+    try { const d = JSON.parse(localStorage.getItem("genio_toasts_dismissed") ?? "{}"); if (d["contextual_" + seccion]) return; } catch {}
 
     const timer = setTimeout(() => {
       if (toastRef.current) return;
-      if (yaVisto(pathname)) return;
+      if (yaVisto(seccion)) return;
 
       const mensaje = getMensajeContextual(pathname, perfil, userName, isLoggedIn);
       if (mensaje) {
-        marcarVisto(pathname);
+        marcarVisto(seccion);
         setToastActivo({
-          id: "contextual_" + pathname,
+          id: "contextual_" + seccion,
           mensaje: mensaje.texto,
           opciones: mensaje.opciones,
         });

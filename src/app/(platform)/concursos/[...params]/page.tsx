@@ -490,8 +490,10 @@ function ConcursoDetallePage() {
       ) : (() => {
         const conMasDe1 = ranking.filter(r => r.referidos > 1);
         const con1 = ranking.filter(r => r.referidos <= 1);
-        const visibles = conMasDe1.length > 0 ? conMasDe1 : ranking.slice(0, 5);
-        const ocultos = conMasDe1.length > 0 ? con1 : ranking.slice(5);
+        const allVisibles = conMasDe1.length > 0 ? conMasDe1 : ranking.slice(0, 5);
+        const allOcultos = conMasDe1.length > 0 ? con1 : ranking.slice(5);
+        const visibles = allVisibles.slice(0, 6);
+        const ocultos = [...allVisibles.slice(6), ...allOcultos];
         const myName = user?.nombre?.split(" ")[0] ?? "";
         const myIndex = ranking.findIndex(r => isAuthenticated && user && r.nombre.startsWith(myName));
         const myEntry = myIndex >= 0 ? ranking[myIndex] : null;

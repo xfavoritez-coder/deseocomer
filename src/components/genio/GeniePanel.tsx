@@ -156,18 +156,7 @@ export default function GeniePanel() {
             <div>
               <p style={PREGUNTA}>{isLoggedIn && userName ? `Hola ${userName} ✨ ¿Cómo quieres comer hoy?` : "¿Cómo quieres comer hoy? 🧞"}</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {["Comer en el local", "Delivery a domicilio", "Retiro en local"].map(m => <button key={m} onClick={() => { setModalidad(m); addInteraccion("modalidad_seleccionada", { modalidad: m }); setStepActual(1); }} style={CHIP}>{m}</button>)}
-              </div>
-            </div>
-          )}
-
-          {/* Step 1: Ocasión */}
-          {stepActual === 1 && (
-            <div>
-              <button onClick={() => setStepActual(0)} style={VOLVER}>← Volver</button>
-              <p style={PREGUNTA}>{isLoggedIn && userName ? `Hola ${userName} ✨ ¿Qué deseas hoy?` : getSaludo()}</p>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {getOcasiones(modalidad).map(o => <button key={o} onClick={() => handleOcasion(o)} style={CHIP}>{o}</button>)}
+                {["Comer en el local", "Delivery a domicilio", "Retiro en local"].map(m => <button key={m} onClick={() => { setModalidad(m); addInteraccion("modalidad_seleccionada", { modalidad: m }); setStepActual(2); }} style={CHIP}>{m}</button>)}
               </div>
             </div>
           )}
@@ -175,7 +164,7 @@ export default function GeniePanel() {
           {/* Step 2: Comuna */}
           {stepActual === 2 && (
             <div>
-              <button onClick={() => setStepActual(1)} style={VOLVER}>← Volver</button>
+              <button onClick={() => setStepActual(0)} style={VOLVER}>← Volver</button>
               <p style={PREGUNTA}>{modalidad === "Delivery a domicilio" ? "¿A qué comuna quieres que te llegue?" : modalidad === "Retiro en local" ? "¿Desde qué zona vas a retirar?" : "¿En qué zona estás?"}</p>
               <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComuna} onChange={e => setBusquedaComuna(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "10px" }} />
