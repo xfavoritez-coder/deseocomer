@@ -136,6 +136,14 @@ function ConcursoDetallePage() {
   }, [infoTooltip]);
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
+  const [esLocal, setEsLocal] = useState(false);
+  const [localId, setLocalId] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      const ls = JSON.parse(localStorage.getItem("deseocomer_local_session") ?? "{}");
+      if (ls?.id && ls?.loggedIn) { setEsLocal(true); setLocalId(ls.id); }
+    } catch {}
+  }, []);
   const [joinLoading, setJoinLoading] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -621,7 +629,19 @@ function ConcursoDetallePage() {
           )}
 
           {/* 4. Link de participación (solo activos) / CTA concursos (finalizados) */}
-          {!isEnded ? (
+          {esLocal && !isEnded ? (
+            <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, padding: 20, textAlign: "center" }}>
+              {localId === c.localId ? (
+                <>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#3db89e", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 8 }}>Este es tu concurso</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", marginBottom: 14 }}>{c.participantes} {c.participantes === 1 ? "participante" : "participantes"}</p>
+                  <a href="/panel/concursos" style={{ display: "inline-block", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 10, padding: "10px 20px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#3db89e", textDecoration: "none", fontWeight: 700 }}>Ir a mi panel →</a>
+                </>
+              ) : (
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)" }}>Los concursos son para usuarios de DeseoComer</p>
+              )}
+            </div>
+          ) : !isEnded ? (
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>

@@ -9,7 +9,7 @@ const DATA_KEY = "deseocomer_panel_local_data";
 const COMUNAS_SANTIAGO = ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort();
 const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","Japonés","Italiano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
+const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 interface HorarioDia { activo: boolean; abre: string; cierra: string }
 interface MenuItem { nombre: string; descripcion: string; precio: string; destacado: boolean }

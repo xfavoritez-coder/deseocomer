@@ -7,7 +7,7 @@ import SubirFoto from "@/components/SubirFoto";
 type L = any;
 
 const CATEGORIAS = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
-const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","Japonés","Italiano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
+const TAGS = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 export default function AdminLocales() {
   const [locales, setLocales] = useState<L[]>([]);
