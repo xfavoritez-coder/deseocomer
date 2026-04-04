@@ -56,7 +56,7 @@ function getOcasiones(mod: string): string[] {
     if (h >= 7 && h < 12) return ["Desayuno a domicilio", "Brunch en casa"];
     if (h >= 12 && h < 16) return ["Almuerzo", "Para la oficina", "Reunión de trabajo"];
     if (h >= 16 && h < 20) return ["Once en casa", "Antojo de tarde"];
-    if (h >= 20) return ["Cena en casa", "Antojo nocturno", "Para la familia"];
+    if (h >= 20) return ["Cena romántica en casa", "Cena en pareja", "Cena en casa", "Antojo nocturno", "Para la familia"];
     return ["Antojo nocturno"];
   }
   if (mod === "Retiro en local") {

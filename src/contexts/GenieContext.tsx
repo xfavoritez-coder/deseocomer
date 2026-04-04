@@ -370,10 +370,20 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       });
     }
 
-    // Filter by comuna STRICTLY
+    // Filter by comuna — try exact match first, then delivery coverage
     if (comuna) {
       const comLower = comuna.toLowerCase();
-      candidates = candidates.filter(l => l.comuna.toLowerCase() === comLower);
+      const exactMatch = candidates.filter(l => l.comuna.toLowerCase() === comLower);
+      if (exactMatch.length > 0) {
+        candidates = exactMatch;
+      } else {
+        // Try locales that deliver to this comuna
+        const deliveryMatch = candidates.filter(l => l.comunasDelivery?.some(c => c.toLowerCase() === comLower));
+        if (deliveryMatch.length > 0) {
+          candidates = deliveryMatch;
+        }
+        // If still nothing, keep all candidates (don't filter by comuna)
+      }
     }
 
     // If no candidates, return null
