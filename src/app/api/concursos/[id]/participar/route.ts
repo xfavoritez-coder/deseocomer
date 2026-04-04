@@ -57,11 +57,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
     });
 
-    // Notificación madrugador
+    // Notificación madrugador (con dedup)
     if (esMadrugador) {
-      prisma.notificacion.create({
-        data: { usuarioId, tipo: "madrugador", mensaje: "¡Entraste entre los primeros 10! +2 pts bonus ⚡" }
-      }).catch(() => {});
+      const yaNotifMad = await prisma.notificacion.findFirst({ where: { usuarioId, tipo: "madrugador", createdAt: { gte: new Date(Date.now() - 60000) } } });
+      if (!yaNotifMad) prisma.notificacion.create({ data: { usuarioId, tipo: "madrugador", mensaje: "¡Entraste entre los primeros 10! +2 pts bonus ⚡" } }).catch(() => {});
     }
 
     // Incrementar totalConcursosParticipados
@@ -123,17 +122,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           });
         }
 
-        // Notification
+        // Notification (con dedup)
         const refNombre = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
-        prisma.notificacion.create({
-          data: {
-            usuarioId: referidoPor,
-            tipo: esNuevo ? "referido_nuevo" : "referido_existente",
-            mensaje: esNuevo
-              ? `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} se registró con tu link. +${puntosRef} pts para ti 🎉`
-              : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código. +${puntosRef} pts 👏`,
-          }
-        }).catch(() => {});
+        const msgRef = esNuevo
+          ? `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} se registró con tu link. +${puntosRef} pts para ti 🎉`
+          : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código. +${puntosRef} pts 👏`;
+        const yaNotifRef = await prisma.notificacion.findFirst({ where: { usuarioId: referidoPor, mensaje: msgRef, createdAt: { gte: new Date(Date.now() - 60000) } } });
+        if (!yaNotifRef) prisma.notificacion.create({ data: { usuarioId: referidoPor, tipo: esNuevo ? "referido_nuevo" : "referido_existente", mensaje: msgRef } }).catch(() => {});
       }
     }
 
@@ -172,13 +167,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           const refDirectoNombre = referidorDirectoId
             ? await prisma.usuario.findUnique({ where: { id: referidorDirectoId }, select: { nombre: true } })
             : null;
-          prisma.notificacion.create({
-            data: {
-              usuarioId: referidorNivel2Id,
-              tipo: "nivel2",
-              mensaje: `+1 punto — ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} trajo a alguien a tu red 🧞`,
-            },
-          }).catch(() => {});
+          const msgN2 = `+1 punto — ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} trajo a alguien a tu red 🧞`;
+          const yaNotifN2 = await prisma.notificacion.findFirst({ where: { usuarioId: referidorNivel2Id, mensaje: msgN2, createdAt: { gte: new Date(Date.now() - 60000) } } });
+          if (!yaNotifN2) prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: msgN2 } }).catch(() => {});
         }
       }
     }

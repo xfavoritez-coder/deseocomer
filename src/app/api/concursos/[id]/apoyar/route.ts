@@ -58,13 +58,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Notification: apoyo recibido
     const supporterUser = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { nombre: true } });
-    prisma.notificacion.create({
-      data: {
-        usuarioId: targetUsuarioId,
-        tipo: "apoyo_recibido",
-        mensaje: `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón. +1 pt 💛`,
-      },
-    }).catch(() => {});
+    const msgApoyo = `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón. +1 pt 💛`;
+    const yaNotifApoyo = await prisma.notificacion.findFirst({ where: { usuarioId: targetUsuarioId, mensaje: msgApoyo, createdAt: { gte: new Date(Date.now() - 60000) } } });
+    if (!yaNotifApoyo) prisma.notificacion.create({ data: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", mensaje: msgApoyo } }).catch(() => {});
 
     return NextResponse.json({ ok: true });
   } catch {

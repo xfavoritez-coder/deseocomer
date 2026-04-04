@@ -497,7 +497,8 @@ export default function LocalDetailPage() {
                     )}
                     {local.linkPedido && (() => {
                       const esWA = /^(\+?56)?[0-9]{8,9}$/.test(local.linkPedido.replace(/\s/g, ""));
-                      const href = esWA ? `https://wa.me/${local.linkPedido.replace(/\D/g, "").replace(/^(?!56)/, "56")}` : local.linkPedido;
+                      const rawUrl = local.linkPedido;
+                      const href = esWA ? `https://wa.me/${rawUrl.replace(/\D/g, "").replace(/^(?!56)/, "56")}` : (rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`);
                       return <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", padding: "12px 20px", borderRadius: "10px", background: esWA ? "rgba(37,211,102,0.1)" : "rgba(61,184,158,0.1)", border: `1px solid ${esWA ? "rgba(37,211,102,0.3)" : "rgba(61,184,158,0.3)"}`, color: esWA ? "#25d366" : "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", textDecoration: "none", textAlign: "center", marginBottom: "12px", boxSizing: "border-box" as const }}>{esWA ? "Pedir por WhatsApp" : "Pedir online"}</a>;
                     })()}
                     <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
