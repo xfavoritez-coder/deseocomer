@@ -327,7 +327,6 @@ export default function GeniePanel() {
 
             {/* Body */}
             <div style={{ padding: "12px 16px" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "15px", fontWeight: 700, color: "#f5d080", textTransform: "uppercase", marginBottom: "4px" }}>{r.nombre}</p>
               <div style={{ display: "flex", gap: "6px", fontSize: "13px", marginBottom: "12px", alignItems: "center" }}>
                 <span style={{ color: "rgba(240,234,214,0.4)" }}>{r.comuna}</span>
                 <span style={{ color: "rgba(240,234,214,0.18)" }}>·</span>
