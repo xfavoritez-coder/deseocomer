@@ -715,7 +715,7 @@ function ConcursoDetallePage() {
   { icon: "👥", pts: "+2", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 2 puntos por cada uno.", ttPts: "+2 puntos" },
   { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
   { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
-  { icon: "💛", pts: "+1", label: "Al apoyar", id: "tt6", ttTitle: "Al apoyar a otro", ttText: "Toca el corazón junto a cualquier participante en el ranking para darle +1 punto. Puedes apoyar una vez cada 24 horas.", ttPts: "+1 punto al otro" },
+  { icon: "💛", pts: "+1", label: "Al recibir apoyo", id: "tt6", ttTitle: "Al recibir apoyo", ttText: "Cuando otro participante toca el corazón en tu perfil del ranking, tú ganas +1 punto. Solo puedes recibir un apoyo por persona cada 24 horas.", ttPts: "+1 punto para ti" },
 ].map((s, idx) => {
                   const isTop = idx < 3;
                   const col = idx % 3;

@@ -100,7 +100,7 @@ export default async function ComoFuncionaPage() {
               { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
               { icon: "🔗", pts: "+1", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
               { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
-              { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Al apoyar a otro participante", highlight: false },
+              { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Al recibir apoyo de otro participante", highlight: false },
             ].map((p, i) => (
               <div key={i} style={{ background: p.highlight ? "rgba(232,168,76,0.07)" : "rgba(255,255,255,0.03)", border: p.highlight ? "1px solid rgba(232,168,76,0.3)" : "0.5px solid rgba(232,168,76,0.1)", borderRadius: "16px", padding: "clamp(16px,3vw,28px) clamp(12px,2vw,20px)", textAlign: "center" }}>
                 <div style={{ fontSize: "clamp(1.5rem,3vw,2rem)", marginBottom: "12px" }}>{p.icon}</div>
