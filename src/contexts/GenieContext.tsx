@@ -354,7 +354,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     // Filter by modalidad
     if (modalidad === "Delivery a domicilio") {
       candidates = candidates.filter(l => l.tieneDelivery === true);
-      if (comuna) candidates = candidates.filter(l => l.comunasDelivery?.includes(comuna));
+      if (comuna) candidates = candidates.filter(l => l.comunasDelivery?.includes(comuna) || l.comuna.toLowerCase() === comuna.toLowerCase());
     } else if (modalidad === "Retiro en local") {
       candidates = candidates.filter(l => l.tieneRetiro === true);
     }
@@ -430,7 +430,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [addInteraccion, showFavoritoToast]);
 
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => l.comunasDelivery ?? []))] }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))] }}>
       {children}
     </GenieContext.Provider>
   );
