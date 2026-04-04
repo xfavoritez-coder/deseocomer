@@ -6,7 +6,7 @@
   "crons": [
     {
       "path": "/api/cron/cerrar-concursos",
-      "schedule": "0 12 * * *"
+      "schedule": "0 0,6,12,18 * * *"
     },
     {
       "path": "/api/cron/recordatorios-locales",

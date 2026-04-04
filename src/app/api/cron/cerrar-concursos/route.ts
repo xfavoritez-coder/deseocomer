@@ -74,7 +74,8 @@ export async function GET(req: NextRequest) {
 
   try {
     // ════════════════════════════════════════════════════════════════════════
-    // PASO 0: Recordatorio 24h a participantes de concursos que terminan hoy
+    // PASO 0: Recordatorio a participantes de concursos que van a cerrar
+    // 3 días → cuando quedan ≤24h | 1 día → cuando quedan ≤8h
     // ════════════════════════════════════════════════════════════════════════
 
     const en24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -97,7 +98,19 @@ export async function GET(req: NextRequest) {
 
     for (const c of concursosTerminanHoy) {
       if (c._count.participantes < 3) {
-        log.push(`[24H_SKIP] ${c.id} - menos de 3 participantes`);
+        log.push(`[REC_SKIP] ${c.id} - menos de 3 participantes`);
+        continue;
+      }
+
+      // Detectar duración: si ≤30h es concurso de 1 día → solo enviar cuando quedan ≤8h
+      const duracionMs = c.fechaActivacion
+        ? new Date(c.fechaFin).getTime() - new Date(c.fechaActivacion).getTime()
+        : null;
+      const esConcurso1Dia = duracionMs !== null && duracionMs <= 30 * 3600000;
+      const horasRestantes = (new Date(c.fechaFin).getTime() - now.getTime()) / 3600000;
+
+      if (esConcurso1Dia && horasRestantes > 8) {
+        log.push(`[REC_WAIT] ${c.id} "${c.premio}" - concurso 1 día, quedan ${Math.round(horasRestantes)}h, esperando ≤8h`);
         continue;
       }
 
