@@ -215,7 +215,7 @@ export default function PanelConcursos() {
               {!terminado && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{tiempoDetalle} restantes</span>}
             </div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "4px" }}>{detalle.premio}</h2>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 {participantes} participantes</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)" }}>👥 {participantes} {participantes === 1 ? "participante" : "participantes"}</p>
           </div>
         </div>
 
@@ -523,7 +523,7 @@ export default function PanelConcursos() {
   return (<div>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
-      <button onClick={() => setWizard(true)} style={B}>+ Concurso</button>
+      <button onClick={() => setWizard(true)} style={{ ...B, padding: "10px 16px", fontSize: "0.78rem", whiteSpace: "nowrap", flexShrink: 0 }}>+ Nuevo</button>
     </div>
 
     {/* Filtros */}
@@ -560,32 +560,34 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} className="dc-panel-concurso-card" style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", overflow: "hidden", transition: "border-color 0.2s" }}>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                {c.imagenUrl ? (
-                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0 }}>
-                    <img src={c.imagenUrl} alt="" style={{ width: "70px", height: "70px", objectFit: "cover", display: "block" }} />
-                  </a>
-                ) : (
-                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ width: "70px", height: "70px", flexShrink: 0, background: "linear-gradient(135deg, rgba(232,168,76,0.15), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", textDecoration: "none" }}>🏆</a>
-                )}
-                <div onClick={() => setDetalle(c)} style={{ flex: 1, padding: "12px 16px", cursor: "pointer", minWidth: 0, overflow: "hidden" }}>
-                  <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textDecoration: "none", display: "block" }}>{c.premio}</a>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                    {parts} participantes · {ended ? (
-                      c.estado === "completado" || c.premioEntregado ? <span style={{ color: "#8b5cf6" }}>✓ Entregado</span> :
-                      c.estado === "en_disputa" ? <span style={{ color: "#ff6b6b" }}>Disputa activa</span> :
-                      c.estado === "expirado" ? <span style={{ color: "rgba(240,234,214,0.4)" }}>Expirado</span> :
-                      c.estado === "en_revision" ? <span style={{ color: "#e8a84c" }}>En revisión</span> :
-                      <span style={{ color: "#ff8080" }}>Pendiente de entrega</span>
-                    ) : <span style={{ color: "#3db89e" }}>{tiempoStr} restantes</span>}
-                  </p>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: 16, overflow: "hidden" }}>
+              {c.imagenUrl ? (
+                <div style={{ position: "relative", height: 120 }}>
+                  <img src={c.imagenUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 40%, rgba(10,8,18,0.85) 100%)" }} />
+                  <div style={{ position: "absolute", bottom: 10, left: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                    {!ended ? (
+                      <span style={{ background: "rgba(10,8,18,0.7)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#3db89e", letterSpacing: "0.08em" }}>● {tiempoStr} restantes</span>
+                    ) : (
+                      <span style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${c.estado === "completado" || c.premioEntregado ? "rgba(61,184,158,0.4)" : "rgba(255,128,128,0.3)"}`, borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: c.estado === "completado" || c.premioEntregado ? "#3db89e" : "#ff8080", letterSpacing: "0.08em" }}>
+                        {c.estado === "completado" || c.premioEntregado ? "✓ Premio entregado" : c.estado === "en_disputa" ? "Disputa activa" : c.estado === "expirado" ? "Expirado" : c.estado === "en_revision" ? "En revisión" : "Pendiente de entrega"}
+                      </span>
+                    )}
+                  </div>
                 </div>
+              ) : (
+                <div style={{ height: 60, background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.85))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.8rem" }}>🏆</div>
+              )}
+              <div style={{ padding: "12px 14px" }} onClick={() => setDetalle(c)}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: 4, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)" }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>
               </div>
-              <div style={{ display: "flex", gap: 6, padding: "0 12px 12px", flexWrap: "wrap" }}>
-                {(c.estado !== "cancelado" && !c.cancelado) && <button onClick={(e) => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px" }}>📸 Compartir</button>}
-                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
-                <button onClick={() => setDetalle(c)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
+              <div style={{ display: "flex", gap: 6, padding: "0 12px 12px", borderTop: "1px solid rgba(232,168,76,0.06)", paddingTop: 10 }}>
+                {c.estado !== "cancelado" && !c.cancelado && (
+                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "rgba(240,234,214,0.5)", cursor: "pointer" }}>📸 Compartir</button>
+                )}
+                <button onClick={() => { setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--accent)", cursor: "pointer" }}>Editar</button>
+                <button onClick={() => setDetalle(c)} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "8px 6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--text-muted)", cursor: "pointer" }}>Detalle</button>
               </div>
             </div>
           );
