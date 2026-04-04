@@ -340,12 +340,10 @@ export default function ConcursosPage() {
                       const actHoras = Math.floor((actMs % 86400000) / 3600000);
                       const actTexto = actDias > 0 ? `${actDias} día${actDias > 1 ? "s" : ""} ${actHoras}h` : `${actHoras}h`;
                       const wc = c.listaEsperaCount ?? 0;
-                      const wcTexto = wc === 0 ? "Sé el primero en anotarte" : wc <= 10 ? "Pocas personas esperando" : wc <= 50 ? `${wc} personas esperando` : `¡${wc} personas esperando este concurso!`;
                       return (
                         <div style={{ marginBottom: 10 }}>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 4 }}>Se activa en {actTexto}</p>
                           <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", marginBottom: 4, whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(167,139,250,0.7)", marginTop: 4 }}>{wcTexto}</p>
                         </div>
                       );
                     })()}
@@ -384,7 +382,7 @@ export default function ConcursosPage() {
                     {/* Participantes / En espera */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.estado === "programado" ? "En espera" : c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.estado === "programado" ? `🔔 ${c.listaEsperaCount ?? 0}` : `${c.participantes}${c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}`}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.estado === "programado" ? `🔔 ${c.listaEsperaCount ?? 0} personas` : `${c.participantes}${c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}`}</span>
                     </div>
 
                     {/* Top 3 */}

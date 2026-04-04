@@ -209,9 +209,6 @@ export default function ConcursosSection() {
                           {new Date(c.fechaActivacion).toLocaleDateString("es-CL", { day: "numeric", month: "short" })}
                         </p>
                       )}
-                      {(c.listaEspera ?? 0) > 0 && (
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "11px", color: "rgba(167,139,250,0.5)", marginTop: "4px" }}>{c.listaEspera} en lista de espera</p>
-                      )}
                     </div>
                   )}
                   {ended && (

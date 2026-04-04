@@ -200,9 +200,10 @@ function RegistroContent() {
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "12px" }}>
                 {(() => {
                   const usarDB = categoriasDB.length > 0;
+                  const estiloExcluir = estilo === "vegano" ? ["Vegano"] : estilo === "vegetariano" ? ["Vegetariano"] : [];
                   const opciones = usarDB
-                    ? categoriasDB.filter(c => !c.estiloExcluido.includes(estilo)).map(c => c.nombre)
-                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Carnes / Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Carnes / Parrilla"] : []; return [...CATEGORIAS_MASTER].filter(c => !excluir.includes(c)); })();
+                    ? categoriasDB.filter(c => !c.estiloExcluido.includes(estilo) && !estiloExcluir.includes(c.nombre)).map(c => c.nombre)
+                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Carnes / Parrilla", "Mariscos", "Sushi", "Vegano"] : estilo === "vegetariano" ? ["Pollo", "Carnes / Parrilla", "Vegetariano"] : []; return [...CATEGORIAS_MASTER].filter(c => !excluir.includes(c)); })();
                   const totalSel = comidasSel.length + customComidas.length;
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);

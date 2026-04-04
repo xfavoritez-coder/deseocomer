@@ -478,12 +478,12 @@ function ConcursoDetallePage() {
             <span style={{ fontSize: 20 }}>🏆</span>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#f5d080", fontWeight: 700, margin: 0 }}>¡El primer lugar te espera!</p>
           </div>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4, textAlign: "center", marginBottom: isAuthenticated && !isParticipating && !isEnded ? 12 : 0 }}>Nadie se ha unido aún. Únete ahora y empieza con ventaja.</p>
-          {isAuthenticated && !isParticipating && !isEnded && (<>
-            <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.2)", border: "1px solid rgba(61,100,210,0.4)", borderRadius: 8, padding: "10px 16px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : "Unirse al concurso →"}</button>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.4)", lineHeight: 1.4, textAlign: "center", marginBottom: 0 }}>{isProgramado ? "Aún no hay participantes" : "Nadie se ha unido aún. Únete ahora y empieza con ventaja."}</p>
+          {!isProgramado && isAuthenticated && !isParticipating && !isEnded && (<>
+            <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "rgba(61,100,210,0.2)", border: "1px solid rgba(61,100,210,0.4)", borderRadius: 8, padding: "10px 16px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#7b9aff", cursor: joinLoading ? "wait" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 12 }}>{joinLoading ? "Uniéndote..." : "Unirse al concurso →"}</button>
             {joinError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8c00", textAlign: "center", marginTop: 8 }}>{joinError}</p>}
           </>)}
-          {!isAuthenticated && !isEnded && (
+          {!isProgramado && !isAuthenticated && !isEnded && (
             <a href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", textAlign: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", textDecoration: "none", marginTop: 8, letterSpacing: "0.06em" }}>Inicia sesión para participar →</a>
           )}
         </div>
@@ -829,16 +829,7 @@ function ConcursoDetallePage() {
               <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
             </div>
           </div>
-          ) : (
-          /* Concurso finalizado: CTA a concursos activos */
-          <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, padding: "20px", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>Este concurso ya no acepta participantes</p>
-            <Link href="/concursos" style={{ display: "inline-block", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: "12px 28px", borderRadius: 10, textDecoration: "none", letterSpacing: "0.06em" }}>Ver concursos activos →</Link>
-            <div style={{ marginTop: 12 }}>
-              <Link href="/concursos/ganadores" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>Ver ganadores anteriores →</Link>
-            </div>
-          </div>
-          )}
+          ) : null}
 
           {/* 5. Ranking (mobile) — hidden on desktop where sidebar shows */}
           <div className="dc-cd-ranking-mobile">
