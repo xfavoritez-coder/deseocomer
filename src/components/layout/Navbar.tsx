@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import BannerVerificacion from "@/components/layout/BannerVerificacion";
 
 const NAV_LINKS = [
   { label: "Concursos",   href: "/concursos"   },
@@ -67,13 +66,26 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  const [reenvioVerif, setReenvioVerif] = useState<"idle" | "sending" | "sent">("idle");
+
   useEffect(() => {
     if (!user?.id) return;
     fetch(`/api/notificaciones?userId=${user.id}`)
       .then(r => r.json())
-      .then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); })
+      .then(d => {
+        const notifsBD = d.notificaciones ?? [];
+        let count = d.noLeidas ?? 0;
+        // Add verification notification if not verified
+        if (user && !user.emailVerificado) {
+          const verifNotif = { id: "verif-pendiente", tipo: "verificacion", mensaje: "⚠️ Tu cuenta no está verificada. Verifica tu email para participar en concursos y sumar puntos.", leida: false, createdAt: new Date().toISOString(), esVerificacion: true };
+          notifsBD.unshift(verifNotif);
+          count++;
+        }
+        setNotifCount(count);
+        setNotifs(notifsBD);
+      })
       .catch(() => {});
-  }, [user?.id]);
+  }, [user?.id, user?.emailVerificado]);
 
   useEffect(() => {
     if (!showNotifs) return;
@@ -98,7 +110,6 @@ export default function Navbar() {
     <>
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
-      <BannerVerificacion />
       <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
         <Link href="/" className="dc-nav-logo" onClick={() => { if (pathname === "/") window.scrollTo({ top: 0, behavior: "smooth" }); }}>🏮 DeseoComer</Link>
 
@@ -136,10 +147,17 @@ export default function Navbar() {
                       {notifs.length === 0 ? (
                         <p style={{ padding: 20, textAlign: "center", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)" }}>Sin notificaciones</p>
                       ) : notifs.slice(0, 8).map(n => (
+                        n.esVerificacion ? (
+                          <div key={n.id} style={{ padding: "12px 14px", borderBottom: "1px solid rgba(224,85,85,0.15)", background: "rgba(224,85,85,0.06)" }}>
+                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#e05555", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
+                            <button onClick={async () => { if (reenvioVerif !== "idle") return; setReenvioVerif("sending"); try { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user?.email }) }); setReenvioVerif("sent"); setTimeout(() => setReenvioVerif("idle"), 5000); } catch { setReenvioVerif("idle"); } }} style={{ marginTop: 8, background: reenvioVerif === "sent" ? "transparent" : "#e05555", color: reenvioVerif === "sent" ? "#3db89e" : "#fff", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", border: "none", borderRadius: 16, padding: "5px 12px", cursor: reenvioVerif === "idle" ? "pointer" : "default" }}>{reenvioVerif === "sending" ? "Enviando..." : reenvioVerif === "sent" ? "✓ Enviado" : "Reenviar verificación →"}</button>
+                          </div>
+                        ) : (
                         <div key={n.id} onClick={async () => { if (!n.leida) { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacionId: n.id }) }); setNotifCount(c => Math.max(0, c - 1)); setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, leida: true } : x)); } setShowNotifs(false); }} style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.06)", cursor: "pointer", background: n.leida ? "transparent" : "rgba(232,168,76,0.04)" }}>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
                         </div>
+                        )
                       ))}
                     </div>
                   )}

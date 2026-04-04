@@ -115,7 +115,6 @@ export async function GET(
             alignItems: "center",
             justifyContent: "center",
             transform: "rotate(45deg)",
-            zIndex: 10,
           }}
         >
           <span
@@ -220,9 +219,8 @@ export async function GET(
           {/* Boton sticker */}
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              alignSelf: "flex-start",
               gap: "32px",
               backgroundColor: "rgba(20,20,28,0.85)",
               border: "2px solid rgba(255,255,255,0.15)",
