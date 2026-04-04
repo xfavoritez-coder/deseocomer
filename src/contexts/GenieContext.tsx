@@ -152,7 +152,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
         setLocalesDB(data.map((l: Record<string, unknown>) => ({
           id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
           categoria: ((l.categoria as string) ?? "general").toLowerCase(),
-          comuna: (l.comuna as string) ?? "Santiago", rating: 4.5, descuento: 0,
+          comuna: (l.comuna as string) ?? "Santiago", rating: ((l._count as Record<string, number>)?.resenas ?? 0) > 0 ? 4.5 : 0, descuento: 0,
           foto: (l.portadaUrl as string) ?? null,
           logoUrl: (l.logoUrl as string) ?? null,
           portadaUrl: (l.portadaUrl as string) ?? null,
