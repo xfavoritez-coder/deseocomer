@@ -599,13 +599,13 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", boxSizing: "border-box", minWidth: 0 }}>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", maxWidth: 800, boxSizing: "border-box", minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "stretch" }}>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
                 {c.imagenUrl ? (
-                  <img src={c.imagenUrl} alt="" style={{ width: 80, height: 80, objectFit: "cover", display: "block" }} />
+                  <img src={c.imagenUrl} alt="" style={{ width: "clamp(80px, 10vw, 120px)", height: "clamp(80px, 10vw, 120px)", objectFit: "cover", display: "block" }} />
                 ) : (
-                  <div style={{ width: 80, height: 80, background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.9))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🏆</div>
+                  <div style={{ width: "clamp(80px, 10vw, 120px)", height: "clamp(80px, 10vw, 120px)", background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.9))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🏆</div>
                 )}
               </a>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, minWidth: 0, textDecoration: "none" }}>
@@ -637,7 +637,7 @@ export default function PanelConcursos() {
               </div>
               <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderTop: "1px solid rgba(232,168,76,0.06)" }}>
                 {c.estado !== "cancelado" && !c.cancelado && (
-                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer" }}>📸</button>
+                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer" }}>📸 Compartir</button>
                 )}
                 <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer" }}>Editar</button>
                 <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Detalle</button>
