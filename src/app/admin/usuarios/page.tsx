@@ -5,10 +5,14 @@ import { adminFetch } from "@/lib/adminFetch";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type U = any;
 
+function loadSessionState<T>(key: string, fallback: T): T {
+  try { const v = sessionStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+
 export default function AdminUsuarios() {
-  const [usuarios, setUsuarios] = useState<U[]>([]);
+  const [usuarios, setUsuarios] = useState<U[]>(() => loadSessionState("admin_usuarios_list", []));
   const [busq, setBusq] = useState("");
-  const [sel, setSel] = useState<U | null>(null);
+  const [sel, setSel] = useState<U | null>(() => loadSessionState("admin_usuarios_sel", null));
   const [toast, setToast] = useState("");
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -46,9 +50,13 @@ export default function AdminUsuarios() {
     }).catch(() => {}).finally(() => setLoadingList(false));
   };
 
-  useEffect(() => { fetchUsuarios(1, ""); }, []);
+  useEffect(() => { if (usuarios.length === 0) fetchUsuarios(1, ""); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { const t = setTimeout(() => { setBusqDebounced(busq); }, 400); return () => clearTimeout(t); }, [busq]);
   useEffect(() => { fetchUsuarios(1, busqDebounced); }, [busqDebounced]);
+
+  // Persistir estado para no perderlo al navegar a actividad
+  useEffect(() => { try { sessionStorage.setItem("admin_usuarios_sel", JSON.stringify(sel)); } catch {} }, [sel]);
+  useEffect(() => { try { sessionStorage.setItem("admin_usuarios_list", JSON.stringify(usuarios)); } catch {} }, [usuarios]);
 
   const show = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
@@ -160,7 +168,7 @@ export default function AdminUsuarios() {
       </div>
 
       {/* Botón actividad detallada */}
-      <a href={`/admin/usuarios/${sel.id}/actividad`} target="_blank" style={{ display: "block", textAlign: "center", padding: "12px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.25)", borderRadius: "12px", fontFamily: "Georgia", fontSize: "0.88rem", color: "#a070e0", textDecoration: "none", marginBottom: "16px", letterSpacing: "0.04em" }}>🧞 Ver actividad completa del usuario →</a>
+      <a href={`/admin/usuarios/${sel.id}/actividad`} style={{ display: "block", textAlign: "center", padding: "12px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.25)", borderRadius: "12px", fontFamily: "Georgia", fontSize: "0.88rem", color: "#a070e0", textDecoration: "none", marginBottom: "16px", letterSpacing: "0.04em" }}>🧞 Ver actividad completa del usuario →</a>
 
       {/* Perfil del Genio */}
       {sel.geniePerfil && (() => {
