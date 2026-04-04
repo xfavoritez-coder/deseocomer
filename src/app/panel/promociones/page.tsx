@@ -93,8 +93,9 @@ export default function PanelPromociones() {
 
   const startEdit = (p: PromoDB) => {
     const dias = Array.isArray(p.diasSemana) ? p.diasSemana : [true, true, true, true, true, false, false];
+    const tipoMap: Record<string, string> = { "promo": "Combo", "combo": "Combo", "Promo": "Combo", "descuento": "Descuento %", "Descuento": "Descuento %", "happy_hour": "Happy Hour", "Happy Hour": "Happy Hour", "2x1": "2x1", "cupon": "Combo", "Cupón": "Combo", "regalo": "Regalo", "Regalo": "Regalo", "cumpleanos": "Cumpleaños", "Cumpleaños": "Cumpleaños" };
     setForm({
-      tipo: p.tipo, titulo: p.titulo, descripcion: p.descripcion ?? "",
+      tipo: tipoMap[p.tipo] || p.tipo, titulo: p.titulo, descripcion: p.descripcion ?? "",
       condiciones: p.condiciones ?? "", descuento: p.porcentajeDescuento ? String(p.porcentajeDescuento) : "",
       dias, horaInicio: p.horaInicio, horaFin: p.horaFin, imagenUrl: p.imagenUrl ?? "",
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

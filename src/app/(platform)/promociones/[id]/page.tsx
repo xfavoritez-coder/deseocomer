@@ -23,7 +23,7 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   if (t === "happy_hour" || t === "happy hour") return { text: "HAPPY HOUR", color: "#d4a017" };
   if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
   if (t === "2x1") return { text: "2×1", color: "#3db89e" };
-  if (t === "descuento" || t === "descuento %" || promo.porcentajeDescuento) return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
+  if (t === "descuento" || t === "descuento %") return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
   if (t === "cupon" || t === "cupón") return { text: "COMBO", color: "#e8a84c" };
   if (t === "precio_especial" || t === "especial") return { text: "COMBO", color: "#e8a84c" };
   if (t === "combo" || t === "promo") return { text: "COMBO", color: "#e8a84c" };

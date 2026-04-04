@@ -177,7 +177,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
               ? { text: "CUMPLEAÑOS", color: "#e05090" }
               : tLower === "2x1"
               ? { text: "2×1", color: "#3db89e" }
-              : tLower === "descuento" || tLower === "descuento %" || promo.porcentajeDescuento
+              : tLower === "descuento" || tLower === "descuento %"
               ? { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" }
               : tLower === "cupon" || tLower === "cupón"
               ? { text: "COMBO", color: "#e8a84c" }
