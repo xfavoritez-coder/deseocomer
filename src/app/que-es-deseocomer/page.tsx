@@ -131,6 +131,24 @@ export default function QueEsDeseoComerPage() {
             </div>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.6, marginTop: 10 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros, tú sigues sumando +1 punto por cada uno que traigan. Así tu red trabaja para ti en cada concurso.</p>
           </div>
+
+          {/* Tipos de concurso */}
+          <div className="qed-centered-content" style={{ marginTop: 24 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: 12, textAlign: "center" }}>Tipos de concurso</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
+                <p style={{ fontSize: 24, marginBottom: 4 }}>🏆</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#e8a84c", fontWeight: 700, marginBottom: 4 }}>Méritos</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", lineHeight: 1.4 }}>Gana quien más puntos acumule al cierre</p>
+              </div>
+              <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 12, padding: "14px 12px", textAlign: "center" }}>
+                <p style={{ fontSize: 24, marginBottom: 4 }}>🎲</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#ec4899", fontWeight: 700, marginBottom: 4 }}>Sorteo</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", lineHeight: 1.4 }}>Cada punto es un boleto — más boletos, más chances</p>
+              </div>
+            </div>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", textAlign: "center", marginTop: 8 }}>También hay concursos programados que se activan en una fecha futura — anótate para que te avisemos.</p>
+          </div>
         </section>
 
         {/* ── PROMOCIONES ──────────────────────────── */}

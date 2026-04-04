@@ -323,12 +323,13 @@ function ConcursoDetallePage() {
   const isEnded = !isProgramado && (!!finalizado || !!timer?.ended || (dbEstado !== "activo" && dbEstado !== "programado"));
 
   // Animación sorteo al entrar a concurso completado
+  const ganadorNombreSorteo = esSorteo ? (concursoData as any)?.ganadorActualNombre : null;
   useEffect(() => {
-    if (esSorteo && isEnded && isParticipating && (concursoData as any)?.ganadorActualNombre && concursoId) {
+    if (esSorteo && isEnded && isParticipating && ganadorNombreSorteo && concursoId) {
       const visto = localStorage.getItem(`sorteo_visto_${concursoId}`);
       if (!visto) setMostrarSorteo(true);
     }
-  }, [esSorteo, isEnded, isParticipating, concursoData, concursoId]);
+  }, [esSorteo, isEnded, isParticipating, ganadorNombreSorteo, concursoId]);
 
   const handleListaEspera = async () => {
     setListaLoading(true);
