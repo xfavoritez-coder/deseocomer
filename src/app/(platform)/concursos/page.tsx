@@ -352,7 +352,12 @@ export default function ConcursosPage() {
 
                     {/* Countdown */}
                     {t && !t.ended && c.estado !== "programado" && (
-                      <div style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: 10, padding: "10px 8px", display: "flex", justifyContent: "center", gap: 2, marginBottom: 12 }}>
+                      <div style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: 10, padding: "10px 8px", marginBottom: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, justifyContent: "center" }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: soon ? urg : "#e8a84c", animation: `dc-pd ${soon ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: soon ? urg : "#e8a84c" }}>Termina en</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "center", gap: 2 }}>
                         {[
                           ...(t.dias > 0 ? [{ v: t.dias, l: "días" }] : []),
                           { v: t.horas, l: "hrs" }, { v: t.minutos, l: "min" }, { v: t.segundos, l: "seg" },
@@ -365,6 +370,7 @@ export default function ConcursosPage() {
                             {i < arr.length - 1 && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: soon ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)", marginBottom: 10 }}>:</span>}
                           </div>
                         ))}
+                        </div>
                       </div>
                     )}
 
@@ -375,10 +381,10 @@ export default function ConcursosPage() {
                       </div>
                     )}
 
-                    {/* Participantes */}
+                    {/* Participantes / En espera */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.participantes}{c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.estado === "programado" ? "En espera" : c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.estado === "programado" ? `🔔 ${c.listaEsperaCount ?? 0}` : `${c.participantes}${c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}`}</span>
                     </div>
 
                     {/* Top 3 */}

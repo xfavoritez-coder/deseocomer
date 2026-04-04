@@ -294,6 +294,16 @@ function ConcursoDetallePage() {
     return () => clearInterval(iid);
   }, [isProgramadoPre, concursoData]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Animación sorteo al entrar a concurso completado
+  const esSorteoEarly = (concursoData as any)?.modalidadConcurso === "sorteo";
+  const ganadorNombreSorteo = esSorteoEarly ? (concursoData as any)?.ganadorActualNombre : null;
+  useEffect(() => {
+    if (esSorteoEarly && isParticipating && ganadorNombreSorteo && concursoId) {
+      const visto = localStorage.getItem(`sorteo_visto_${concursoId}`);
+      if (!visto) setMostrarSorteo(true);
+    }
+  }, [esSorteoEarly, isParticipating, ganadorNombreSorteo, concursoId]);
+
   // ── Loading skeleton ──
   if (dbLoading) return (<main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}><Navbar />
     <div className="dc-skeleton-wrap">
@@ -322,14 +332,6 @@ function ConcursoDetallePage() {
   const esSorteo = (concursoData as any)?.modalidadConcurso === "sorteo";
   const isEnded = !isProgramado && (!!finalizado || !!timer?.ended || (dbEstado !== "activo" && dbEstado !== "programado"));
 
-  // Animación sorteo al entrar a concurso completado
-  const ganadorNombreSorteo = esSorteo ? (concursoData as any)?.ganadorActualNombre : null;
-  useEffect(() => {
-    if (esSorteo && isEnded && isParticipating && ganadorNombreSorteo && concursoId) {
-      const visto = localStorage.getItem(`sorteo_visto_${concursoId}`);
-      if (!visto) setMostrarSorteo(true);
-    }
-  }, [esSorteo, isEnded, isParticipating, ganadorNombreSorteo, concursoId]);
 
   const handleListaEspera = async () => {
     setListaLoading(true);
