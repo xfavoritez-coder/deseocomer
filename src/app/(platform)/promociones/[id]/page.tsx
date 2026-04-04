@@ -63,7 +63,7 @@ export default function PromocionDetailPage() {
     imagenUrl: dbPromo.imagenUrl ?? "",
     titulo: dbPromo.titulo ?? "",
     descripcion: dbPromo.descripcion ?? "",
-    porcentajeDescuento: dbPromo.porcentajeDescuento ?? undefined,
+    porcentajeDescuento: dbPromo.porcentajeDescuento || undefined,
     precioOriginal: dbPromo.precioOriginal ?? undefined,
     precioDescuento: dbPromo.precioDescuento ?? undefined,
     diasSemana: Array.isArray(dbPromo.diasSemana) ? dbPromo.diasSemana.map((v: boolean, i: number) => v ? i : -1).filter((n: number) => n >= 0) : [],
@@ -252,7 +252,7 @@ export default function PromocionDetailPage() {
                       ${promo.precioDescuento.toLocaleString("es-CL")}
                     </div>
                   )}
-                  {promo.porcentajeDescuento && (
+                  {!!promo.porcentajeDescuento && (
                     <div style={{ display: "inline-block", background: "rgba(61,184,158,0.12)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "20px", padding: "4px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#3db89e", letterSpacing: "0.5px" }}>
                       {promo.precioOriginal && promo.precioDescuento ? `Ahorras $${(promo.precioOriginal - promo.precioDescuento).toLocaleString("es-CL")}` : `-${promo.porcentajeDescuento}% de descuento`}
                     </div>
