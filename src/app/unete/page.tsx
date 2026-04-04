@@ -2,6 +2,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { CATEGORIAS, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 function generarPassword(): string {
   const chars = "abcdefghijkmnpqrstuvwxyz23456789";
@@ -24,6 +25,7 @@ function UneteInner() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [categoriasLocal, setCategoriasLocal] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
@@ -67,6 +69,7 @@ function UneteInner() {
           registroRapido: true,
           passwordPlain: pw,
           captadorCodigo,
+          categorias: categoriasLocal,
         }),
       });
 
@@ -149,6 +152,44 @@ function UneteInner() {
               <label style={L}>Teléfono</label>
               <input style={I} type="tel" value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="+56 9 1234 5678" />
               {errors.telefono && <p style={{ fontSize: 12, color: "#e05555", margin: "4px 0 0" }}>{errors.telefono}</p>}
+            </div>
+
+            <div style={{ height: 1, background: "rgba(180,130,40,0.1)" }} />
+
+            <div>
+              <label style={L}>Categorías (hasta 3)</label>
+              <p style={{ fontSize: 11, color: "rgba(80,60,20,0.4)", marginBottom: 8, lineHeight: 1.4 }}>La primera será tu categoría principal</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                {CATEGORIAS.map(cat => {
+                  const idx = categoriasLocal.indexOf(cat);
+                  const sel = idx !== -1;
+                  const isPrimary = idx === 0;
+                  const maxed = categoriasLocal.length >= 3 && !sel;
+                  return (
+                    <button key={cat} type="button" disabled={maxed}
+                      onClick={() => setCategoriasLocal(prev => sel ? prev.filter(c => c !== cat) : [...prev, cat])}
+                      style={{
+                        padding: "5px 12px", borderRadius: "20px", fontSize: 12,
+                        fontFamily: "var(--font-lato), Lato, sans-serif",
+                        border: sel
+                          ? isPrimary ? "1px solid #c47f1a" : "1px solid rgba(42,96,16,0.4)"
+                          : "1px solid rgba(180,130,40,0.2)",
+                        background: sel
+                          ? isPrimary ? "rgba(196,127,26,0.12)" : "rgba(42,96,16,0.08)"
+                          : "transparent",
+                        color: sel
+                          ? isPrimary ? "#c47f1a" : "#2a6010"
+                          : maxed ? "rgba(80,60,20,0.2)" : "rgba(80,60,20,0.55)",
+                        cursor: maxed ? "not-allowed" : "pointer",
+                        opacity: maxed ? 0.3 : 1,
+                      }}>
+                      {CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}
+                      {isPrimary && <span style={{ marginLeft: 4, fontSize: 10 }}>★</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              {categoriasLocal.length > 0 && <p style={{ fontSize: 11, color: "rgba(80,60,20,0.35)", marginTop: 6 }}>{categoriasLocal.length}/3 categorías</p>}
             </div>
 
             <button onClick={handleSubmit} disabled={!canSubmit || saving} style={{ width: "100%", padding: 14, background: "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 14, fontWeight: 700, color: "#fff", letterSpacing: "0.05em", textTransform: "uppercase", cursor: "pointer", marginTop: 4, opacity: canSubmit && !saving ? 1 : 0.5 }}>

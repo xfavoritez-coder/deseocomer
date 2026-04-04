@@ -2,12 +2,10 @@
 import { useState, useEffect } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 import SubirFoto from "@/components/SubirFoto";
+import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
-
-const CATEGORIAS_FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
-const TAGS_FALLBACK = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 export default function AdminLocales() {
   const [locales, setLocales] = useState<L[]>([]);
@@ -24,13 +22,9 @@ export default function AdminLocales() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectMotivo, setRejectMotivo] = useState("");
-  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
-  const [tagsDB, setTagsDB] = useState<string[]>([]);
-  const CATEGORIAS = categoriasDB.length > 0 ? categoriasDB : CATEGORIAS_FALLBACK;
-  const TAGS = tagsDB.length > 0 ? tagsDB : TAGS_FALLBACK;
+  const CATEGORIAS = [...CATEGORIAS_MASTER];
 
   useEffect(() => { adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
-  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); setTagsDB(data.map((c: any) => c.nombre)); } }).catch(() => {}); }, []);
 
   const show = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 3500); };
 
@@ -97,7 +91,7 @@ export default function AdminLocales() {
       {/* Info card */}
       <div style={cardS}>
         <p style={cardTitleS}>Datos del local</p>
-        {[["Nombre", sel.nombre], ["Categoría", sel.categoria], ["Comuna", sel.comuna], ["Dirección", sel.direccion], ["Teléfono", sel.telefono], ["Instagram", sel.instagram], ["Sitio web", sel.sitioWeb], ["Dueño", sel.nombreDueno], ["Celular dueño", sel.celularDueno], ["Email", sel.email], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Categorías", (sel.categorias ?? []).join(", ") || "—"], ["Comuna", sel.comuna], ["Dirección", sel.direccion], ["Teléfono", sel.telefono], ["Instagram", sel.instagram], ["Sitio web", sel.sitioWeb], ["Dueño", sel.nombreDueno], ["Celular dueño", sel.celularDueno], ["Email", sel.email], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
           {(sel.sirveEnMesa ?? true) && <span style={{ fontSize: "0.72rem", padding: "3px 8px", borderRadius: "10px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.2)", color: "#a070e0" }}>En mesa</span>}
           {sel.tieneDelivery && <span style={{ fontSize: "0.72rem", padding: "3px 8px", borderRadius: "10px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.2)", color: "#3db89e" }}>Delivery</span>}
@@ -130,26 +124,18 @@ export default function AdminLocales() {
             </div>
           ))}
           <div style={{ marginBottom: "10px" }}>
-            <label style={labelS}>Categoría</label>
+            <label style={labelS}>Categorías (máx. 3)</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {CATEGORIAS.map(cat => {
-                const sel2 = editData.categoria === cat;
-                return <button key={cat} type="button" onClick={() => setEditData(d => ({ ...d, categoria: cat }))} style={{ padding: "5px 12px", borderRadius: "16px", border: sel2 ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.15)", background: sel2 ? "rgba(232,168,76,0.15)" : "transparent", color: sel2 ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer" }}>{cat}</button>;
-              })}
-            </div>
-          </div>
-          <div style={{ marginBottom: "10px" }}>
-            <label style={labelS}>Etiquetas (máx. 6)</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {TAGS.map(tag => {
-                const tags: string[] = editData.tags ? (typeof editData.tags === "string" ? JSON.parse(editData.tags) : editData.tags) : [];
-                const sel2 = tags.includes(tag);
-                const maxed = tags.length >= 6 && !sel2;
-                return <button key={tag} type="button" disabled={maxed} onClick={() => {
-                  const cur: string[] = editData.tags ? (typeof editData.tags === "string" ? JSON.parse(editData.tags) : editData.tags) : [];
-                  const next = sel2 ? cur.filter(t => t !== tag) : [...cur, tag];
-                  setEditData(d => ({ ...d, tags: next }));
-                }} style={{ padding: "5px 12px", borderRadius: "16px", border: sel2 ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.15)", background: sel2 ? "rgba(232,168,76,0.15)" : "transparent", color: sel2 ? "#e8a84c" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: maxed ? "default" : "pointer" }}>{tag}</button>;
+                const cats: string[] = editData.categorias ?? [];
+                const idx = cats.indexOf(cat);
+                const sel2 = idx !== -1;
+                const isPrimary = idx === 0;
+                const maxed = cats.length >= 3 && !sel2;
+                return <button key={cat} type="button" disabled={maxed} onClick={() => {
+                  const cur: string[] = editData.categorias ?? [];
+                  setEditData(d => ({ ...d, categorias: sel2 ? cur.filter(c => c !== cat) : [...cur, cat] }));
+                }} style={{ padding: "5px 12px", borderRadius: "16px", border: sel2 ? (isPrimary ? "1px solid #e8a84c" : "1px solid rgba(61,184,158,0.3)") : "1px solid rgba(232,168,76,0.15)", background: sel2 ? (isPrimary ? "rgba(232,168,76,0.15)" : "rgba(61,184,158,0.12)") : "transparent", color: sel2 ? (isPrimary ? "#e8a84c" : "#3db89e") : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: maxed ? "default" : "pointer", opacity: maxed ? 0.3 : 1 }}>{CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}{isPrimary ? " ★" : ""}</button>;
               })}
             </div>
           </div>
@@ -228,7 +214,7 @@ export default function AdminLocales() {
           <a href={`/panel`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center", color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>⚡ Ver promociones del local</a>
           {!sel.activo && <button onClick={async () => { if (await action("aprobar")) { setSel({ ...sel, activo: true }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, activo: true } : l)); show("✓ Aprobado y notificado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>✓ Aprobar y notificar</button>}
           {!sel.activo && <button onClick={async () => { if (await action("reenviar-activacion")) show("✓ Email de activación enviado"); }} disabled={loading} style={btnOutlineS}>📧 Reenviar email de activación</button>}
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categoria: sel.categoria ?? "", comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", tags: sel.tags ?? [], sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categorias: sel.categorias ?? [], comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           <button onClick={() => { resetModes(); setRejectMode(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ {sel.activo ? "Desactivar" : "Rechazar"}</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar</button>

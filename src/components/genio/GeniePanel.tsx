@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import { useGenie, type LocalRecomendado } from "@/contexts/GenieContext";
+import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 const OCASIONES = ["Almuerzo solo", "Con amigos", "Cena romántica", "Antojo rápido", "Para llevar"];
 
@@ -12,15 +13,6 @@ const COMUNAS = [
   "El Bosque", "La Cisterna", "La Granja", "La Pintana", "Lo Espejo", "Lo Prado", "Quilicura",
   "Quinta Normal", "Renca", "San Bernardo", "San Joaquín", "San Ramón", "Padre Hurtado",
   "Melipilla", "Talagante", "Puente Alto", "Pirque", "Bellavista",
-];
-
-// COMUNAS_CON_COBERTURA se obtiene dinámicamente del context
-
-const CATEGORIAS_FALLBACK = [
-  { emoji: "🍕", label: "Pizza" }, { emoji: "🍣", label: "Sushi" },
-  { emoji: "🍔", label: "Hamburguesa" }, { emoji: "🌮", label: "Mexicano" },
-  { emoji: "🥗", label: "Saludable" }, { emoji: "🍝", label: "Pastas" },
-  { emoji: "🐔", label: "Pollo" }, { emoji: "🎲", label: "Sorpréndeme" },
 ];
 
 // Frases del genio por ocasión
@@ -103,11 +95,8 @@ export default function GeniePanel() {
   const [emailSinCobertura, setEmailSinCobertura] = useState("");
   const [nombreSinCobertura, setNombreSinCobertura] = useState("");
   const [emailGuardado, setEmailGuardado] = useState(false);
-  const [categoriasDBGenie, setCategoriasDBGenie] = useState<{ emoji: string; label: string }[]>([]);
-  const CATEGORIAS = categoriasDBGenie.length > 0 ? [...categoriasDBGenie, { emoji: "🎲", label: "Sorpréndeme" }] : CATEGORIAS_FALLBACK;
+  const CATEGORIAS = [...CATEGORIAS_MASTER.map(c => ({ emoji: CATEGORIA_EMOJI[c] ?? "🍽️", label: c })), { emoji: "🎲", label: "Sorpréndeme" }];
   const shownIds = useRef<string[]>([]);
-
-  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { const cats = data.filter((c: any) => c.tipo === "principal").map((c: any) => ({ emoji: c.emoji || "🍽️", label: c.nombre })); if (cats.length > 0) setCategoriasDBGenie(cats); } }).catch(() => {}); }, []);
 
   useEffect(() => {
     if (stepActual !== 4 || isLoggedIn || regDismissed) return;
@@ -334,7 +323,7 @@ export default function GeniePanel() {
               <div style={{ display: "flex", gap: "6px", fontSize: "13px", marginBottom: "12px", alignItems: "center" }}>
                 <span style={{ color: "rgba(240,234,214,0.4)" }}>{r.comuna}</span>
                 <span style={{ color: "rgba(240,234,214,0.18)" }}>·</span>
-                <span style={{ color: "#3db89e" }}>{r.categoria}</span>
+                <span style={{ color: "#3db89e" }}>{CATEGORIA_EMOJI[r.categorias?.[0] ?? ""] ?? "🍽️"} {r.categorias?.[0] ?? r.categoria}</span>
                 {r.rating > 0 && (<><span style={{ color: "rgba(240,234,214,0.18)" }}>·</span><span style={{ color: "#e8a84c", fontWeight: 600 }}>★ {r.rating.toFixed ? r.rating.toFixed(1) : r.rating}</span></>)}
               </div>
 

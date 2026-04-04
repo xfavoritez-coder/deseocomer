@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { makeLocalSlug } from "@/lib/slugify";
+import { CATEGORIAS } from "@/lib/categorias";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -43,7 +44,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const local = await prisma.local.update({
       where: { id },
       data: {
-        nombre: body.nombre, categoria: body.categoria, descripcion: body.descripcion,
+        nombre: body.nombre, descripcion: body.descripcion,
         historia: body.historia, telefono: body.telefono, instagram: body.instagram,
         direccion: body.direccion, comuna: body.comuna, ciudad: body.ciudad,
         ...(body.nombreDueno !== undefined && { nombreDueno: body.nombreDueno }),
@@ -52,7 +53,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         lat: body.lat, lng: body.lng,
         horarios: body.horarios, logoUrl: body.logoUrl, portadaUrl: body.portadaUrl,
         galeria: body.galeria, tieneMenu: body.tieneMenu,
-        ...(body.tags !== undefined && { tags: body.tags }),
+        ...(body.categorias !== undefined && {
+          categorias: Array.isArray(body.categorias)
+            ? body.categorias.filter((c: string) => CATEGORIAS.includes(c as any)).slice(0, 3)
+            : [],
+        }),
         ...(body.sirveEnMesa !== undefined && { sirveEnMesa: body.sirveEnMesa }),
         ...(body.tieneDelivery !== undefined && { tieneDelivery: body.tieneDelivery }),
         ...(body.comunasDelivery !== undefined && { comunasDelivery: body.comunasDelivery }),

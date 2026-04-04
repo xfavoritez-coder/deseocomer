@@ -77,6 +77,20 @@ export default function RegistroLocalPage() {
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem, 5vw, 1.8rem)", color: "var(--accent)", marginBottom: "8px" }}>Registra tu local</h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", marginBottom: "28px" }}>¿Ya tienes cuenta? <Link href="/login-local" style={{ color: "var(--oasis-bright)", fontWeight: 700, textDecoration: "none" }}>Inicia sesión →</Link></p>
 
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "20px", padding: "14px", background: "rgba(232,168,76,0.05)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "12px" }}>
+            {[
+              { icon: "🏆", txt: "Concursos virales", desc: "— tus clientes invitan a sus amigos" },
+              { icon: "⚡", txt: "Promociones", desc: "— visibles cuando buscan dónde comer" },
+              { icon: "🗺️", txt: "Apareces en búsquedas", desc: "de tu comuna" },
+            ].map(b => (
+              <div key={b.txt} style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "rgba(240,234,214,0.6)" }}>
+                <span style={{ fontSize: "14px", flexShrink: 0 }}>{b.icon}</span>
+                <span><strong style={{ color: "rgba(240,234,214,0.85)" }}>{b.txt}</strong> {b.desc}</span>
+              </div>
+            ))}
+            <Link href="/solo-locales" style={{ fontSize: "11px", color: "rgba(61,184,158,0.6)", textAlign: "center", marginTop: "4px", textDecoration: "none", display: "block", letterSpacing: "0.04em" }}>¿Cómo funciona? Conoce más →</Link>
+          </div>
+
           {error && <div style={{ background: "rgba(255,50,50,0.1)", border: "1px solid rgba(255,50,50,0.3)", borderRadius: "10px", padding: "12px", marginBottom: "16px" }}><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff6b6b" }}>⚠️ {error}</p></div>}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>

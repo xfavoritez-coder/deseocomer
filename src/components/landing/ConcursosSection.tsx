@@ -32,7 +32,7 @@ export default function ConcursosSection() {
           if (uA && !uB) return -1; if (!uA && uB) return 1;
           if (uA && uB) return rA - rB;
           const partDiff = (b._count?.participantes ?? 0) - (a._count?.participantes ?? 0);
-          const boostDiff = boostScore(b.local?.categoria, b.local?.comuna) - boostScore(a.local?.categoria, a.local?.comuna);
+          const boostDiff = boostScore(b.local?.categorias?.[0], b.local?.comuna, b.local?.categorias) - boostScore(a.local?.categorias?.[0], a.local?.comuna, a.local?.categorias);
           return partDiff + boostDiff * 10;
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

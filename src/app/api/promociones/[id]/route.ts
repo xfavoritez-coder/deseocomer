@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const promocion = await prisma.promocion.findFirst({
       where: { OR: [{ id }, { slug: id }] },
       include: {
-        local: { select: { id: true, slug: true, nombre: true, comuna: true, categoria: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true, direccion: true, linkPedido: true } },
+        local: { select: { id: true, slug: true, nombre: true, comuna: true, categorias: true, logoUrl: true, portadaUrl: true, instagram: true, telefono: true, direccion: true, linkPedido: true } },
       },
     });
     if (!promocion) return NextResponse.json({ error: "No encontrada" }, { status: 404 });

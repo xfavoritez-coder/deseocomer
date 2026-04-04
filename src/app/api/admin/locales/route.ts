@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
       select: {
         id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true,
-        ciudad: true, comuna: true, direccion: true, categoria: true, logoUrl: true, portadaUrl: true,
+        ciudad: true, comuna: true, direccion: true, categorias: true, logoUrl: true, portadaUrl: true,
         lat: true, lng: true, instagram: true, sitioWeb: true, descripcion: true, historia: true,
         activo: true, captadorCodigo: true, createdAt: true,
         sirveEnMesa: true, tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,

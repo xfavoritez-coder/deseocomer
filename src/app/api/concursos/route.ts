@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
         },
       },
       include: {
-        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true, categoria: true } },
+        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true, categorias: true } },
         ganadorActual: { select: { nombre: true } },
         _count: { select: { participantes: true, listaEspera: true } },
       },

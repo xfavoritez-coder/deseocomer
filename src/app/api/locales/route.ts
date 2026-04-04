@@ -2,16 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { makeLocalSlug } from "@/lib/slugify";
+import { CATEGORIAS } from "@/lib/categorias";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const categoria = searchParams.get("categoria");
+    const q = searchParams.get("q");
+
     const locales = await prisma.local.findMany({
       where: {
         activo: true,
         nombre: { not: "" },
-        categoria: { not: null },
+        categorias: { isEmpty: false },
         direccion: { not: "" },
         comuna: { not: "" },
+        ...(categoria && { categorias: { has: categoria } }),
+        ...(q && {
+          OR: [
+            { nombre: { contains: q, mode: "insensitive" as const } },
+            { categorias: { has: q } },
+            { descripcion: { contains: q, mode: "insensitive" as const } },
+          ],
+        }),
       },
       include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
@@ -30,7 +43,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, nombreDueno, nombreEncargado, email, password, telefono, ciudad, registroRapido, passwordPlain, captadorCodigo } = await req.json();
+    const { nombre, nombreDueno, nombreEncargado, email, password, telefono, ciudad, registroRapido, passwordPlain, captadorCodigo, categorias: rawCategorias } = await req.json();
+    const categorias = Array.isArray(rawCategorias)
+      ? rawCategorias.filter((c: string) => (CATEGORIAS as readonly string[]).includes(c)).slice(0, 3)
+      : [];
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
@@ -76,6 +92,7 @@ export async function POST(req: NextRequest) {
         ...(registroRapido && { registroRapido: true }),
         ...(captadorData && captadorData),
         ...(esFounder && { esFounder: true, founderAt: new Date() }),
+        ...(categorias.length > 0 && { categorias }),
       },
     });
 

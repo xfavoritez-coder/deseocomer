@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           ...(body.nombre !== undefined && { nombre: body.nombre }),
           ...(body.nombreDueno !== undefined && { nombreDueno: body.nombreDueno }),
           ...(body.celularDueno !== undefined && { celularDueno: body.celularDueno }),
-          ...(body.categoria !== undefined && { categoria: body.categoria }),
+          ...(body.categorias !== undefined && { categorias: Array.isArray(body.categorias) ? body.categorias.slice(0, 3) : [] }),
           ...(body.ciudad !== undefined && { ciudad: body.ciudad }),
           ...(body.comuna !== undefined && { comuna: body.comuna }),
           ...(body.direccion !== undefined && { direccion: body.direccion }),

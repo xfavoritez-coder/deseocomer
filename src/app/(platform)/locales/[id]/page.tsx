@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useFavoritos } from "@/hooks/useFavoritos";
 import { getLocalById, LOCALES, type Local, type Resena } from "@/lib/mockLocales";
 import { CONCURSOS } from "@/lib/mockConcursos";
+import { CATEGORIA_EMOJI } from "@/lib/categorias";
 
 const MapaLocal = dynamic(() => import("@/components/MapaLocal"), {
   ssr: false,
@@ -98,16 +99,18 @@ export default function LocalDetailPage() {
 
   // Fetch similar locals from DB
   useEffect(() => {
-    const cat = mockLocal?.categoria ?? (dbLocal?.categoria as string | undefined);
+    const cats = mockLocal?.categoria ? [mockLocal.categoria] : (dbLocal?.categorias as string[] ?? []);
+    const primaryCat = cats[0];
     const slug = typeof id === "string" ? id : "";
-    if (!cat) return;
+    if (!primaryCat) return;
     fetch("/api/locales")
       .then(r => r.json())
       .then((data: any[]) => {
         if (!Array.isArray(data)) return;
         const filtered = data
           .filter((l: any) => {
-            const matchCat = l.categoria === cat || (Array.isArray(l.tags) && l.tags.includes(cat));
+            const lCats = l.categorias ?? [];
+            const matchCat = lCats.some((c: string) => cats.includes(c));
             const notSelf = (l.slug ?? l.id) !== slug && String(l.id) !== String(id);
             return matchCat && notSelf && l.activo !== false;
           })
@@ -115,7 +118,7 @@ export default function LocalDetailPage() {
           .map((l: any) => ({
             id: l.slug || l.id,
             nombre: l.nombre ?? "",
-            categoria: l.categoria ?? "",
+            categoria: l.categorias?.[0] ?? "",
             barrio: l.comuna ?? "",
             rating: l._avg?.resenas?.rating ?? 0,
             imagenPortada: l.portadaUrl ?? null,
@@ -123,13 +126,13 @@ export default function LocalDetailPage() {
         setSimilares(filtered);
       })
       .catch(() => {});
-  }, [mockLocal?.categoria, dbLocal?.categoria, id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mockLocal?.categoria, dbLocal?.categorias, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build a unified local object
   const local = mockLocal ?? (dbLocal ? {
     id: Number(id) || 0,
     nombre: dbLocal.nombre as string ?? "",
-    categoria: dbLocal.categoria as string ?? "Otro",
+    categoria: (dbLocal.categorias as string[])?.[0] ?? "Otro",
     descripcion: dbLocal.descripcion as string ?? "",
     historia: "",
     barrio: dbLocal.comuna as string ?? "Santiago",
@@ -156,7 +159,7 @@ export default function LocalDetailPage() {
     tieneRetiro: (dbLocal.tieneRetiro as boolean) ?? false,
     sirveEnMesa: (dbLocal.sirveEnMesa as boolean) ?? true,
     linkPedido: (dbLocal.linkPedido as string) ?? "",
-    tags: (dbLocal.tags as string[]) ?? [],
+    categorias: (dbLocal.categorias as string[]) ?? [],
   } : null);
 
   // Detect owner / local session
@@ -283,7 +286,7 @@ export default function LocalDetailPage() {
                 )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.categoria}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{CATEGORIA_EMOJI[local.categoria] ?? "🍽️"} {local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
                 {tieneHorarios && (<>
@@ -295,11 +298,11 @@ export default function LocalDetailPage() {
                 </>)}
               </div>
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {Array.isArray((local as any).tags) && (local as any).tags.length > 0 && (
+              {Array.isArray((local as any).categorias) && (local as any).categorias.length > 0 && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
                   {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(local as any).tags.slice(0, 4).map((tag: string) => (
-                    <span key={tag} style={{ padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(232,168,76,0.08)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)" }}>{tag}</span>
+                  {(local as any).categorias.map((cat: string) => (
+                    <span key={cat} style={{ padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(232,168,76,0.08)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)" }}>{CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}</span>
                   ))}
                 </div>
               )}
@@ -341,10 +344,10 @@ export default function LocalDetailPage() {
                     <p style={bodyStyle}>{local.descripcion}</p>
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {(local as any).tags?.length > 0 && (
+                    {(local as any).categorias?.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {(local as any).tags.map((tag: string) => (
+                        {(local as any).categorias.map((tag: string) => (
                           <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
                         ))}
                       </div>

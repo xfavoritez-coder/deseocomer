@@ -30,6 +30,7 @@ export interface LocalRecomendado {
   slug?: string;
   nombre: string;
   categoria: string;
+  categorias?: string[];
   comuna: string;
   rating: number;
   descuento: number;
@@ -44,7 +45,6 @@ export interface LocalRecomendado {
   comunasDelivery?: string[];
   tieneRetiro?: boolean;
   linkPedido?: string;
-  tags?: string[];
 }
 
 interface GenieContextType {
@@ -69,13 +69,13 @@ interface GenieContextType {
 const STORAGE_KEY = "deseocomer_genio_perfil";
 
 const LOCALES_DB: LocalRecomendado[] = [
-  { id: "1", nombre: "El Rincón del Sushi", categoria: "sushi", comuna: "Providencia", rating: 4.8, descuento: 20, foto: null },
-  { id: "2", nombre: "La Pizzería Romana", categoria: "pizza", comuna: "Ñuñoa", rating: 4.5, descuento: 0, foto: null },
-  { id: "3", nombre: "BurgerCraft", categoria: "hamburguesa", comuna: "Las Condes", rating: 4.7, descuento: 15, foto: null },
-  { id: "4", nombre: "Verde Natural", categoria: "saludable", comuna: "Providencia", rating: 4.6, descuento: 0, foto: null },
-  { id: "5", nombre: "Tacos & Co", categoria: "mexicano", comuna: "Santiago Centro", rating: 4.4, descuento: 10, foto: null },
-  { id: "6", nombre: "Pasta Fresca Nonna", categoria: "pastas", comuna: "Ñuñoa", rating: 4.6, descuento: 0, foto: null },
-  { id: "7", nombre: "El Pollo Dorado", categoria: "pollo", comuna: "Maipú", rating: 4.3, descuento: 5, foto: null },
+  { id: "1", nombre: "El Rincón del Sushi", categoria: "sushi", categorias: ["Sushi"], comuna: "Providencia", rating: 4.8, descuento: 20, foto: null },
+  { id: "2", nombre: "La Pizzería Romana", categoria: "pizza", categorias: ["Pizza"], comuna: "Ñuñoa", rating: 4.5, descuento: 0, foto: null },
+  { id: "3", nombre: "BurgerCraft", categoria: "hamburguesa", categorias: ["Hamburguesa"], comuna: "Las Condes", rating: 4.7, descuento: 15, foto: null },
+  { id: "4", nombre: "Verde Natural", categoria: "saludable", categorias: ["Saludable", "Vegano"], comuna: "Providencia", rating: 4.6, descuento: 0, foto: null },
+  { id: "5", nombre: "Tacos & Co", categoria: "mexicano", categorias: ["Mexicano"], comuna: "Santiago Centro", rating: 4.4, descuento: 10, foto: null },
+  { id: "6", nombre: "Pasta Fresca Nonna", categoria: "pastas", categorias: ["Pastas", "Italiano"], comuna: "Ñuñoa", rating: 4.6, descuento: 0, foto: null },
+  { id: "7", nombre: "El Pollo Dorado", categoria: "pollo", categorias: ["Pollo"], comuna: "Maipú", rating: 4.3, descuento: 5, foto: null },
 ];
 
 function createEmptyPerfil(): GeniePerfil {
@@ -149,23 +149,26 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetch("/api/locales").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
-        setLocalesDB(data.map((l: Record<string, unknown>) => ({
-          id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
-          categoria: ((l.categoria as string) ?? "general").toLowerCase(),
-          comuna: (l.comuna as string) ?? "Santiago", rating: ((l._count as Record<string, number>)?.resenas ?? 0) > 0 ? 4.5 : 0, descuento: 0,
-          foto: (l.portadaUrl as string) ?? null,
-          logoUrl: (l.logoUrl as string) ?? null,
-          portadaUrl: (l.portadaUrl as string) ?? null,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          promociones: (l.promociones as any[]) ?? [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          concursos: (l.concursos as any[]) ?? [],
-          tieneDelivery: (l.tieneDelivery as boolean) ?? false,
-          comunasDelivery: (l.comunasDelivery as string[]) ?? [],
-          tieneRetiro: (l.tieneRetiro as boolean) ?? false,
-          linkPedido: (l.linkPedido as string) ?? "",
-          tags: (l.tags as string[]) ?? [],
-        })));
+        setLocalesDB(data.map((l: Record<string, unknown>) => {
+          const cats = (l.categorias as string[]) ?? [];
+          return {
+            id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
+            categoria: (cats[0] ?? "general").toLowerCase(),
+            categorias: cats,
+            comuna: (l.comuna as string) ?? "Santiago", rating: ((l._count as Record<string, number>)?.resenas ?? 0) > 0 ? 4.5 : 0, descuento: 0,
+            foto: (l.portadaUrl as string) ?? null,
+            logoUrl: (l.logoUrl as string) ?? null,
+            portadaUrl: (l.portadaUrl as string) ?? null,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            promociones: (l.promociones as any[]) ?? [],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            concursos: (l.concursos as any[]) ?? [],
+            tieneDelivery: (l.tieneDelivery as boolean) ?? false,
+            comunasDelivery: (l.comunasDelivery as string[]) ?? [],
+            tieneRetiro: (l.tieneRetiro as boolean) ?? false,
+            linkPedido: (l.linkPedido as string) ?? "",
+          };
+        }));
       }
     }).catch(() => {});
   }, []);
@@ -359,15 +362,12 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       candidates = candidates.filter(l => l.tieneRetiro === true);
     }
 
-    // Filter by category STRICTLY (also check tags)
+    // Filter by category using categorias array
     if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
       const catLower = categoria.toLowerCase();
-      candidates = candidates.filter(l => {
-        if (l.categoria.toLowerCase() === catLower) return true;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tags = (l as any).tags as string[] | undefined;
-        return Array.isArray(tags) && tags.some(t => t.toLowerCase().includes(catLower) || catLower.includes(t.toLowerCase()));
-      });
+      candidates = candidates.filter(l =>
+        l.categorias?.some(c => c.toLowerCase() === catLower) ?? l.categoria.toLowerCase() === catLower
+      );
     }
 
     // Filter by comuna (skip if delivery already filtered by comunasDelivery)
@@ -391,9 +391,12 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     // Score each candidate
     const scored = candidates.map(l => {
       let score = (l.rating ?? 4) * 10;
-      const catScore = perfil.gustos.categorias[l.categoria] ?? 0;
+      const primaryCat = l.categorias?.[0]?.toLowerCase() ?? l.categoria;
+      const catScore = perfil.gustos.categorias[primaryCat] ?? 0;
+      // Bonus for secondary categories
+      const secScore = (l.categorias ?? []).slice(1).reduce((acc, c) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;
-      score += catScore * 2 + comScore;
+      score += catScore * 2 + secScore + comScore;
       if (l.descuento > 0) score += l.descuento * 0.5;
       score += Math.random() * 5;
       return { ...l, score };

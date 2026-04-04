@@ -77,7 +77,7 @@ export default function PromocionesPage() {
           condiciones: p.condiciones ?? undefined,
           modalidad: Array.isArray(p.modalidad) ? p.modalidad : [],
           vistas: p.vistas ?? 0,
-          localCategoria: p.local?.categoria ?? "",
+          localCategoria: p.local?.categorias?.[0] ?? "",
         }));
         setPromos(mapped);
       }

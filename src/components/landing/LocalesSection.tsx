@@ -3,8 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import BotonFavorito from "@/components/BotonFavorito";
 import { boostScore } from "@/lib/personalizacion";
-
-const categoriasFallback = ["Todos", "Pizza", "Sushi", "Almuerzo", "Burger", "Vegano", "Café"];
+import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -18,28 +17,25 @@ function getInitials(nombre: string): string {
 }
 
 const localesMock = [
-  { id: 1, nombre: "Pizza Napoli",          categoria: "Pizza",    barrio: "Providencia",     emoji: "🍕", rating: 0, precio: "", isOpen: true, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", logoUrl: null as string | null },
-  { id: 2, nombre: "Sushi Oasis",           categoria: "Sushi",    barrio: "Las Condes",      emoji: "🍣", rating: 0, precio: "", isOpen: true, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", logoUrl: null as string | null },
-  { id: 3, nombre: "El Menú de Don Carlos", categoria: "Almuerzo", barrio: "Santiago Centro", emoji: "🍲", rating: 0, precio: "", isOpen: true, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600", logoUrl: null as string | null },
-  { id: 4, nombre: "Burger Desierto",       categoria: "Burger",   barrio: "Ñuñoa",           emoji: "🍔", rating: 0, precio: "", isOpen: true, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", logoUrl: null as string | null },
-  { id: 5, nombre: "Verde Oasis",           categoria: "Vegano",   barrio: "Vitacura",        emoji: "🥗", rating: 0, precio: "", isOpen: true, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", logoUrl: null as string | null },
-  { id: 6, nombre: "Café Arenas",           categoria: "Café",     barrio: "Bellavista",      emoji: "☕", rating: 0, precio: "", isOpen: true, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", logoUrl: null as string | null },
+  { id: 1, nombre: "Pizza Napoli",          categorias: ["Pizza", "Italiano"],    barrio: "Providencia",     emoji: "🍕", rating: 0, precio: "", isOpen: true, descripcion: "La mejor pizza napolitana de Santiago, horno de leña importado de Italia.",       imagenUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600", logoUrl: null as string | null },
+  { id: 2, nombre: "Sushi Oasis",           categorias: ["Sushi", "Japonés"],     barrio: "Las Condes",      emoji: "🍣", rating: 0, precio: "", isOpen: true, descripcion: "Omakase y rolls creativos con ingredientes del Pacífico.",                          imagenUrl: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600", logoUrl: null as string | null },
+  { id: 3, nombre: "El Menú de Don Carlos", categorias: ["Saludable"],            barrio: "Santiago Centro", emoji: "🍲", rating: 0, precio: "", isOpen: true, descripcion: "Cocina casera chilena, almuerzo completo con sabor de abuela.",                     imagenUrl: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=600", logoUrl: null as string | null },
+  { id: 4, nombre: "Burger Desierto",       categorias: ["Hamburguesa"],          barrio: "Ñuñoa",           emoji: "🍔", rating: 0, precio: "", isOpen: true, descripcion: "Smash burgers artesanales con ingredientes locales y salsas únicas.",              imagenUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600", logoUrl: null as string | null },
+  { id: 5, nombre: "Verde Oasis",           categorias: ["Vegano", "Saludable"],  barrio: "Vitacura",        emoji: "🥗", rating: 0, precio: "", isOpen: true, descripcion: "Cocina plant-based de autor, menú cambiante según temporada.",                     imagenUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600", logoUrl: null as string | null },
+  { id: 6, nombre: "Café Arenas",           categorias: ["Café", "Brunch"],       barrio: "Bellavista",      emoji: "☕", rating: 0, precio: "", isOpen: true, descripcion: "Specialty coffee de origen, pastelería artesanal y ambiente íntimo.",              imagenUrl: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600", logoUrl: null as string | null },
 ];
 
 export default function LocalesSection() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
   const [locales, setLocales] = useState(localesMock);
-  const [categoriasDBLanding, setCategoriasDBLanding] = useState<string[]>([]);
-  const categorias = categoriasDBLanding.length > 0 ? ["Todos", ...categoriasDBLanding] : categoriasFallback;
-
-  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { const tops = data.filter((c: any) => c.tipo === "principal").slice(0, 6).map((c: any) => c.nombre); if (tops.length > 0) setCategoriasDBLanding(tops); } }).catch(() => {}); }, []);
+  const categorias = ["Todos", ...CATEGORIAS_MASTER.slice(0, 8)];
 
   useEffect(() => {
     fetch("/api/locales").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mapped = data.map((l: any) => ({
-          id: l.slug || l.id, nombre: l.nombre ?? "", categoria: l.categoria ?? "Otro",
+          id: l.slug || l.id, nombre: l.nombre ?? "", categorias: l.categorias ?? [],
           barrio: l.comuna ?? "Santiago", emoji: "🍽️",
           rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,
           descripcion: l.descripcion ?? "",
@@ -47,7 +43,7 @@ export default function LocalesSection() {
           logoUrl: l.logoUrl ?? null,
         }));
         // Sort by personalization
-        mapped.sort((a: any, b: any) => boostScore(b.categoria, b.barrio) - boostScore(a.categoria, a.barrio));
+        mapped.sort((a: any, b: any) => boostScore(b.categorias?.[0], b.barrio, b.categorias) - boostScore(a.categorias?.[0], a.barrio, a.categorias));
         setLocales(mapped.slice(0, 6));
       }
     }).catch(() => {});
@@ -55,7 +51,7 @@ export default function LocalesSection() {
 
   const localesFiltrados = categoriaActiva === "Todos"
     ? locales
-    : locales.filter(l => l.categoria === categoriaActiva);
+    : locales.filter((l: any) => l.categorias?.includes(categoriaActiva));
 
   return (
     <section className="dc-loc-section" style={{ backgroundColor: "var(--bg-primary)" }}>
@@ -138,7 +134,7 @@ export default function LocalesSection() {
                     <span style={{ fontSize: "2.5rem", opacity: 0.3 }}>🍽️</span>
                   </div>
                 )}
-                <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categoria, comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
+                <BotonFavorito localId={String(local.id)} localData={{ categoria: local.categorias?.[0] ?? "", comuna: local.barrio }} size="sm" style={{ position: "absolute", top: "8px", right: "8px", zIndex: 3 }} />
               </div>
               <div style={{ padding: local.descripcion ? "16px 20px 20px" : "16px 20px 16px" }}>
                 {/* Header: logo + nombre + meta + rating */}
@@ -160,7 +156,7 @@ export default function LocalesSection() {
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
                         <span className="dc-comuna">{local.barrio}</span>
                         <span className="dc-sep">·</span>
-                        <span className="dc-categoria">{local.categoria}</span>
+                        <span className="dc-categoria">{CATEGORIA_EMOJI[local.categorias?.[0]] ?? "🍽️"} {local.categorias?.[0] ?? ""}</span>
                       </div>
                     </div>
                   </div>

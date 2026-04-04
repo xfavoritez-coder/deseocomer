@@ -214,14 +214,14 @@ function TabFavoritos() {
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "12px" }}>
-      {locales.map((l: { id: string; nombre: string; comuna: string; categoria: string }) => (
+      {locales.map((l: { id: string; nombre: string; comuna: string; categorias?: string[] }) => (
         <Link key={l.id} href={`/locales/${l.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "16px", textDecoration: "none" }}>
           <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, color: "var(--bg-primary)", flexShrink: 0 }}>
             {l.nombre?.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--accent)" }}>{l.nombre}</p>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>{l.categoria} · {l.comuna}</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>{l.categorias?.[0] ?? ""} · {l.comuna}</p>
           </div>
         </Link>
       ))}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { getPendingRef, hasEmailCounted, markEmailCounted, incrementRef, clearPendingRef, savePendingRef, getRefUserName } from "@/lib/referrals";
+import { CATEGORIAS as CATEGORIAS_MASTER } from "@/lib/categorias";
 
 function OjoIcon({ visible }: { visible: boolean }) {
   return (
@@ -198,11 +199,10 @@ function RegistroContent() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "12px" }}>
                 {(() => {
-                  const FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Parrilla", "Árabe", "Peruano", "India", "Coreano", "Mediterráneo", "Thai", "Ramen", "Fusión", "Sin gluten", "Café", "Postres", "Brunch"];
                   const usarDB = categoriasDB.length > 0;
                   const opciones = usarDB
                     ? categoriasDB.filter(c => !c.estiloExcluido.includes(estilo)).map(c => c.nombre)
-                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : []; return FALLBACK.filter(c => !excluir.includes(c)); })();
+                    : (() => { const excluir = estilo === "vegano" ? ["Pollo", "Parrilla", "Mariscos", "Sushi"] : estilo === "vegetariano" ? ["Pollo", "Parrilla"] : []; return [...CATEGORIAS_MASTER].filter(c => !excluir.includes(c)); })();
                   const totalSel = comidasSel.length + customComidas.length;
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);

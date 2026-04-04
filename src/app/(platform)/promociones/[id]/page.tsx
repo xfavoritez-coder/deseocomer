@@ -58,7 +58,7 @@ export default function PromocionDetailPage() {
     comuna: dbPromo.local?.comuna ?? "",
     tipo: normalizeTipo(dbPromo.tipo ?? ""),
     categoria: "cena" as const,
-    categoriaLocal: dbPromo.local?.categoria ?? "",
+    categoriaLocal: dbPromo.local?.categorias?.[0] ?? "",
     imagen: "⚡",
     imagenUrl: dbPromo.imagenUrl ?? "",
     titulo: dbPromo.titulo ?? "",

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         condiciones: true, porcentajeDescuento: true, precioOriginal: true, precioDescuento: true,
         horaInicio: true, horaFin: true, diasSemana: true, activa: true, esCumpleanos: true,
         imagenUrl: true, vistas: true, modalidad: true, createdAt: true,
-        local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true, categoria: true } },
+        local: { select: { id: true, nombre: true, comuna: true, slug: true, logoUrl: true, categorias: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 100,

@@ -6,8 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
 import { useGenie } from "@/contexts/GenieContext";
-
-const CATEGORIAS_FALLBACK = ["Todos", "Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Pollo"];
+import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -32,10 +31,7 @@ export default function LocalesPage() {
   const [soloConConcursos, setSoloConConcursos] = useState(false);
   const [soloConPromociones, setSoloConPromociones] = useState(false);
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
-  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
-  const CATEGORIAS = categoriasDB.length > 0 ? ["Todos", ...categoriasDB] : CATEGORIAS_FALLBACK;
-
-  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); }).catch(() => {}); }, []);
+  const CATEGORIAS = ["Todos", ...CATEGORIAS_MASTER];
 
   useEffect(() => {
     fetch("/api/locales")
@@ -47,7 +43,7 @@ export default function LocalesPage() {
             id: l.id,
             slug: l.slug,
             nombre: l.nombre ?? "",
-            categoria: l.categoria ?? "Otro",
+            categorias: l.categorias ?? [],
             comuna: l.comuna ?? "Santiago",
             rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
             precio: "",
@@ -78,11 +74,11 @@ export default function LocalesPage() {
     .filter(l => {
       if (busqueda) {
         const q = busqueda.toLowerCase();
-        if (!l.nombre?.toLowerCase().includes(q) && !l.comuna?.toLowerCase().includes(q) && !l.categoria?.toLowerCase().includes(q) && !(l.tags && l.tags.some((t: string) => t.toLowerCase().includes(q)))) return false;
+        const catMatch = l.categorias?.some((c: string) => c.toLowerCase().includes(q));
+        if (!l.nombre?.toLowerCase().includes(q) && !l.comuna?.toLowerCase().includes(q) && !catMatch) return false;
       }
       if (categoriaActiva !== "Todos") {
-        const catMatch = l.categoria?.toLowerCase() === categoriaActiva.toLowerCase() || (l.tags && l.tags.some((t: string) => t.toLowerCase() === categoriaActiva.toLowerCase()));
-        if (!catMatch) return false;
+        if (!l.categorias?.includes(categoriaActiva)) return false;
       }
       if (soloAbiertos && l.horarios) {
         const ahora = new Date();
@@ -96,7 +92,7 @@ export default function LocalesPage() {
       return true;
     })
     .sort((a, b) => {
-      const boostDiff = boostScore(b.categoria, b.comuna, b.tags) - boostScore(a.categoria, a.comuna, a.tags);
+      const boostDiff = boostScore(b.categorias?.[0], b.comuna, b.categorias) - boostScore(a.categorias?.[0], a.comuna, a.categorias);
       if (ordenamiento === "para_ti") return boostDiff;
       if (ordenamiento === "rating") {
         const diff = (b.rating ?? 0) - (a.rating ?? 0);
@@ -267,7 +263,7 @@ export default function LocalesPage() {
 
                       {/* Favorito top-right */}
                       <div style={{ position: "absolute", top: "10px", right: "10px", zIndex: 2 }}>
-                        <BotonFavorito localId={local.id} localData={{ categoria: local.categoria, comuna: local.comuna }} size="sm" />
+                        <BotonFavorito localId={local.id} localData={{ categoria: local.categorias?.[0] ?? "", comuna: local.comuna }} size="sm" />
                       </div>
                     </div>
 
@@ -288,7 +284,7 @@ export default function LocalesPage() {
                             <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
                               <span className="dc-comuna">{local.comuna}</span>
                               <span className="dc-sep">·</span>
-                              <span className="dc-categoria">{local.categoria}</span>
+                              <span className="dc-categoria">{CATEGORIA_EMOJI[local.categorias?.[0]] ?? "🍽️"} {local.categorias?.[0] ?? ""}</span>
                             </div>
                           </div>
                         </div>

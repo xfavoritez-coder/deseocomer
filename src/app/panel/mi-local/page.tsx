@@ -2,14 +2,13 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import SubirFoto from "@/components/SubirFoto";
+import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
 const MapaUbicacion = dynamic(() => import("@/components/panel/MapaUbicacion"), { ssr: false, loading: () => <div style={{ height: "220px", borderRadius: "12px", background: "rgba(45,26,8,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>Cargando mapa...</span></div> });
 
 const DATA_KEY = "deseocomer_panel_local_data";
 const COMUNAS_SANTIAGO = ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort();
-const CATEGORIAS_FALLBACK = ["Pizza", "Sushi", "Hamburguesa", "Vegano", "Café", "Almuerzo", "Pastas", "Mexicano", "Mariscos", "Otro"];
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const TAGS_FALLBACK = ["Pizza","Sushi","Hamburguesa","Mexicano","Vegano","Vegetariano","Saludable","Pastas","Pollo","Mariscos","Parrilla","Árabe","Peruano","India","Coreano","Mediterráneo","Thai","Ramen","Fusión","Sin gluten","Café","Postres","Brunch"];
 
 interface HorarioDia { activo: boolean; abre: string; cierra: string }
 interface MenuItem { nombre: string; descripcion: string; precio: string; destacado: boolean }
@@ -55,12 +54,7 @@ export default function MiLocalPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [sugerencias, setSugerencias] = useState<any[]>([]);
 
-  const [categoriasDB, setCategoriasDB] = useState<string[]>([]);
-  const [tagsDBList, setTagsDBList] = useState<string[]>([]);
-  const CATEGORIAS = categoriasDB.length > 0 ? categoriasDB : CATEGORIAS_FALLBACK;
-  const TAGS = tagsDBList.length > 0 ? tagsDBList : TAGS_FALLBACK;
-
-  useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) { setCategoriasDB(data.filter((c: any) => c.tipo === "principal").map((c: any) => c.nombre)); setTagsDBList(data.map((c: any) => c.nombre)); } }).catch(() => {}); }, []);
+  const CATEGORIAS = [...CATEGORIAS_MASTER];
 
   const showToast = (msg: string, tipo: "ok" | "error" = "ok") => { setToast({ msg, tipo }); setTimeout(() => setToast(null), 4000); };
 
@@ -71,7 +65,7 @@ export default function MiLocalPage() {
       if (session.id) {
         fetch(`/api/locales/${session.id}`).then(r => r.ok ? r.json() : null).then(data => {
           if (data) {
-            const merged = { ...local, nombre: data.nombre ?? local.nombre, categoria: data.categoria ?? local.categoria, nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tags: data.tags ?? local.tags ?? [], tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng, sirveEnMesa: data.sirveEnMesa ?? local.sirveEnMesa ?? true, tieneDelivery: data.tieneDelivery ?? local.tieneDelivery ?? false, comunasDelivery: data.comunasDelivery ?? local.comunasDelivery ?? [], tieneRetiro: data.tieneRetiro ?? local.tieneRetiro ?? false, linkPedido: data.linkPedido ?? local.linkPedido ?? "" };
+            const merged = { ...local, nombre: data.nombre ?? local.nombre, categorias: data.categorias ?? local.categorias ?? [], nombreDueno: data.nombreDueno ?? local.nombreDueno, celularDueno: data.celularDueno ?? local.celularDueno, emailDueno: data.email ?? local.emailDueno, descripcion: data.descripcion ?? local.descripcion, historia: data.historia ?? local.historia, telefono: data.telefono ?? local.telefono, instagram: data.instagram ?? local.instagram, sitioWeb: data.sitioWeb ?? local.sitioWeb, direccion: data.direccion ?? local.direccion, comuna: data.comuna ?? local.comuna, ciudad: data.ciudad ?? local.ciudad, logoUrl: data.logoUrl ?? local.logoUrl, portadaUrl: data.portadaUrl ?? local.portadaUrl, galeria: data.galeria ?? local.galeria, horarios: data.horarios ?? local.horarios, tieneMenu: data.tieneMenu ?? local.tieneMenu, lat: data.lat ?? local.lat, lng: data.lng ?? local.lng, sirveEnMesa: data.sirveEnMesa ?? local.sirveEnMesa ?? true, tieneDelivery: data.tieneDelivery ?? local.tieneDelivery ?? false, comunasDelivery: data.comunasDelivery ?? local.comunasDelivery ?? [], tieneRetiro: data.tieneRetiro ?? local.tieneRetiro ?? false, linkPedido: data.linkPedido ?? local.linkPedido ?? "" };
             setD(merged); save(merged);
           }
         }).catch(() => {});
@@ -106,7 +100,7 @@ export default function MiLocalPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           nombre: d.nombre,
-          categoria: d.categoria,
+          categorias: d.categorias ?? [],
           descripcion: d.descripcion,
           historia: d.historia,
           telefono: d.telefono,
@@ -118,7 +112,6 @@ export default function MiLocalPage() {
           horarios: d.horarios,
           logoUrl: d.logoUrl,
           portadaUrl: d.portadaUrl,
-          tags: d.tags ?? [],
           tieneMenu: d.tieneMenu,
           lat: d.lat,
           lng: d.lng,
@@ -170,13 +163,44 @@ export default function MiLocalPage() {
       <SectionTitle>Información del local</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <Field label="Nombre del local" value={d.nombre as string ?? ""} onChange={v => set("nombre", v)} placeholder="Pizza Napoli" />
-        <div><label style={LS}>Categoría</label><select style={IS as React.CSSProperties} value={d.categoria as string ?? ""} onChange={e => set("categoria", e.target.value)}><option value="">Selecciona...</option>{CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
         <div>
-          <label style={LS}>Especialidades <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(máx. 6)</span></label>
+          <label style={LS}>Categorías <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textTransform: "none", letterSpacing: 0 }}>(elige hasta 3)</span></label>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "11px", color: "rgba(240,234,214,0.3)", marginBottom: "12px", lineHeight: 1.5 }}>La primera que elijas aparecerá en tu card. Las otras sirven para que te encuentren cuando buscan ese tipo de comida.</p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {TAGS.map(tag => { const tags = (d.tags as string[]) ?? []; const sel = tags.includes(tag); const maxed = tags.length >= 6 && !sel; return <button key={tag} type="button" disabled={maxed} onClick={() => { const cur = (d.tags as string[]) ?? []; set("tags", sel ? cur.filter(t => t !== tag) : [...cur, tag]); }} style={{ padding: "6px 14px", borderRadius: "20px", border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)", background: sel ? "rgba(232,168,76,0.15)" : "transparent", color: sel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)", fontFamily: "var(--font-lato)", fontSize: "0.82rem", cursor: maxed ? "default" : "pointer" }}>{tag}</button>; })}
+            {CATEGORIAS.map(cat => {
+              const cats = (d.categorias as string[]) ?? [];
+              const idx = cats.indexOf(cat);
+              const sel = idx !== -1;
+              const isPrimary = idx === 0;
+              const maxed = cats.length >= 3 && !sel;
+              return (
+                <button key={cat} type="button" disabled={maxed}
+                  onClick={() => {
+                    const cur = (d.categorias as string[]) ?? [];
+                    set("categorias", sel ? cur.filter(c => c !== cat) : [...cur, cat]);
+                  }}
+                  style={{
+                    padding: "6px 14px", borderRadius: "20px", position: "relative",
+                    border: sel
+                      ? isPrimary ? "1px solid #e8a84c" : "1px solid rgba(61,184,158,0.3)"
+                      : "1px solid rgba(232,168,76,0.15)",
+                    background: sel
+                      ? isPrimary ? "rgba(232,168,76,0.2)" : "rgba(61,184,158,0.12)"
+                      : "transparent",
+                    color: sel
+                      ? isPrimary ? "#e8a84c" : "#3db89e"
+                      : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.45)",
+                    fontFamily: "var(--font-lato)", fontSize: "0.82rem",
+                    cursor: maxed ? "not-allowed" : "pointer",
+                    opacity: maxed ? 0.3 : 1,
+                  }}>
+                  {CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}
+                  {isPrimary && <span style={{ marginLeft: "6px", fontSize: "0.7rem", opacity: 0.8 }}>★ Principal</span>}
+                </button>
+              );
+            })}
           </div>
-          {((d.tags as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.tags as string[]) ?? []).length}/6 etiquetas</p>}
+          {((d.categorias as string[]) ?? []).length > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>{((d.categorias as string[]) ?? []).length}/3 categorías</p>}
         </div>
         <div><label style={LS}>Descripción ({((d.descripcion as string) ?? "").length}/300)</label><textarea style={{ ...IS, resize: "vertical", minHeight: "80px" }} maxLength={300} value={d.descripcion as string ?? ""} onChange={e => set("descripcion", e.target.value)} placeholder="Cuéntale al mundo sobre tu local..." /></div>
         <Field label="Teléfono del local" value={d.telefono as string ?? ""} onChange={v => set("telefono", v)} placeholder="+56 2 2345 6789" />

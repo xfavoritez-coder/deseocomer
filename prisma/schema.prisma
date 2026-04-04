@@ -61,7 +61,7 @@ model Local {
   password      String
   telefono      String?
   ciudad        String   @default("santiago")
-  categoria     String?
+  categorias    String[] @default([])
   descripcion   String?
   historia      String?
   direccion     String?
@@ -74,7 +74,6 @@ model Local {
   logoUrl       String?
   portadaUrl    String?
   galeria       Json?
-  tags          String[] @default([])
   tieneMenu     Boolean  @default(false)
   tieneDelivery     Boolean  @default(false)
   comunasDelivery   String[] @default([])
