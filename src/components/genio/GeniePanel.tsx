@@ -7,12 +7,19 @@ import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categori
 const OCASIONES = ["Almuerzo solo", "Con amigos", "Cena romántica", "Antojo rápido", "Para llevar"];
 
 const COMUNAS = [
+  // Santiago
   "Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura", "San Miguel", "Maipú",
   "La Florida", "Pudahuel", "Peñalolén", "Macul", "La Reina", "Lo Barnechea", "Huechuraba",
   "Recoleta", "Independencia", "Estación Central", "Cerrillos", "Cerro Navia", "Conchalí",
   "El Bosque", "La Cisterna", "La Granja", "La Pintana", "Lo Espejo", "Lo Prado", "Quilicura",
   "Quinta Normal", "Renca", "San Bernardo", "San Joaquín", "San Ramón", "Padre Hurtado",
   "Melipilla", "Talagante", "Puente Alto", "Pirque", "Bellavista",
+  // Valparaíso
+  "Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "Con Con", "Reñaca",
+  // Concepción
+  "Concepción", "Talcahuano", "Hualpén", "San Pedro de la Paz", "Chiguayante",
+  // Otras ciudades
+  "La Serena", "Coquimbo", "Antofagasta", "Calama", "Temuco", "Pucón", "Villarrica",
 ];
 
 // Frases del genio por ocasión

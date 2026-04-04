@@ -7,7 +7,14 @@ import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categori
 const MapaUbicacion = dynamic(() => import("@/components/panel/MapaUbicacion"), { ssr: false, loading: () => <div style={{ height: "220px", borderRadius: "12px", background: "rgba(45,26,8,0.85)", display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)" }}>Cargando mapa...</span></div> });
 
 const DATA_KEY = "deseocomer_panel_local_data";
-const COMUNAS_SANTIAGO = ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort();
+const COMUNAS_POR_CIUDAD: Record<string, string[]> = {
+  Santiago: ["Cerrillos","Cerro Navia","Conchalí","El Bosque","Estación Central","Huechuraba","Independencia","La Cisterna","La Florida","La Granja","La Pintana","La Reina","Las Condes","Lo Barnechea","Lo Espejo","Lo Prado","Macul","Maipú","Melipilla","Padre Hurtado","Pedro Aguirre Cerda","Peñalolén","Providencia","Pudahuel","Puente Alto","Quilicura","Quinta Normal","Recoleta","Renca","San Bernardo","San Joaquín","San Miguel","San Ramón","Santiago Centro","Vitacura","Ñuñoa"].sort(),
+  Valparaíso: ["Valparaíso","Viña del Mar","Quilpué","Villa Alemana","Con Con","Limache","Olmué","Casablanca","Reñaca"].sort(),
+  Concepción: ["Concepción","Talcahuano","Hualpén","Chiguayante","San Pedro de la Paz","Penco","Tomé","Coronel","Lota"].sort(),
+  "La Serena": ["La Serena","Coquimbo","Ovalle","Vicuña","Andacollo"].sort(),
+  Antofagasta: ["Antofagasta","Calama","Mejillones","Taltal","San Pedro de Atacama"].sort(),
+  Temuco: ["Temuco","Padre Las Casas","Villarrica","Pucón","Angol","Victoria","Lautaro"].sort(),
+};
 const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 interface HorarioDia { activo: boolean; abre: string; cierra: string }
@@ -211,7 +218,8 @@ export default function MiLocalPage() {
       <SectionTitle>Ubicación</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "32px" }}>
         <div><label style={LS}>Ciudad</label><select style={IS as React.CSSProperties} value={d.ciudad as string ?? ""} onChange={e => set("ciudad", e.target.value)}><option value="">Selecciona ciudad...</option><option value="Santiago">Santiago</option><option value="Valparaíso">Valparaíso</option><option value="Concepción">Concepción</option><option value="La Serena">La Serena</option><option value="Antofagasta">Antofagasta</option><option value="Temuco">Temuco</option><option value="Otra">Otra</option></select></div>
-        {(d.ciudad as string) === "Santiago" && <div><label style={LS}>Comuna</label><select style={IS as React.CSSProperties} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)}><option value="">Selecciona...</option>{COMUNAS_SANTIAGO.map(c => <option key={c} value={c}>{c}</option>)}</select></div>}
+        {COMUNAS_POR_CIUDAD[d.ciudad as string] && <div><label style={LS}>Comuna</label><select style={IS as React.CSSProperties} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)}><option value="">Selecciona...</option>{COMUNAS_POR_CIUDAD[d.ciudad as string].map(c => <option key={c} value={c}>{c}</option>)}</select></div>}
+        {(d.ciudad as string) === "Otra" && <div><label style={LS}>Comuna / Sector</label><input style={IS} value={d.comuna as string ?? ""} onChange={e => set("comuna", e.target.value)} placeholder="Escribe tu comuna o sector" /></div>}
 
         {/* Dirección con autocomplete */}
         <div style={{ position: "relative" }}>
@@ -361,7 +369,7 @@ export default function MiLocalPage() {
           <div style={{ marginBottom: "16px" }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "8px" }}>Comunas donde haces delivery</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxHeight: "160px", overflowY: "auto" }}>
-              {COMUNAS_SANTIAGO.map(c => {
+              {(COMUNAS_POR_CIUDAD[d.ciudad as string] ?? COMUNAS_POR_CIUDAD.Santiago).map((c: string) => {
                 const comunas = (d.comunasDelivery as string[]) ?? [];
                 const sel = comunas.includes(c);
                 return (
