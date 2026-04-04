@@ -5,7 +5,7 @@ export function buildEmailHtml({ nombre, cuposRestantes, trackClickUrl, trackOpe
   trackOpenUrl: string;
   email: string;
 }): string {
-  const saludo = nombre ? `Hola ${nombre.split(" ")[0]},` : "Hola,";
+  const saludo = "Hola,";
   const desuscribirUrl = `https://deseocomer.com/desuscribir?email=${encodeURIComponent(email)}`;
 
   return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
@@ -40,8 +40,8 @@ export function buildEmailHtml({ nombre, cuposRestantes, trackClickUrl, trackOpe
 
   ${cuposRestantes > 0 ? `<div style="background:linear-gradient(135deg,#1a0e05,#2d1a08);border-radius:14px;padding:24px;margin-bottom:24px;text-align:center;border:1px solid rgba(232,168,76,0.3)">
     <p style="font-size:10px;font-weight:700;color:#3db89e;letter-spacing:0.2em;text-transform:uppercase;margin:0 0 10px">🎖️ Oferta de fundadores</p>
-    <h2 style="font-size:20px;font-weight:700;color:#f5d080;margin:0 0 12px;line-height:1.3">1 año gratis para<br>los primeros 50 locales</h2>
-    <p style="font-size:13px;color:rgba(240,220,160,0.6);line-height:1.6;margin:0 0 16px">Estamos en lanzamiento. Los primeros 50 locales acceden a <strong style="color:#f5d080">todas las funciones gratis durante 1 año</strong>. Avisaremos con anticipación antes de cobrar. Registrarse y aparecer siempre será gratis.</p>
+    <h2 style="font-size:20px;font-weight:700;color:#f5d080;margin:0 0 12px;line-height:1.3">Gratis para siempre<br>para los primeros 50 locales</h2>
+    <p style="font-size:13px;color:rgba(240,220,160,0.6);line-height:1.6;margin:0 0 16px">Estamos en lanzamiento. Los primeros 50 locales podrán <strong style="color:#f5d080">aparecer en la plataforma, publicar concursos y promociones gratis para siempre</strong>.</p>
     <div style="background:rgba(232,168,76,0.1);border:1px solid rgba(232,168,76,0.25);border-radius:20px;padding:8px 20px;display:inline-block">
       <span style="font-size:18px;font-weight:700;color:#e8a84c">${cuposRestantes}</span>
       <span style="font-size:12px;color:rgba(240,220,160,0.5);margin-left:6px">cupos restantes de 50</span>
@@ -49,12 +49,11 @@ export function buildEmailHtml({ nombre, cuposRestantes, trackClickUrl, trackOpe
   </div>` : ""}
 
   <div style="margin-bottom:28px">
-    ${["Registro gratis sin tarjeta de crédito", "Apareces en la plataforma de inmediato", "Concursos y promociones sin costo durante 1 año", "Mientras más temprano entres, mejor posicionado quedas"].map(t => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f0e8"><span style="color:#3db89e;font-weight:700;font-size:14px;flex-shrink:0">✓</span><span style="font-size:13px;color:#5a4010">${t}</span></div>`).join("")}
+    ${["Registro gratis sin tarjeta de crédito", "Apareces en la plataforma de inmediato", "Concursos y promociones gratis para siempre", "Mientras más temprano entres, mejor posicionado quedas"].map(t => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f5f0e8"><span style="color:#3db89e;font-weight:700;font-size:14px;flex-shrink:0">✓</span><span style="font-size:13px;color:#5a4010">${t}</span></div>`).join("")}
   </div>
 
   <div style="text-align:center;margin-bottom:24px">
     <a href="${trackClickUrl}" style="display:inline-block;padding:16px 40px;background:#e8a84c;border-radius:12px;font-size:15px;font-weight:700;color:#0a0812;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase">Registrar mi local gratis →</a>
-    ${cuposRestantes > 0 ? `<p style="font-size:12px;color:#a08040;margin-top:10px;line-height:1.5">Solo quedan ${cuposRestantes} cupos con acceso gratuito por 1 año. Sin compromisos.</p>` : ""}
   </div>
 </div>
 
