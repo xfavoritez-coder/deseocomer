@@ -1,10 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { checkAdminAuth } from "@/lib/adminAuth";
 
-export async function GET(req: NextRequest) {
-  const authErr = checkAdminAuth(req);
-  if (authErr) return authErr;
+export async function GET() {
 
   // QUERY 1 — Top 10 usuarios con más referidos
   const usuariosConReferidos = await prisma.participanteConcurso.groupBy({
