@@ -106,7 +106,7 @@ export default function DatosPersonalesPage() {
       <SectionTitle>Información del dueño o encargado</SectionTitle>
       <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
         <Field label="Nombre del dueño o encargado" value={nombreDueno} onChange={setNombreDueno} placeholder="Tu nombre completo" />
-        <Field label="Celular del dueño" value={celularDueno} onChange={setCelularDueno} placeholder="+56 9 1234 5678" />
+        <Field label="Celular del dueño" value={celularDueno} onChange={setCelularDueno} placeholder="+56 9 1234 5678" autoComplete="tel" />
         <div>
           <label style={LS}>Email de acceso</label>
           <input type="text" style={{ ...IS, opacity: 0.6, cursor: "not-allowed" }} value={emailDueno} readOnly />
@@ -166,6 +166,6 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "16px", paddingBottom: "8px", borderBottom: "1px solid var(--border-color)" }}>{children}</h3>;
 }
 
-function Field({ label, value, onChange, placeholder, type = "text" }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
-  return <div><label style={LS}>{label}</label><input type={type} style={IS} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} /></div>;
+function Field({ label, value, onChange, placeholder, type = "text", autoComplete }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; autoComplete?: string }) {
+  return <div><label style={LS}>{label}</label><input type={type} autoComplete={autoComplete} style={IS} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} /></div>;
 }
