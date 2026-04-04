@@ -59,7 +59,7 @@ export default function SoloLocalesPage() {
           Más clientes, más ventas
         </h1>
         <p className="sl-hero-sub" style={{ fontSize: 15, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: 24 }}>
-          Llega a miles de personas en Santiago que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local gratis.
+          Conecta con personas en Santiago que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local sin costo.
         </p>
         <button style={btnStyle} onClick={() => router.push("/registro-local")}>
           Registrar mi local gratis →

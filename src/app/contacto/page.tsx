@@ -63,7 +63,7 @@ function ContactoInner() {
             {/* Quick options */}
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "36px" }}>
               {[
-                { icon: "🏪", color: "rgba(232,168,76,0.1)", title: "Quiero registrar mi local", desc: "Llega a miles de personas en Santiago", href: "/registro-local" },
+                { icon: "🏪", color: "rgba(232,168,76,0.1)", title: "Quiero registrar mi local", desc: "Conecta con personas que buscan dónde comer", href: "/registro-local" },
                 { icon: "🏆", color: "rgba(61,184,158,0.1)", title: "Tengo dudas sobre un concurso", desc: "Premios, reglas o cómo participar", href: "/concursos/como-funciona" },
               ].map((op, i) => (
                 <Link key={i} href={op.href} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "16px 18px", background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.12)", borderRadius: "14px", textDecoration: "none", transition: "border-color 0.2s" }}>

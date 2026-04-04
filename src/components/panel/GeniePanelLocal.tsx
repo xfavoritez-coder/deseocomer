@@ -70,7 +70,7 @@ function getMensajeContextual(path: string, local: any): MensajeGenio | null {
 
   // PROMOCIONES
   if (path === "/panel/promociones") {
-    if (!tienePromociones && !wasShown("tip_promociones")) return { id: "tip_promociones", tipo: "onboarding", texto: "🧞 Un happy hour publicado aquí llega a miles de personas que buscan dónde ir hoy" };
+    if (!tienePromociones && !wasShown("tip_promociones")) return { id: "tip_promociones", tipo: "onboarding", texto: "🧞 Un happy hour publicado aquí llega a personas que buscan dónde ir hoy" };
   }
 
   return null;
