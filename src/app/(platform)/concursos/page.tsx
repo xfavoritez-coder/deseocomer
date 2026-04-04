@@ -190,7 +190,7 @@ export default function ConcursosPage() {
                     borderRadius: 20, overflow: "hidden", cursor: "pointer", transition: "transform 0.2s, border-color 0.2s",
                   }}>
                     {/* Image */}
-                    <div style={{ position: "relative", height: 200, overflow: "hidden" }}>
+                    <div style={{ position: "relative", height: 180, overflow: "hidden" }}>
                       {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                         : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a0f2e, #2d1a08)" }} />}
                       {/* Badge estado */}
@@ -280,7 +280,7 @@ export default function ConcursosPage() {
                 }}
                 >
                   {/* Image */}
-                  <div style={{ position: "relative", height: 200, overflow: "hidden" }}>
+                  <div style={{ position: "relative", height: 180, overflow: "hidden" }}>
                     {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }} />
                       : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a0f2e, #2d1a08)" }} />}
 
@@ -312,7 +312,7 @@ export default function ConcursosPage() {
                   </div>
 
                   {/* Body */}
-                  <div style={{ padding: "14px 16px 16px" }}>
+                  <div style={{ padding: "16px 20px 18px" }}>
                     {/* Local */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                       {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
@@ -453,8 +453,11 @@ export default function ConcursosPage() {
           .dc-cp-content { padding: 0 14px 60px; }
           .dc-cp-filters { justify-content: flex-start; }
         }
+        @media (min-width: 640px) {
+          .dc-cp-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        }
         @media (min-width: 1024px) {
-          .dc-cp-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+          .dc-cp-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
         }
       `}</style>
     </main>
