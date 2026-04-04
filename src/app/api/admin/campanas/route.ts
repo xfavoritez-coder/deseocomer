@@ -46,7 +46,18 @@ export async function POST(req: NextRequest) {
       select: { email: true },
     });
     const registeredEmails = new Set(existingLocals.map(l => l.email.toLowerCase()));
-    const validContactos = contactos.filter((c: any) => !registeredEmails.has(c.email.toLowerCase()));
+
+    // Filter out unsubscribed emails
+    const desuscritos = await prisma.contactoCampana.findMany({
+      where: { email: { in: contactos.map((c: any) => c.email.toLowerCase()) }, errorEnvio: "desuscrito" },
+      select: { email: true },
+    });
+    const unsubs = new Set(desuscritos.map(d => d.email.toLowerCase()));
+
+    const validContactos = contactos.filter((c: any) => {
+      const em = c.email.toLowerCase();
+      return !registeredEmails.has(em) && !unsubs.has(em);
+    });
 
     const campana = await prisma.campana.create({
       data: {
