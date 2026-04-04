@@ -47,6 +47,9 @@ export default function ConcursosPage() {
           createdAt: c.createdAt ?? c.fechaInicio ?? null,
           localCategoria: c.local?.categoria ?? "",
           localComuna: c.local?.comuna ?? "",
+          estado: c.estado ?? "activo",
+          fechaActivacion: c.fechaActivacion ?? null,
+          listaEsperaCount: c._count?.listaEspera ?? 0,
           ranking: (c.participantes ?? []).slice(0, 3).map((p: { usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", refs: p.puntos ?? 0 })),
         })));
       }
@@ -104,13 +107,16 @@ export default function ConcursosPage() {
   const sorted = [...concursos].filter(c => {
     const ended = getTimeLeft(c.endsAt).ended;
     const soon = isSoonEnding(c.endsAt);
-    if (filter === "activos") return !ended && !soon;
-    if (filter === "por_terminar") return !ended && soon;
+    if (filter === "activos") return !ended && !soon && c.estado !== "programado";
+    if (filter === "por_terminar") return !ended && soon && c.estado !== "programado";
     if (filter === "finalizados") return false;
-    return true; // Show all including ended
+    return true;
   }).sort((a, b) => {
     const endedA = getTimeLeft(a.endsAt).ended;
     const endedB = getTimeLeft(b.endsAt).ended;
+    // Programados siempre al final (después de activos, antes de finalizados)
+    if (a.estado === "programado" && b.estado !== "programado") return 1;
+    if (b.estado === "programado" && a.estado !== "programado") return -1;
     // Finalizados siempre al final
     if (endedA && !endedB) return 1;
     if (!endedA && endedB) return -1;
@@ -290,9 +296,14 @@ export default function ConcursosPage() {
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#3db89e", textTransform: "uppercase" }}>Nuevo</span>
                       </div>
                     )}
-                    {ended && (
+                    {ended && c.estado !== "programado" && (
                       <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Finalizado</span>
+                      </div>
+                    )}
+                    {c.estado === "programado" && (
+                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(167,139,250,0.9)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: "#0a0812", textTransform: "uppercase" }}>🔮 Próximamente</span>
                       </div>
                     )}
 
@@ -310,12 +321,29 @@ export default function ConcursosPage() {
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}><span style={{ fontSize: 16 }}>🏆 </span>{c.premio}</div>
                     {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>}
 
-                    {c.participantes < 10 && (
+                    {c.estado !== "programado" && c.participantes < 10 && (
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 10 }}>⚡ +2 pts bonus primeros 10</span>
                     )}
 
+                    {/* Programado info */}
+                    {c.estado === "programado" && (() => {
+                      const actMs = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() - Date.now() : 0;
+                      const actDias = Math.floor(actMs / 86400000);
+                      const actHoras = Math.floor((actMs % 86400000) / 3600000);
+                      const actTexto = actDias > 0 ? `${actDias} día${actDias > 1 ? "s" : ""} ${actHoras}h` : `${actHoras}h`;
+                      const wc = c.listaEsperaCount ?? 0;
+                      const wcTexto = wc === 0 ? "Sé el primero en anotarte" : wc <= 10 ? "Pocas personas esperando" : wc <= 50 ? `${wc} personas esperando` : `¡${wc} personas esperando este concurso!`;
+                      return (
+                        <div style={{ marginBottom: 10 }}>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 4 }}>Se activa en {actTexto}</p>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", marginBottom: 4 }}>⚡ Bonus +2 pts para los primeros 10</span>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(167,139,250,0.7)", marginTop: 4 }}>{wcTexto}</p>
+                        </div>
+                      );
+                    })()}
+
                     {/* Countdown */}
-                    {t && !t.ended && (
+                    {t && !t.ended && c.estado !== "programado" && (
                       <div style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: 10, padding: "10px 8px", display: "flex", justifyContent: "center", gap: 2, marginBottom: 12 }}>
                         {[
                           ...(t.dias > 0 ? [{ v: t.dias, l: "días" }] : []),
@@ -366,7 +394,16 @@ export default function ConcursosPage() {
                     )}
 
                     {/* CTA */}
-                    {!ended ? (
+                    {c.estado === "programado" ? (
+                    <button onClick={e => { e.stopPropagation(); router.push(`/concursos/${c.slug}`); }} style={{
+                      width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
+                      fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, textTransform: "uppercase",
+                      letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center",
+                      background: "transparent", border: "1px solid rgba(167,139,250,0.4)", color: "#a78bfa",
+                    }}>
+                      🔔 Avisarme →
+                    </button>
+                    ) : !ended ? (
                     <button onClick={e => { e.stopPropagation(); router.push(`/concursos/${c.slug}`); }} style={{
                       width: "100%", padding: 13, borderRadius: 10, cursor: "pointer",
                       fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, textTransform: "uppercase",

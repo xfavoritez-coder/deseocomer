@@ -10,7 +10,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true } },
         participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true, email: true, telefono: true } } }, orderBy: { puntos: "desc" } },
         ganadorActual: { select: { id: true, nombre: true } },
-        _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
+        _count: { select: { participantes: { where: { estado: { not: "descalificado" } } }, listaEspera: true } },
       },
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });

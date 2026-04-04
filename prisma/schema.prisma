@@ -121,6 +121,7 @@ model MenuItem {
 }
 
 enum EstadoConcurso {
+  programado
   activo
   finalizado
   en_revision
@@ -169,11 +170,13 @@ model Concurso {
   disputaAt           DateTime?
   ganadorDescartadoRazon String?
   modalidadPremio   String[] @default([])
+  fechaActivacion   DateTime?
 
   createdAt         DateTime @default(now())
 
   local         Local    @relation(fields: [localId], references: [id])
   participantes ParticipanteConcurso[]
+  listaEspera   ListaEsperaConcurso[]
   ganador1      Usuario? @relation("Ganador1", fields: [ganador1Id], references: [id])
   ganador2      Usuario? @relation("Ganador2", fields: [ganador2Id], references: [id])
   ganador3      Usuario? @relation("Ganador3", fields: [ganador3Id], references: [id])
@@ -385,4 +388,18 @@ model ComidaCustom {
   usuario         Usuario  @relation(fields: [usuarioId], references: [id])
 
   @@index([texto])
+}
+
+model ListaEsperaConcurso {
+  id          String   @id @default(cuid())
+  concursoId  String
+  email       String
+  nombre      String?
+  usuarioId   String?
+  notificado  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  concurso    Concurso @relation(fields: [concursoId], references: [id])
+
+  @@unique([concursoId, email])
 }

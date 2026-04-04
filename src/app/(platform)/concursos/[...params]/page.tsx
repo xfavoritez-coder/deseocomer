@@ -106,7 +106,7 @@ function ConcursoDetallePage() {
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
-          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null });
+          setConcursoData({ ...built, estado: data.estado ?? "activo", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
         }
         setDbLoading(false);
@@ -279,7 +279,60 @@ function ConcursoDetallePage() {
 
   const c = concurso ?? finalizado!;
   const dbEstado = c.estado ?? (timer?.ended ? "finalizado" : "activo");
-  const isEnded = !!finalizado || !!timer?.ended || dbEstado !== "activo";
+  const isProgramado = dbEstado === "programado";
+  const isEnded = !isProgramado && (!!finalizado || !!timer?.ended || (dbEstado !== "activo" && dbEstado !== "programado"));
+
+  // Lista de espera state for programado
+  const [listaEsperaTotal, setListaEsperaTotal] = useState(0);
+  const [listaRegistrado, setListaRegistrado] = useState(false);
+  const [listaEmail, setListaEmail] = useState("");
+  const [listaNombre, setListaNombre] = useState("");
+  const [listaLoading, setListaLoading] = useState(false);
+  const [activationTimer, setActivationTimer] = useState<{ dias: number; horas: number; minutos: number; segundos: number } | null>(null);
+
+  useEffect(() => {
+    if (!isProgramado || !concursoId) return;
+    fetch(`/api/concursos/${concursoId}/lista-espera`).then(r => r.json()).then(d => setListaEsperaTotal(d.total ?? 0)).catch(() => {});
+  }, [isProgramado, concursoId]);
+
+  useEffect(() => {
+    if (!isProgramado || !c?.endsAt) return;
+    // fechaActivacion is stored in concursoData from the API
+    const fechaAct = (concursoData as any)?.fechaActivacion;
+    if (!fechaAct) return;
+    const target = new Date(fechaAct).getTime();
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      setActivationTimer({
+        dias: Math.floor(diff / 86400000),
+        horas: Math.floor((diff % 86400000) / 3600000),
+        minutos: Math.floor((diff % 3600000) / 60000),
+        segundos: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    tick();
+    const iid = setInterval(tick, 1000);
+    return () => clearInterval(iid);
+  }, [isProgramado, concursoData]);
+
+  const handleListaEspera = async () => {
+    setListaLoading(true);
+    const email = isAuthenticated && user ? user.email : listaEmail.trim();
+    const nombre = isAuthenticated && user ? user.nombre : listaNombre.trim() || null;
+    const usuarioId = isAuthenticated && user ? user.id : null;
+    try {
+      const res = await fetch(`/api/concursos/${concursoId}/lista-espera`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, nombre, usuarioId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setListaRegistrado(true);
+        if (data.total) setListaEsperaTotal(data.total);
+      }
+    } catch {}
+    setListaLoading(false);
+  };
   const soon = concurso ? isSoonEnding(concurso.endsAt) : false;
   const urgColor = "#e05555";
   const refLink = isAuthenticated && user && c
@@ -528,7 +581,8 @@ function ConcursoDetallePage() {
       <section className="dc-cd-hero" style={{ position: "relative", height: "280px", overflow: "hidden" }}>
         {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: isProgramado ? "linear-gradient(to bottom, rgba(10,8,18,0.2) 0%, rgba(10,8,18,0.96) 100%)" : "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
+        {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
         {/* Back */}
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
@@ -587,11 +641,68 @@ function ConcursoDetallePage() {
             </div>
           )}
 
+          {/* Programado - Próximamente */}
+          {isProgramado && (
+            <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+              {/* Countdown de activación */}
+              {activationTimer && (
+                <div>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(167,139,250,0.7)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 8 }}>🔮 Se activa en</p>
+                  <div style={{ background: "rgba(10,8,18,0.7)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 12, padding: 14, display: "flex", justifyContent: "center", gap: 6 }}>
+                    {[
+                      ...(activationTimer.dias > 0 ? [{ v: activationTimer.dias, l: "días" }] : []),
+                      { v: activationTimer.horas, l: "hrs" }, { v: activationTimer.minutos, l: "min" }, { v: activationTimer.segundos, l: "seg" },
+                    ].map(({ v, l }, i, arr) => (
+                      <div key={l} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <div style={{ background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.15)", borderRadius: 8, minWidth: 44, padding: "8px 6px", textAlign: "center" }}>
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#a78bfa" }}>{String(v).padStart(2, "0")}</span>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 9, color: "rgba(167,139,250,0.5)", margin: "2px 0 0", textTransform: "uppercase" }}>{l}</p>
+                        </div>
+                        {i < arr.length - 1 && <span style={{ color: "rgba(167,139,250,0.3)", fontWeight: 700 }}>:</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Card principal */}
+              <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 16, padding: 24, textAlign: "center" }}>
+                <span style={{ fontSize: 32, display: "block", marginBottom: 12 }}>🔮</span>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 16, color: "#a78bfa", textTransform: "uppercase", marginBottom: 8 }}>Este concurso aún no ha comenzado</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, marginBottom: 12 }}>Sé de los primeros en participar. Avisaremos cuando empiece para que tengas ventaja sobre los demás.</p>
+                {listaEsperaTotal > 0 && <span style={{ display: "inline-block", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>👁 {listaEsperaTotal} personas esperando</span>}
+
+                {/* Incentivo bonus madrugador */}
+                <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 12, padding: "14px 16px", marginBottom: 16, display: "flex", gap: 12, alignItems: "flex-start", textAlign: "left" }}>
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>⚡</span>
+                  <div>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Ventaja para los primeros</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.55)", lineHeight: 1.5 }}>Los <strong style={{ color: "rgba(240,234,214,0.8)" }}>primeros 10 en participar</strong> cuando el concurso se active reciben <strong style={{ color: "#e8a84c" }}>+2 puntos extra</strong> automáticamente. ¡Anótate y entra antes que todos!</p>
+                  </div>
+                </div>
+
+                {/* Formulario lista de espera */}
+                {listaRegistrado ? (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "#a78bfa", lineHeight: 1.5 }}>✓ ¡Listo! Te avisaremos cuando el concurso empiece. Revisa tu email.</p>
+                ) : isAuthenticated && user ? (
+                  <button onClick={handleListaEspera} disabled={listaLoading} style={{ width: "100%", padding: 14, background: "transparent", border: "1px solid rgba(167,139,250,0.4)", borderRadius: 12, color: "#a78bfa", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer" }}>{listaLoading ? "..." : "🔔 Avisarme cuando empiece →"}</button>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <input type="email" placeholder="tu@email.com" value={listaEmail} onChange={e => setListaEmail(e.target.value)} style={{ padding: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 10, color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none" }} />
+                    <input type="text" placeholder="Tu nombre (opcional)" value={listaNombre} onChange={e => setListaNombre(e.target.value)} style={{ padding: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 10, color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none" }} />
+                    <button onClick={handleListaEspera} disabled={listaLoading || !listaEmail.includes("@")} style={{ padding: 14, background: "transparent", border: "1px solid rgba(167,139,250,0.4)", borderRadius: 12, color: "#a78bfa", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", opacity: listaEmail.includes("@") ? 1 : 0.5 }}>{listaLoading ? "..." : "🔔 Avisarme →"}</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Bonus madrugador */}
-          {!isEnded && (() => {
+          {!isEnded && !isProgramado && (() => {
             const totalParts = c.participantes ?? 0;
+            if (totalParts >= 10) return null;
             const madrugadoresRestantes = Math.max(0, 10 - totalParts);
-            if (madrugadoresRestantes > 0) return (
+            return (
               <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(232,168,76,0.06))", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 14, padding: "14px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12, marginTop: 20 }}>
                 <span style={{ fontSize: 24, flexShrink: 0 }}>⚡</span>
                 <div style={{ flex: 1 }}>
@@ -604,11 +715,10 @@ function ConcursoDetallePage() {
                 </div>
               </div>
             );
-            return <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)", textAlign: "center", marginBottom: 8, marginTop: 20 }}>⚡ Bonus madrugador agotado · 10/10 tomados</p>;
           })()}
 
           {/* 3. Countdown */}
-          {!isEnded && timer && (
+          {!isEnded && !isProgramado && timer && (
             <div style={{ marginTop: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 8 }}>⏳ termina en</p>
               <div style={{ background: "rgba(10,8,18,0.7)", border: `1px solid ${soon ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.18)"}`, borderRadius: 12, padding: 14, display: "flex", justifyContent: "center", gap: 6 }}>

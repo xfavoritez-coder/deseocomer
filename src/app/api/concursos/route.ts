@@ -10,7 +10,10 @@ export async function GET(req: NextRequest) {
 
     const concursos = await prisma.concurso.findMany({
       where: {
-        activo: true,
+        OR: [
+          { activo: true },
+          { estado: "programado" },
+        ],
         local: {
           activo: true,
         },
@@ -18,7 +21,7 @@ export async function GET(req: NextRequest) {
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, comuna: true, categoria: true } },
         ganadorActual: { select: { nombre: true } },
-        _count: { select: { participantes: true } },
+        _count: { select: { participantes: true, listaEspera: true } },
       },
       orderBy: { fechaFin: "asc" },
       take: limit,
@@ -33,15 +36,28 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { localId, premio, descripcion, condiciones, imagenUrl, fechaFin } = await req.json();
+    const { localId, premio, descripcion, condiciones, imagenUrl, fechaFin, fechaActivacion } = await req.json();
     if (!localId || !premio || !fechaFin) return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+
+    // Determine if programado
+    const esProgramado = fechaActivacion && new Date(fechaActivacion) > new Date();
 
     // Get local name for slug
     const local = await prisma.local.findUnique({ where: { id: localId }, select: { nombre: true } });
     const slug = makeConcursoSlug(premio, local?.nombre ?? "local");
 
     const concurso = await prisma.concurso.create({
-      data: { localId, slug, premio, descripcion, ...(condiciones && { condiciones }), imagenUrl, fechaFin: new Date(fechaFin) },
+      data: {
+        localId, slug, premio, descripcion,
+        ...(condiciones && { condiciones }),
+        imagenUrl,
+        fechaFin: new Date(fechaFin),
+        ...(esProgramado ? {
+          estado: "programado",
+          activo: false,
+          fechaActivacion: new Date(fechaActivacion),
+        } : {}),
+      },
     });
 
     // Notify captador on first contest (bonus email)

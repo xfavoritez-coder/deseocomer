@@ -24,6 +24,8 @@ export default function PanelConcursos() {
 
 
   const [dur, setDur] = useState(3);
+  const [activacion, setActivacion] = useState<"ahora" | "programar">("ahora");
+  const [fechaActivacion, setFechaActivacion] = useState("");
   const [imagenConcurso, setImagenConcurso] = useState("");
   const [descripcionPremio, setDescripcionPremio] = useState("");
   const [condiciones, setCondiciones] = useState("");
@@ -78,18 +80,20 @@ export default function PanelConcursos() {
   const publish = async () => {
     const s = getSession();
     if (!s.id) return;
-    const fechaFin = new Date(); fechaFin.setDate(fechaFin.getDate() + dur);
+    const esProgramado = activacion === "programar" && fechaActivacion && new Date(fechaActivacion) > new Date();
+    const inicio = esProgramado ? new Date(fechaActivacion) : new Date();
+    const fechaFin = new Date(inicio); fechaFin.setDate(fechaFin.getDate() + dur);
     try {
       const res = await fetch("/api/concursos", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localId: s.id, premio: pFinal, descripcion: descripcionPremio.trim() || null, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null }),
+        body: JSON.stringify({ localId: s.id, premio: pFinal, descripcion: descripcionPremio.trim() || null, fechaFin: fechaFin.toISOString(), imagenUrl: imagenConcurso || null, condiciones: condiciones.trim() || null, fechaActivacion: esProgramado ? new Date(fechaActivacion).toISOString() : null }),
       });
       if (res.ok) {
         const nuevo = await res.json();
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false);
+    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion("");
   };
 
   const copyLink = (c: Concurso) => {
@@ -425,6 +429,35 @@ export default function PanelConcursos() {
         {labelReq("Duración")}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
 
+        {labelReq("¿Cuándo se activa?", false)}
+        {(() => {
+          const yaHayProgramado = concursos.some((c: any) => c.estado === "programado");
+          return (
+            <div>
+              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button onClick={() => { setActivacion("ahora"); setFechaActivacion(""); }} style={chip(activacion === "ahora")}>Ahora mismo</button>
+                <div style={{ position: "relative" }}>
+                  <button disabled={yaHayProgramado} onClick={() => !yaHayProgramado && setActivacion("programar")} style={{ ...chip(activacion === "programar"), opacity: yaHayProgramado ? 0.4 : 1, cursor: yaHayProgramado ? "default" : "pointer" }}>Programar fecha</button>
+                  {yaHayProgramado && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "#e8a84c", marginTop: "4px", maxWidth: "200px", lineHeight: 1.4 }}>Ya tienes un concurso programado. Espera a que se active para programar otro.</p>}
+                </div>
+              </div>
+              {activacion === "programar" && (
+                <div style={{ marginTop: "12px" }}>
+                  <input type="datetime-local" value={fechaActivacion} onChange={e => {
+                    const val = e.target.value;
+                    const selected = new Date(val);
+                    const now = new Date();
+                    const max7d = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    if (selected > max7d) { setFechaActivacion(""); return; }
+                    setFechaActivacion(val);
+                  }} min={new Date(Date.now() + 3600000).toISOString().slice(0, 16)} max={new Date(Date.now() + 7 * 24 * 3600000).toISOString().slice(0, 16)} style={{ padding: "10px 14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: "10px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "0.9rem", outline: "none" }} />
+                  {fechaActivacion && new Date(fechaActivacion) > new Date(Date.now() + 7 * 24 * 3600000) && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#ff6b6b", marginTop: "6px" }}>Máximo 7 días de anticipación</p>}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {labelReq("Foto del concurso")}
         <SubirFoto folder="concursos" preview={imagenConcurso || null} label="Subir foto del premio" height="140px" onUpload={url => setImagenConcurso(url)} />
 
@@ -442,8 +475,8 @@ export default function PanelConcursos() {
             <div style={{ position: "relative", height: "180px" }}>
               <img src={imagenConcurso} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", alignItems: "center", gap: "6px", background: "rgba(0,0,0,0.6)", borderRadius: "20px", padding: "4px 12px" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#3db89e", animation: "dcPulse 1.8s ease-in-out infinite" }} />
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", color: "#3db89e", textTransform: "uppercase" }}>Activo</span>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: activacion === "programar" && fechaActivacion ? "#a78bfa" : "#3db89e", animation: "dcPulse 1.8s ease-in-out infinite" }} />
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", color: activacion === "programar" && fechaActivacion ? "#a78bfa" : "#3db89e", textTransform: "uppercase" }}>{activacion === "programar" && fechaActivacion ? "🔮 Próximamente" : "Activo"}</span>
               </div>
             </div>
           )}
@@ -571,8 +604,10 @@ export default function PanelConcursos() {
               </a>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, minWidth: 0, textDecoration: "none" }}>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>{c.premio}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  {!ended ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  {c.estado === "programado" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#a78bfa" }}>🔮 Programado</span>
+                  ) : !ended ? (
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#3db89e" }}>
                       <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#3db89e", flexShrink: 0, animation: "dcPulse 1.5s ease-in-out infinite" }} />
                       {tiempoStr} restantes
@@ -589,7 +624,9 @@ export default function PanelConcursos() {
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(255,128,128,0.08)", border: "1px solid rgba(255,128,128,0.2)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#ff8080" }}>⏳ Pendiente</span>
                   )}
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", margin: 0 }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>
+                {c.estado === "programado" && c.fechaActivacion && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", margin: 0 }}>Se activa el {new Date(c.fechaActivacion).toLocaleDateString("es-CL")} a las {new Date(c.fechaActivacion).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}</p>}
+                {c.estado === "programado" && (c._count?.listaEspera ?? 0) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "#a78bfa", margin: 0 }}>{c._count?.listaEspera ?? 0} personas en lista de espera</p>}
+                {c.estado !== "programado" && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", margin: 0 }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>}
               </a>
               </div>
               <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderTop: "1px solid rgba(232,168,76,0.06)" }}>

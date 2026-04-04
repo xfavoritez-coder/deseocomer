@@ -337,6 +337,46 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
     }
 
     // ════════════════════════════════════════════════════════════════════════
+    // ACTIVAR CONCURSOS PROGRAMADOS
+    // ════════════════════════════════════════════════════════════════════════
+
+    const aActivar = await prisma.concurso.findMany({
+      where: {
+        estado: "programado",
+        fechaActivacion: { lte: now },
+      },
+      include: {
+        listaEspera: { where: { notificado: false } },
+      },
+    });
+
+    for (const concurso of aActivar) {
+      await prisma.concurso.update({
+        where: { id: concurso.id },
+        data: { estado: "activo", activo: true },
+      });
+      log.push(`[ACTIVADO] ${concurso.id} - ${concurso.premio}`);
+
+      // Notificar lista de espera
+      for (const entrada of concurso.listaEspera) {
+        try {
+          await resend.emails.send({
+            from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
+            to: entrada.email,
+            subject: `🔮 ¡Ya comenzó! ${concurso.premio}`,
+            html: `<div style="background:#1a0e05;font-family:Georgia,serif;padding:40px 24px;max-width:560px;margin:0 auto"><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.2em;text-align:center">🧞 DeseoComer</h1><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:32px;margin-top:24px"><p style="font-size:24px;text-align:center;margin-bottom:16px">🔮</p><h2 style="color:#f5d080;font-size:20px;text-align:center;margin-bottom:12px">¡El concurso que esperabas ya comenzó!</h2><p style="color:#c0a060;font-size:16px;line-height:1.6;text-align:center;margin-bottom:8px">${entrada.nombre ? `Hola ${entrada.nombre},` : "Hola,"}</p><p style="color:#c0a060;font-size:15px;line-height:1.6;text-align:center;margin-bottom:24px">El concurso <strong style="color:#e8a84c">${concurso.premio}</strong> acaba de activarse. ¡Entra ahora para ser de los primeros y obtener el bonus madrugador!</p><div style="text-align:center"><a href="https://deseocomer.com/concursos/${concurso.slug || concurso.id}" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">¡Participar ahora! →</a></div><p style="color:#5a4028;font-size:13px;text-align:center;margin-top:20px;line-height:1.6">💡 Los primeros 10 en participar reciben +2 puntos extra de bonus madrugador</p></div></div>`,
+          });
+          await prisma.listaEsperaConcurso.update({
+            where: { id: entrada.id },
+            data: { notificado: true },
+          });
+        } catch (emailErr) {
+          console.error(`[Cron] Error email lista espera ${entrada.email}:`, emailErr);
+        }
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
     // RESULTADO
     // ════════════════════════════════════════════════════════════════════════
 
