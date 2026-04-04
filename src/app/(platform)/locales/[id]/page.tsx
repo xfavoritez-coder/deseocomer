@@ -404,6 +404,20 @@ export default function LocalDetailPage() {
                     );
                   })()}
 
+                  {/* Sin concursos ni promociones */}
+                  {concursosActivos.length === 0 && promosLocal.length === 0 && (
+                    <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "14px", padding: "24px", textAlign: "center" }}>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", marginBottom: esPropioDueno ? "14px" : "0" }}>Sin concursos ni promociones activas</p>
+                      {esPropioDueno && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.5, marginBottom: "4px" }}>Publica un concurso o promoción para que más personas te encuentren</p>
+                          <a href="/panel/concursos" style={{ display: "block", padding: "11px", background: "#e8a84c", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#0a0812", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Crear concurso →</a>
+                          <a href="/panel/promociones" style={{ display: "block", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#e8a84c", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Publicar promoción →</a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Reseñas preview */}
                   {local.resenas.length === 0 ? (
                     <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "12px", padding: "28px 24px", textAlign: "center" }}>
@@ -469,9 +483,9 @@ export default function LocalDetailPage() {
                     </div>
                     {/* Modalidades */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
-                      {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", color: "#a070e0" }}>Servicio en mesa</span>}
-                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.3)", color: "#3db89e" }}>Delivery</span>}
-                      {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", color: "rgba(232,168,76,0.8)" }}>Retiro en local</span>}
+                      {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Servicio en mesa</span>}
+                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Delivery</span>}
+                      {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Retiro en local</span>}
                     </div>
                     {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
                       <div style={{ marginBottom: "12px" }}>

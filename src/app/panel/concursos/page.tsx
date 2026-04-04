@@ -46,6 +46,7 @@ export default function PanelConcursos() {
   const [actionToast, setActionToast] = useState("");
   const [abrirEditando, setAbrirEditando] = useState(false);
   const [filtroPanel, setFiltroPanel] = useState<"todos" | "activos" | "pendientes" | "entregados">("todos");
+  const [sharePrompt, setSharePrompt] = useState(false);
 
   useEffect(() => {
     const s = getSession();
@@ -91,6 +92,8 @@ export default function PanelConcursos() {
       if (res.ok) {
         const nuevo = await res.json();
         setConcursos(prev => [{ ...nuevo, _count: { participantes: 0 } }, ...prev]);
+        setDetalle({ ...nuevo, _count: { participantes: 0 }, participantes: [] });
+        setSharePrompt(true);
       }
     } catch {}
     setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion(""); setModalidadConcurso("meritos");
@@ -237,6 +240,19 @@ export default function PanelConcursos() {
             </button>
           </div>
         </div>
+
+        {/* Share prompt after creating */}
+        {sharePrompt && (
+          <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(232,168,76,0.04))", border: "1px solid rgba(232,168,76,0.35)", borderRadius: "14px", padding: "20px", marginBottom: "20px", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#f5d080", marginBottom: "6px" }}>¡Tu concurso está en vivo! 🎉</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.5, marginBottom: "16px" }}>Comparte el link en tus redes sociales para que más personas participen. Mientras más personas compartan, mayor alcance tendrá tu local.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <a href={`https://wa.me/?text=${encodeURIComponent(`¡Participa en nuestro concurso y gana ${detalle.premio}! 🏆\n${link}`)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "rgba(37,211,102,0.12)", border: "1px solid rgba(37,211,102,0.35)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#25d366", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Compartir en WhatsApp</a>
+              <a href={`https://www.instagram.com/`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "rgba(225,48,108,0.08)", border: "1px solid rgba(225,48,108,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#e1306c", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Publicar en Instagram</a>
+            </div>
+            <button onClick={() => setSharePrompt(false)} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", cursor: "pointer", marginTop: "10px" }}>Ahora no</button>
+          </div>
+        )}
 
         {/* Ranking / Participantes */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
