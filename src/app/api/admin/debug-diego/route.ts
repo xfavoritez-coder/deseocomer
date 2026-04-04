@@ -22,10 +22,6 @@ export async function GET() {
     },
   });
 
-  const apoyos = await prisma.apoyo.findMany({
-    where: { targetUsuarioId: diego.id },
-  }).catch(() => []);
-
   return NextResponse.json({
     usuario: diego,
     participaciones: participaciones.map((p) => ({
@@ -47,6 +43,5 @@ export async function GET() {
       concurso: p.concurso.premio,
       puntos: p.puntos,
     })),
-    totalApoyosRecibidos: apoyos.length,
   });
 }
