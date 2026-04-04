@@ -113,3 +113,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+  try {
+    const { id } = await params;
+    await prisma.participanteConcurso.deleteMany({ where: { concursoId: id } });
+    await prisma.concurso.delete({ where: { id } });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("[Admin concursos DELETE]", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
+}

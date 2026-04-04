@@ -431,6 +431,7 @@ export default function AdminConcursos() {
                 <button onClick={() => cerrar(sel.id)} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", cursor: "pointer", width: "100%" }}>Cerrar concurso</button>
               )}
               <a href={`/concursos/${sel.slug || sel.id}`} target="_blank" rel="noopener" style={{ display: "block", textAlign: "center", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", borderRadius: "8px", border: "1px solid rgba(232,168,76,0.2)", color: "#e8a84c", textDecoration: "none" }}>Ver concurso público →</a>
+              <button onClick={async () => { if (!confirm(`¿Eliminar "${sel.premio}"? Se borrarán todos los participantes. Esta acción no se puede deshacer.`)) return; try { const res = await adminFetch(`/api/admin/concursos/${sel.id}`, { method: "DELETE" }); if (res.ok) { setConcursos(prev => prev.filter(c => c.id !== sel.id)); cerrarPanel(); } } catch {} }} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "8px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.82rem", padding: "10px", cursor: "pointer", width: "100%" }}>🗑 Eliminar concurso</button>
             </div>
           </div>
           <style>{`@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
