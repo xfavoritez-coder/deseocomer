@@ -520,7 +520,7 @@ export default function PanelConcursos() {
     <button onClick={() => setFiltroPanel(key)} style={{ padding: "6px 14px", borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.06em", background: filtroPanel === key ? "rgba(232,168,76,0.15)" : "transparent", border: filtroPanel === key ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: filtroPanel === key ? "var(--accent)" : "var(--text-muted)" }}>{label}</button>
   );
 
-  return (<div>
+  return (<div style={{ width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px", width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
       <button onClick={() => setWizard(true)} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0 }}>+ Concurso</button>
@@ -560,7 +560,8 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", display: "flex", alignItems: "stretch", width: "100%", boxSizing: "border-box" }}>
+            <div key={c.id} className="dc-panel-cc" style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", boxSizing: "border-box" }}>
+              <div style={{ display: "flex", alignItems: "stretch" }}>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
                 {c.imagenUrl ? (
                   <img src={c.imagenUrl} alt="" style={{ width: 80, height: 80, objectFit: "cover", display: "block" }} />
@@ -590,12 +591,13 @@ export default function PanelConcursos() {
                 </div>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", margin: 0 }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>
               </a>
-              <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 5, padding: "10px 10px", borderLeft: "1px solid rgba(232,168,76,0.06)", flexShrink: 0 }}>
+              </div>
+              <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderTop: "1px solid rgba(232,168,76,0.06)" }}>
                 {c.estado !== "cancelado" && !c.cancelado && (
-                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer", whiteSpace: "nowrap" }}>📸 Compartir</button>
+                  <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer" }}>📸</button>
                 )}
-                <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>Editar</button>
-                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer", whiteSpace: "nowrap" }}>Detalle</button>
+                <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer" }}>Editar</button>
+                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Detalle</button>
               </div>
             </div>
           );
