@@ -138,9 +138,10 @@ export async function GET(
             bottom: 0,
             left: 0,
             right: 0,
-            padding: "0 80px 200px",
+            padding: "0 80px 300px",
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
             gap: "28px",
           }}
         >
@@ -152,6 +153,7 @@ export async function GET(
               color: "rgba(240,234,214,0.45)",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
+              textAlign: "center",
             }}
           >
             {concurso.local.nombre}
@@ -162,6 +164,7 @@ export async function GET(
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "16px",
             }}
           >
@@ -190,6 +193,7 @@ export async function GET(
               textTransform: "uppercase",
               lineHeight: "1.15",
               letterSpacing: "0.02em",
+              textAlign: "center",
             }}
           >
             {concurso.premio}
@@ -199,6 +203,7 @@ export async function GET(
           <div
             style={{
               height: "2px",
+              width: "100%",
               backgroundColor: "rgba(232,168,76,0.15)",
               display: "flex",
             }}
@@ -211,6 +216,7 @@ export async function GET(
               fontSize: "48px",
               color: "rgba(240,234,214,0.45)",
               lineHeight: "1.4",
+              textAlign: "center",
             }}
           >
             Participa gratis e invita amigos para ganar
