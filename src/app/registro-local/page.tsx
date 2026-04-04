@@ -102,6 +102,7 @@ export default function RegistroLocalPage() {
             </div>
 
             <button type="submit" disabled={loading} style={{ ...btnS, opacity: loading ? 0.6 : 1 }}>{loading ? "Registrando..." : "Registrar mi local gratis"}</button>
+            <Link href="/solo-locales" style={{ display: "block", textAlign: "center", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", textDecoration: "none", marginTop: "12px" }}>¿Cómo funciona? Conoce más →</Link>
           </form>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
