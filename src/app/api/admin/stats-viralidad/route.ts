@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkAdminAuth } from "@/lib/adminAuth";
 
 export async function GET(req: NextRequest) {
-  if (req.headers.get("x-admin") !== "true") {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
 
   // QUERY 1 — Top 10 usuarios con más referidos
   const usuariosConReferidos = await prisma.participanteConcurso.groupBy({
