@@ -370,8 +370,8 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       });
     }
 
-    // Filter by comuna — try exact match first, then delivery coverage
-    if (comuna) {
+    // Filter by comuna (skip if delivery already filtered by comunasDelivery)
+    if (comuna && modalidad !== "Delivery a domicilio") {
       const comLower = comuna.toLowerCase();
       const exactMatch = candidates.filter(l => l.comuna.toLowerCase() === comLower);
       if (exactMatch.length > 0) {
@@ -382,7 +382,6 @@ export function GenieProvider({ children }: { children: ReactNode }) {
         if (deliveryMatch.length > 0) {
           candidates = deliveryMatch;
         }
-        // If still nothing, keep all candidates (don't filter by comuna)
       }
     }
 
