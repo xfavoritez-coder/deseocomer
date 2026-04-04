@@ -521,14 +521,14 @@ export default function PanelConcursos() {
   );
 
   return (<div style={{ width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px", width: "100%", boxSizing: "border-box", overflowX: "hidden" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px", width: "100%", boxSizing: "border-box" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
-      <button onClick={() => setWizard(true)} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0 }}>+ Concurso</button>
+      <button onClick={() => setWizard(true)} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0, fontSize: "0.78rem", padding: "10px 16px" }}>+ Concurso</button>
     </div>
 
     {/* Filtros */}
     {concursos.length > 0 && (
-      <div style={{ display: "flex", gap: "6px", marginBottom: "16px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "4px" }}>
+      <div style={{ display: "flex", gap: "6px", marginBottom: "16px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "4px", width: "100%", boxSizing: "border-box" }}>
         {chipFiltro("todos", "Todos")}
         {chipFiltro("activos", "Activos")}
         {chipFiltro("pendientes", "Pendientes")}
@@ -560,7 +560,7 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} className="dc-panel-cc" style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", boxSizing: "border-box" }}>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", boxSizing: "border-box", minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "stretch" }}>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
                 {c.imagenUrl ? (
@@ -578,7 +578,7 @@ export default function PanelConcursos() {
                       {tiempoStr} restantes
                     </span>
                   ) : c.estado === "completado" || c.premioEntregado ? (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.25)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#3db89e" }}>✓ Premio entregado</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(245,208,128,0.08)", border: "1px solid rgba(245,208,128,0.3)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#f5d080" }}>✓ Premio entregado</span>
                   ) : c.estado === "en_disputa" ? (
                     <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 20, background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.25)", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#ff6b6b" }}>Disputa activa</span>
                   ) : c.estado === "expirado" ? (

@@ -209,6 +209,8 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         }
         .dc-panel-main {
           flex: 1; margin-left: 240px; padding: 32px 40px; min-height: 100vh;
+          width: calc(100% - 240px); max-width: calc(100% - 240px);
+          overflow-x: hidden; box-sizing: border-box;
         }
         .dc-panel-mobilebar {
           display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999;
@@ -225,7 +227,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         @media (max-width: 767px) {
           .dc-panel-mobilebar { display: flex; }
           .dc-panel-sidebar { display: none; }
-          .dc-panel-main { margin-left: 0; padding: 80px 16px 32px; }
+          .dc-panel-main { margin-left: 0; padding: 80px 16px 32px; width: 100%; max-width: 100%; overflow-x: hidden; box-sizing: border-box; }
         }
       `}</style>
     </div>
