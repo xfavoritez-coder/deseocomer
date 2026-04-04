@@ -336,7 +336,7 @@ export default function ConcursosPage() {
                       return (
                         <div style={{ marginBottom: 10 }}>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 4 }}>Se activa en {actTexto}</p>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", marginBottom: 4 }}>⚡ Bonus +2 pts para los primeros 10</span>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", marginBottom: 4, whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(167,139,250,0.7)", marginTop: 4 }}>{wcTexto}</p>
                         </div>
                       );

@@ -6,7 +6,7 @@ import { boostScore } from "@/lib/personalizacion";
 
 
 
-interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; descripcion: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[] }
+interface ConcursoHome { id: string; slug: string; local: string; localLogoUrl: string | null; premio: string; descripcion: string; participantes: number; horasRestantes: number; fechaFin: string; imagen: string; imagenUrl: string; topRanking: { nombre: string; referidos: number }[]; estado?: string; fechaActivacion?: string; listaEspera?: number }
 const concursosMock: ConcursoHome[] = [];
 
 export default function ConcursosSection() {
@@ -24,10 +24,15 @@ export default function ConcursosSection() {
           const rA = new Date(a.fechaFin).getTime() - ahora;
           const rB = new Date(b.fechaFin).getTime() - ahora;
           const endedA = rA <= 0, endedB = rB <= 0;
+          const progA = a.estado === "programado", progB = b.estado === "programado";
           // Finalizados siempre al final
           if (endedA && !endedB) return 1;
           if (!endedA && endedB) return -1;
           if (endedA && endedB) return rB - rA;
+          // Programados después de activos
+          if (progA && !progB) return 1;
+          if (!progA && progB) return -1;
+          if (progA && progB) return new Date(a.fechaActivacion ?? a.fechaFin).getTime() - new Date(b.fechaActivacion ?? b.fechaFin).getTime();
           const uA = rA <= 86400000, uB = rB <= 86400000;
           if (uA && !uB) return -1; if (!uA && uB) return 1;
           if (uA && uB) return rA - rB;
@@ -36,13 +41,16 @@ export default function ConcursosSection() {
           return partDiff + boostDiff * 10;
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setConcursos(sorted.slice(0, 3).map((c: any) => ({
+        setConcursos(sorted.slice(0, 4).map((c: any) => ({
           id: c.id, slug: c.slug ?? c.id, local: c.local?.nombre ?? "Local", localLogoUrl: c.local?.logoUrl ?? null, premio: c.premio ?? "", descripcion: c.descripcion ?? "",
           participantes: c._count?.participantes ?? 0,
           horasRestantes: Math.max(0, (new Date(c.fechaFin).getTime() - ahora) / 3600000),
           fechaFin: c.fechaFin,
           imagen: "🏆", imagenUrl: c.imagenUrl ?? "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600",
           topRanking: [],
+          estado: c.estado ?? "activo",
+          fechaActivacion: c.fechaActivacion ?? undefined,
+          listaEspera: c._count?.listaEspera ?? 0,
         })));
       }
     }).catch(() => {}).finally(() => setLoading(false));
@@ -116,18 +124,19 @@ export default function ConcursosSection() {
             const totalSeg = t.d * 86400 + t.h * 3600 + t.m * 60 + t.s;
             const msRestantes = new Date(c.fechaFin).getTime() - Date.now();
             const ended = msRestantes <= 0;
-            const esUrgente = !ended && msRestantes <= 24 * 3600000;
+            const esProgramado = c.estado === "programado";
+            const esUrgente = !ended && !esProgramado && msRestantes <= 24 * 3600000;
             const urgColor = "#e05555";
             const numColor = esUrgente ? urgColor : "rgba(240,234,214,0.9)";
             const sepColor = esUrgente ? "rgba(224,85,85,0.3)" : "rgba(240,234,214,0.2)";
-            const badgeText = ended ? "Finalizado" : esUrgente ? "¡Termina hoy!" : "Activo";
-            const badgeColor = ended ? "rgba(240,234,214,0.4)" : esUrgente ? urgColor : "#3db89e";
-            const badgeDot = ended ? "rgba(240,234,214,0.3)" : esUrgente ? urgColor : "#3db89e";
+            const badgeText = ended ? "Finalizado" : esProgramado ? "Próximamente" : esUrgente ? "¡Termina hoy!" : "Activo";
+            const badgeColor = ended ? "rgba(240,234,214,0.4)" : esProgramado ? "#a78bfa" : esUrgente ? urgColor : "#3db89e";
+            const badgeDot = ended ? "rgba(240,234,214,0.3)" : esProgramado ? "#a78bfa" : esUrgente ? urgColor : "#3db89e";
 
             return (
               <a key={c.id} href={`/concursos/${c.slug || c.id}`} className="dc-cst-card" style={{
                 background: "rgba(20,12,35,0.95)",
-                border: `1px solid ${esUrgente ? "rgba(224,85,85,0.4)" : "rgba(232,168,76,0.25)"}`,
+                border: `1px solid ${esProgramado ? "rgba(167,139,250,0.35)" : esUrgente ? "rgba(224,85,85,0.4)" : "rgba(232,168,76,0.25)"}`,
                 borderRadius: "20px", overflow: "hidden", textDecoration: "none", display: "block", color: "inherit",
                 transition: "transform 0.2s, border-color 0.2s",
               }}>
@@ -136,7 +145,7 @@ export default function ConcursosSection() {
                   <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   <div style={{ position: "absolute", top: 0, right: 0, zIndex: 4, lineHeight: 0 }}><SelloGratis size="sm" /></div>
                   {/* Badge */}
-                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${ended ? "rgba(255,255,255,0.12)" : esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
+                  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 3, background: "rgba(10,8,18,0.75)", border: `1px solid ${ended ? "rgba(255,255,255,0.12)" : esProgramado ? "rgba(167,139,250,0.5)" : esUrgente ? "rgba(224,85,85,0.5)" : "rgba(232,168,76,0.35)"}`, borderRadius: "20px", padding: "4px 10px 4px 6px", display: "flex", alignItems: "center", gap: "5px" }}>
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: badgeDot, animation: ended ? "none" : `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: badgeColor, textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
@@ -159,7 +168,7 @@ export default function ConcursosSection() {
                   <p className="dc-cst-desc" style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "14px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.descripcion || "Comparte tu link y gana este premio. Mientras más amigos invites, más chances tienes."}</p>
 
                   {/* Countdown box */}
-                  {!ended && (
+                  {!ended && !esProgramado && (
                     <div style={{ background: "rgba(10,8,18,0.6)", border: `1px solid ${esUrgente ? "rgba(224,85,85,0.3)" : "rgba(232,168,76,0.15)"}`, borderRadius: "12px", padding: "10px 14px", marginBottom: "14px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
                         <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: esUrgente ? urgColor : "#e8a84c", animation: `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
@@ -183,6 +192,19 @@ export default function ConcursosSection() {
                       </div>
                     </div>
                   )}
+                  {esProgramado && (
+                    <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#a78bfa", textTransform: "uppercase" }}>Se activa pronto</span>
+                      {c.fechaActivacion && (
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "12px", color: "rgba(167,139,250,0.6)", marginTop: "4px" }}>
+                          {new Date(c.fechaActivacion).toLocaleDateString("es-CL", { day: "numeric", month: "short" })}
+                        </p>
+                      )}
+                      {(c.listaEspera ?? 0) > 0 && (
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "11px", color: "rgba(167,139,250,0.5)", marginTop: "4px" }}>{c.listaEspera} en lista de espera</p>
+                      )}
+                    </div>
+                  )}
                   {ended && (
                     <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
@@ -192,17 +214,17 @@ export default function ConcursosSection() {
                   {/* Footer */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                      👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}
+                      {esProgramado ? <>🔔 {c.listaEspera ?? 0} en espera</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
                     </span>
                     {!ended && (
                       <span className={esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : "dc-cst-btn"} style={{
                         fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 700,
                         padding: "7px 16px", borderRadius: "20px",
-                        border: `1px solid ${misConcursos.has(c.id) ? "rgba(61,184,158,0.4)" : esUrgente ? urgColor : "var(--accent)"}`,
-                        color: misConcursos.has(c.id) ? "#3db89e" : esUrgente ? urgColor : "var(--accent)",
+                        border: `1px solid ${esProgramado ? "rgba(167,139,250,0.4)" : misConcursos.has(c.id) ? "rgba(61,184,158,0.4)" : esUrgente ? urgColor : "var(--accent)"}`,
+                        color: esProgramado ? "#a78bfa" : misConcursos.has(c.id) ? "#3db89e" : esUrgente ? urgColor : "var(--accent)",
                         background: "transparent",
                       }}>
-                        {misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
+                        {esProgramado ? "Ver detalles" : misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                       </span>
                     )}
                   </div>
@@ -246,7 +268,7 @@ export default function ConcursosSection() {
           .dc-cst-btn-urgent { background: #e05555 !important; color: #fff !important; border-color: #e05555 !important; }
         }
         @media (min-width: 1024px) {
-          .dc-cst-grid { grid-template-columns: repeat(3, 1fr); }
+          .dc-cst-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
           .dc-cst-premio { font-size: 24px; }
         }
         @media (max-width: 767px) {
