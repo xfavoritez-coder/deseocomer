@@ -95,6 +95,8 @@ model Local {
   recordatorio10d               Boolean  @default(false)
   captadorId      String?
   captadorCodigo  String?  @default("")
+  esFounder       Boolean  @default(false)
+  founderAt       DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -402,4 +404,35 @@ model ListaEsperaConcurso {
   concurso    Concurso @relation(fields: [concursoId], references: [id])
 
   @@unique([concursoId, email])
+}
+
+model Campana {
+  id               String   @id @default(cuid())
+  asunto           String
+  template         String   @default("founder")  // founder, generico, reactivacion
+  estado           String   @default("borrador")  // borrador, enviando, completada
+  totalContactos   Int      @default(0)
+  totalEnviados    Int      @default(0)
+  totalErrores     Int      @default(0)
+  createdAt        DateTime @default(now())
+  enviadoAt        DateTime?
+  contactos        ContactoCampana[]
+}
+
+model ContactoCampana {
+  id           String    @id @default(cuid())
+  campanaId    String
+  email        String
+  nombre       String?
+  abrioEmail   Boolean   @default(false)
+  hizoClic     Boolean   @default(false)
+  seRegistro   Boolean   @default(false)
+  errorEnvio   String?
+  abrioAt      DateTime?
+  clicAt       DateTime?
+  createdAt    DateTime  @default(now())
+  campana      Campana   @relation(fields: [campanaId], references: [id])
+
+  @@unique([campanaId, email])
+  @@index([email])
 }

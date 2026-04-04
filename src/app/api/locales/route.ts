@@ -53,6 +53,21 @@ export async function POST(req: NextRequest) {
       } catch { /* ignore */ }
     }
 
+    // Check founder cupos
+    let esFounder = false;
+    try {
+      const [cfgTotal, cfgUsados] = await Promise.all([
+        prisma.configSite.findUnique({ where: { clave: "cupos_founder_total" } }),
+        prisma.configSite.findUnique({ where: { clave: "cupos_founder_usados" } }),
+      ]);
+      const total = cfgTotal ? parseInt(cfgTotal.valor) : 50;
+      const usados = cfgUsados ? parseInt(cfgUsados.valor) : 0;
+      if (usados < total) {
+        esFounder = true;
+        await prisma.configSite.upsert({ where: { clave: "cupos_founder_usados" }, create: { clave: "cupos_founder_usados", valor: "1" }, update: { valor: String(usados + 1) } });
+      }
+    } catch {}
+
     const local = await prisma.local.create({
       data: {
         nombre, slug, nombreDueno: nombreDueno || nombreEncargado, celularDueno: telefono,
@@ -60,8 +75,17 @@ export async function POST(req: NextRequest) {
         ...(nombreEncargado && { nombreEncargado }),
         ...(registroRapido && { registroRapido: true }),
         ...(captadorData && captadorData),
+        ...(esFounder && { esFounder: true, founderAt: new Date() }),
       },
     });
+
+    // Track campaign conversion
+    try {
+      const contacto = await prisma.contactoCampana.findFirst({ where: { email: email.toLowerCase() } });
+      if (contacto) {
+        await prisma.contactoCampana.update({ where: { id: contacto.id }, data: { seRegistro: true } });
+      }
+    } catch {}
 
     // Send welcome email for quick registration
     if (registroRapido && passwordPlain) {

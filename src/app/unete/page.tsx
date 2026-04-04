@@ -28,10 +28,12 @@ function UneteInner() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
   const [emailUsado, setEmailUsado] = useState("");
+  const [cuposRestantes, setCuposRestantes] = useState<number | null>(null);
 
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) localStorage.setItem("deseocomer_captador_ref", ref);
+    fetch("/api/cupos-founder").then(r => r.json()).then(d => { if (d.restantes !== undefined) setCuposRestantes(d.restantes); }).catch(() => {});
   }, [searchParams]);
 
   const canSubmit = nombreLocal.trim() && nombre.trim() && email.trim() && telefono.trim();
@@ -94,6 +96,11 @@ function UneteInner() {
           <div style={{ fontSize: 32, marginBottom: 8 }}>🧞</div>
           <p style={{ fontFamily: "var(--font-cinzel), Cinzel, serif", fontSize: 18, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6, margin: "0 0 6px" }}>Únete a DeseoComer</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", margin: 0, lineHeight: 1.5 }}>Solo 4 datos y tu local estará en la plataforma.<br />El resto lo completas después con calma.</p>
+          {cuposRestantes !== null && cuposRestantes > 0 && (
+            <div style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 20, padding: "6px 16px", display: "inline-block", marginTop: 12 }}>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#fff", letterSpacing: "0.06em", textTransform: "uppercase" }}>⚡ {cuposRestantes} cupos de fundador disponibles</span>
+            </div>
+          )}
         </div>
 
         {done ? (

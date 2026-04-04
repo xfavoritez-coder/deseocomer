@@ -13,6 +13,7 @@ const NAV = [
   { icon: "📋", label: "Lista Espera", href: "/admin/lista-espera" },
   { icon: "🧞", label: "Mensajes", href: "/admin/mensajes" },
   { icon: "🍽️", label: "Comidas", href: "/admin/comidas-sugeridas" },
+  { icon: "📧", label: "Campañas", href: "/admin/campanas" },
   { icon: "⚙️", label: "Ajustes", href: "/admin/ajustes" },
 ];
 
