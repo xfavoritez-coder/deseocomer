@@ -227,7 +227,7 @@ export default function ConcursosSection() {
                         color: esProgramado ? "#a78bfa" : misConcursos.has(c.id) ? "#3db89e" : esUrgente ? urgColor : "var(--accent)",
                         background: "transparent",
                       }}>
-                        {esProgramado ? "🔔 Avisarme →" : misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
+                        {esProgramado ? "🔔 Avisarme" : misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                       </span>
                     )}
                   </div>

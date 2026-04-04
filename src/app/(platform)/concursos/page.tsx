@@ -456,9 +456,6 @@ export default function ConcursosPage() {
         @media (min-width: 1024px) {
           .dc-cp-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
         }
-        @media (min-width: 1440px) {
-          .dc-cp-grid { grid-template-columns: repeat(4, 1fr); }
-        }
       `}</style>
     </main>
   );
