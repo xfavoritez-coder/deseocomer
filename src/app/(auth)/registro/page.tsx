@@ -41,22 +41,34 @@ function RegistroContent() {
 
   function checkEmailTypo(email: string): string {
     const lower = email.toLowerCase().trim();
+    if (!lower.includes("@") || !lower.includes(".")) return "";
     const corrections: [RegExp, string][] = [
-      [/@gm[ai]{0,2}l\.c[co]m$/i, "@gmail.com"],
       [/@gmial\.com$/i, "@gmail.com"],
       [/@gmal\.com$/i, "@gmail.com"],
       [/@gamil\.com$/i, "@gmail.com"],
+      [/@gmaill\.com$/i, "@gmail.com"],
+      [/@gmail\.co$/i, "@gmail.com"],
+      [/@gmail\.cm$/i, "@gmail.com"],
+      [/@gmail\.cmo$/i, "@gmail.com"],
+      [/@gmaik\.com$/i, "@gmail.com"],
       [/@hotmal\.com$/i, "@hotmail.com"],
       [/@homail\.com$/i, "@hotmail.com"],
+      [/@hotmial\.com$/i, "@hotmail.com"],
+      [/@hotmail\.co$/i, "@hotmail.com"],
       [/@outlok\.com$/i, "@outlook.com"],
+      [/@outook\.com$/i, "@outlook.com"],
       [/@yaho\.com$/i, "@yahoo.com"],
-      [/\.ccom$/i, ""],
-      [/\.comm$/i, ""],
+      [/@yahooo\.com$/i, "@yahoo.com"],
+      [/\.ccom$/i, ".com"],
+      [/\.comm$/i, ".com"],
+      [/\.ocm$/i, ".com"],
+      [/\.coml$/i, ".com"],
     ];
     for (const [pattern, fix] of corrections) {
       if (pattern.test(lower)) {
-        if (fix) return lower.replace(pattern, fix);
-        return lower.replace(/\.c+om$/i, ".com");
+        const suggested = lower.replace(pattern, fix);
+        if (suggested === lower) return "";
+        return suggested;
       }
     }
     return "";
@@ -143,6 +155,11 @@ function RegistroContent() {
             </div>
           ) : onboardingStep === 1 ? (
             <div style={{ textAlign: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 16 }}>
+                <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#e8a84c" }} />
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>PASO 1 DE 2</span>
+                <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "rgba(232,168,76,0.15)" }} />
+              </div>
               <div style={{ fontSize: "2rem", marginBottom: "12px" }}>🍽️</div>
               <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Cuál es tu estilo?</h2>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Así te mostramos lo que más te gusta</p>
@@ -167,6 +184,11 @@ function RegistroContent() {
             </div>
           ) : onboardingStep === 2 ? (
             <div style={{ textAlign: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 16 }}>
+                <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#3db89e" }} />
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>PASO 2 DE 2</span>
+                <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#e8a84c" }} />
+              </div>
               <div style={{ fontSize: "2rem", marginBottom: "12px" }}>😋</div>
               <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Qué te encanta comer?</h2>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
