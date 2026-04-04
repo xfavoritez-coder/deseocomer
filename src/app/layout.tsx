@@ -9,6 +9,7 @@ import GenieLampara from "@/components/genio/GenieButton";
 import GenieContextual from "@/components/GenieContextual";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import BannerVerificacion from "@/components/layout/BannerVerificacion";
+import LiveActivityToast from "@/components/layout/LiveActivityToast";
 
 const cinzelDecorative = Cinzel_Decorative({
   subsets: ["latin"],
@@ -89,6 +90,7 @@ export default function RootLayout({
                 {children}
                 <GenieLampara />
                 <GenieContextual />
+                <LiveActivityToast />
               </GenieProvider>
             </AuthProvider>
           </ThemeProvider>
