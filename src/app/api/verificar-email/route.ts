@@ -75,9 +75,12 @@ export async function GET(req: NextRequest) {
       where: { usuarioId: usuario.id },
       select: { concursoId: true, referidorDirectoId: true, referidorNivel2Id: true },
     });
+    console.log("[Nivel2] Buscando participaciones con nivel2 para usuario:", usuario.id, usuario.nombre);
+    console.log("[Nivel2] Total encontradas:", misParticipaciones.length);
 
     for (const mp of misParticipaciones) {
       if (!mp.referidorNivel2Id) continue;
+      console.log("[Nivel2] Procesando concursoId:", mp.concursoId, "nivel2Id:", mp.referidorNivel2Id);
 
       // Get the concurso to check if active
       const concurso = await prisma.concurso.findUnique({
@@ -107,6 +110,9 @@ export async function GET(req: NextRequest) {
       const menosDeUnaHora = referidorDirecto?.createdAt
         ? (Date.now() - new Date(referidorDirecto.createdAt).getTime()) < 3600000
         : false;
+
+      console.log("[Nivel2] mismaIP:", mismaIP, "menosDeUnaHora:", menosDeUnaHora);
+      console.log("[Nivel2] puntosNivel2 actuales:", nivel2Participante?.puntosNivel2);
 
       if (mismaIP || menosDeUnaHora) {
         // Mark as pending for review

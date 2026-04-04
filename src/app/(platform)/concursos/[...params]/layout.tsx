@@ -9,6 +9,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { params: segments } = await params;
   const slug = segments[0] ?? "";
+  const refName = segments[1] ? decodeURIComponent(segments[1]) : null;
 
   try {
     const concurso = await prisma.concurso.findFirst({
@@ -19,19 +20,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!concurso) return {};
 
     const premioCorto = concurso.premio.length > 40
-      ? concurso.premio.substring(0, 40).trim() + '...'
+      ? concurso.premio.substring(0, 40).trim() + "..."
       : concurso.premio;
-    const title = `🏆 Premio: ${premioCorto} — ${concurso.local.nombre} | DeseoComer`;
-    const description = "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
-    const image = concurso.imagenUrl?.startsWith('http')
-      ? concurso.imagenUrl
-      : concurso.imagenUrl
-        ? `https://deseocomer.com${concurso.imagenUrl}`
-        : concurso.local.portadaUrl?.startsWith('http')
-          ? concurso.local.portadaUrl
-          : concurso.local.portadaUrl
-            ? `https://deseocomer.com${concurso.local.portadaUrl}`
-            : null;
+
+    // Personalizar título si viene de un link de referido
+    const refNameCapitalized = refName ? refName.charAt(0).toUpperCase() + refName.slice(1) : null;
+    const title = refNameCapitalized
+      ? `${refNameCapitalized} te invita a ganar ${premioCorto} | DeseoComer`
+      : `🏆 Premio: ${premioCorto} — ${concurso.local.nombre} | DeseoComer`;
+    const description = refNameCapitalized
+      ? `${refNameCapitalized} está participando por ${premioCorto} en ${concurso.local.nombre}. Regístrate gratis, súmale puntos y tú también entras a ganar.`
+      : "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
+
+    // OG image dinámica via /api/og
+    const ogTitle = refNameCapitalized
+      ? `${refNameCapitalized} te invita a ganar`
+      : premioCorto;
+    const ogSubtitle = refNameCapitalized
+      ? `${premioCorto} — ${concurso.local.nombre}`
+      : `Participa gratis en ${concurso.local.nombre}`;
+    const ogImage = `https://deseocomer.com/api/og?title=${encodeURIComponent(ogTitle)}&subtitle=${encodeURIComponent(ogSubtitle)}`;
+
     const url = `https://deseocomer.com/concursos/${slug}`;
 
     return {
@@ -42,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         url,
         siteName: "DeseoComer",
-        ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: concurso.premio }] } : {}),
+        images: [{ url: ogImage, width: 1200, height: 630, alt: concurso.premio }],
         type: "website",
         locale: "es_CL",
       },
@@ -50,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: "summary_large_image",
         title,
         description,
-        ...(image ? { images: [image] } : {}),
+        images: [ogImage],
       },
       alternates: { canonical: url },
     };
