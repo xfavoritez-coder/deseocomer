@@ -159,6 +159,9 @@ export default function AdminUsuarios() {
         )}
       </div>
 
+      {/* Botón actividad detallada */}
+      <a href={`/admin/usuarios/${sel.id}/actividad`} target="_blank" style={{ display: "block", textAlign: "center", padding: "12px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.25)", borderRadius: "12px", fontFamily: "Georgia", fontSize: "0.88rem", color: "#a070e0", textDecoration: "none", marginBottom: "16px", letterSpacing: "0.04em" }}>🧞 Ver actividad completa del usuario →</a>
+
       {/* Perfil del Genio */}
       {sel.geniePerfil && (() => {
         const gp = sel.geniePerfil as { gustos?: { categorias?: Record<string, number>; comunas?: Record<string, number>; ocasiones?: Record<string, number>; horario?: Record<string, number>; precioPreferido?: string | null }; comportamiento?: { localesVisitados?: { nombre: string; categoria: string; comuna: string }[]; promocionesAbiertas?: string[]; concursosVistos?: string[]; filtrosUsados?: string[] }; respuestasGenio?: { pregunta: string; respuesta: string }[] };
