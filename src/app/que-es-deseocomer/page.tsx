@@ -40,7 +40,7 @@ export default function QueEsDeseoComerPage() {
             ¿Qué es DeseoComer?
           </h1>
           <p className="qed-hero-sub" style={{ fontSize: 16, color: "rgba(240,234,214,0.6)", lineHeight: 1.65, marginBottom: 28 }}>
-            La forma más fácil de descubrir dónde comer en Santiago, participar en concursos y ganar comida gratis.
+            La forma más fácil de descubrir dónde comer en tu ciudad, participar en concursos y ganar comida gratis.
           </p>
           <div className="qed-btns" style={{ display: "flex", justifyContent: "center", gap: 10 }}>
             <button style={btnPrimary} onClick={() => router.push("/locales")}>Explorar locales →</button>
@@ -57,7 +57,7 @@ export default function QueEsDeseoComerPage() {
           <div className="qed-centered-content">
             {[
               { titulo: "¿Qué buscas hoy?", texto: "Almuerzo solo, con amigos, cena romántica, antojo rápido o para llevar." },
-              { titulo: "¿En qué zona de Santiago?", texto: "Elige tu comuna y el Genio busca en tu zona." },
+              { titulo: "¿En qué zona estás?", texto: "Elige tu comuna y el Genio busca en tu zona." },
               { titulo: "¿Qué te provoca hoy?", texto: "Sushi, pizza, vegano, saludable, o déjate sorprender." },
             ].map((p, i) => (
               <div key={p.titulo} style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 16 }}>
@@ -76,7 +76,7 @@ export default function QueEsDeseoComerPage() {
         <section style={{ padding: "36px 0", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
           <p style={sLabel}>Concursos</p>
           <h2 style={sTitle}>Gana comida gratis cada semana</h2>
-          <p style={sSub}>Los mejores locales de Santiago regalan sus platos. Participa gratis e invita amigos para ganar puntos.</p>
+          <p style={sSub}>Los mejores locales regalan sus platos. Participa gratis e invita amigos para ganar puntos.</p>
 
           <div className="qed-centered-content">
             {/* Real concursos */}
@@ -136,7 +136,7 @@ export default function QueEsDeseoComerPage() {
         {/* ── PROMOCIONES ──────────────────────────── */}
         <section style={{ padding: "36px 0", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
           <p style={sLabel}>Promociones</p>
-          <h2 style={sTitle}>Las mejores ofertas de Santiago en un solo lugar</h2>
+          <h2 style={sTitle}>Las mejores ofertas en un solo lugar</h2>
           <p style={sSub}>Happy hours, 2x1, descuentos y cupones de los mejores locales. Siempre actualizados.</p>
           <div className="qed-centered-content">
             {[
@@ -161,7 +161,7 @@ export default function QueEsDeseoComerPage() {
             ¿Listo para empezar?
           </h2>
           <p style={{ fontSize: 14, color: "rgba(240,234,214,0.4)", marginBottom: 24, lineHeight: 1.5 }}>
-            Únete gratis y empieza a descubrir los mejores locales de Santiago hoy.
+            Únete gratis y empieza a descubrir los mejores locales de tu ciudad hoy.
           </p>
           <div className="qed-cta-btns" style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
             <button style={{ ...btnPrimary, width: "100%", maxWidth: 280 }} onClick={() => router.push("/registro")}>Crear cuenta gratis →</button>

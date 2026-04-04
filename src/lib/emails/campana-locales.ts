@@ -16,7 +16,7 @@ export function buildEmailHtml({ nombre, cuposRestantes, trackClickUrl, trackOpe
   <p style="font-size:40px;margin:0 0 10px">🧞</p>
   <p style="font-size:13px;font-weight:700;color:#e8a84c;letter-spacing:0.25em;text-transform:uppercase;margin:0 0 20px">DeseoComer</p>
   <h1 style="font-size:26px;font-weight:700;color:#f5d080;line-height:1.3;margin:0 0 8px">Tu local podría estar<br>ganando visibilidad gratis</h1>
-  <p style="font-size:14px;color:rgba(240,220,160,0.6);margin:0 0 16px">La nueva plataforma gastronómica de Santiago</p>
+  <p style="font-size:14px;color:rgba(240,220,160,0.6);margin:0 0 16px">La nueva plataforma gastronómica de Chile</p>
   ${cuposRestantes > 0 ? `<div style="background:rgba(232,168,76,0.15);border:1px solid rgba(232,168,76,0.4);border-radius:20px;padding:6px 16px;display:inline-block"><span style="font-size:12px;font-weight:700;color:#e8a84c;letter-spacing:0.06em;text-transform:uppercase">⚡ Solo quedan ${cuposRestantes} cupos de fundador</span></div>` : ""}
 </div>
 
@@ -59,7 +59,7 @@ export function buildEmailHtml({ nombre, cuposRestantes, trackClickUrl, trackOpe
 
 <div style="background:#faf6ee;padding:20px 36px;border-top:1px solid #f0e8d0;text-align:center">
   <p style="font-size:13px;font-weight:700;color:#c47f1a;margin:0 0 6px">🧞 El equipo de DeseoComer</p>
-  <p style="font-size:11px;color:#a08040;line-height:1.6;margin:0">deseocomer.com · Santiago, Chile<br><a href="${desuscribirUrl}" style="color:#c47f1a">Desuscribirse</a></p>
+  <p style="font-size:11px;color:#a08040;line-height:1.6;margin:0">deseocomer.com · Chile<br><a href="${desuscribirUrl}" style="color:#c47f1a">Desuscribirse</a></p>
 </div>
 
 <img src="${trackOpenUrl}" width="1" height="1" style="display:none;visibility:hidden" />

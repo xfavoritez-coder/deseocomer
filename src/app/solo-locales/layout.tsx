@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Aumenta tus ventas y llega a más clientes — DeseoComer",
-  description: "Conecta con personas en Santiago que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local sin costo.",
+  description: "Conecta con personas que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local sin costo.",
   openGraph: {
     title: "🚀 Aumenta tus ventas y llega a más clientes — DeseoComer",
-    description: "Conecta con personas en Santiago que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local sin costo.",
+    description: "Conecta con personas que buscan dónde comer hoy. Publica concursos, promociones y haz crecer tu local sin costo.",
     url: "https://deseocomer.com/solo-locales",
     siteName: "DeseoComer",
     type: "website",

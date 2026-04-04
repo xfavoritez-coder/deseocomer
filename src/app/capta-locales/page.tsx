@@ -5,7 +5,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
 const PASOS = [
-  { titulo: "Entra a un local", texto: "Visita cualquier restaurante, café o local de comida en Santiago que no esté en DeseoComer." },
+  { titulo: "Entra a un local", texto: "Visita cualquier restaurante, café o local de comida que no esté en DeseoComer." },
   { titulo: "Muéstrale DeseoComer", texto: "Enséñale la plataforma desde tu teléfono y muéstrale el QR para que se registre gratis." },
   { titulo: "Gana tu comisión", texto: "Cada local registrado con tu código te suma $10.000. Si publica un concurso, $5.000 más." },
 ];
@@ -13,7 +13,7 @@ const PASOS = [
 const FAQS = [
   { pregunta: "¿Cuándo y cómo me pagan?", respuesta: "Los pagos se realizan quincenalmente via transferencia bancaria. Debes tener RUT chileno y cuenta bancaria para recibir el pago." },
   { pregunta: "¿Cómo saben que el local lo registré yo?", respuesta: "Cada captador tiene un código único. El local lo ingresa al registrarse y queda asociado a tu cuenta automáticamente." },
-  { pregunta: "¿Hay un límite de locales que puedo captar?", respuesta: "No hay límite. Cuantos más locales registres, más ganas. Puedes trabajar en cualquier comuna de Santiago." },
+  { pregunta: "¿Hay un límite de locales que puedo captar?", respuesta: "No hay límite. Cuantos más locales registres, más ganas. Puedes trabajar en cualquier comuna." },
   { pregunta: "¿Necesito experiencia en ventas?", respuesta: "No. Solo necesitas ganas de salir a la calle y hablar con dueños de locales. Te damos todo lo que necesitas para empezar." },
 ];
 

@@ -5,9 +5,9 @@ import Footer from "@/components/layout/Footer";
 
 const BENEFICIOS = [
   { icon: "🏆", titulo: "Concursos que se comparten solos", texto: "Tus clientes invitan amigos para ganar puntos. Tú consigues nuevos clientes ", highlight: "sin pagar un peso en publicidad." },
-  { icon: "⚡", titulo: "Aumenta tus ventas con promociones", texto: "Publica happy hours, descuentos y cupones. ", highlight: "Miles de personas los ven", after: " cuando deciden dónde comer hoy." },
+  { icon: "⚡", titulo: "Aumenta tus ventas con promociones", texto: "Publica happy hours, descuentos y cupones. ", highlight: "Las personas los ven", after: " cuando deciden dónde comer hoy." },
   { icon: "📱", titulo: "Panel simple desde tu celular", texto: "Publica un concurso en 3 pasos. ", highlight: "Sin conocimientos técnicos", after: ", sin complicaciones." },
-  { icon: "📍", titulo: "Tu local en el mapa de Santiago", texto: "Aparece cuando alguien busca comida en tu comuna. ", highlight: "Visibilidad real", after: " donde están tus clientes." },
+  { icon: "📍", titulo: "Tu local en el mapa", texto: "Aparece cuando alguien busca comida en tu comuna. ", highlight: "Visibilidad real", after: " donde están tus clientes." },
 ];
 
 const PASOS = [
@@ -25,7 +25,7 @@ const TESTIMONIOS = [
 const FAQS = [
   { icon: "💰", pregunta: "¿Cuánto cuesta?", respuesta: "Registrar tu local es completamente gratis. Publica concursos y promociones sin costo." },
   { icon: "🤔", pregunta: "¿Necesito saber de tecnología?", respuesta: "Para nada. Si sabes usar WhatsApp, sabes usar DeseoComer. El panel está diseñado para manejarlo desde el celular." },
-  { icon: "🍕", pregunta: "¿Funciona para mi tipo de local?", respuesta: "Sí. Restaurantes, cafeterías, locales de comida rápida, delivery, food trucks — cualquier negocio de comida en Santiago." },
+  { icon: "🍕", pregunta: "¿Funciona para mi tipo de local?", respuesta: "Sí. Restaurantes, cafeterías, locales de comida rápida, delivery, food trucks — cualquier negocio de comida en Chile." },
   { icon: "⏱️", pregunta: "¿Cuánto toma publicar un concurso?", respuesta: "Menos de 3 minutos. Eliges el premio, subes una foto y defines la duración. Listo." },
 ];
 
@@ -71,7 +71,7 @@ export default function SoloLocalesPage() {
       <section style={{ padding: 24, borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
         <div className="sl-stats" style={{ display: "flex", gap: 10 }}>
           {[
-            { num: "+500", label: "Personas buscan dónde comer cada semana" },
+            { num: "0$", label: "Costo para aparecer en la plataforma" },
             { num: "3 min", label: "Para publicar tu primer concurso" },
             { num: "100%", label: "Gratis para registrar tu local" },
           ].map((s) => (
