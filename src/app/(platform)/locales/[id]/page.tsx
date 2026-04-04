@@ -93,6 +93,8 @@ export default function LocalDetailPage() {
       .catch(() => { setDbLoading(false); });
   }, [id, mockLocal]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [similares, setSimilares] = useState<any[]>([]);
 
   // Fetch similar locals from DB
   useEffect(() => {
@@ -215,8 +217,6 @@ export default function LocalDetailPage() {
   const concursosFinalizados = concursosLocal.filter((c: any) => !c.activo || new Date(c.fechaFin) <= new Date());
   const promosLocal = dbLocal && Array.isArray((dbLocal as Record<string, unknown>).promociones) ? ((dbLocal as Record<string, unknown>).promociones as Record<string, unknown>[]).filter((p: Record<string, unknown>) => p.activa) : [];
   const DIAS_NOMBRE_FICHA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [similares, setSimilares] = useState<any[]>([]);
   const tieneHorarios = local.horarios && local.horarios.length > 0 && local.horarios.some(h => !h.cerrado);
   const tieneUbicacion = !!(local.direccion || local.lat);
   const tieneSidebar = tieneHorarios || tieneUbicacion;
