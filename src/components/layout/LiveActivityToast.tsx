@@ -70,8 +70,7 @@ export default function LiveActivityToast() {
           if (shownIds.current.has(p.id)) continue;
           shownIds.current.add(p.id);
 
-          // Don't show own participations
-          if (myId && p.usuarioId === myId) continue;
+          // Show to everyone including the user themselves
 
           queue.current.push(p);
         }
