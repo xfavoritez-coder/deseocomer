@@ -19,7 +19,7 @@ export default function PanelConcursos() {
   const [loading, setLoading] = useState(true);
   const [wizard, setWizard] = useState(false);
   const [detalle, setDetalle] = useState<Concurso | null>(null);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [premio, setPremio] = useState("");
   const [modalidadConcurso, setModalidadConcurso] = useState<"meritos" | "sorteo">("meritos");
 
@@ -96,7 +96,7 @@ export default function PanelConcursos() {
         setSharePrompt(true);
       }
     } catch {}
-    setWizard(false); setStep(1); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion(""); setModalidadConcurso("meritos");
+    setWizard(false); setStep(0); setPremio(""); setImagenConcurso(""); setDescripcionPremio(""); setCondiciones(""); setConfirmPublish(false); setActivacion("ahora"); setFechaActivacion(""); setModalidadConcurso("meritos");
   };
 
   const copyLink = (c: Concurso) => {
@@ -433,14 +433,43 @@ export default function PanelConcursos() {
   // ── Wizard (2 steps) ──
   if (wizard) return (
     <div style={{ maxWidth: "560px" }}>
-      <button onClick={() => { setWizard(false); setStep(1); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
-      <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[1, 2].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
+      <button onClick={() => { if (step === 0) { setWizard(false); setStep(0); } else setStep(step - 1); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver</button>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "28px" }}>{[0, 1, 2].map(s => <div key={s} style={{ flex: 1, height: "3px", borderRadius: "2px", background: s <= step ? "var(--accent)" : "var(--border-color)" }} />)}</div>
+
+      {/* Step 0: Introducción */}
+      {step === 0 && (<div>
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Cómo funcionan los concursos?</h2>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>Los concursos son la forma más efectiva de que personas reales compartan tu local con sus amigos. Así funciona:</p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "24px" }}>
+          {[
+            { icon: "🎁", title: "Tú pones el premio", desc: "Puede ser un menú, un descuento, un plato gratis... algo que motive a participar. Tú decides qué ofrecer." },
+            { icon: "🔗", title: "Los participantes comparten tu local", desc: "Cada persona que participa recibe un link único. Mientras más amigos inviten, más puntos ganan y más personas conocen tu local." },
+            { icon: "🏆", title: "El ganador recibe el premio", desc: "Al terminar el concurso, te avisamos quién ganó. Tú coordinas la entrega del premio directamente con el ganador." },
+            { icon: "📈", title: "Tu local gana visibilidad real", desc: "Cada concurso genera decenas de compartidos orgánicos. Personas reales recomendando tu local a personas reales." },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: "12px", alignItems: "flex-start", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "14px" }}>
+              <span style={{ fontSize: "1.3rem", flexShrink: 0, marginTop: "2px" }}>{item.icon}</span>
+              <div>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "#f5d080", margin: "0 0 4px" }}>{item.title}</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: "12px", padding: "14px", marginBottom: "24px", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#3db89e", lineHeight: 1.5, margin: 0 }}>Los concursos son <strong>100% gratis</strong> para tu local. Solo necesitas definir un premio que puedas entregar.</p>
+        </div>
+
+        <button onClick={() => setStep(1)} style={B}>Entendido, crear mi concurso →</button>
+      </div>)}
 
       {step === 1 && (<div>
-        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Nuevo concurso</h2>
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "20px" }}>Configura tu concurso</h2>
 
         {labelReq("Tipo de concurso")}
-        <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "8px" }}>
           {(["meritos", "sorteo"] as const).map(m => {
             const sel = modalidadConcurso === m;
             const isSorteo = m === "sorteo";
@@ -450,18 +479,20 @@ export default function PanelConcursos() {
               <button key={m} onClick={() => setModalidadConcurso(m)} style={{ flex: 1, padding: "14px 12px", borderRadius: 12, cursor: "pointer", background: sel ? bg : "transparent", border: `1px solid ${sel ? c : "rgba(255,255,255,0.1)"}`, textAlign: "center", transition: "all 0.2s" }}>
                 <p style={{ fontSize: 24, margin: "0 0 4px" }}>{isSorteo ? "🎲" : "🏆"}</p>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: sel ? c : "rgba(240,234,214,0.5)", margin: 0 }}>{isSorteo ? "Sorteo" : "Méritos"}</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: sel ? `${c}aa` : "rgba(240,234,214,0.3)", margin: "4px 0 0", lineHeight: 1.3 }}>{isSorteo ? "Sorteo ponderado — más puntos, más chances" : "Gana quien más puntos acumule"}</p>
               </button>
             );
           })}
         </div>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.4, marginBottom: "16px" }}>{modalidadConcurso === "meritos" ? "Gana quien más puntos acumule compartiendo tu local. Ideal para maximizar alcance." : "Se sortea entre los participantes. Más puntos = más boletos = más chances de ganar. Ideal para generar expectativa."}</p>
 
         {labelReq("Premio")}
         <input style={I} value={premio} onChange={e => setPremio(e.target.value)} placeholder="Ej: menú para 3, pizza familiar, etc" maxLength={50} />
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", marginTop: "4px", textAlign: "right" }}>{premio.length}/50</p>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", lineHeight: 1.4, marginTop: "2px" }}>Escribe algo concreto y atractivo. Ej: &quot;Menú para 2&quot; funciona mejor que &quot;descuento&quot;.</p>
 
         {labelReq("Descripción del premio")}
         <textarea style={{ ...I, resize: "vertical", minHeight: "80px" }} value={descripcionPremio} onChange={e => setDescripcionPremio(e.target.value)} placeholder="Ej: Incluye 2 rollos especiales, nigiri y bebida para dos personas" />
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", lineHeight: 1.4, marginTop: "4px" }}>Detalla qué incluye el premio para que los participantes sepan exactamente qué pueden ganar.</p>
 
         {labelReq("Duración")}
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>{DURACIONES.map(d => <button key={d.v} onClick={() => setDur(d.v)} style={chip(dur === d.v)}>{d.l}</button>)}</div>
@@ -553,6 +584,24 @@ export default function PanelConcursos() {
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{condiciones}</p>
           </div>
         )}
+        {/* Info sobre entrega del premio */}
+        <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "12px", padding: "14px", marginBottom: "20px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "8px" }}>¿Cómo se entrega el premio?</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {[
+              "Al terminar el concurso, te mostramos quién ganó con su nombre y datos",
+              "El ganador recibirá un código único que deberá presentarte",
+              "Tú verificas el código y entregas el premio directamente",
+              "Todo queda registrado en tu panel para tu tranquilidad",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                <span style={{ color: "#3db89e", fontSize: "0.7rem", marginTop: "3px", flexShrink: 0 }}>✓</span>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.4, margin: 0 }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div style={{ display: "flex", gap: "12px" }}>
           <button onClick={() => setStep(1)} style={{ ...B, background: "transparent", border: "1px solid var(--accent)", color: "var(--accent)", flex: 1 }}>← Editar</button>
           <button onClick={() => setConfirmPublish(true)} style={{ ...B, flex: 2 }}>Publicar</button>
@@ -615,11 +664,24 @@ export default function PanelConcursos() {
     {loading ? (
       <div style={{ textAlign: "center", padding: "40px" }}><p style={{ color: "var(--text-muted)" }}>Cargando...</p></div>
     ) : concursos.length === 0 ? (
-      <div style={{ textAlign: "center", padding: "60px 20px" }}>
+      <div style={{ textAlign: "center", padding: "48px 20px" }}>
         <div style={{ fontSize: "3rem", marginBottom: "12px" }}>🏆</div>
         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--accent)", marginBottom: "8px" }}>Aún no has publicado ningún concurso</p>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Publica tu primer concurso y empieza a ganar visibilidad</p>
-        <button onClick={() => setWizard(true)} style={B}>Crear mi primer concurso</button>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "20px", maxWidth: "400px", margin: "0 auto 20px" }}>Los concursos son la forma más rápida de que personas reales compartan tu local con sus amigos. Solo necesitas elegir un premio y nosotros nos encargamos del resto.</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "340px", margin: "0 auto 24px", textAlign: "left" }}>
+          {[
+            { icon: "🎁", text: "Tú eliges el premio (un menú, un plato, un descuento)" },
+            { icon: "🔗", text: "Los participantes comparten tu local para ganar puntos" },
+            { icon: "📈", text: "Tu local llega a cientos de personas nuevas" },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <span style={{ fontSize: "1.1rem" }}>{item.icon}</span>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", margin: 0, lineHeight: 1.4 }}>{item.text}</p>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => setWizard(true)} style={B}>Crear mi primer concurso →</button>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.25)", marginTop: "12px" }}>Es gratis y toma menos de 2 minutos</p>
       </div>
     ) : concursosFiltrados.length === 0 ? (
       <div style={{ textAlign: "center", padding: "40px 20px" }}>
