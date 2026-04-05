@@ -4,7 +4,7 @@ import { useGenie } from "@/contexts/GenieContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function GenieToast() {
-  const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen } = useGenie();
+  const { toastActivo, setToastActivo, addRespuestaGenio, setIsOpen, getRecomendacion, setQuickRec, perfil } = useGenie();
   const { user, isAuthenticated } = useAuth();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -170,9 +170,21 @@ export default function GenieToast() {
       dismissToast();
       return;
     }
-    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante" || opt === "Muéstrame") {
+    if (opt === "Sí, ayúdame" || opt === "Buscar restaurante") {
       dismissToast();
       setIsOpen(true);
+      return;
+    }
+    if (opt === "Muéstrame") {
+      dismissToast();
+      const favCat = Object.entries(perfil?.gustos?.categorias ?? {}).sort(([, a], [, b]) => (b as number) - (a as number))[0]?.[0];
+      const rec = getRecomendacion(favCat || undefined);
+      if (rec) {
+        setQuickRec(rec);
+        setIsOpen(true);
+      } else {
+        setIsOpen(true);
+      }
       return;
     }
     // Navigate to specific pages

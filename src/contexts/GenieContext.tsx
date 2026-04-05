@@ -62,6 +62,8 @@ interface GenieContextType {
   showFavoritoToast: () => void;
   comunasConLocales: string[];
   comunasDelivery: string[];
+  quickRec: LocalRecomendado | null;
+  setQuickRec: (r: LocalRecomendado | null) => void;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -144,6 +146,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   const [toastActivo, setToastActivo] = useState<GenieContextType["toastActivo"]>(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [localesDB, setLocalesDB] = useState<LocalRecomendado[]>(LOCALES_DB);
+  const [quickRec, setQuickRec] = useState<LocalRecomendado | null>(null);
 
   // Fetch real locales from API
   useEffect(() => {
@@ -433,7 +436,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [addInteraccion, showFavoritoToast]);
 
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))] }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))], quickRec, setQuickRec }}>
       {children}
     </GenieContext.Provider>
   );
