@@ -100,6 +100,7 @@ export default function LocalDetailPage() {
   // Fetch similar locals from DB
   useEffect(() => {
     const cats = mockLocal?.categoria ? [mockLocal.categoria] : (dbLocal?.categorias as string[] ?? []);
+    const comuna = mockLocal?.barrio ?? (dbLocal?.comuna as string ?? "");
     const primaryCat = cats[0];
     const slug = typeof id === "string" ? id : "";
     if (!primaryCat) return;
@@ -110,23 +111,42 @@ export default function LocalDetailPage() {
         const filtered = data
           .filter((l: any) => {
             const lCats = l.categorias ?? [];
+            const lComuna = (l.comuna ?? "").toLowerCase();
             const matchCat = lCats.some((c: string) => cats.includes(c));
+            const matchComuna = lComuna === comuna.toLowerCase();
             const notSelf = (l.slug ?? l.id) !== slug && String(l.id) !== String(id);
-            return matchCat && notSelf && l.activo !== false;
+            return matchCat && matchComuna && notSelf && l.activo !== false;
           })
-          .slice(0, 3)
-          .map((l: any) => ({
-            id: l.slug || l.id,
-            nombre: l.nombre ?? "",
-            categoria: l.categorias?.[0] ?? "",
-            barrio: l.comuna ?? "",
-            rating: l._avg?.resenas?.rating ?? 0,
-            imagenPortada: l.portadaUrl ?? null,
-          }));
+          .map((l: any) => {
+            const lCats = (l.categorias ?? []) as string[];
+            const catScore = lCats.reduce((acc: number, c: string) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
+            const matchCat = lCats.some((c: string) => cats.includes(c));
+            const matchComuna = (l.comuna ?? "").toLowerCase() === comuna.toLowerCase();
+            return {
+              id: l.slug || l.id,
+              nombre: l.nombre ?? "",
+              categoria: lCats[0] ?? "",
+              barrio: l.comuna ?? "",
+              rating: l._avg?.resenas?.rating ?? 0,
+              imagenPortada: l.portadaUrl ?? null,
+              _catScore: catScore,
+              _matchCat: matchCat,
+              _matchComuna: matchComuna,
+            };
+          })
+          .sort((a, b) => {
+            // 1. User taste score (higher first)
+            if (b._catScore !== a._catScore) return b._catScore - a._catScore;
+            // 2. Same category + same comuna first
+            const aMatch = (a._matchCat ? 2 : 0) + (a._matchComuna ? 1 : 0);
+            const bMatch = (b._matchCat ? 2 : 0) + (b._matchComuna ? 1 : 0);
+            return bMatch - aMatch;
+          })
+          .slice(0, 6);
         setSimilares(filtered);
       })
       .catch(() => {});
-  }, [mockLocal?.categoria, dbLocal?.categorias, id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mockLocal?.categoria, dbLocal?.categorias, dbLocal?.comuna, id, perfil.gustos.categorias]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build a unified local object
   const local = mockLocal ?? (dbLocal ? {
@@ -278,9 +298,11 @@ export default function LocalDetailPage() {
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
           <div className="dc-hero-inner" style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "10px" }}>
-            <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: local.imagenLogo ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0, overflow: "hidden" }}>
-              {local.imagenLogo ? <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
+            {local.imagenLogo && (
+            <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0, overflow: "hidden" }}>
+              <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
             </div>
+            )}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="dc-hero-nombre-row" style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap", marginBottom: "6px" }}>
                 <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
@@ -300,6 +322,17 @@ export default function LocalDetailPage() {
                 )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                {esImportado && googleRating && (
+                  <>
+                    <span style={{ position: "relative", cursor: "help", display: "inline-flex", alignItems: "center", gap: "3px" }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip2") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip2") as HTMLElement; if (t) t.style.opacity = "0"; }}>
+                      <span style={{ fontSize: "0.75rem", color: "#e8a84c" }}>★</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "rgba(232,168,76,0.8)", letterSpacing: "0.1em" }}>{googleRating.toFixed(1)}</span>
+                      <span style={{ fontSize: "0.65rem", color: "rgba(232,168,76,0.5)", fontFamily: "var(--font-lato)" }}>G</span>
+                      <div className="gtooltip2" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
+                    </span>
+                    <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
+                  </>
+                )}
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{CATEGORIA_EMOJI[local.categoria] ?? "🍽️"} {local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{comunaDisplay || local.barrio}</span>
@@ -311,23 +344,54 @@ export default function LocalDetailPage() {
                   </div>
                 </>)}
               </div>
-              {esImportado && (
-                <a href={`/reclamar-local/${id}`} style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap", marginTop: "8px" }}>¿Eres el dueño? →</a>
-              )}
             </div>
           </div>
         </div>
       </section>
 
 
+      {esImportado && (
+        <div className="dc-dueno-bar" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 16px',
+          borderBottom: '1px solid rgba(167,139,250,0.15)',
+          background: 'rgba(167,139,250,0.04)',
+        }}>
+          <p style={{
+            fontFamily: 'var(--font-lato)',
+            fontSize: '0.78rem',
+            color: 'rgba(167,139,250,0.6)',
+            margin: 0,
+          }}>
+            Local aún no verificado
+          </p>
+          <a href={`/reclamar-local/${dbLocal?.slug || id}`} style={{
+            fontFamily: 'var(--font-cinzel)',
+            fontSize: '0.7rem',
+            letterSpacing: '0.08em',
+            background: 'rgba(167,139,250,0.12)',
+            border: '1px solid rgba(167,139,250,0.3)',
+            color: '#a78bfa',
+            borderRadius: '8px',
+            padding: '6px 12px',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}>
+            ¿Eres el dueño? →
+          </a>
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="dc-tabs-sticky" style={{ position: "sticky", top: "64px", zIndex: 50, background: "var(--bg-primary)", borderBottom: "1px solid var(--border-color)", overflowX: "auto", scrollbarWidth: "none" }}>
         <div className="dc-tabs-inner" style={{ display: "flex", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
-          { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
           { key: "Concursos" as Tab, label: "Concursos", count: concursosActivos.length > 0 ? concursosActivos.length : (concursosLocal.length > 0 ? concursosLocal.length : null), countColor: concursosActivos.length > 0 ? "#1a0e05" : "rgba(240,234,214,0.5)", countBg: concursosActivos.length > 0 ? "#e8a84c" : "rgba(255,255,255,0.1)" },
           { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#c97060" },
+          { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
             {t.label}
@@ -345,7 +409,7 @@ export default function LocalDetailPage() {
             {/* TAB: Información */}
             {tab === "Información" && (
               <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <div className="dc-local-main-content" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Descripción — ocultar si importado sin contenido */}
                   {(local.descripcion || local.historia || (!esImportado && (local as any).categorias?.length > 1)) && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
@@ -484,9 +548,9 @@ export default function LocalDetailPage() {
                   )}
                   {tieneUbicacion && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Información</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Encuéntranos</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
-                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{direccionDisplay || local.direccion}{esImportado && comunaDisplay ? `, ${comunaDisplay}` : !esImportado && local.barrio ? `, ${local.barrio}` : ""}{esImportado && dbLocal?.ciudad ? `, ${(dbLocal.ciudad as string).charAt(0).toUpperCase() + (dbLocal.ciudad as string).slice(1)}` : ""}</a></p>}
+                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={(dbLocal?.googleMapsUrl as string) || (local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`)} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{direccionDisplay || local.direccion}{esImportado && comunaDisplay ? `, ${comunaDisplay}` : !esImportado && local.barrio ? `, ${local.barrio}` : ""}{esImportado && dbLocal?.ciudad ? `, ${(dbLocal.ciudad as string).charAt(0).toUpperCase() + (dbLocal.ciudad as string).slice(1)}` : ""}</a></p>}
                       {local.telefono && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Phone size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`tel:${local.telefono.replace(/\s/g, "")}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.telefono}</a></p>}
                       {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
                       {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
@@ -668,12 +732,16 @@ export default function LocalDetailPage() {
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
         @media (max-width: 1023px) {
-          .dc-local-layout { grid-template-columns: 1fr; }
-          .dc-local-sidebar { position: static; }
+          .dc-local-layout { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+          .dc-local-sidebar { position: static; order: 2; }
+          .dc-local-main-content { order: 1; }
         }
         @media (min-width: 1024px) {
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
           .dc-tabs-inner { max-width: 1100px; margin: 0 auto; }
+        }
+        @media (min-width: 768px) {
+          .dc-dueno-bar { display: none; }
         }
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }

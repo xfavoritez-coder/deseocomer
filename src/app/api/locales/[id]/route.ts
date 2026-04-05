@@ -37,6 +37,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         .trim();
       safe.direccion = direccionLimpia || local.direccion;
 
+      if (local.googlePlaceId) {
+        safe.googleMapsUrl = `https://www.google.com/maps/place/?q=place_id:${local.googlePlaceId}`;
+      }
+
       const cats = local.categorias ?? [];
       safe.categorias = [...new Set(cats)];
     }

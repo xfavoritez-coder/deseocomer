@@ -168,7 +168,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
             id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
             categoria: (cats[0] ?? "general").toLowerCase(),
             categorias: cats,
-            comuna: (l.comuna as string) ?? "Santiago",
+            comuna: ((l.comuna as string) ?? "Santiago").replace(/,.*$/, '').replace(/\s*local\s*\d+/gi, '').replace(/\s*\d{5,}/g, '').trim(),
             rating,
             googleRating,
             estadoLocal,

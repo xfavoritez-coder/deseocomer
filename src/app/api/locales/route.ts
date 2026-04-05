@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { makeLocalSlug } from "@/lib/slugify";
 import { CATEGORIAS } from "@/lib/categorias";
+import { enriquecerLocalConGoogle } from "@/lib/enriquecer-local-google";
 
 export async function GET(req: NextRequest) {
   try {
@@ -39,20 +40,26 @@ export async function GET(req: NextRequest) {
       },
       include: {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
+        resenas: { select: { rating: true } },
         promociones: { where: { activa: true }, select: { id: true, titulo: true, descripcion: true, horaInicio: true, horaFin: true }, take: 3 },
         concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 3 },
       },
     });
+    const addRating = (l: typeof locales[number]) => {
+      const { password: _, resenas, ...rest } = l;
+      const promedioResenas = resenas.length > 0
+        ? resenas.reduce((sum, r) => sum + r.rating, 0) / resenas.length
+        : null;
+      return { ...rest, promedioResenas };
+    };
     if (paginated) {
       const hasMore = locales.length > limit;
       const results = hasMore ? locales.slice(0, limit) : locales;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const safe = results.map(({ password: _, ...rest }) => rest);
+      const safe = results.map(addRating);
       const nextCursor = hasMore ? results[results.length - 1].id : null;
       return NextResponse.json({ locales: safe, nextCursor, hasMore });
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const safe = locales.map(({ password: _, ...rest }) => rest);
+    const safe = locales.map(addRating);
     return NextResponse.json(safe);
   } catch (error) {
     console.error("[API /locales GET] Error:", error);
@@ -158,6 +165,8 @@ export async function POST(req: NextRequest) {
         console.error("[Email registro rápido]", emailErr);
       }
     }
+
+    enriquecerLocalConGoogle(local.id).catch(() => {});
 
     const { password: _, ...localSinPassword } = local;
     return NextResponse.json(localSinPassword, { status: 201 });

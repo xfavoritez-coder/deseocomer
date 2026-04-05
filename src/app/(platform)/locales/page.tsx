@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { boostScore } from "@/lib/personalizacion";
 import Navbar from "@/components/layout/Navbar";
@@ -17,6 +17,29 @@ function getInitials(nombre: string): string {
   return nombre.split(" ").map(w => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
 
+const MAPA_DIAS: Record<string, number> = {
+  'domingo': 0, 'lunes': 1, 'martes': 2, 'miércoles': 3,
+  'jueves': 4, 'viernes': 5, 'sábado': 6,
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseHorarioGoogle(hg: any): any[] | null {
+  if (!hg?.descripcion) return null;
+  const result: any[] = Array(7).fill(null).map(() => ({ cerrado: true, abre: '', cierra: '' }));
+  for (const linea of hg.descripcion) {
+    const [diaRaw, horasRaw] = linea.split(': ');
+    const idx = MAPA_DIAS[diaRaw?.toLowerCase().trim()];
+    if (idx === undefined) continue;
+    if (!horasRaw || horasRaw.toLowerCase().includes('cerrado')) {
+      result[idx] = { cerrado: true, abre: '', cierra: '' };
+    } else {
+      const sep = horasRaw.includes('–') ? '–' : '-';
+      const [abre, cierra] = horasRaw.split(sep).map((h: string) => h.trim());
+      result[idx] = { cerrado: false, abre: abre ?? '', cierra: cierra ?? '' };
+    }
+  }
+  return result;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const localesMock: any[] = [];
 
@@ -31,6 +54,9 @@ export default function LocalesPage() {
   const [soloConConcursos, setSoloConConcursos] = useState(false);
   const [soloConPromociones, setSoloConPromociones] = useState(false);
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
+  const [comunaActiva, setComunaActiva] = useState("");
+  const [showComunaDropdown, setShowComunaDropdown] = useState(false);
+  const [busquedaComunaFiltro, setBusquedaComunaFiltro] = useState("");
   const CATEGORIAS = ["Todos", ...CATEGORIAS_MASTER];
 
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -45,12 +71,13 @@ export default function LocalesPage() {
     nombre: l.nombre ?? "",
     categorias: l.categorias ?? [],
     comuna: l.comuna ?? "Santiago",
-    rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
+    rating: l.promedioResenas ?? l.googleRating ?? 0,
+    promedioResenas: l.promedioResenas ?? null,
     precio: "",
     imagenUrl: l.portadaUrl ?? null,
     logoUrl: l.logoUrl,
     descripcion: l.descripcion ?? "",
-    horarios: l.horarios,
+    horarios: l.horarios ?? (l.horarioGoogle ? parseHorarioGoogle(l.horarioGoogle) : null),
     createdAt: l.createdAt,
     googleRating: l.googleRating ?? null,
     estadoLocal: l.estadoLocal ?? null,
@@ -129,15 +156,44 @@ export default function LocalesPage() {
     }
   }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const comunasDisponibles = useMemo(() => {
+    const set = new Set(locales.map(l => l.comuna).filter(Boolean));
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [locales]);
+
+  useEffect(() => {
+    if (!showComunaDropdown) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".dc-comuna-dropdown")) {
+        setShowComunaDropdown(false);
+        setBusquedaComunaFiltro("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showComunaDropdown]);
+
   const localesFiltrados = locales
     .filter(l => {
-      if (soloAbiertos && l.horarios) {
+      if (soloAbiertos) {
+        if (!l.horarios) return false;
         const ahora = new Date();
         const dia = ahora.getDay();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const horarioDia = (l.horarios as any)?.[dia];
-        if (horarioDia?.cerrado) return false;
+        if (!horarioDia || horarioDia.cerrado) return false;
+        if (horarioDia.abre && horarioDia.cierra) {
+          const [aH, aM] = horarioDia.abre.split(':').map(Number);
+          const [cH, cM] = horarioDia.cierra.split(':').map(Number);
+          const minNow = ahora.getHours() * 60 + ahora.getMinutes();
+          const minAbre = (aH || 0) * 60 + (aM || 0);
+          const minCierra = (cH || 0) * 60 + (cM || 0);
+          if (minCierra > minAbre) { if (minNow < minAbre || minNow >= minCierra) return false; }
+          else { if (minNow < minAbre && minNow >= minCierra) return false; }
+        }
       }
+      if (comunaActiva && l.comuna !== comunaActiva) return false;
       if (soloConConcursos && (l._count?.concursos ?? 0) === 0) return false;
       if (soloConPromociones && (l._count?.promociones ?? 0) === 0) return false;
       return true;
@@ -163,9 +219,10 @@ export default function LocalesPage() {
     setSoloAbiertos(false);
     setSoloConConcursos(false);
     setSoloConPromociones(false);
+    setComunaActiva("");
   };
 
-  const hayFiltros = busqueda || categoriaActiva !== "Todos" || soloAbiertos || soloConConcursos || soloConPromociones;
+  const hayFiltros = busqueda || categoriaActiva !== "Todos" || soloAbiertos || soloConConcursos || soloConPromociones || comunaActiva;
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -188,7 +245,7 @@ export default function LocalesPage() {
           <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
           <input
             type="text"
-            placeholder="Buscar local, categoría o comuna..."
+            placeholder="Buscar local o categoría..."
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
             style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
@@ -219,6 +276,26 @@ export default function LocalesPage() {
           <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             ⚡ Con promociones
           </button>
+          <div className="dc-comuna-dropdown" style={{ position: "relative", flexShrink: 0 }}>
+            <button onClick={() => setShowComunaDropdown(!showComunaDropdown)} style={{ padding: "8px 16px", borderRadius: "20px", border: comunaActiva ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: comunaActiva ? "rgba(232,168,76,0.15)" : "transparent", color: comunaActiva ? "#e8a84c" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", whiteSpace: "nowrap", minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+              📍 {comunaActiva || "Comuna"} ▾
+            </button>
+            {showComunaDropdown && (
+              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", padding: "12px", width: "220px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
+                <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComunaFiltro} onChange={e => setBusquedaComunaFiltro(e.target.value)} style={{ width: "100%", padding: "8px 12px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "8px" }} autoFocus />
+                <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                  <button onClick={() => { setComunaActiva(""); setShowComunaDropdown(false); setBusquedaComunaFiltro(""); }} style={{ width: "100%", padding: "8px 10px", background: !comunaActiva ? "rgba(232,168,76,0.1)" : "transparent", border: "none", borderRadius: "8px", color: !comunaActiva ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", cursor: "pointer", textAlign: "left" as const, marginBottom: "2px" }}>
+                    Todas las comunas
+                  </button>
+                  {comunasDisponibles.filter(c => c.toLowerCase().includes(busquedaComunaFiltro.toLowerCase())).map(comuna => (
+                    <button key={comuna} onClick={() => { setComunaActiva(comuna); setShowComunaDropdown(false); setBusquedaComunaFiltro(""); }} style={{ width: "100%", padding: "8px 10px", background: comunaActiva === comuna ? "rgba(232,168,76,0.1)" : "transparent", border: "none", borderRadius: "8px", color: comunaActiva === comuna ? "#e8a84c" : "rgba(240,234,214,0.6)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", cursor: "pointer", textAlign: "left" as const, marginBottom: "2px" }}>
+                      {comuna}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
@@ -339,13 +416,13 @@ export default function LocalesPage() {
                             </div>
                           </div>
                         </div>
-                        {(local._count?.resenas ?? 0) > 0 ? (
+                        {(local as any).promedioResenas ? (
                           <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px" }}>
                             <span style={{ color: "var(--accent)" }}>★</span>
-                            <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating?.toFixed ? local.rating.toFixed(1) : local.rating}</span>
+                            <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{(local as any).promedioResenas.toFixed(1)}</span>
                             <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
                           </div>
-                        ) : (local as any).googleRating && (local as any).estadoLocal !== "RECHAZADO" && (local as any).googleRating ? (
+                        ) : (local as any).googleRating && (local as any).estadoLocal !== "RECHAZADO" ? (
                           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px", cursor: "help" }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
                             <span style={{ color: "#e8a84c", opacity: 0.7 }}>★</span>
                             <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(240,234,214,0.5)" }}>{(local as any).googleRating.toFixed(1)}</span>

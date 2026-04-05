@@ -166,7 +166,7 @@ export default function GeniePanel() {
     addInteraccion("comuna_seleccionada", { comuna: c });
     setBusquedaComuna("");
     const cobertura = modalidad === "Delivery a domicilio" ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
-    setStepActual(cobertura.includes(c) ? 3 : "sin_cobertura");
+    setStepActual(cobertura.some(x => x.toLowerCase() === c.toLowerCase()) ? 3 : "sin_cobertura");
   };
 
   const handleCategoria = (c: string) => {
@@ -223,9 +223,10 @@ export default function GeniePanel() {
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "10px" }} />
               {(() => {
                 const cobertura = modalidad === "Delivery a domicilio" ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
+                const coberturaLower = cobertura.map(c => c.toLowerCase());
                 const filtered = COMUNAS.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()));
-                const activas = filtered.filter(c => cobertura.includes(c)).sort((a, b) => a.localeCompare(b));
-                const noActivas = filtered.filter(c => !cobertura.includes(c)).sort((a, b) => a.localeCompare(b));
+                const activas = filtered.filter(c => coberturaLower.includes(c.toLowerCase())).sort((a, b) => a.localeCompare(b));
+                const noActivas = filtered.filter(c => !coberturaLower.includes(c.toLowerCase())).sort((a, b) => a.localeCompare(b));
                 return (
                   <div style={{ maxHeight: "220px", overflowY: "auto" }}>
                     {activas.length > 0 && (
@@ -402,7 +403,7 @@ export default function GeniePanel() {
 
               {/* Buttons */}
               <div style={{ display: "flex", gap: "8px" }}>
-                <Link href={`/locales/${r.slug || r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local →</Link>
+                <Link href={`/locales/${r.slug || r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local</Link>
                 <button onClick={handleOtra} style={{ padding: "11px 14px", background: "transparent", border: "1px solid rgba(232,168,76,0.22)", borderRadius: "10px", fontSize: "14px", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Otra sugerencia</button>
               </div>
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkAdminAuth } from "@/lib/adminAuth";
 import { Resend } from "resend";
+import { enriquecerLocalConGoogle } from "@/lib/enriquecer-local-google";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -29,6 +30,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (accion === "aprobar") {
       await prisma.local.update({ where: { id }, data: { activo: true, activadoAt: new Date() } });
+      enriquecerLocalConGoogle(id).catch(() => {});
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://deseocomer.com";
       const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
 
