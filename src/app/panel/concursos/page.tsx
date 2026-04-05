@@ -650,7 +650,7 @@ export default function PanelConcursos() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
           <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)", margin: 0 }}>Concursos</h1>
-          <button onClick={() => { setStep(0); setWizard(true); }} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "2px" }}>¿Cómo funcionan?</button>
+          <button onClick={() => { setStep(0); setWizard(true); }} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", marginTop: "2px", textDecoration: "underline" }}>¿Cómo funcionan?</button>
         </div>
         <button onClick={() => { setStep(concursos.length > 0 ? 1 : 0); setWizard(true); }} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0, fontSize: "0.78rem", padding: "10px 16px" }}>+ Concurso</button>
       </div>
