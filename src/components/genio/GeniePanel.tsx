@@ -402,7 +402,7 @@ export default function GeniePanel() {
 
               {/* Buttons */}
               <div style={{ display: "flex", gap: "8px" }}>
-                <Link href={`/locales/${r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local →</Link>
+                <Link href={`/locales/${r.slug || r.id}`} onClick={() => setIsOpen(false)} style={{ flex: 1, padding: "11px", background: "#e8a84c", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "14px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.04em", textTransform: "uppercase", textDecoration: "none", textAlign: "center" }}>Ver local →</Link>
                 <button onClick={handleOtra} style={{ padding: "11px 14px", background: "transparent", border: "1px solid rgba(232,168,76,0.22)", borderRadius: "10px", fontSize: "14px", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Otra sugerencia</button>
               </div>
 
