@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const participaciones = await prisma.participanteConcurso.findMany({
       where: { usuarioId: id },
       select: {
-        id: true, concursoId: true, puntos: true, puntosNivel2: true, puntosNivel2Pendientes: true,
+        id: true, concursoId: true, puntos: true, puntosMadrugador: true, esMadrugador: true, puntosNivel2: true, puntosNivel2Pendientes: true,
         referidoPor: true, referidorDirectoId: true, referidorNivel2Id: true, estado: true,
         concurso: { select: { id: true, slug: true, premio: true, fechaFin: true, estado: true, local: { select: { nombre: true } } } },
       },
@@ -67,6 +67,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       estadoConcurso: p.concurso.estado,
       fechaFin: p.concurso.fechaFin,
       puntos: p.puntos,
+      puntosMadrugador: p.puntosMadrugador,
+      esMadrugador: p.esMadrugador,
       puntosNivel2: p.puntosNivel2,
       puntosNivel2Pendientes: p.puntosNivel2Pendientes,
       estado: p.estado,

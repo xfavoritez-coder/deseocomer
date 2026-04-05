@@ -290,7 +290,7 @@ export default function AdminUsuarios() {
       {redReferidos.length > 0 && (
         <div style={cardS}>
           <p style={cardTitleS}>Red de referidos</p>
-          {redReferidos.map((r: { concursoId: string; premio: string; localNombre: string; slug: string; puntos: number; puntosNivel2: number; puntosNivel2Pendientes: number; referidoPorId: string | null; referidoPorNombre: string | null; referidosDirectos: { id: string; nombre: string; email: string; verificado: boolean; puntos: number; estado: string; ipRegistro?: string }[]; referidosNivel2: { id: string; nombre: string; email: string; verificado: boolean; ipRegistro?: string }[] }) => (
+          {redReferidos.map((r: { concursoId: string; premio: string; localNombre: string; slug: string; puntos: number; puntosMadrugador?: number; puntosNivel2: number; puntosNivel2Pendientes: number; referidoPorId: string | null; referidoPorNombre: string | null; referidosDirectos: { id: string; nombre: string; email: string; verificado: boolean; puntos: number; estado: string; ipRegistro?: string }[]; referidosNivel2: { id: string; nombre: string; email: string; verificado: boolean; ipRegistro?: string }[] }) => (
             <div key={r.concursoId} style={{ marginBottom: "16px", padding: "12px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px" }}>
               <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f5d080", marginBottom: "4px" }}>{r.premio}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: "10px" }}>{r.localNombre}</p>
@@ -298,22 +298,29 @@ export default function AdminUsuarios() {
               {/* Desglose puntos + ajustar */}
               {(() => {
                 const directosVerificados = r.referidosDirectos.filter((x: { verificado: boolean }) => x.verificado).length;
-                const ptsRegistro = 1;
-                const ptsDirectos = directosVerificados * 2;
+                const directosNoVerif = r.referidosDirectos.filter((x: { verificado: boolean }) => !x.verificado).length;
+                const entroConRef = !!r.referidoPorId;
+                const ptsBase = 1;
+                const ptsRefBonus = entroConRef ? 3 : 0;
+                const ptsDirectos = directosVerificados * 3;
                 const ptsNivel2 = r.puntosNivel2;
-                const ptsApoyos = Math.max(0, r.puntos - ptsRegistro - ptsDirectos - ptsNivel2);
+                const ptsMadrugador = r.puntosMadrugador ?? 0;
+                const ptsApoyos = Math.max(0, r.puntos - ptsBase - ptsRefBonus - ptsDirectos - ptsNivel2 - ptsMadrugador);
                 return (
                   <div style={{ marginBottom: "10px" }}>
                     <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center", marginBottom: "6px" }}>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: "10px", background: "rgba(232,168,76,0.1)", color: "#e8a84c", fontWeight: 700 }}>{r.puntos} pts total</span>
-                      <button onClick={() => { setAjustarPuntos({ concursoId: r.concursoId, premio: r.premio, puntosActuales: r.puntos }); setAjustarNuevosPuntos(String(r.puntos)); setAjustarMotivo(""); setAjustarEnviarCorreo(true); }} style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "3px 10px", borderRadius: "8px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", color: "#a070e0", cursor: "pointer", marginLeft: "auto" }}>Ajustar puntos</button>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", padding: "4px 14px", borderRadius: "10px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", color: "#e8a84c", fontWeight: 700 }}>{r.puntos} pts total</span>
+                      <button onClick={() => { setAjustarPuntos({ concursoId: r.concursoId, premio: r.premio, puntosActuales: r.puntos }); setAjustarNuevosPuntos(String(r.puntos)); setAjustarMotivo(""); setAjustarEnviarCorreo(true); }} style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "3px 10px", borderRadius: "8px", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", color: "#a070e0", cursor: "pointer", marginLeft: "auto" }}>Ajustar</button>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "3px", padding: "8px 10px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.04)" }}>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>1 (registro)</span>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{directosVerificados} referidos directos verificados x 2 = {ptsDirectos}</span>
-                      {ptsNivel2 > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#3db89e" }}>{ptsNivel2} pts nivel 2</span>}
-                      {r.puntosNivel2Pendientes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff8c00", fontStyle: "italic" }}>{r.puntosNivel2Pendientes} pts nivel 2 pendientes</span>}
-                      {ptsApoyos > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#e05090" }}>{ptsApoyos} apoyos recibidos</span>}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", padding: "8px 10px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.04)", fontSize: "0.72rem", fontFamily: "Georgia" }}>
+                      <span style={{ color: "rgba(240,234,214,0.5)" }}>Base</span><span style={{ color: "#e8a84c", textAlign: "right" }}>+{ptsBase}</span>
+                      {ptsRefBonus > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Bonus referido</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{ptsRefBonus}</span></>}
+                      {ptsMadrugador > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Madrugador</span><span style={{ color: "#e8a84c", textAlign: "right" }}>+{ptsMadrugador}</span></>}
+                      {directosVerificados > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Referidos ({directosVerificados} × 3)</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{ptsDirectos}</span></>}
+                      {directosNoVerif > 0 && <><span style={{ color: "rgba(255,130,80,0.6)", fontStyle: "italic" }}>{directosNoVerif} ref sin verificar</span><span style={{ color: "rgba(255,130,80,0.4)", textAlign: "right", fontStyle: "italic" }}>pendiente</span></>}
+                      {ptsNivel2 > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Nivel 2</span><span style={{ color: "#a070e0", textAlign: "right" }}>+{ptsNivel2}</span></>}
+                      {r.puntosNivel2Pendientes > 0 && <><span style={{ color: "#ff8c00", fontStyle: "italic" }}>Nivel 2 pendiente</span><span style={{ color: "#ff8c00", textAlign: "right", fontStyle: "italic" }}>+{r.puntosNivel2Pendientes}</span></>}
+                      {ptsApoyos > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Apoyos 💛</span><span style={{ color: "#e05090", textAlign: "right" }}>+{ptsApoyos}</span></>}
                     </div>
                   </div>
                 );
@@ -358,16 +365,24 @@ export default function AdminUsuarios() {
 
               {/* Referidos directos */}
               {r.referidosDirectos.length > 0 && (
-                <div style={{ marginBottom: "8px" }}>
-                  <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Referidos directos ({r.referidosDirectos.length}) — {r.referidosDirectos.filter((x: { verificado: boolean }) => x.verificado).length} verificados</p>
+                <div style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                    <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Referidos directos</p>
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", padding: "2px 8px", borderRadius: "10px", background: "rgba(61,184,158,0.1)", color: "#3db89e" }}>{r.referidosDirectos.filter((x: { verificado: boolean }) => x.verificado).length} ✓</span>
+                    {r.referidosDirectos.filter((x: { verificado: boolean }) => !x.verificado).length > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", padding: "2px 8px", borderRadius: "10px", background: "rgba(255,80,80,0.1)", color: "#ff8080" }}>{r.referidosDirectos.filter((x: { verificado: boolean }) => !x.verificado).length} ⏳</span>}
+                  </div>
                   {r.referidosDirectos.map((ref) => (
-                    <div key={ref.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.03)", flexWrap: "wrap" }}>
-                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1, minWidth: "100px" }}>{ref.nombre}</button>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.25)" }}>{ref.email}</span>
-                      {ref.ipRegistro && <span style={{ fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.2)" }}>{ref.ipRegistro}</span>}
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(61,184,158,0.1)" : "rgba(255,80,80,0.1)", border: `1px solid ${ref.verificado ? "rgba(61,184,158,0.3)" : "rgba(255,80,80,0.3)"}`, color: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }}>{ref.verificado ? "✓ Verificado" : "Sin verificar"}</span>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(232,168,76,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#e8a84c" : "rgba(240,234,214,0.25)", flexShrink: 0 }}>{ref.verificado ? "+2 pts" : "+2 pendiente"}</span>
-                      {ref.estado === "descalificado" && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 8px", borderRadius: "8px", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", color: "#ff6b6b", flexShrink: 0 }}>Descalificado</span>}
+                    <div key={ref.id} style={{ padding: "8px 10px", marginBottom: "4px", background: ref.verificado ? "rgba(61,184,158,0.04)" : "rgba(255,80,80,0.03)", border: `1px solid ${ref.verificado ? "rgba(61,184,158,0.12)" : "rgba(255,80,80,0.1)"}`, borderRadius: "8px" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                        <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }} />
+                        <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, textAlign: "left", fontWeight: 600 }}>{ref.nombre}</button>
+                        <span style={{ marginLeft: "auto", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(232,168,76,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#e8a84c" : "rgba(240,234,214,0.25)", fontWeight: 700, flexShrink: 0 }}>{ref.verificado ? "+3 pts" : "+3 pendiente"}</span>
+                      </div>
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", paddingLeft: "12px" }}>
+                        <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.3)" }}>{ref.email}</span>
+                        {ref.ipRegistro && <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.2)" }}>IP: {ref.ipRegistro}</span>}
+                        {ref.estado === "descalificado" && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "1px 6px", borderRadius: "6px", background: "rgba(255,80,80,0.15)", color: "#ff6b6b" }}>Descalificado</span>}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -375,15 +390,17 @@ export default function AdminUsuarios() {
 
               {/* Referidos nivel 2 */}
               {r.referidosNivel2.length > 0 && (
-                <div>
-                  <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Red nivel 2 ({r.referidosNivel2.length}) — {r.referidosNivel2.filter((x: { verificado: boolean }) => x.verificado).length} verificados</p>
+                <div style={{ marginBottom: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                    <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Red nivel 2</p>
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", padding: "2px 8px", borderRadius: "10px", background: "rgba(128,64,208,0.1)", color: "#a070e0" }}>{r.referidosNivel2.length} personas</span>
+                  </div>
                   {r.referidosNivel2.map((ref) => (
-                    <div key={ref.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.03)", flexWrap: "wrap" }}>
-                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1, minWidth: "100px" }}>{ref.nombre}</button>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.25)" }}>{ref.email}</span>
-                      {ref.ipRegistro && <span style={{ fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.2)" }}>{ref.ipRegistro}</span>}
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(61,184,158,0.1)" : "rgba(255,80,80,0.1)", border: `1px solid ${ref.verificado ? "rgba(61,184,158,0.3)" : "rgba(255,80,80,0.3)"}`, color: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }}>{ref.verificado ? "✓ Verificado" : "Sin verificar"}</span>
-                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(61,184,158,0.08)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#3db89e" : "rgba(240,234,214,0.25)", flexShrink: 0 }}>{ref.verificado ? "+1 pt" : "+1 pendiente"}</span>
+                    <div key={ref.id} style={{ padding: "6px 10px", marginBottom: "3px", background: "rgba(128,64,208,0.03)", border: "1px solid rgba(128,64,208,0.08)", borderRadius: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }} />
+                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.7)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)" }}>{ref.ipRegistro || ""}</span>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 6px", borderRadius: "6px", background: ref.verificado ? "rgba(128,64,208,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }}>{ref.verificado ? "+1 pt" : "pendiente"}</span>
                     </div>
                   ))}
                 </div>
