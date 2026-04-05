@@ -173,18 +173,41 @@ export default function GeniePanel() {
     setStepActual(cobertura.some(x => x.toLowerCase() === c.toLowerCase()) ? 3 : "sin_cobertura");
   };
 
-  const handleCategoria = (c: string) => {
+  const handleCategoria = async (c: string) => {
     setCategoria(c);
     addInteraccion("categoria_seleccionada", { categoria: c });
     shownIds.current = [];
-    const rec = getRecomendacion(c === "Sorpréndeme" ? undefined : c, comuna || undefined, [], modalidad);
+    // Try from cache first
+    let rec = getRecomendacion(c === "Sorpréndeme" ? undefined : c, comuna || undefined, [], modalidad);
     if (rec) {
       shownIds.current.push(rec.id);
       setResultado(rec);
       setStepActual(4);
-    } else {
-      setStepActual("sin_resultados");
+      return;
     }
+    // Fetch from API and retry
+    setStepActual("buscando");
+    try {
+      const params = new URLSearchParams();
+      if (c && c !== "Sorpréndeme") params.set("categoria", c);
+      if (comuna) params.set("comuna", comuna);
+      if (modalidad === "Delivery a domicilio") params.set("modalidad", "delivery");
+      const res = await fetch(`/api/locales/recomendar?${params}`);
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        // Pick random from top rated
+        const pool = data.filter((l: any) => (l.googleRating ?? 0) >= 4.0);
+        const candidates = pool.length >= 3 ? pool : data;
+        const pick = candidates[Math.floor(Math.random() * Math.min(5, candidates.length))];
+        if (pick) {
+          shownIds.current.push(pick.id);
+          setResultado(pick);
+          setStepActual(4);
+          return;
+        }
+      }
+    } catch {}
+    setStepActual("sin_resultados");
   };
 
   const handleOtra = () => {
@@ -305,6 +328,14 @@ export default function GeniePanel() {
           )}
 
           {/* Step sin_resultados */}
+          {stepActual === "buscando" && (
+            <div style={{ textAlign: "center", padding: "20px 0" }}>
+              <div style={{ fontSize: "2rem", marginBottom: "10px", animation: "dc-pulse 1s ease-in-out infinite" }}>🧞</div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(245,208,128,0.7)" }}>Buscando locales...</p>
+              <style>{`@keyframes dc-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }`}</style>
+            </div>
+          )}
+
           {stepActual === "sin_resultados" && (
             <div>
               <button onClick={() => { setSinResultadosGuardado(false); setEmailSinResultados(""); setNombreSinResultados(""); setStepActual(3); }} style={VOLVER}>← Volver</button>

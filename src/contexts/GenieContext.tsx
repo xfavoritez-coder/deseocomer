@@ -73,15 +73,7 @@ interface GenieContextType {
 
 const STORAGE_KEY = "deseocomer_genio_perfil";
 
-const LOCALES_DB: LocalRecomendado[] = [
-  { id: "1", nombre: "El Rincón del Sushi", categoria: "sushi", categorias: ["Sushi"], comuna: "Providencia", rating: 4.8, descuento: 20, foto: null },
-  { id: "2", nombre: "La Pizzería Romana", categoria: "pizza", categorias: ["Pizza"], comuna: "Ñuñoa", rating: 4.5, descuento: 0, foto: null },
-  { id: "3", nombre: "BurgerCraft", categoria: "hamburguesa", categorias: ["Hamburguesa"], comuna: "Las Condes", rating: 4.7, descuento: 15, foto: null },
-  { id: "4", nombre: "Verde Natural", categoria: "saludable", categorias: ["Saludable", "Vegano"], comuna: "Providencia", rating: 4.6, descuento: 0, foto: null },
-  { id: "5", nombre: "Tacos & Co", categoria: "mexicano", categorias: ["Mexicano"], comuna: "Santiago Centro", rating: 4.4, descuento: 10, foto: null },
-  { id: "6", nombre: "Pasta Fresca Nonna", categoria: "pastas", categorias: ["Pastas"], comuna: "Ñuñoa", rating: 4.6, descuento: 0, foto: null },
-  { id: "7", nombre: "El Pollo Dorado", categoria: "pollo", categorias: ["Pollo"], comuna: "Maipú", rating: 4.3, descuento: 5, foto: null },
-];
+const LOCALES_DB: LocalRecomendado[] = [];
 
 function createEmptyPerfil(): GeniePerfil {
   return {
