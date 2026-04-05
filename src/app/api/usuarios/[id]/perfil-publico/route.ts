@@ -90,6 +90,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       totalGanados: usuario.totalConcursosGanados ?? 0,
       mejorPosicion: usuario.mejorPosicion,
       totalReferidos: totalReferidos._count ?? 0,
+      totalApoyos: concursos.reduce((sum, c) => sum + c.desglose.apoyos, 0),
       concursos,
     });
   } catch (error) {

@@ -75,6 +75,8 @@ export default function PerfilUsuarioPage() {
 
   return shell(
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 16px 60px" }}>
+      <button onClick={() => window.history.back()} style={{ background: "none", border: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer", padding: 0, marginBottom: 20 }}>← Volver</button>
+
       {/* Header */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
         {perfil.fotoUrl ? (
@@ -92,11 +94,12 @@ export default function PerfilUsuarioPage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, marginBottom: 32 }}>
         {[
           { value: perfil.totalConcursos, label: "Concursos" },
           { value: perfil.totalGanados, label: "Ganados" },
           { value: perfil.totalReferidos, label: "Referidos" },
+          { value: (perfil as any).totalApoyos ?? 0, label: "Apoyos 💛" },
         ].map(s => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 14, padding: "16px 12px", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(1.3rem, 4vw, 1.8rem)", fontWeight: 700, color: "#f5d080", margin: "0 0 4px" }}>{s.value}</p>
