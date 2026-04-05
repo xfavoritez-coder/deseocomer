@@ -58,9 +58,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Notification: apoyo recibido
     const supporterUser = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { nombre: true } });
-    const msgApoyo = `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó con un corazón. +1 pt 💛`;
-    const yaNotifApoyo = await prisma.notificacion.findFirst({ where: { usuarioId: targetUsuarioId, mensaje: msgApoyo, createdAt: { gte: new Date(Date.now() - 60000) } } });
-    if (!yaNotifApoyo) prisma.notificacion.create({ data: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", mensaje: msgApoyo } }).catch(() => {});
+    const premioCorto = concurso.premio.length > 25 ? concurso.premio.substring(0, 25) + "..." : concurso.premio;
+    const msgApoyo = `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó en "${premioCorto}". +1 pt 💛`;
+    const yaNotifApoyo = await prisma.notificacion.findFirst({ where: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", createdAt: { gte: new Date(Date.now() - 60000) } } });
+    if (!yaNotifApoyo) prisma.notificacion.create({ data: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", mensaje: msgApoyo, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
 
     return NextResponse.json({ ok: true });
   } catch {
