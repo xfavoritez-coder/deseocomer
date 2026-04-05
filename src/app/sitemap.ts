@@ -1,10 +1,13 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
+// Force dynamic to avoid build-time DB calls that timeout
+export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Cache for 1 hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://deseocomer.com";
 
-  // Páginas estáticas
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${baseUrl}/locales`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
@@ -18,52 +21,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/terminos`, changeFrequency: "monthly", priority: 0.2 },
   ];
 
-  // Locales dinámicos
-  const locales = await prisma.local.findMany({
-    where: {
-      OR: [
-        { activo: true },
-        { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" },
-      ],
-      nombre: { not: "" },
-      categorias: { isEmpty: false },
-      NOT: { estadoLocal: "RECHAZADO" },
-    },
-    select: { slug: true, id: true, updatedAt: true },
-  });
+  try {
+    const [locales, concursos, promociones] = await Promise.all([
+      prisma.local.findMany({
+        where: {
+          OR: [
+            { activo: true },
+            { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" },
+          ],
+          nombre: { not: "" },
+          categorias: { isEmpty: false },
+          NOT: { estadoLocal: "RECHAZADO" },
+        },
+        select: { slug: true, id: true, updatedAt: true },
+      }),
+      prisma.concurso.findMany({
+        where: { activo: true, cancelado: false },
+        select: { slug: true, id: true, fechaInicio: true },
+      }),
+      prisma.promocion.findMany({
+        where: { activa: true },
+        select: { slug: true, id: true, createdAt: true },
+      }),
+    ]);
 
-  const localesPages: MetadataRoute.Sitemap = locales.map(l => ({
-    url: `${baseUrl}/locales/${l.slug || l.id}`,
-    lastModified: l.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+    const localesPages: MetadataRoute.Sitemap = locales.map(l => ({
+      url: `${baseUrl}/locales/${l.slug || l.id}`,
+      lastModified: l.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
 
-  // Concursos activos
-  const concursos = await prisma.concurso.findMany({
-    where: { activo: true, cancelado: false },
-    select: { slug: true, id: true, fechaInicio: true },
-  });
+    const concursosPages: MetadataRoute.Sitemap = concursos.map(c => ({
+      url: `${baseUrl}/concursos/${c.slug || c.id}`,
+      lastModified: c.fechaInicio,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
+    }));
 
-  const concursosPages: MetadataRoute.Sitemap = concursos.map(c => ({
-    url: `${baseUrl}/concursos/${c.slug || c.id}`,
-    lastModified: c.fechaInicio,
-    changeFrequency: "daily" as const,
-    priority: 0.8,
-  }));
+    const promosPages: MetadataRoute.Sitemap = promociones.map(p => ({
+      url: `${baseUrl}/promociones/${p.slug || p.id}`,
+      lastModified: p.createdAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
 
-  // Promociones activas
-  const promociones = await prisma.promocion.findMany({
-    where: { activa: true },
-    select: { slug: true, id: true, createdAt: true },
-  });
-
-  const promosPages: MetadataRoute.Sitemap = promociones.map(p => ({
-    url: `${baseUrl}/promociones/${p.slug || p.id}`,
-    lastModified: p.createdAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
-
-  return [...staticPages, ...localesPages, ...concursosPages, ...promosPages];
+    return [...staticPages, ...localesPages, ...concursosPages, ...promosPages];
+  } catch (error) {
+    console.error("[Sitemap] Error fetching dynamic data:", error);
+    return staticPages;
+  }
 }
