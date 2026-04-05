@@ -356,7 +356,7 @@ function ConcursoDetallePage() {
   const soon = concurso ? isSoonEnding(concurso.endsAt, startsAtDetail) : false;
   const urgColor = "#e05555";
   const refLink = isAuthenticated && user && c
-    ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${getRefCode(user.id)}`
+    ? `https://deseocomer.com/concursos/${c.slug ?? concursoId}/${encodeURIComponent(user.nombre.split(" ")[0].toLowerCase())}/${user.codigoRef || getRefCode(user.id)}`
     : null;
   const copyLink = async () => { if (!refLink) return; try { await navigator.clipboard.writeText(refLink); setCopied(true); setTimeout(() => setCopied(false), 2500); addInteraccion("concurso_compartido", { id: String(concursoId || ""), localId: c?.localId || "" }); } catch {} };
   const handleSupport = async (targetName: string, targetId: string, targetUsuarioId: string) => {

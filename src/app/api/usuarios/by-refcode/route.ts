@@ -8,15 +8,28 @@ export async function GET(req: NextRequest) {
 
     const upper = code.toUpperCase();
 
-    // Search all users (not just verified) - the referrer may not have verified yet
-    const usuarios = await prisma.usuario.findMany({
+    // First: search by codigoRef (the real referral code)
+    const byCode = await prisma.usuario.findFirst({
+      where: { codigoRef: upper },
       select: { id: true, nombre: true },
     });
+    if (byCode) return NextResponse.json({ id: byCode.id, nombre: byCode.nombre.split(" ")[0] });
 
-    const found = usuarios.find(u => u.id.slice(-6).toUpperCase() === upper);
-    if (!found) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    // Second: search by ID (in case someone passed the full userId)
+    const byId = await prisma.usuario.findUnique({
+      where: { id: code },
+      select: { id: true, nombre: true },
+    });
+    if (byId) return NextResponse.json({ id: byId.id, nombre: byId.nombre.split(" ")[0] });
 
-    return NextResponse.json({ id: found.id, nombre: found.nombre.split(" ")[0] });
+    // Third: legacy fallback - search by last 6 chars of ID (old getRefCode format)
+    const byLegacy = await prisma.usuario.findFirst({
+      where: { id: { endsWith: code.toLowerCase() } },
+      select: { id: true, nombre: true },
+    });
+    if (byLegacy) return NextResponse.json({ id: byLegacy.id, nombre: byLegacy.nombre.split(" ")[0] });
+
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }

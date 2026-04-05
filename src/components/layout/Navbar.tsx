@@ -174,7 +174,7 @@ export default function Navbar() {
 
         {/* Mobile notification bell — visible only on mobile for authenticated users */}
         {isAuthenticated && user && (
-          <div ref={notifRef} className="dc-mobile-notif" style={{ position: "relative" }}>
+          <div ref={notifRef} className="dc-mobile-notif" style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
               <span style={{ fontSize: "1.1rem" }}>🔔</span>
               {notifCount > 0 && (

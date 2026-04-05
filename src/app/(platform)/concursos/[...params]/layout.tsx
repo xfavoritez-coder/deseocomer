@@ -32,8 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `${refNameCapitalized} está participando por ${premioCorto} en ${concurso.local.nombre}. Regístrate gratis, súmale puntos y tú también entras a ganar.`
       : "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
 
-    // OG image: static fallback for fast loading (Facebook/WhatsApp need < 2s)
-    const ogImage = "https://deseocomer.com/og-default.png";
+    // OG image: use concurso/local image if available, fallback to static
+    const ogImage = concurso.imagenUrl || concurso.local.portadaUrl || "https://deseocomer.com/og-default.png";
 
     const url = `https://deseocomer.com/concursos/${slug}`;
 
