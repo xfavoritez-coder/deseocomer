@@ -358,7 +358,7 @@ export default function LocalDetailPage() {
                     {(local as any).categorias?.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {([...new Set((local as any).categorias ?? [])] as string[]).map((tag: string) => (
+                        {([...new Set((local as any).categorias ?? [])] as string[]).slice(1).map((tag: string) => (
                           <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
                         ))}
                       </div>
