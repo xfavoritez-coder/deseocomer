@@ -295,10 +295,11 @@ export default function LocalesPage() {
                             <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
                           </div>
                         ) : (local as any).googleRating && (local as any).estadoLocal === "NO_RECLAMADO" ? (
-                          <div title="Rating según Google Maps" style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px", cursor: "help" }}>
+                          <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px", cursor: "help" }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
                             <span style={{ color: "#e8a84c", opacity: 0.7 }}>★</span>
                             <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(240,234,214,0.5)" }}>{(local as any).googleRating.toFixed(1)}</span>
                             <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.3)", fontFamily: "var(--font-lato)" }}>G</span>
+                            <div className="gtooltip" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
                           </div>
                         ) : (
                           <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
