@@ -18,25 +18,24 @@ export async function GET(req: NextRequest) {
       take: paginated ? limit + 1 : limit,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       where: {
-        OR: [
-          { activo: true },
-          { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" },
-        ],
-        nombre: { not: "" },
-        categorias: { isEmpty: false },
-        direccion: { not: "" },
-        comuna: { not: "" },
-        NOT: { estadoLocal: "RECHAZADO" },
-        ...(categoria && { categorias: { has: categoria } }),
-        ...(q && {
-          AND: [{
+        AND: [
+          // Base: only active locales
+          { OR: [{ activo: true }, { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" }] },
+          { nombre: { not: "" } },
+          { categorias: { isEmpty: false } },
+          { NOT: { estadoLocal: "RECHAZADO" } },
+          // Category filter
+          ...(categoria ? [{ categorias: { has: categoria } }] : []),
+          // Search query
+          ...(q ? [{
             OR: [
               { nombre: { contains: q, mode: "insensitive" as const } },
-              { categorias: { has: q } },
+              { comuna: { contains: q, mode: "insensitive" as const } },
+              { categorias: { hasSome: q.split(/\s+/).filter(w => w.length > 2) } },
               { descripcion: { contains: q, mode: "insensitive" as const } },
             ],
-          }],
-        }),
+          }] : []),
+        ],
       },
       include: paginated ? {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
