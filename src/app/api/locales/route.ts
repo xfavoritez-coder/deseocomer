@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const limit = paginated ? Math.min(Number(searchParams.get("limit")) || 24, 60) : 500;
 
     const locales = await prisma.local.findMany({
-      ...(paginated && { take: limit + 1 }),
+      take: paginated ? limit + 1 : limit,
       ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       where: {
         OR: [
@@ -38,28 +38,32 @@ export async function GET(req: NextRequest) {
           }],
         }),
       },
-      include: {
+      include: paginated ? {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
         resenas: { select: { rating: true } },
         promociones: { where: { activa: true }, select: { id: true, titulo: true, descripcion: true, horaInicio: true, horaFin: true }, take: 3 },
         concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 3 },
+      } : {
+        _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
+        concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 1 },
       },
     });
-    const addRating = (l: typeof locales[number]) => {
-      const { password: _, resenas, ...rest } = l;
-      const promedioResenas = resenas.length > 0
-        ? resenas.reduce((sum, r) => sum + r.rating, 0) / resenas.length
-        : null;
-      return { ...rest, promedioResenas };
-    };
     if (paginated) {
+      const addRating = (l: typeof locales[number]) => {
+        const { password: _, resenas, ...rest } = l as any;
+        const promedioResenas = resenas?.length > 0
+          ? resenas.reduce((sum: number, r: any) => sum + r.rating, 0) / resenas.length
+          : null;
+        return { ...rest, promedioResenas };
+      };
       const hasMore = locales.length > limit;
       const results = hasMore ? locales.slice(0, limit) : locales;
       const safe = results.map(addRating);
       const nextCursor = hasMore ? results[results.length - 1].id : null;
       return NextResponse.json({ locales: safe, nextCursor, hasMore });
     }
-    const safe = locales.map(addRating);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const safe = locales.map(({ password: _, ...rest }) => rest);
     return NextResponse.json(safe);
   } catch (error) {
     console.error("[API /locales GET] Error:", error);
