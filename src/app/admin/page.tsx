@@ -25,17 +25,25 @@ export default function AdminDashboard() {
     { icon: "📅", label: "Total concursos", value: stats.totalConcursos },
   ];
 
-  const pendientes = (stats.totalLocales ?? 0) - (stats.localesActivos ?? 0);
+  const manualesPendientes = stats.localesManualesPendientes ?? 0;
+  const reclamadosPendientes = stats.localesReclamadosPendientes ?? 0;
 
   return (
     <div>
       <h1 className="adm-dash-title" style={{ fontFamily: "Georgia", color: "#e8a84c", marginBottom: "24px" }}>Dashboard</h1>
 
-      {pendientes > 0 && (
-        <div className="adm-dash-alert" style={{ background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.25)", borderRadius: "14px", padding: "16px 20px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+      {manualesPendientes > 0 && (
+        <div className="adm-dash-alert" style={{ background: "rgba(255,100,100,0.08)", border: "1px solid rgba(255,100,100,0.25)", borderRadius: "14px", padding: "16px 20px", marginBottom: "12px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "1.4rem" }}>🔔</span>
-          <p style={{ fontFamily: "Georgia", color: "#ff8080", flex: 1, margin: 0 }} className="adm-dash-alert-text">Tienes <strong>{pendientes} {pendientes === 1 ? "local pendiente" : "locales pendientes"}</strong> de aprobación</p>
-          <a href="/admin/locales" className="adm-dash-alert-btn" style={{ fontFamily: "Georgia", color: "#0a0812", background: "#e8a84c", padding: "10px 20px", borderRadius: "10px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar ahora →</a>
+          <p style={{ fontFamily: "Georgia", color: "#ff8080", flex: 1, margin: 0 }} className="adm-dash-alert-text">Tienes <strong>{manualesPendientes} {manualesPendientes === 1 ? "local" : "locales"}</strong> registrados pendientes de aprobación</p>
+          <a href="/admin/locales" className="adm-dash-alert-btn" style={{ fontFamily: "Georgia", color: "#0a0812", background: "#e8a84c", padding: "10px 20px", borderRadius: "10px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar →</a>
+        </div>
+      )}
+      {reclamadosPendientes > 0 && (
+        <div className="adm-dash-alert" style={{ background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: "14px", padding: "16px 20px", marginBottom: "12px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <span style={{ fontSize: "1.4rem" }}>🏪</span>
+          <p style={{ fontFamily: "Georgia", color: "#a78bfa", flex: 1, margin: 0 }} className="adm-dash-alert-text"><strong>{reclamadosPendientes} {reclamadosPendientes === 1 ? "local reclamado" : "locales reclamados"}</strong> esperando aprobación</p>
+          <a href="/admin/locales" className="adm-dash-alert-btn" style={{ fontFamily: "Georgia", color: "#0a0812", background: "#a78bfa", padding: "10px 20px", borderRadius: "10px", textDecoration: "none", fontWeight: 700, whiteSpace: "nowrap" }}>Revisar →</a>
         </div>
       )}
       <div className="adm-dash-cards" style={{ display: "grid", gap: "12px", marginBottom: "32px" }}>
