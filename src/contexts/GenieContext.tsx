@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -158,44 +158,14 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   const [sessionCount, setSessionCount] = useState(0);
   const [localesDB, setLocalesDB] = useState<LocalRecomendado[]>(LOCALES_DB);
   const [quickRec, setQuickRec] = useState<LocalRecomendado | null>(null);
+  const [comunasFromDB, setComunasFromDB] = useState<string[]>([]);
+  const [comunasDeliveryFromDB, setComunasDeliveryFromDB] = useState<string[]>([]);
 
-  // Fetch real locales from API
+  // Fetch only comunas (lightweight) instead of all locales
   useEffect(() => {
-    fetch("/api/locales").then(r => r.json()).then(data => {
-      if (Array.isArray(data) && data.length > 0) {
-        setLocalesDB(data.map((l: Record<string, unknown>) => {
-          const cats = (l.categorias as string[]) ?? [];
-          const resenas = (l._count as Record<string, number>)?.resenas ?? 0;
-          const concursos = (l._count as Record<string, number>)?.concursos ?? 0;
-          const googleRating = (l.googleRating as number) ?? null;
-          const estadoLocal = (l.estadoLocal as string) ?? null;
-          const rating = resenas > 0
-            ? ((l._avg as Record<string, number>)?.rating ?? 4.2)
-            : googleRating ?? 0;
-          return {
-            id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
-            categoria: (cats[0] ?? "general").toLowerCase(),
-            categorias: cats,
-            comuna: ((l.comuna as string) ?? "Santiago").replace(/,.*$/, '').replace(/\s*local\s*\d+/gi, '').replace(/\s*\d{5,}/g, '').trim(),
-            rating,
-            googleRating,
-            estadoLocal,
-            descuento: 0,
-            foto: (l.portadaUrl as string) ?? null,
-            logoUrl: (l.logoUrl as string) ?? null,
-            portadaUrl: (l.portadaUrl as string) ?? null,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            promociones: (l.promociones as any[]) ?? [],
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            concursos: (l.concursos as any[]) ?? [],
-            tieneConcurso: concursos > 0,
-            tieneDelivery: (l.tieneDelivery as boolean) ?? false,
-            comunasDelivery: (l.comunasDelivery as string[]) ?? [],
-            tieneRetiro: (l.tieneRetiro as boolean) ?? false,
-            linkPedido: (l.linkPedido as string) ?? "",
-          };
-        }));
-      }
+    fetch("/api/locales/comunas").then(r => r.json()).then(data => {
+      if (data.comunas) setComunasFromDB(data.comunas);
+      if (data.comunasDelivery) setComunasDeliveryFromDB(data.comunasDelivery);
     }).catch(() => {});
   }, []);
 
@@ -382,51 +352,33 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     });
   }, [updatePerfil]);
 
+  // Cache for API-fetched recommendations
+  const recomendacionCache = useRef<Map<string, LocalRecomendado[]>>(new Map());
+
   const getRecomendacion = useCallback((categoria?: string, comuna?: string, excludeIds?: string[], modalidad?: string): LocalRecomendado | null => {
-    let candidates = [...localesDB];
-    if (excludeIds?.length) candidates = candidates.filter(l => !excludeIds.includes(l.id));
+    const cacheKey = `${categoria ?? ""}|${comuna ?? ""}|${modalidad ?? ""}`;
+    const cached = recomendacionCache.current.get(cacheKey);
 
-    // Filter by modalidad
-    if (modalidad === "Delivery a domicilio") {
-      candidates = candidates.filter(l => l.tieneDelivery === true);
-      if (comuna) candidates = candidates.filter(l => l.comunasDelivery?.includes(comuna) || l.comuna.toLowerCase() === comuna.toLowerCase());
-    } else if (modalidad === "Retiro en local") {
-      // Locales con retiro explícito + todos los que sirven en mesa (tienen dirección física)
-      candidates = candidates.filter(l => l.tieneRetiro === true || !!l.comuna);
+    // If we have cached results from API, use those
+    const candidates = cached ?? localesDB;
+    let pool = [...candidates];
+    if (excludeIds?.length) pool = pool.filter(l => !excludeIds.includes(l.id));
+
+    // Prefer well-rated (≥4.0)
+    const bienValorados = pool.filter(l => (l.googleRating ?? l.rating ?? 0) >= 4.0);
+    if (bienValorados.length >= 3) pool = bienValorados;
+
+    if (pool.length === 0) {
+      // Trigger async fetch for next time
+      const params = new URLSearchParams();
+      if (categoria && categoria !== "Sorpréndeme") params.set("categoria", categoria);
+      if (comuna) params.set("comuna", comuna);
+      if (modalidad === "Delivery a domicilio") params.set("modalidad", "delivery");
+      fetch(`/api/locales/recomendar?${params}`).then(r => r.json()).then(data => {
+        if (Array.isArray(data) && data.length > 0) recomendacionCache.current.set(cacheKey, data);
+      }).catch(() => {});
+      return null;
     }
-
-    // Filter by category using categorias array
-    if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
-      const catLower = categoria.toLowerCase();
-      candidates = candidates.filter(l =>
-        l.categorias?.some(c => c.toLowerCase() === catLower) ?? l.categoria.toLowerCase() === catLower
-      );
-    }
-
-    // Filter by comuna (skip if delivery already filtered by comunasDelivery)
-    if (comuna && modalidad !== "Delivery a domicilio") {
-      const comLower = comuna.toLowerCase();
-      const exactMatch = candidates.filter(l => l.comuna.toLowerCase() === comLower);
-      if (exactMatch.length > 0) {
-        candidates = exactMatch;
-      } else {
-        // Try locales that deliver to this comuna
-        const deliveryMatch = candidates.filter(l => l.comunasDelivery?.some(c => c.toLowerCase() === comLower));
-        if (deliveryMatch.length > 0) {
-          candidates = deliveryMatch;
-        }
-      }
-    }
-
-    // If no candidates, return null
-    if (candidates.length === 0) return null;
-
-    // Prefer well-rated locales (≥4.0), then score with randomness
-    const bienValorados = candidates.filter(l => {
-      const r = l.googleRating ?? l.rating ?? 0;
-      return r >= 4.0;
-    });
-    const pool = bienValorados.length >= 3 ? bienValorados : candidates;
 
     const scored = pool.map(l => {
       const ratingBase = l.googleRating && l.rating === 0 ? l.googleRating : l.rating;
@@ -437,14 +389,11 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       const secScore = (l.categorias ?? []).slice(1).reduce((acc, c) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;
       score += catScore * 2 + secScore + comScore;
-      if (l.descuento > 0) score += l.descuento * 0.5;
-      score += Math.random() * 20; // More randomness to vary results
+      score += Math.random() * 20;
       if (l.estadoLocal === 'NO_RECLAMADO') score -= 5;
       return { ...l, score };
     });
-
     scored.sort((a, b) => b.score - a.score);
-    // Pick randomly from top 5 instead of always #1
     const top = scored.slice(0, Math.min(5, scored.length));
     return top[Math.floor(Math.random() * top.length)] ?? null;
   }, [perfil.gustos, localesDB]);
@@ -476,7 +425,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [addInteraccion, showFavoritoToast]);
 
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))], quickRec, setQuickRec }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: comunasFromDB.length > 0 ? comunasFromDB : [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: comunasDeliveryFromDB.length > 0 ? comunasDeliveryFromDB : [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))], quickRec, setQuickRec }}>
       {children}
     </GenieContext.Provider>
   );
