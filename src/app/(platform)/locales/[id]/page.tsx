@@ -312,14 +312,6 @@ export default function LocalDetailPage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
                   </div>
                 )}
-                {esImportado && googleRating && !local.rating && (
-                  <div style={{ position: "relative", cursor: "help", display: "flex", alignItems: "center", gap: "3px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
-                    <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "rgba(232,168,76,0.8)" }}>{googleRating.toFixed(1)}</span>
-                    <span style={{ fontSize: "0.7rem", color: "rgba(232,168,76,0.5)", fontFamily: "var(--font-lato)" }}>G</span>
-                    <div className="gtooltip" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
-                  </div>
-                )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 {esImportado && googleRating && (

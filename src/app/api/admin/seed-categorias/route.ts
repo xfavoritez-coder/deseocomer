@@ -28,6 +28,11 @@ const CATEGORIAS_INICIALES = [
   { nombre: "Sin gluten", slug: "sin-gluten", emoji: "🌾", tipo: "tag", orden: 22 },
   { nombre: "Postres", slug: "postres", emoji: "🍰", tipo: "tag", orden: 23 },
   { nombre: "Brunch", slug: "brunch", emoji: "🥞", tipo: "tag", orden: 24 },
+  { nombre: "Chifa", slug: "chifa", emoji: "🥢", tipo: "tag", orden: 25 },
+  { nombre: "Empanadas", slug: "empanadas", emoji: "🥟", tipo: "tag", orden: 26 },
+  { nombre: "Poke Bowl", slug: "poke-bowl", emoji: "🥗", tipo: "tag", orden: 27 },
+  { nombre: "Sandwich", slug: "sandwich", emoji: "🥪", tipo: "tag", orden: 28 },
+  { nombre: "Jugos y Smoothies", slug: "jugos-smoothies", emoji: "🥤", tipo: "tag", orden: 29 },
 ];
 
 export async function POST() {

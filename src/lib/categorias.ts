@@ -5,6 +5,7 @@ export const CATEGORIAS = [
   "Peruano", "India", "Coreano", "Mediterráneo", "Thai",
   "Ramen", "Fusión", "Sin gluten", "Café",
   "Postres", "Brunch", "Chifa",
+  "Empanadas", "Poke Bowl", "Sandwich", "Jugos y Smoothies",
 ] as const;
 
 export type Categoria = (typeof CATEGORIAS)[number];
@@ -34,4 +35,8 @@ export const CATEGORIA_EMOJI: Record<string, string> = {
   "Postres": "🍰",
   "Brunch": "🥐",
   "Chifa": "🥢",
+  "Empanadas": "🥟",
+  "Poke Bowl": "🥗",
+  "Sandwich": "🥪",
+  "Jugos y Smoothies": "🥤",
 };
