@@ -108,7 +108,7 @@ function ConcursoDetallePage() {
             premio: data.premio ?? "", descripcionPremio: data.descripcion ?? "",
             condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
             endsAt: new Date(data.fechaFin).getTime(),
-            ranking: (data.participantes ?? []).map((p: { usuario?: { nombre?: string; fotoUrl?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "" })),
+            ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "" })),
             reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
@@ -514,7 +514,11 @@ function ConcursoDetallePage() {
               ) : (
                 <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{r.nombre.charAt(0).toUpperCase()}</div>
               )}
-              <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
+              {(r as any).usuarioId ? (
+                <Link href={`/usuario/${(r as any).usuarioId}`} style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize", textDecoration: "none" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</Link>
+              ) : (
+                <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
+              )}
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
               {esSorteo && probPct > 0 && <span title="Probabilidad de ganar basada en tus boletos" style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(236,72,153,0.5)", cursor: "help" }}>{probPct}%</span>}

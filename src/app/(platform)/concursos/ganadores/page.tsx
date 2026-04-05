@@ -12,6 +12,7 @@ type Ganador = {
   local: string;
   categoria: string | null;
   ganador: string;
+  ganadorId: string | null;
   fechaFin: string;
   participantes: number;
 };
@@ -107,7 +108,7 @@ export default function GanadoresPage() {
                     return (
                       <div key={c.id} style={{ background: bgs[i], border: `1px solid ${borders[i]}`, borderRadius: "14px", padding: isCentral ? "24px 8px 14px" : "14px 8px", textAlign: "center" }}>
                         <div style={{ fontSize: "clamp(1.1rem, 3vw, 1.6rem)", marginBottom: "8px" }}>{medals[i]}</div>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.7rem, 2vw, 0.85rem)", fontWeight: 700, color: "#f0ead6", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</p>
+                        {c.ganadorId ? <Link href={`/usuario/${c.ganadorId}`} style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.7rem, 2vw, 0.85rem)", fontWeight: 700, color: "#f0ead6", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", textDecoration: "none" }}>{c.ganador}</Link> : <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.7rem, 2vw, 0.85rem)", fontWeight: 700, color: "#f0ead6", marginBottom: "3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</p>}
                         <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.55rem, 1.5vw, 0.68rem)", color: "rgba(240,234,214,0.4)", lineHeight: 1.3, marginBottom: "6px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.5rem, 1.3vw, 0.6rem)", color: "#3db89e", letterSpacing: "0.05em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
                       </div>
@@ -139,7 +140,7 @@ export default function GanadoresPage() {
                       <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.78rem", color: "#f5d080", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                         <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.charAt(0)}</div>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</span>
+                        {c.ganadorId ? <Link href={`/usuario/${c.ganadorId}`} style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textDecoration: "none" }}>{c.ganador}</Link> : <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</span>}
                         {c.fechaFin && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>}
                       </div>
                     </div>

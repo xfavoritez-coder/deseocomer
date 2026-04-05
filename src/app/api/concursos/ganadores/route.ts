@@ -7,7 +7,7 @@ export async function GET() {
       where: { estado: "completado" },
       include: {
         local: { select: { nombre: true, categorias: true } },
-        ganadorActual: { select: { nombre: true } },
+        ganadorActual: { select: { id: true, nombre: true } },
       },
       orderBy: { premioConfirmadoAt: "desc" },
     });
@@ -21,6 +21,7 @@ export async function GET() {
         local: g.local.nombre,
         categoria: g.local.categorias?.[0] ?? "",
         ganador: (() => { const n = g.ganadorActual?.nombre ?? "Ganador"; const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; })(),
+        ganadorId: g.ganadorActualId,
         fechaFin: g.premioConfirmadoAt?.toLocaleDateString("es-CL") ?? "",
         participantes: 0,
       })),
