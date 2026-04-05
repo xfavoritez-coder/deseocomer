@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
 import bcrypt from "bcryptjs";
 import * as crypto from "crypto";
+import { promises as dns } from "dns";
 import disposableDomains from "disposable-email-domains";
 
 async function generarCodigoRef(nombre: string): Promise<string> {
@@ -30,6 +31,24 @@ export async function POST(req: NextRequest) {
         { error: "Este tipo de correo no está permitido. Por favor usa un correo personal como Gmail u Outlook." },
         { status: 400 }
       );
+    }
+
+    // Verificar que el dominio tenga registros MX válidos
+    if (domain) {
+      try {
+        const mx = await dns.resolveMx(domain);
+        if (!mx || mx.length === 0) {
+          return NextResponse.json(
+            { error: "El dominio de tu correo no parece válido. Verifica que esté bien escrito." },
+            { status: 400 }
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          { error: "El dominio de tu correo no parece válido. Verifica que esté bien escrito." },
+          { status: 400 }
+        );
+      }
     }
 
     const existe = await prisma.usuario.findUnique({ where: { email } });
