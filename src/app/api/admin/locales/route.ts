@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   if (authErr) return authErr;
   try {
     const locales = await prisma.local.findMany({
-      where: { OR: [{ estadoLocal: "ACTIVO" }, { estadoLocal: null }] },
+      where: { NOT: { estadoLocal: "NO_RECLAMADO" } },
       orderBy: { createdAt: "desc" },
       select: {
         id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true,

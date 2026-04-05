@@ -14,6 +14,7 @@ const NAV = [
   { icon: "🧞", label: "Mensajes", href: "/admin/mensajes" },
   { icon: "🍽️", label: "Comidas", href: "/admin/comidas-sugeridas" },
   { icon: "📧", label: "Campañas", href: "/admin/campanas" },
+  { icon: "🗺️", label: "Importados", href: "/admin/locales-importados" },
   { icon: "⚙️", label: "Ajustes", href: "/admin/ajustes" },
 ];
 
