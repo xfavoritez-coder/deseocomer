@@ -31,10 +31,11 @@ export default function LocalesSection() {
   const categorias = ["Todos", ...CATEGORIAS_MASTER.slice(0, 8)];
 
   useEffect(() => {
-    fetch("/api/locales").then(r => r.json()).then(data => {
-      if (Array.isArray(data) && data.length > 0) {
+    fetch("/api/locales?paginated=1&limit=12").then(r => r.json()).then(data => {
+      const arr = data.locales ?? data;
+      if (Array.isArray(arr) && arr.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mapped = data.map((l: any) => ({
+        const mapped = arr.map((l: any) => ({
           id: l.slug || l.id, nombre: l.nombre ?? "", categorias: l.categorias ?? [],
           barrio: l.comuna ?? "Santiago", emoji: "🍽️",
           rating: l._count?.resenas > 0 ? 4.5 : 0, precio: "", isOpen: true,

@@ -57,25 +57,50 @@ export default function LocalesPage() {
     _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },
   });
 
+  const buildUrl = useCallback((cursor?: string | null) => {
+    const params = new URLSearchParams({ paginated: "1", limit: "24" });
+    if (categoriaActiva !== "Todos") params.set("categoria", categoriaActiva);
+    if (busqueda.trim().length >= 2) params.set("q", busqueda.trim());
+    if (cursor) params.set("cursor", cursor);
+    return `/api/locales?${params}`;
+  }, [categoriaActiva, busqueda]);
+
+  const fetchLocales = useCallback(async (reset = false) => {
+    if (reset) { setLoading(true); setLocales([]); setNextCursor(null); setHasMore(true); }
+    try {
+      const res = await fetch(buildUrl(reset ? null : undefined));
+      const data = await res.json();
+      if (data.locales?.length > 0) {
+        setLocales(reset ? data.locales.map(mapLocal) : prev => [...prev, ...data.locales.map(mapLocal)]);
+        setNextCursor(data.nextCursor);
+        setHasMore(data.hasMore);
+      } else if (reset) {
+        setLocales([]);
+        setHasMore(false);
+      }
+    } catch { if (reset) setLocales([]); setHasMore(false); }
+    setLoading(false);
+    setLoadingMore(false);
+  }, [buildUrl]);
+
+  // Initial load + reload on filter change
   useEffect(() => {
-    fetch("/api/locales?paginated=1&limit=24")
-      .then(r => r.json())
-      .then(data => {
-        if (data.locales?.length > 0) {
-          setLocales(data.locales.map(mapLocal));
-          setNextCursor(data.nextCursor);
-          setHasMore(data.hasMore);
-        }
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    fetchLocales(true);
+  }, [categoriaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced search
+  useEffect(() => {
+    if (busqueda.length === 0 || busqueda.length >= 2) {
+      const timer = setTimeout(() => fetchLocales(true), busqueda.length === 0 ? 0 : 400);
+      return () => clearTimeout(timer);
+    }
+  }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore || !nextCursor) return;
     setLoadingMore(true);
     try {
-      const res = await fetch(`/api/locales?paginated=1&limit=24&cursor=${nextCursor}`);
+      const res = await fetch(buildUrl(nextCursor));
       const data = await res.json();
       if (data.locales?.length > 0) {
         setLocales(prev => [...prev, ...data.locales.map(mapLocal)]);
@@ -86,7 +111,7 @@ export default function LocalesPage() {
       }
     } catch { setHasMore(false); }
     setLoadingMore(false);
-  }, [hasMore, loadingMore, nextCursor]);
+  }, [hasMore, loadingMore, nextCursor, buildUrl]);
 
   useEffect(() => {
     if (!observerRef.current) return;
@@ -99,23 +124,13 @@ export default function LocalesPage() {
 
   useEffect(() => {
     if (busqueda.length >= 3) {
-      const timer = setTimeout(() => {
-        addInteraccion("busqueda", { query: busqueda });
-      }, 1500);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => addInteraccion("busqueda", { query: busqueda }), 1500);
+      return () => clearTimeout(t);
     }
   }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const localesFiltrados = locales
     .filter(l => {
-      if (busqueda) {
-        const q = busqueda.toLowerCase();
-        const catMatch = l.categorias?.some((c: string) => c.toLowerCase().includes(q));
-        if (!l.nombre?.toLowerCase().includes(q) && !l.comuna?.toLowerCase().includes(q) && !catMatch) return false;
-      }
-      if (categoriaActiva !== "Todos") {
-        if (!l.categorias?.includes(categoriaActiva)) return false;
-      }
       if (soloAbiertos && l.horarios) {
         const ahora = new Date();
         const dia = ahora.getDay();

@@ -282,23 +282,23 @@ export default function LocalDetailPage() {
               {local.imagenLogo ? <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="dc-hero-nombre-row" style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "6px" }}>
+              <div className="dc-hero-nombre-row" style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>
                 <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
+                {local.rating > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }}>
+                    <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
+                  </div>
+                )}
+                {esImportado && googleRating && !local.rating && (
+                  <div style={{ position: "relative", cursor: "help", display: "flex", alignItems: "center", gap: "3px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
+                    <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "rgba(232,168,76,0.8)" }}>{googleRating.toFixed(1)}</span>
+                    <span style={{ fontSize: "0.7rem", color: "rgba(232,168,76,0.5)", fontFamily: "var(--font-lato)" }}>G</span>
+                    <div className="gtooltip" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
+                  </div>
+                )}
                 <div className="dc-hero-acciones" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-                  {local.rating > 0 && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "3px 10px" }}>
-                      <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
-                    </div>
-                  )}
-                  {esImportado && googleRating && !local.rating && (
-                    <div style={{ position: "relative", cursor: "help", display: "flex", alignItems: "center", gap: "3px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "3px 10px" }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
-                      <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "rgba(232,168,76,0.8)" }}>{googleRating.toFixed(1)}</span>
-                      <span style={{ fontSize: "0.7rem", color: "rgba(232,168,76,0.5)", fontFamily: "var(--font-lato)" }}>G</span>
-                      <div className="gtooltip" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
-                    </div>
-                  )}
                   {esImportado && (
                     <a href={`/reclamar-local/${id}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap" }}>¿Eres el dueño? →</a>
                   )}

@@ -366,7 +366,12 @@ export default function GeniePanel() {
                 <span style={{ color: "rgba(240,234,214,0.4)" }}>{r.comuna}</span>
                 <span style={{ color: "rgba(240,234,214,0.18)" }}>·</span>
                 <span style={{ color: "#3db89e" }}>{CATEGORIA_EMOJI[r.categorias?.[0] ?? ""] ?? "🍽️"} {r.categorias?.[0] ?? r.categoria}</span>
-                {r.rating > 0 && (<><span style={{ color: "rgba(240,234,214,0.18)" }}>·</span><span style={{ color: "#e8a84c", fontWeight: 600 }}>★ {r.rating.toFixed ? r.rating.toFixed(1) : r.rating}</span></>)}
+                {(() => {
+                  const ratingMostrar = r.rating > 0 ? r.rating : (r as any).googleRating;
+                  const esGoogle = r.rating === 0 && (r as any).googleRating;
+                  if (!ratingMostrar) return null;
+                  return (<><span style={{ color: "rgba(240,234,214,0.18)" }}>·</span><span style={{ color: "#e8a84c", fontWeight: 600 }}>★ {ratingMostrar.toFixed ? ratingMostrar.toFixed(1) : ratingMostrar}{esGoogle && <span style={{ fontSize: "10px", opacity: 0.5, marginLeft: "2px" }}>G</span>}</span></>);
+                })()}
               </div>
 
               {/* Extras: promo + concurso */}

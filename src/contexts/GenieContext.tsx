@@ -41,6 +41,9 @@ export interface LocalRecomendado {
   promociones?: any[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   concursos?: any[];
+  googleRating?: number | null;
+  estadoLocal?: string | null;
+  tieneConcurso?: boolean;
   tieneDelivery?: boolean;
   comunasDelivery?: string[];
   tieneRetiro?: boolean;
@@ -154,11 +157,22 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(data) && data.length > 0) {
         setLocalesDB(data.map((l: Record<string, unknown>) => {
           const cats = (l.categorias as string[]) ?? [];
+          const resenas = (l._count as Record<string, number>)?.resenas ?? 0;
+          const concursos = (l._count as Record<string, number>)?.concursos ?? 0;
+          const googleRating = (l.googleRating as number) ?? null;
+          const estadoLocal = (l.estadoLocal as string) ?? null;
+          const rating = resenas > 0
+            ? ((l._avg as Record<string, number>)?.rating ?? 4.2)
+            : googleRating ?? 0;
           return {
             id: String(l.slug || l.id), slug: l.slug as string, nombre: l.nombre as string,
             categoria: (cats[0] ?? "general").toLowerCase(),
             categorias: cats,
-            comuna: (l.comuna as string) ?? "Santiago", rating: ((l._count as Record<string, number>)?.resenas ?? 0) > 0 ? 4.5 : 0, descuento: 0,
+            comuna: (l.comuna as string) ?? "Santiago",
+            rating,
+            googleRating,
+            estadoLocal,
+            descuento: 0,
             foto: (l.portadaUrl as string) ?? null,
             logoUrl: (l.logoUrl as string) ?? null,
             portadaUrl: (l.portadaUrl as string) ?? null,
@@ -166,6 +180,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
             promociones: (l.promociones as any[]) ?? [],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             concursos: (l.concursos as any[]) ?? [],
+            tieneConcurso: concursos > 0,
             tieneDelivery: (l.tieneDelivery as boolean) ?? false,
             comunasDelivery: (l.comunasDelivery as string[]) ?? [],
             tieneRetiro: (l.tieneRetiro as boolean) ?? false,
@@ -393,15 +408,17 @@ export function GenieProvider({ children }: { children: ReactNode }) {
 
     // Score each candidate
     const scored = candidates.map(l => {
-      let score = (l.rating ?? 4) * 10;
+      const ratingBase = l.googleRating && l.rating === 0 ? l.googleRating : l.rating;
+      let score = (ratingBase ?? 4) * 10;
+      if (l.tieneConcurso) score += 40;
       const primaryCat = l.categorias?.[0]?.toLowerCase() ?? l.categoria;
       const catScore = perfil.gustos.categorias[primaryCat] ?? 0;
-      // Bonus for secondary categories
       const secScore = (l.categorias ?? []).slice(1).reduce((acc, c) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;
       score += catScore * 2 + secScore + comScore;
       if (l.descuento > 0) score += l.descuento * 0.5;
-      score += Math.random() * 5;
+      score += Math.random() * 3;
+      if (l.estadoLocal === 'NO_RECLAMADO') score -= 8;
       return { ...l, score };
     });
 
