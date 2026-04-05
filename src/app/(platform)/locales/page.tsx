@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
 import { useGenie } from "@/contexts/GenieContext";
 import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
+import { esComunaValida } from "@/lib/comunas";
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -155,7 +156,7 @@ export default function LocalesPage() {
   }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const comunasDisponibles = useMemo(() => {
-    const set = new Set(locales.map(l => l.comuna).filter(Boolean));
+    const set = new Set(locales.map(l => l.comuna).filter(c => c && esComunaValida(c)));
     return [...set].sort((a, b) => a.localeCompare(b));
   }, [locales]);
 

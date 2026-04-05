@@ -123,15 +123,19 @@ function mapearCategoria(types: string[]): string[] {
   return categorias.slice(0, 3)
 }
 
+// Import normalizarComuna from lib
+import { normalizarComuna } from '../src/lib/comunas'
+
 function extraerComuna(address: string): string {
+  // Try normalizarComuna first with the address parts
   const partes = address.split(',').map(p => p.trim())
-  // Formato típico: "Av. X 123, Providencia, Región Metropolitana, Chile"
-  if (partes.length >= 3) {
-    return partes[partes.length - 3] || partes[partes.length - 2] || ''
+  for (const parte of partes) {
+    const norm = normalizarComuna(parte, address)
+    if (norm) return norm
   }
-  if (partes.length >= 2) {
-    return partes[partes.length - 2] || ''
-  }
+  // Fallback: raw extraction
+  if (partes.length >= 3) return partes[partes.length - 3] || ''
+  if (partes.length >= 2) return partes[partes.length - 2] || ''
   return ''
 }
 
