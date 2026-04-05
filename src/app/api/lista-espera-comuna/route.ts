@@ -3,13 +3,15 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, nombre, comuna, usuarioId } = await req.json();
+    const { email, nombre, comuna, categoria, usuarioId } = await req.json();
     if (!email || !comuna) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
 
-    const existe = await prisma.listaEsperaComuna.findFirst({ where: { email, comuna } });
+    const comunaKey = categoria ? `${comuna}` : comuna;
+    const existe = await prisma.listaEsperaComuna.findFirst({ where: { email, comuna: comunaKey } });
     if (existe) return NextResponse.json({ ok: true, existe: true });
 
-    const entrada = await prisma.listaEsperaComuna.create({ data: { email, nombre, comuna, usuarioId } });
+    const nombreConCat = categoria ? `${nombre || ""}||${categoria}` : nombre;
+    const entrada = await prisma.listaEsperaComuna.create({ data: { email, nombre: nombreConCat, comuna: comunaKey, usuarioId } });
     return NextResponse.json(entrada, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
@@ -24,7 +26,8 @@ export async function GET() {
     for (const item of lista) {
       if (!porComuna[item.comuna]) porComuna[item.comuna] = { total: 0, emails: [] };
       porComuna[item.comuna].total++;
-      porComuna[item.comuna].emails.push({ email: item.email, nombre: item.nombre, fecha: item.createdAt, notificado: item.notificado });
+      const [nombreReal, categoriaItem] = (item.nombre || "").split("||");
+      porComuna[item.comuna].emails.push({ email: item.email, nombre: nombreReal || null, categoria: categoriaItem || null, fecha: item.createdAt, notificado: item.notificado });
     }
     const ranking = Object.entries(porComuna).map(([comuna, data]) => ({ comuna, total: data.total, emails: data.emails })).sort((a, b) => b.total - a.total);
     return NextResponse.json({ lista, ranking });

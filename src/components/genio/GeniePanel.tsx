@@ -359,7 +359,7 @@ export default function GeniePanel() {
                           await fetch("/api/lista-espera-comuna", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ email: emailSinResultados.trim().toLowerCase(), nombre: nombreSinResultados.trim() || null, comuna: `${comuna} — busca ${categoria}` }),
+                            body: JSON.stringify({ email: emailSinResultados.trim().toLowerCase(), nombre: nombreSinResultados.trim() || null, comuna, categoria }),
                           });
                           setSinResultadosGuardado(true);
                         } catch {}
