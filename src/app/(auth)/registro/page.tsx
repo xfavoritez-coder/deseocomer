@@ -20,8 +20,12 @@ function RegistroContent() {
   const { register } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const refCode = searchParams.get("ref");
-  const concursoId = searchParams.get("concurso");
+  const refCodeUrl = searchParams.get("ref");
+  const concursoIdUrl = searchParams.get("concurso");
+  // Fallback: si no hay params en URL, leer de localStorage (pendingRef)
+  const pending = getPendingRef();
+  const refCode = refCodeUrl || pending?.refCode || null;
+  const concursoId = concursoIdUrl || pending?.concursoId || null;
   const [form, setForm] = useState({ nombre: "", email: "", password: "", confirm: "", terms: false });
   const [showPw, setShowPw] = useState(false);
   const [showConf, setShowConf] = useState(false);
@@ -109,12 +113,14 @@ function RegistroContent() {
     setLoading(false);
     if (res.success) {
       if (res.alertaIP) setAlertaIPMsg("Detectamos que ya existen cuentas registradas desde tu ubicación. Recuerda que crear múltiples cuentas puede resultar en la descalificación de concursos.");
-      const pending = getPendingRef(); let msg = ""; let redirectToPath = "/";
-      if (pending && res.userId && pending.refCode !== res.userId) {
-        const fn = getRefUserName(pending.refCode);
-        const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
+      let msg = ""; let redirectToPath = "/";
+      const effectiveRef = refCode;
+      const effectiveConcurso = concursoId;
+      if (effectiveRef && res.userId && effectiveRef !== res.userId) {
+        const fn = getRefUserName(effectiveRef);
+        const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(effectiveRef)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
         msg = refName ? `📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a ${refName} y ganar tú también 3 puntos.` : "📧 Activa tu cuenta desde tu correo — ambos ganan 3 puntos automáticamente.";
-        redirectToPath = `/concursos/${pending.concursoId}`;
+        if (effectiveConcurso) redirectToPath = `/concursos/${effectiveConcurso}`;
         clearPendingRef();
       }
       setRefMsg(msg); setSuccess(true);

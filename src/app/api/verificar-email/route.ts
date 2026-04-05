@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     // Auto-participate in concurso if referred
     if (refCodeParam && concursoParam) {
       try {
-        const referidor = await prisma.usuario.findFirst({ where: { codigoRef: refCodeParam.toUpperCase() }, select: { id: true } });
+        const referidor = await prisma.usuario.findFirst({ where: { OR: [{ codigoRef: refCodeParam.toUpperCase() }, { id: refCodeParam }] }, select: { id: true } });
         if (referidor) {
           const concurso = await prisma.concurso.findFirst({
             where: { OR: [{ id: concursoParam }, { slug: concursoParam }], activo: true },

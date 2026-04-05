@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     // Resolve referrer name if refCode provided
     let refNombre: string | null = null;
     if (refCode) {
-      const referidor = await prisma.usuario.findFirst({ where: { codigoRef: refCode.toUpperCase() }, select: { nombre: true } });
+      const referidor = await prisma.usuario.findFirst({ where: { OR: [{ codigoRef: refCode.toUpperCase() }, { id: refCode }] }, select: { nombre: true } });
       refNombre = referidor?.nombre?.split(" ")[0] ?? null;
     }
 
