@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
 
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, emailVerificadoAt: new Date(), tokenVerificacion: null } });
 
+    let autoReferidorNombre: string | null = null;
+    let autoConcursoSlug: string | null = null;
+
     // Auto-participate in concurso if referred
     if (refCodeParam && concursoParam) {
       try {
@@ -71,6 +74,10 @@ export async function GET(req: NextRequest) {
             }
           }
         }
+        // Set concursoSlug and referidorNombre for the response
+        const refUser = referidor ? await prisma.usuario.findUnique({ where: { id: referidor.id }, select: { nombre: true } }) : null;
+        autoReferidorNombre = refUser?.nombre?.split(" ")[0] ?? null;
+        autoConcursoSlug = concursoParam;
       } catch (e) { console.error("[verificar-email] Error auto-participar:", e); }
     }
 
@@ -204,7 +211,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email, referidorNombre, concursoSlug });
+    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email, referidorNombre: referidorNombre || autoReferidorNombre, concursoSlug: concursoSlug || autoConcursoSlug });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }

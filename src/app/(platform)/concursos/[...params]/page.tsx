@@ -507,7 +507,7 @@ function ConcursoDetallePage() {
           const supportKey = rAny.usuarioId || `mock_${r.nombre}`;
           const alreadySupported = supportedMap[supportKey];
           return (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(61,184,158,0.04)" : "transparent", position: "relative" }}>
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(100,140,255,0.1)" : "transparent", border: isMe ? "1px solid rgba(100,140,255,0.2)" : undefined, borderRadius: isMe ? 8 : 0, position: "relative" }}>
               <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
               {r.fotoUrl ? (
                 <img src={r.fotoUrl} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
