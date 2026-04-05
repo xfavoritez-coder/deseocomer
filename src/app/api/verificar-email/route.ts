@@ -62,12 +62,14 @@ export async function GET(req: NextRequest) {
 
               // Notificación al nuevo participante
               const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
-              prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste al concurso con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉` } }).catch(() => {});
+              const premioCorto = concurso.premio && concurso.premio.length > 30 ? concurso.premio.substring(0, 30) + "..." : (concurso.premio || "un concurso");
+              const cSlug = concurso.slug || concurso.id;
+              prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
 
               // Notificación al referidor
               if (refParticipante) {
                 const nombreRef = usuario.nombre?.split(" ")[0] ?? "Alguien";
-                prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} activó su cuenta con tu link. +3 pts para ti 🎉` } }).catch(() => {});
+                prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} activó su cuenta con tu link en "${premioCorto}". +3 pts para ti 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
               }
 
               prisma.usuario.update({ where: { id: usuario.id }, data: { totalConcursosParticipados: { increment: 1 } } }).catch(() => {});

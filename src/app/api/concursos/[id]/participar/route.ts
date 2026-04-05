@@ -62,10 +62,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Notificación al entrar al concurso
     const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
+    const premioCorto = concurso.premio.length > 30 ? concurso.premio.substring(0, 30) + "..." : concurso.premio;
     const msgEntrada = referidoPor
-      ? `¡Entraste al concurso con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`
-      : `¡Entraste al concurso con ${totalPts} punto${totalPts > 1 ? "s" : ""}!${esMadrugador ? " (+2 bonus madrugador ⚡)" : " Invita amigos para sumar más 🚀"}`;
-    prisma.notificacion.create({ data: { usuarioId, tipo: "entrada_concurso", mensaje: msgEntrada } }).catch(() => {});
+      ? `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`
+      : `¡Entraste a "${premioCorto}" con ${totalPts} punto${totalPts > 1 ? "s" : ""}!${esMadrugador ? " (+2 bonus madrugador ⚡)" : " Invita amigos para sumar más 🚀"}`;
+    prisma.notificacion.create({ data: { usuarioId, tipo: "entrada_concurso", mensaje: msgEntrada, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
 
     // Incrementar totalConcursosParticipados
     prisma.usuario.update({
@@ -129,10 +130,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         // Notification (con dedup)
         const refNombre = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { nombre: true } });
         const msgRef = esNuevo
-          ? `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} se registró con tu link. +${puntosRef} pts para ti 🎉`
-          : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código. +${puntosRef} pts 👏`;
-        const yaNotifRef = await prisma.notificacion.findFirst({ where: { usuarioId: referidoPor, mensaje: msgRef, createdAt: { gte: new Date(Date.now() - 60000) } } });
-        if (!yaNotifRef) prisma.notificacion.create({ data: { usuarioId: referidoPor, tipo: esNuevo ? "referido_nuevo" : "referido_existente", mensaje: msgRef } }).catch(() => {});
+          ? `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} se registró con tu link en "${premioCorto}". +${puntosRef} pts para ti 🎉`
+          : `${refNombre?.nombre?.split(" ")[0] ?? "Alguien"} participó con tu código en "${premioCorto}". +${puntosRef} pts 👏`;
+        const yaNotifRef = await prisma.notificacion.findFirst({ where: { usuarioId: referidoPor, mensaje: { contains: refNombre?.nombre?.split(" ")[0] ?? "" }, createdAt: { gte: new Date(Date.now() - 60000) } } });
+        if (!yaNotifRef) prisma.notificacion.create({ data: { usuarioId: referidoPor, tipo: esNuevo ? "referido_nuevo" : "referido_existente", mensaje: msgRef, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
       }
     }
 
