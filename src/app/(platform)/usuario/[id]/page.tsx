@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
+interface Desglose { registro: number; referidosNuevos: number; referidosExistentes: number; nivel2: number; madrugador: number; apoyos: number }
 interface Concurso {
   id: string;
   slug: string;
@@ -13,6 +14,7 @@ interface Concurso {
   local: string;
   localLogo: string | null;
   puntos: number;
+  desglose: Desglose;
   estado: "activo" | "finalizado" | "ganador" | "programado";
   participantes: number;
 }
@@ -110,29 +112,45 @@ export default function PerfilUsuarioPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {perfil.concursos.map(c => {
               const est = estadoColor[c.estado] ?? estadoColor.finalizado;
+              const d = c.desglose;
+              const desgloseItems = [
+                d.registro > 0 && { label: "Registro", value: d.registro, icon: "🎟️" },
+                d.referidosNuevos > 0 && { label: "Referidos nuevos", value: d.referidosNuevos, icon: "🆕" },
+                d.referidosExistentes > 0 && { label: "Referidos existentes", value: d.referidosExistentes, icon: "👥" },
+                d.nivel2 > 0 && { label: "Red de referidos", value: d.nivel2, icon: "🔗" },
+                d.madrugador > 0 && { label: "Bonus madrugador", value: d.madrugador, icon: "⚡" },
+                d.apoyos > 0 && { label: "Apoyos recibidos", value: d.apoyos, icon: "💛" },
+              ].filter(Boolean) as { label: string; value: number; icon: string }[];
               return (
-                <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 14, padding: 12, textDecoration: "none", transition: "border-color 0.2s" }}>
-                  {c.imagenUrl ? (
-                    <img src={c.imagenUrl} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
-                  ) : (
-                    <div style={{ width: 52, height: 52, borderRadius: 10, background: "rgba(232,168,76,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <span style={{ fontSize: "1.3rem" }}>🏆</span>
+                <div key={c.id} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 14, overflow: "hidden" }}>
+                  <Link href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, textDecoration: "none" }}>
+                    {c.imagenUrl ? (
+                      <img src={c.imagenUrl} alt="" style={{ width: 52, height: 52, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: 52, height: 52, borderRadius: 10, background: "rgba(232,168,76,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <span style={{ fontSize: "1.3rem" }}>🏆</span>
+                      </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f0ead6", margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {c.localLogo ? <img src={c.localLogo} alt="" style={{ width: 14, height: 14, borderRadius: "50%", objectFit: "cover" }} /> : null}
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)" }}>{c.local}</span>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", padding: "3px 10px", borderRadius: 20, background: est.bg, border: `1px solid ${est.border}`, color: est.color, whiteSpace: "nowrap" }}>{est.label}</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#f5d080", fontWeight: 700 }}>{c.puntos} pts</span>
+                    </div>
+                  </Link>
+                  {desgloseItems.length > 0 && (
+                    <div style={{ borderTop: "1px solid rgba(232,168,76,0.06)", padding: "8px 12px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                      {desgloseItems.map(item => (
+                        <span key={item.label} style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", padding: "2px 8px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "rgba(240,234,214,0.45)" }}>{item.icon} {item.label}: +{item.value}</span>
+                      ))}
                     </div>
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f0ead6", margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.premio}</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      {c.localLogo ? (
-                        <img src={c.localLogo} alt="" style={{ width: 14, height: 14, borderRadius: "50%", objectFit: "cover" }} />
-                      ) : null}
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)" }}>{c.local}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", padding: "3px 10px", borderRadius: 20, background: est.bg, border: `1px solid ${est.border}`, color: est.color, whiteSpace: "nowrap" }}>{est.label}</span>
-                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)" }}>{c.puntos} pts</span>
-                  </div>
-                </Link>
+                </div>
               );
             })}
           </div>

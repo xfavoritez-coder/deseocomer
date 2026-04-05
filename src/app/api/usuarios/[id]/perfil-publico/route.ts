@@ -53,7 +53,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     const concursos = participaciones.map(p => {
       const ended = new Date(p.concurso.fechaFin).getTime() <= Date.now();
-      const esGanador = p.concurso.ganadorActualId === id;
+      const esGanador = p.concurso.ganadorActualId === usuario.id;
       return {
         id: p.concurso.id,
         slug: p.concurso.slug,
@@ -62,6 +62,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         local: p.concurso.local.nombre,
         localLogo: p.concurso.local.logoUrl,
         puntos: p.puntos,
+        desglose: {
+          registro: 1,
+          referidosNuevos: p.puntosReferidosNuevos ?? 0,
+          referidosExistentes: p.puntosReferidosExistentes ?? 0,
+          nivel2: p.puntosNivel2 ?? 0,
+          madrugador: p.puntosMadrugador ?? 0,
+          apoyos: Math.max(0, (p.puntos ?? 0) - 1 - (p.puntosReferidosNuevos ?? 0) - (p.puntosReferidosExistentes ?? 0) - (p.puntosNivel2 ?? 0) - (p.puntosMadrugador ?? 0)),
+        },
         estado: esGanador ? "ganador" : ended ? "finalizado" : p.concurso.estado === "programado" ? "programado" : "activo",
         participantes: p.concurso._count.participantes,
       };
