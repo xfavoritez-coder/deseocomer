@@ -243,60 +243,93 @@ interface ParticipacionAPI {
 }
 
 function TabConcursos({ userId, userName }: { userId: string; userName: string }) {
-  const [refCounts, setRefCounts] = useState<Array<{ concursoId: string | number; count: number }>>([]);
   const [copied, setCopied] = useState<string | number | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [ganados, setGanados] = useState<any[]>([]);
-  const [ganadosLoading, setGanadosLoading] = useState(true);
-  const [participacionesAPI, setParticipacionesAPI] = useState<ParticipacionAPI[]>([]);
+  const [participaciones, setParticipaciones] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [expandedConcurso, setExpandedConcurso] = useState<string | null>(null);
-
-  useEffect(() => { setRefCounts(getAllRefCounts(userId)); }, [userId]);
-
-  useEffect(() => {
-    fetch(`/api/usuarios/${userId}/concursos-ganados`)
-      .then(r => r.ok ? r.json() : [])
-      .then(data => { if (Array.isArray(data)) setGanados(data); })
-      .catch(() => {})
-      .finally(() => setGanadosLoading(false));
-  }, [userId]);
 
   useEffect(() => {
     fetch(`/api/usuarios/${userId}/participaciones`)
       .then(r => r.ok ? r.json() : [])
-      .then(data => { if (Array.isArray(data)) setParticipacionesAPI(data); })
-      .catch(() => {});
+      .then(data => { if (Array.isArray(data)) setParticipaciones(data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [userId]);
 
-  const copyLink = async (concursoId: string | number) => {
-    const c = CONCURSOS.find(x => x.id === concursoId);
-    const slug = c?.slug ?? String(concursoId);
+  const { user: authUser } = useAuth();
+  const codigoRef = authUser?.codigoRef || getRefCode(userId);
+
+  const copyLink = async (slug: string) => {
     const nombre = encodeURIComponent(userName.split(" ")[0].toLowerCase());
-    const url = `https://deseocomer.com/concursos/${slug}/${nombre}/${getRefCode(userId)}`;
-    try { await navigator.clipboard.writeText(url); setCopied(concursoId); setTimeout(() => setCopied(null), 2500); } catch {}
+    const url = `https://deseocomer.com/concursos/${slug}/${nombre}/${codigoRef}`;
+    try { await navigator.clipboard.writeText(url); setCopied(slug); setTimeout(() => setCopied(null), 2500); } catch {}
   };
+
+  const activos = participaciones.filter((p: any) => p.estado === "activo");
+  const finalizados = participaciones.filter((p: any) => p.estado !== "activo");
+  const ganados = participaciones.filter((p: any) => p.estado === "ganador");
 
   const estadoBadge = (estado: string) => {
     const map: Record<string, { bg: string; border: string; color: string; label: string }> = {
-      finalizado: { bg: "rgba(232,168,76,0.1)", border: "rgba(232,168,76,0.3)", color: "#e8a84c", label: "Pendiente de entrega" },
-      completado: { bg: "rgba(61,184,158,0.1)", border: "rgba(61,184,158,0.3)", color: "#3db89e", label: "Premio recibido ✓" },
-      en_disputa: { bg: "rgba(255,80,80,0.1)", border: "rgba(255,80,80,0.3)", color: "#ff6b6b", label: "Disputa activa" },
-      en_revision: { bg: "rgba(232,168,76,0.1)", border: "rgba(232,168,76,0.3)", color: "#e8a84c", label: "En revisión" },
+      activo: { bg: "rgba(61,184,158,0.1)", border: "rgba(61,184,158,0.3)", color: "#3db89e", label: "Activo" },
+      ganador: { bg: "rgba(232,168,76,0.15)", border: "rgba(232,168,76,0.4)", color: "#e8a84c", label: "🏆 Ganador" },
+      finalizado: { bg: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)", label: "Finalizado" },
       expirado: { bg: "rgba(255,255,255,0.04)", border: "rgba(255,255,255,0.1)", color: "rgba(240,234,214,0.4)", label: "Expirado" },
     };
     const s = map[estado] ?? map.finalizado;
     return <span style={{ display: "inline-block", background: s.bg, border: `1px solid ${s.border}`, borderRadius: "20px", padding: "2px 10px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: s.color }}>{s.label}</span>;
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderConcursoCard = (p: any) => (
+    <div key={p.concursoId} onClick={() => setExpandedConcurso(prev => prev === p.concursoId ? null : p.concursoId)} style={{
+      background: p.estado === "ganador" ? "rgba(232,168,76,0.06)" : "var(--bg-secondary)",
+      border: `1px solid ${p.estado === "ganador" ? "rgba(232,168,76,0.25)" : "var(--border-color)"}`,
+      borderRadius: "16px", padding: "16px 18px", cursor: "pointer",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <span style={{ fontSize: "1.4rem", flexShrink: 0 }}>{p.estado === "ganador" ? "🏆" : p.estado === "activo" ? "🎯" : "🏁"}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <Link href={`/concursos/${p.slug || p.concursoId}`} onClick={e => e.stopPropagation()} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.88rem", color: "var(--accent)", textDecoration: "none", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.premio}</Link>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", margin: "2px 0 0" }}>{p.local} · {p.participantes} participantes</p>
+        </div>
+        <div style={{ textAlign: "center", flexShrink: 0 }}>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)", margin: 0 }}>{p.puntos}</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", color: "rgba(240,234,214,0.35)", letterSpacing: "0.1em", margin: 0 }}>PTS</p>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px" }}>
+        {estadoBadge(p.estado)}
+        {p.estado === "activo" && (
+          <button onClick={e => { e.stopPropagation(); copyLink(p.slug || p.concursoId); }} style={{ marginLeft: "auto", background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "4px 10px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--accent)" }}>
+            {copied === (p.slug || p.concursoId) ? "✓ Copiado" : "📋 Copiar link"}
+          </button>
+        )}
+      </div>
+      {expandedConcurso === p.concursoId && (
+        <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid var(--border-color)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px", fontSize: "0.75rem", fontFamily: "var(--font-lato)" }}>
+          <span style={{ color: "rgba(240,234,214,0.5)" }}>Base</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+1</span>
+          {p.bonusRef > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Bonus referido</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{p.bonusRef}</span></>}
+          {p.puntosMadrugador > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Madrugador</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+{p.puntosMadrugador}</span></>}
+          {p.puntosReferidosNuevos > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Referidos ({Math.round(p.puntosReferidosNuevos / 3)}×3)</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{p.puntosReferidosNuevos}</span></>}
+          {p.puntosReferidosExistentes > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Ref. existentes</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+{p.puntosReferidosExistentes}</span></>}
+          {p.puntosNivel2 > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Red nivel 2</span><span style={{ color: "#a070e0", textAlign: "right" }}>+{p.puntosNivel2}</span></>}
+          {p.apoyos > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Apoyos 💛</span><span style={{ color: "#e05090", textAlign: "right" }}>+{p.apoyos}</span></>}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* Stats grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         {[
-          { label: "Concursos", value: participacionesAPI.length, icon: "🏆" },
+          { label: "Concursos", value: participaciones.length, icon: "🏆" },
           { label: "Ganados", value: ganados.length, icon: "👑" },
-          { label: "Mejor posición", value: (() => { const pts = participacionesAPI.map(p => p.puntos).filter(Boolean); return pts.length > 0 ? Math.max(...pts) + " pts" : "—"; })(), icon: "📊" },
-          { label: "Puntos históricos", value: participacionesAPI.reduce((acc, p) => acc + (p.puntos ?? 0), 0), icon: "✨" },
+          { label: "Puntos total", value: participaciones.reduce((acc: number, p: any) => acc + (p.puntos ?? 0), 0), icon: "✨" },
+          { label: "Activos", value: activos.length, icon: "🎯" },
         ].map(s => (
           <div key={s.label} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 14, padding: 16, textAlign: "center" }}>
             <p style={{ fontSize: "1.2rem", marginBottom: 4 }}>{s.icon}</p>
@@ -306,131 +339,36 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
         ))}
       </div>
 
-      {/* Concursos ganados */}
-      {!ganadosLoading && ganados.length > 0 && (
+      {/* Banner ganador */}
+      {ganados.length > 0 && (
+        <div style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 14, padding: "16px 20px", textAlign: "center" }}>
+          <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", margin: 0 }}>🏆 Has ganado {ganados.length} {ganados.length === 1 ? "concurso" : "concursos"}</p>
+        </div>
+      )}
+
+      {loading && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: "20px" }}>Cargando concursos...</p>}
+
+      {/* Concursos activos */}
+      {activos.length > 0 && (
         <div>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>Mis concursos ganados</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#3db89e", marginBottom: "12px" }}>Concursos activos</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {ganados.map((g) => (
-              <div key={g.id} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "18px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "1.4rem" }}>🏆</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <Link href={`/concursos/${g.slug || g.id}`} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>{g.premio}</Link>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>{g.local?.nombre}</p>
-                  </div>
-                  {estadoBadge(g.estado)}
-                </div>
-                {g.estado === "finalizado" && g.codigoEntrega && (
-                  <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", padding: "10px 14px", marginTop: "8px" }}>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "4px" }}>Tu código: <strong style={{ color: "var(--accent)", letterSpacing: "0.05em" }}>{g.codigoEntrega}</strong></p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)" }}>Revisa tu email para instrucciones de entrega</p>
-                  </div>
-                )}
-                {g.estado === "completado" && g.premioConfirmadoAt && (
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>Recibido el {new Date(g.premioConfirmadoAt).toLocaleDateString("es-CL")}</p>
-                )}
-                {g.estado === "en_disputa" && (
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", marginTop: "4px" }}>Nuestro equipo está investigando tu caso</p>
-                )}
-              </div>
-            ))}
+            {activos.map(renderConcursoCard)}
           </div>
         </div>
       )}
 
-      {/* Mis participaciones */}
-      {refCounts.length > 0 && (
+      {/* Concursos finalizados */}
+      {finalizados.length > 0 && (
         <div>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>Mis participaciones</p>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "12px" }}>Finalizados</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {refCounts.map(({ concursoId, count }) => {
-              const info = CONCURSOS.find(x => x.id === concursoId) ?? CONCURSOS_FINALIZADOS.find(x => x.id === concursoId);
-              const isActive = CONCURSOS.some(c => c.id === concursoId);
-              const apiData = participacionesAPI.find(p => String(p.concursoId) === String(concursoId));
-              const totalPts = apiData?.puntos ?? count;
-              const nivel2 = apiData?.puntosNivel2 ?? 0;
-              const nivel2Pend = apiData?.puntosNivel2Pendientes ?? 0;
-              const registro = 1;
-              const referidosDirectos = Math.max(0, totalPts - registro - nivel2);
-              return (
-                <div key={concursoId} onClick={() => setExpandedConcurso(prev => prev === String(concursoId) ? null : String(concursoId))} style={{
-                  background: "var(--bg-secondary)", border: "1px solid var(--border-color)",
-                  borderRadius: "16px", padding: "18px 20px", cursor: "pointer",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                    <span style={{ fontSize: "1.6rem" }}>{info?.imagen ?? "🎪"}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <Link href={`/concursos/${concursoId}`} style={{
-                        fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem",
-                        color: "var(--accent)", textDecoration: "none",
-                      }}>
-                        {info?.premio ?? `Concurso #${concursoId}`}
-                      </Link>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>
-                        {info?.local} · <span style={{ color: isActive ? "#3db89e" : "var(--text-muted)" }}>
-                          {isActive ? "Activo" : "Finalizado"}
-                        </span>
-                      </p>
-                    </div>
-                    <div style={{ textAlign: "center", flexShrink: 0 }}>
-                      <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", color: "var(--accent)" }}>{totalPts}</p>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", color: "var(--oasis-bright)", letterSpacing: "0.1em" }}>PTS</p>
-                    </div>
-                    {isActive && (
-                      <button onClick={() => copyLink(concursoId)} style={{
-                        background: "none", border: "1px solid var(--border-color)",
-                        borderRadius: "8px", padding: "6px 12px", cursor: "pointer",
-                        fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)",
-                      }}>
-                        {copied === concursoId ? "✓" : "📋"}
-                      </button>
-                    )}
-                  </div>
-                  {/* Points breakdown */}
-                  <div style={{
-                    marginTop: "12px", paddingTop: "10px",
-                    borderTop: "1px solid var(--border-color)",
-                  }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "6px" }}>
-                      Tus puntos: {totalPts}
-                    </p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "3px", paddingLeft: "8px" }}>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
-                        Registro: <span style={{ color: "var(--accent)" }}>+1</span>
-                      </p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
-                        Referidos directos: <span style={{ color: "var(--accent)" }}>+{referidosDirectos}</span>
-                      </p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.55)" }}>
-                        Red de referidos: <span style={{ color: "var(--accent)" }}>+{nivel2}</span>
-                      </p>
-                      {nivel2 > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "rgba(240,234,214,0.25)", fontStyle: "italic", marginTop: 2 }}>Puntos ganados porque personas que tú invitaste también invitaron a otros al concurso.</p>}
-                      {nivel2Pend > 0 && (
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>
-                          En verificaci&oacute;n: +{nivel2Pend} pts
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {expandedConcurso === String(concursoId) && (
-                    <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(232,168,76,0.08)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.8 }}>
-                      <p>• Registro: +1</p>
-                      {(apiData?.puntosMadrugador ?? 0) > 0 && <p>• Bonus madrugador: +{apiData!.puntosMadrugador}</p>}
-                      {(apiData?.puntosReferidosNuevos ?? 0) > 0 && <p>• Referidos nuevos: +{apiData!.puntosReferidosNuevos}</p>}
-                      {(apiData?.puntosReferidosExistentes ?? 0) > 0 && <p>• Referidos existentes: +{apiData!.puntosReferidosExistentes}</p>}
-                      {nivel2 > 0 && <p>• Red de referidos: +{nivel2}</p>}
-                      <p style={{ color: "var(--accent)", fontWeight: 700, marginTop: 4 }}>Total: +{totalPts} pts</p>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {finalizados.map(renderConcursoCard)}
           </div>
         </div>
       )}
 
-      {refCounts.length === 0 && ganados.length === 0 && !ganadosLoading && (
+      {!loading && participaciones.length === 0 && (
         <EmptyState icon="🏆" text="No participas en ningún concurso aún" btnText="Ver concursos activos" btnHref="/concursos" />
       )}
     </div>
