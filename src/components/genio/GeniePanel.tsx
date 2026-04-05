@@ -102,6 +102,10 @@ export default function GeniePanel() {
   const [emailSinCobertura, setEmailSinCobertura] = useState("");
   const [nombreSinCobertura, setNombreSinCobertura] = useState("");
   const [emailGuardado, setEmailGuardado] = useState(false);
+  const [emailSinResultados, setEmailSinResultados] = useState("");
+  const [nombreSinResultados, setNombreSinResultados] = useState("");
+  const [sinResultadosGuardado, setSinResultadosGuardado] = useState(false);
+  const [sinResultadosLoading, setSinResultadosLoading] = useState(false);
   const CATEGORIAS = useMemo(() => {
     const all = CATEGORIAS_MASTER.map(c => ({ emoji: CATEGORIA_EMOJI[c] ?? "🍽️", label: c }));
 
@@ -303,20 +307,53 @@ export default function GeniePanel() {
           {/* Step sin_resultados */}
           {stepActual === "sin_resultados" && (
             <div>
-              <button onClick={() => setStepActual(3)} style={VOLVER}>← Volver</button>
-              <div style={{ textAlign: "center", padding: "8px 0" }}>
-                <div style={{ fontSize: "2rem", marginBottom: "10px" }}>🧞</div>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px", lineHeight: 1.4 }}>
-                  Aún no tenemos {categoria.toLowerCase()} en {comuna}
-                </p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.5)", marginBottom: "16px", lineHeight: 1.5 }}>
-                  Estamos creciendo. ¿Probamos con otra categoría o buscamos en otra zona?
-                </p>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <button onClick={() => setStepActual(3)} style={{ padding: "10px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.85)", cursor: "pointer" }}>Cambiar categoría</button>
-                  <button onClick={() => { setStepActual(2); setComuna(""); }} style={{ padding: "10px", background: "transparent", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.45)", cursor: "pointer" }}>Buscar en otra zona</button>
+              <button onClick={() => { setSinResultadosGuardado(false); setEmailSinResultados(""); setNombreSinResultados(""); setStepActual(3); }} style={VOLVER}>← Volver</button>
+              {!sinResultadosGuardado ? (
+                <div style={{ textAlign: "center", padding: "8px 0" }}>
+                  <div style={{ fontSize: "2rem", marginBottom: "10px" }}>🧞</div>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", marginBottom: "8px", lineHeight: 1.4 }}>
+                    Aún no tenemos {categoria.toLowerCase()} en {comuna}
+                  </p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.5)", marginBottom: "16px", lineHeight: 1.5 }}>
+                    Estamos sumando locales cada semana. Déjanos tu email y te avisamos cuando haya {categoria.toLowerCase()} en {comuna}, junto con concursos y promociones de tu zona.
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+                    <input type="text" placeholder="Tu nombre" value={nombreSinResultados} onChange={e => setNombreSinResultados(e.target.value)} style={{ padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
+                    <input type="email" placeholder="tu@email.com" value={emailSinResultados} onChange={e => setEmailSinResultados(e.target.value)} style={{ padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
+                    <button
+                      disabled={sinResultadosLoading || !emailSinResultados.includes("@")}
+                      onClick={async () => {
+                        setSinResultadosLoading(true);
+                        try {
+                          await fetch("/api/lista-espera-comuna", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: emailSinResultados.trim().toLowerCase(), nombre: nombreSinResultados.trim() || null, comuna: `${comuna} — busca ${categoria}` }),
+                          });
+                          setSinResultadosGuardado(true);
+                        } catch {}
+                        setSinResultadosLoading(false);
+                      }}
+                      style={{ padding: "12px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "#e8a84c", cursor: "pointer", letterSpacing: "0.06em", opacity: emailSinResultados.includes("@") ? 1 : 0.5 }}
+                    >
+                      {sinResultadosLoading ? "Guardando..." : "🔔 Avísame cuando haya"}
+                    </button>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => setStepActual(3)} style={{ flex: 1, padding: "9px", background: "transparent", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(245,208,128,0.45)", cursor: "pointer" }}>Otra categoría</button>
+                    <button onClick={() => { setStepActual(2); setComuna(""); }} style={{ flex: 1, padding: "9px", background: "transparent", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(245,208,128,0.45)", cursor: "pointer" }}>Otra zona</button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{ textAlign: "center", padding: "8px 0" }}>
+                  <div style={{ fontSize: "2rem", marginBottom: "8px" }}>✨</div>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#3db89e", marginBottom: "6px" }}>¡Listo{nombreSinResultados ? `, ${nombreSinResultados.split(" ")[0]}` : ""}!</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(245,208,128,0.5)", marginBottom: "16px", lineHeight: 1.5 }}>Te avisaremos cuando tengamos {categoria.toLowerCase()} en {comuna}, con concursos y promociones incluidas 🧞</p>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button onClick={() => { setSinResultadosGuardado(false); setEmailSinResultados(""); setNombreSinResultados(""); setStepActual(3); }} style={{ flex: 1, padding: "9px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(245,208,128,0.85)", cursor: "pointer" }}>Buscar otra cosa</button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
