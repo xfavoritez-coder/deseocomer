@@ -49,6 +49,7 @@ export default function LocalesPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [locales, setLocales] = useState<any[]>(localesMock);
   const [loading, setLoading] = useState(true);
+  const [initialLoaded, setInitialLoaded] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
   const [soloAbiertos, setSoloAbiertos] = useState(false);
@@ -107,6 +108,7 @@ export default function LocalesPage() {
     } catch { if (reset) setLocales([]); setHasMore(false); }
     setLoading(false);
     setLoadingMore(false);
+    setInitialLoaded(true);
   }, [buildUrl]);
 
   // Initial load + reload on filter change
@@ -284,7 +286,7 @@ export default function LocalesPage() {
 
       {/* Grid */}
       <section style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 80px" }}>
-        {loading ? (
+        {(loading || !initialLoaded) ? (
           /* Skeleton */
           <div className="dc-loc-grid">
             {Array.from({ length: 6 }).map((_, i) => (
