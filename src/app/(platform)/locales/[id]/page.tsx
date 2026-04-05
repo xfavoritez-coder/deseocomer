@@ -320,7 +320,7 @@ export default function LocalDetailPage() {
                       <span style={{ fontSize: "0.75rem", color: "#e8a84c" }}>★</span>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "rgba(232,168,76,0.8)", letterSpacing: "0.1em" }}>{googleRating.toFixed(1)}</span>
                       <span style={{ fontSize: "0.65rem", color: "rgba(232,168,76,0.5)", fontFamily: "var(--font-lato)" }}>G</span>
-                      <div className="gtooltip2" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
+                      <div className="gtooltip2" style={{ position: "absolute", bottom: "120%", left: 0, background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
                     </span>
                     <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                   </>
@@ -402,7 +402,7 @@ export default function LocalDetailPage() {
             {tab === "Información" && (
               <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
                 <div className="dc-local-main-content" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Descripción — ocultar si importado sin contenido */}
+                  {/* Descripción — ocultar si importado sin contenido — order 1 mobile */}
                   {(local.descripcion || local.historia || (!esImportado && (local as any).categorias?.length > 1)) && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
@@ -420,6 +420,8 @@ export default function LocalDetailPage() {
                   </div>
                   )}
 
+                </div>
+                <div className="dc-local-concursos-promos" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Concurso destacado (solo si hay activos) */}
                   {concursosActivos.length > 0 && (() => {
                     const c = concursosActivos[0];
@@ -484,6 +486,8 @@ export default function LocalDetailPage() {
                     </div>
                   )}
 
+                </div>
+                <div className="dc-local-resenas-section" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Reseñas preview */}
                   {local.resenas.length === 0 ? (
                     <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "12px", padding: "28px 24px", textAlign: "center" }}>
@@ -725,8 +729,10 @@ export default function LocalDetailPage() {
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
         @media (max-width: 1023px) {
           .dc-local-layout { grid-template-columns: 1fr; display: flex; flex-direction: column; }
-          .dc-local-sidebar { position: static; order: 2; }
           .dc-local-main-content { order: 1; }
+          .dc-local-concursos-promos { order: 2; }
+          .dc-local-sidebar { position: static; order: 3; }
+          .dc-local-resenas-section { order: 4; }
         }
         @media (min-width: 1024px) {
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
