@@ -51,6 +51,19 @@ model Usuario {
   comidasCustom   ComidaCustom[]
 }
 
+enum OrigenLocal {
+  REGISTRO_PROPIO
+  GOOGLE_PLACES
+  MANUAL_ADMIN
+}
+
+enum EstadoLocal {
+  ACTIVO
+  NO_RECLAMADO
+  SUSPENDIDO
+  RECHAZADO
+}
+
 model Local {
   id            String   @id @default(cuid())
   slug          String?  @unique
@@ -96,15 +109,25 @@ model Local {
   captadorCodigo  String?  @default("")
   esFounder       Boolean  @default(false)
   founderAt       DateTime?
+  origenImportacion   OrigenLocal?
+  estadoLocal         EstadoLocal   @default(ACTIVO)
+  googlePlaceId       String?       @unique
+  googleRating        Float?
+  googleReviews       Int?
+  horarioGoogle       Json?
+  scoreConfianza      Int?
+  reclamadoPor        String?
+  reclamadoEn         DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  menuItems   MenuItem[]
-  concursos   Concurso[]
-  promociones Promocion[]
-  favoritos   Favorito[]
-  resenas     Resena[]
-  captador    Captador? @relation("CaptadorLocales", fields: [captadorId], references: [id])
+  menuItems     MenuItem[]
+  concursos     Concurso[]
+  promociones   Promocion[]
+  favoritos     Favorito[]
+  resenas       Resena[]
+  alertasEspera LocalAlertaEspera[]
+  captador      Captador? @relation("CaptadorLocales", fields: [captadorId], references: [id])
 }
 
 model MenuItem {
@@ -435,4 +458,20 @@ model ContactoCampana {
 
   @@unique([campanaId, email])
   @@index([email])
+}
+
+model LocalAlertaEspera {
+  id            String    @id @default(cuid())
+  localId       String
+  usuarioId     String?
+  email         String
+  notificado    Boolean   @default(false)
+  notificadoEn  DateTime?
+  createdAt     DateTime  @default(now())
+
+  local         Local     @relation(fields: [localId], references: [id], onDelete: Cascade)
+
+  @@unique([localId, email])
+  @@index([localId])
+  @@index([notificado])
 }

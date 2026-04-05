@@ -7,12 +7,13 @@ export async function GET(req: NextRequest) {
   if (authErr) return authErr;
   try {
     const locales = await prisma.local.findMany({
+      where: { OR: [{ estadoLocal: "ACTIVO" }, { estadoLocal: null }] },
       orderBy: { createdAt: "desc" },
       select: {
         id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true,
         ciudad: true, comuna: true, direccion: true, categorias: true, logoUrl: true, portadaUrl: true,
         lat: true, lng: true, instagram: true, sitioWeb: true, descripcion: true, historia: true,
-        activo: true, captadorCodigo: true, createdAt: true,
+        activo: true, captadorCodigo: true, createdAt: true, estadoLocal: true, origenImportacion: true,
         sirveEnMesa: true, tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,
         _count: { select: { concursos: true, promociones: true, favoritos: true, resenas: true } },
       },
