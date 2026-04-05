@@ -201,7 +201,7 @@ export default function GenieLampara() {
           }}>
             <button onClick={(e) => { e.stopPropagation(); setShowBalloon(false); try { localStorage.setItem("deseocomer_genio_ultimo_recordatorio", String(Date.now())); } catch {} }} style={{ position: "absolute", top: "-8px", right: "-8px", width: "20px", height: "20px", borderRadius: "50%", background: "rgba(232,168,76,0.9)", border: "none", color: "#1a0e05", fontSize: "0.68rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, zIndex: 2 }}>✕</button>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", fontWeight: 700, letterSpacing: "0.03em", color: s.color, margin: 0 }}>
-              ✨ Pregúntame qué comer
+              ✨ Pregúntame dónde comer
             </p>
             <div style={{ position: "absolute", bottom: "-8px", right: "20px", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: `8px solid ${s.border}` }} />
           </div>

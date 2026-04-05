@@ -188,6 +188,11 @@ export default function GenieToast() {
       return;
     }
     // Navigate to specific pages
+    if (opt === "Explorar todo") {
+      dismissToast();
+      window.location.href = "/locales";
+      return;
+    }
     if (opt === "Ver promociones" || opt === "Ver ahora" || opt === "Ver mis ofertas" || opt === "Ver todas") {
       dismissToast();
       window.location.href = "/promociones";

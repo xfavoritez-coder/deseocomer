@@ -22,6 +22,8 @@ export default function AdminUsuarios() {
   const [newPass, setNewPass] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [soloIPsDuplicadas, setSoloIPsDuplicadas] = useState(false);
+  const [filtroEstado, setFiltroEstado] = useState("");
+  const [ordenUsuarios, setOrdenUsuarios] = useState("reciente");
   const [descalificarConfirm, setDescalificarConfirm] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [redReferidos, setRedReferidos] = useState<any[]>([]);
@@ -38,10 +40,12 @@ export default function AdminUsuarios() {
   const [loadingList, setLoadingList] = useState(true);
   const [busqDebounced, setBusqDebounced] = useState("");
 
-  const fetchUsuarios = (p: number, q: string) => {
+  const fetchUsuarios = (p: number, q: string, filtro?: string, orden?: string) => {
     setLoadingList(true);
     const params = new URLSearchParams({ page: String(p), limit: "20" });
     if (q) params.set("busq", q);
+    if (filtro || filtroEstado) params.set("filtro", filtro ?? filtroEstado);
+    if (orden || ordenUsuarios !== "reciente") params.set("orden", orden ?? ordenUsuarios);
     adminFetch(`/api/admin/usuarios?${params}`).then(r => r.json()).then(d => {
       setUsuarios(d.usuarios ?? []);
       setTotalPages(d.totalPages ?? 1);
@@ -52,7 +56,7 @@ export default function AdminUsuarios() {
 
   useEffect(() => { if (usuarios.length === 0) fetchUsuarios(1, ""); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { const t = setTimeout(() => { setBusqDebounced(busq); }, 400); return () => clearTimeout(t); }, [busq]);
-  useEffect(() => { fetchUsuarios(1, busqDebounced); }, [busqDebounced]);
+  useEffect(() => { fetchUsuarios(1, busqDebounced); }, [busqDebounced, filtroEstado, ordenUsuarios]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Persistir estado para no perderlo al navegar a actividad
   useEffect(() => { try { sessionStorage.setItem("admin_usuarios_sel", JSON.stringify(sel)); } catch {} }, [sel]);
@@ -495,6 +499,22 @@ export default function AdminUsuarios() {
       <h1 style={{ fontFamily: "Georgia", fontSize: "1.6rem", color: "#e8a84c", marginBottom: "16px" }}>Usuarios ({totalUsuarios})</h1>
       <input style={{ ...inputS, marginBottom: "14px", maxWidth: "500px" }} placeholder="Buscar por nombre o email..." value={busq} onChange={e => setBusq(e.target.value)} />
 
+      <div style={{ display: "flex", gap: "8px", marginBottom: "12px", flexWrap: "wrap", alignItems: "center" }}>
+        {[
+          { key: "", label: "Todos" },
+          { key: "verificados", label: "✓ Verificados" },
+          { key: "no_verificados", label: "⏳ Sin verificar" },
+        ].map(f => (
+          <button key={f.key} onClick={() => setFiltroEstado(f.key)} style={{ padding: "6px 14px", borderRadius: "20px", border: filtroEstado === f.key ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.1)", background: filtroEstado === f.key ? "rgba(232,168,76,0.12)" : "transparent", color: filtroEstado === f.key ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer" }}>{f.label}</button>
+        ))}
+        <span style={{ width: "1px", height: "20px", background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
+        <select value={ordenUsuarios} onChange={e => setOrdenUsuarios(e.target.value)} style={{ padding: "6px 28px 6px 12px", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(240,234,214,0.6)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center" }}>
+          <option value="reciente" style={{ background: "#0a0812" }}>Más recientes</option>
+          <option value="actividad" style={{ background: "#0a0812" }}>Más actividad</option>
+          <option value="concursos" style={{ background: "#0a0812" }}>Más concursos</option>
+        </select>
+      </div>
+
       <label style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", cursor: "pointer" }}>
         <input type="checkbox" checked={soloIPsDuplicadas} onChange={e => setSoloIPsDuplicadas(e.target.checked)} style={{ accentColor: "#ff8c00", width: "18px", height: "18px" }} />
         <span style={{ fontFamily: "Georgia", fontSize: "0.95rem", color: "rgba(240,234,214,0.55)" }}>Mostrar solo IPs duplicadas</span>
@@ -516,6 +536,13 @@ export default function AdminUsuarios() {
                 <span style={{ fontSize: "0.85rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
                 {isIPDuplicada(u.ipRegistro) && <span style={ipBadgeS}>⚠️ IP</span>}
               </div>
+              {(u._count?.participaciones > 0 || u._count?.favoritos > 0) && (
+                <div style={{ display: "flex", gap: "6px", fontSize: "0.75rem", color: "rgba(240,234,214,0.4)" }}>
+                  {u._count.participaciones > 0 && <span>🏆{u._count.participaciones}</span>}
+                  {u._count.favoritos > 0 && <span>💛{u._count.favoritos}</span>}
+                  {u._count.resenas > 0 && <span>⭐{u._count.resenas}</span>}
+                </div>
+              )}
               <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
             </div>

@@ -42,11 +42,12 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, accion } = await req.json()
 
-    if (!id || !accion) {
+    if (!accion) {
       return NextResponse.json({ error: 'Faltan parámetros' }, { status: 400 })
     }
 
     if (accion === 'aprobar') {
+      if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
       await prisma.local.update({
         where: { id },
         data: {
@@ -73,6 +74,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (accion === 'rechazar') {
+      if (!id) return NextResponse.json({ error: 'Falta id' }, { status: 400 })
       await prisma.local.update({
         where: { id },
         data: {

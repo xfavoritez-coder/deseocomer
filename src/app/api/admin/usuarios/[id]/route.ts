@@ -270,6 +270,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await prisma.participanteConcurso.deleteMany({ where: { usuarioId: id } });
     await prisma.favorito.deleteMany({ where: { usuarioId: id } });
     await prisma.resena.deleteMany({ where: { usuarioId: id } });
+    await prisma.mensajeVisto.deleteMany({ where: { usuarioId: id } });
+    await prisma.toastDismissed.deleteMany({ where: { usuarioId: id } });
+    await prisma.notificacion.deleteMany({ where: { usuarioId: id } });
+    await prisma.comidaCustom.deleteMany({ where: { usuarioId: id } });
+    await prisma.concurso.updateMany({ where: { ganador1Id: id }, data: { ganador1Id: null } });
+    await prisma.concurso.updateMany({ where: { ganador2Id: id }, data: { ganador2Id: null } });
+    await prisma.concurso.updateMany({ where: { ganador3Id: id }, data: { ganador3Id: null } });
+    await prisma.concurso.updateMany({ where: { ganadorActualId: id }, data: { ganadorActualId: null } });
     await prisma.usuario.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (error) {

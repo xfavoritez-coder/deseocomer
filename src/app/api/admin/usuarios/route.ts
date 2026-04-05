@@ -10,16 +10,27 @@ export async function GET(req: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
     const limit = Math.min(50, parseInt(searchParams.get("limit") ?? "20"));
     const busq = searchParams.get("busq") ?? "";
+    const filtro = searchParams.get("filtro") ?? "";
+    const orden = searchParams.get("orden") ?? "reciente";
     const skip = (page - 1) * limit;
 
-    const where = busq
-      ? { OR: [{ nombre: { contains: busq, mode: "insensitive" as const } }, { email: { contains: busq, mode: "insensitive" as const } }] }
-      : {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const conditions: any[] = [];
+    if (busq) conditions.push({ OR: [{ nombre: { contains: busq, mode: "insensitive" as const } }, { email: { contains: busq, mode: "insensitive" as const } }] });
+    if (filtro === "verificados") conditions.push({ emailVerificado: true });
+    if (filtro === "no_verificados") conditions.push({ emailVerificado: false });
+
+    const where = conditions.length > 0 ? { AND: conditions } : {};
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let orderBy: any = { createdAt: "desc" };
+    if (orden === "actividad") orderBy = [{ favoritos: { _count: "desc" } }, { createdAt: "desc" }];
+    if (orden === "concursos") orderBy = [{ participaciones: { _count: "desc" } }, { createdAt: "desc" }];
 
     const [usuarios, total] = await Promise.all([
       prisma.usuario.findMany({
         where,
-        orderBy: { createdAt: "desc" },
+        orderBy,
         skip,
         take: limit,
         select: {
