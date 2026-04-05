@@ -650,6 +650,9 @@ export default function PanelConcursos() {
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
       <button onClick={() => { setStep(concursos.length > 0 ? 1 : 0); setWizard(true); }} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0, fontSize: "0.78rem", padding: "10px 16px" }}>+ Concurso</button>
     </div>
+    <div style={{ marginBottom: "16px" }}>
+      <a href="/concursos/como-funciona" target="_blank" rel="noopener" style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", textDecoration: "underline" }}>¿Cómo funcionan los concursos? →</a>
+    </div>
 
     {/* Filtros */}
     {concursos.length > 0 && (
