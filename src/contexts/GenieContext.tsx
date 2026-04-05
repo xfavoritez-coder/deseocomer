@@ -359,10 +359,27 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     const cacheKey = `${categoria ?? ""}|${comuna ?? ""}|${modalidad ?? ""}`;
     const cached = recomendacionCache.current.get(cacheKey);
 
-    // If we have cached results from API, use those
-    const candidates = cached ?? localesDB;
-    let pool = [...candidates];
+    // If we have cached results from API, use those; otherwise filter localesDB
+    let pool = [...(cached ?? localesDB)];
     if (excludeIds?.length) pool = pool.filter(l => !excludeIds.includes(l.id));
+
+    // Filter by category
+    if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
+      const catLower = categoria.toLowerCase();
+      pool = pool.filter(l => l.categorias?.some(c => c.toLowerCase() === catLower) ?? l.categoria.toLowerCase() === catLower);
+    }
+
+    // Filter by comuna
+    if (comuna) {
+      const comLower = comuna.toLowerCase();
+      const exactMatch = pool.filter(l => l.comuna.toLowerCase() === comLower);
+      if (exactMatch.length > 0) pool = exactMatch;
+    }
+
+    // Filter by modalidad
+    if (modalidad === "Delivery a domicilio") {
+      pool = pool.filter(l => l.tieneDelivery === true);
+    }
 
     // Prefer well-rated (≥4.0)
     const bienValorados = pool.filter(l => (l.googleRating ?? l.rating ?? 0) >= 4.0);
