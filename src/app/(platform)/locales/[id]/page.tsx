@@ -162,6 +162,10 @@ export default function LocalDetailPage() {
     categorias: (dbLocal.categorias as string[]) ?? [],
   } : null);
 
+  const esImportado = dbLocal?.estadoLocal === 'NO_RECLAMADO'
+  const googleRating = dbLocal?.googleRating as number | null
+  const googleReviews = dbLocal?.googleReviews as number | null
+
   // Detect owner / local session
   useEffect(() => {
     try {
@@ -253,6 +257,54 @@ export default function LocalDetailPage() {
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
+
+      {/* Banner importado */}
+      {esImportado && (
+        <div style={{
+          background: 'rgba(167,139,250,0.08)',
+          border: '1px solid rgba(167,139,250,0.25)',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          margin: '16px 24px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
+          maxWidth: '1100px',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.2rem' }}>🗺️</span>
+            <div>
+              <p style={{ fontFamily: 'var(--font-cinzel)', fontSize: '0.8rem', color: '#a78bfa', marginBottom: '2px' }}>Perfil importado desde Google</p>
+              <p style={{ fontFamily: 'var(--font-lato)', fontSize: '0.78rem', color: 'rgba(240,234,214,0.45)', lineHeight: 1.4 }}>
+                {googleRating && `⭐ ${googleRating} (${googleReviews} reseñas en Google) · `}
+                Este local aún no ha sido reclamado por su dueño
+              </p>
+            </div>
+          </div>
+          <a
+            href={`/reclamar-local/${local?.id}`}
+            style={{
+              fontFamily: 'var(--font-cinzel)',
+              fontSize: '0.75rem',
+              letterSpacing: '0.08em',
+              background: 'rgba(167,139,250,0.15)',
+              border: '1px solid rgba(167,139,250,0.4)',
+              color: '#a78bfa',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              fontWeight: 700,
+            }}
+          >
+            ¿Eres el dueño? →
+          </a>
+        </div>
+      )}
 
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
