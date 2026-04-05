@@ -45,10 +45,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       orderBy: { createdAt: "desc" },
     });
 
-    // Count total referidos across all concursos
-    const totalReferidos = await prisma.participanteConcurso.aggregate({
-      where: { referidorDirectoId: usuario.id },
-      _count: true,
+    // Count total referidos verificados across all concursos
+    const totalReferidos = await prisma.participanteConcurso.count({
+      where: {
+        referidorDirectoId: usuario.id,
+        usuario: { emailVerificado: true },
+      },
     });
 
     const concursos = participaciones.map(p => {
@@ -94,7 +96,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       totalConcursos: realTotalConcursos,
       totalGanados: realTotalGanados,
       mejorPosicion: usuario.mejorPosicion,
-      totalReferidos: totalReferidos._count ?? 0,
+      totalReferidos,
       totalApoyos: realTotalApoyos,
       concursos,
     });
