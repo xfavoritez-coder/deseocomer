@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 interface Participacion {
   id: string;
+  usuarioId: string;
   nombre: string;
   premio: string;
   slug: string;
@@ -69,8 +70,8 @@ export default function LiveActivityToast() {
           if (shownIds.current.has(p.id)) continue;
           shownIds.current.add(p.id);
 
-          // Don't show if it's the current user (check by name match is imperfect but ok)
-          if (myId && p.id === myId) continue;
+          // Don't show own participations
+          if (myId && p.usuarioId === myId) continue;
 
           queue.current.push(p);
         }
@@ -111,7 +112,7 @@ export default function LiveActivityToast() {
   return (
     <>
       <div
-        onClick={() => { setExiting(true); setTimeout(() => { setVisible(false); setCurrent(null); }, 300); }}
+        onClick={() => { if (current.slug) window.location.href = `/concursos/${current.slug}`; setExiting(true); setTimeout(() => { setVisible(false); setCurrent(null); }, 300); }}
         style={{
           position: "fixed",
           bottom: 20,

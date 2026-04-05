@@ -12,6 +12,7 @@ export async function GET() {
       },
       select: {
         id: true,
+        usuarioId: true,
         createdAt: true,
         usuario: { select: { nombre: true } },
         concurso: { select: { premio: true, slug: true } },
@@ -26,6 +27,7 @@ export async function GET() {
         const nombreCorto = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0];
         return {
           id: p.id,
+          usuarioId: p.usuarioId,
           nombre: nombreCorto,
           premio: p.concurso.premio,
           slug: p.concurso.slug,
