@@ -736,7 +736,7 @@ function ConcursoDetallePage() {
                   <div style={{ background: "rgba(10,8,18,0.5)", borderRadius: 20, height: 6, overflow: "hidden", marginTop: 6 }}>
                     <div style={{ background: "linear-gradient(to right, #e8a84c, #f5d080)", width: `${(totalParts / 10) * 100}%`, height: "100%", borderRadius: 20, transition: "width 0.3s" }} />
                   </div>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(232,168,76,0.6)", marginTop: 4 }}>{madrugadoresRestantes} lugares restantes con bonus</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", marginTop: 4 }}>{madrugadoresRestantes} lugares restantes con bonus</p>
                 </div>
               </div>
             );
@@ -803,10 +803,9 @@ function ConcursoDetallePage() {
                       <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.12em" }}>{user.codigoRef}</span>
                       </div>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
                     </div>
                   )}
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", marginTop: 6, lineHeight: 1.4 }}>Comparte tu link o código. Si quien lo usa también invita a otros, seguirás sumando puntos.</p>
                 </div>
               ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
@@ -821,7 +820,7 @@ function ConcursoDetallePage() {
               ) : null}
             </div>
             <div style={{ borderTop: "1px solid rgba(232,168,76,0.1)", padding: "10px 20px", textAlign: "center" }}>
-              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
+              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
             </div>
           </div>
           ) : null}
@@ -853,7 +852,7 @@ function ConcursoDetallePage() {
                       <div style={{ position: "absolute", width: 200, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, ...(isTop ? { bottom: "calc(100% + 8px)", top: "auto" } : { top: "calc(100% + 8px)", bottom: "auto" }), ...(col === 0 ? { left: 0, transform: "none" } : col === 2 ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
                         <div style={{ position: "absolute", ...(isTop ? { top: "100%", borderTop: "6px solid rgba(232,168,76,0.3)", borderBottom: "none" } : { bottom: "100%", borderBottom: "6px solid rgba(232,168,76,0.3)", borderTop: "none" }), left: "50%", transform: "translateX(-50%)", borderLeft: "6px solid transparent", borderRight: "6px solid transparent" }} />
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 5 }}>{s.ttTitle}</p>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>{s.ttText}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>{s.ttText}</p>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#3db89e", marginTop: 6, fontWeight: 700 }}>{s.ttPts}</p>
                       </div>
                     )}
@@ -893,7 +892,7 @@ function ConcursoDetallePage() {
                   </div>
                 </div>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros a participar, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.28)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.32)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
           )}
@@ -1063,7 +1062,7 @@ function ConcursoDetallePage() {
             Compartir por WhatsApp
           </button>
           <button onClick={copyLink} style={{ width: "100%", padding: 12, background: "transparent", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 13, color: "rgba(232,168,76,0.7)", cursor: "pointer", letterSpacing: "0.04em", marginBottom: 12 }}>{copied ? "✓ Link copiado" : "🔗 Copiar mi link"}</button>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)", lineHeight: 1.4 }}>Tu posición sube cada vez que alguien entra por tu link. ¡El ranking se actualiza en tiempo real!</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)", lineHeight: 1.4 }}>Tu posición sube cada vez que alguien entra por tu link. El ranking se actualiza en tiempo real.</p>
         </div>
       </>)}
 
