@@ -11,29 +11,24 @@ export async function GET(req: NextRequest) {
     const modalidad = searchParams.get("modalidad");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {
-      OR: [
-        { activo: true },
-        { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" },
-      ],
-      nombre: { not: "" },
-      categorias: { isEmpty: false },
-      NOT: { estadoLocal: "RECHAZADO" },
-    };
+    const conditions: any[] = [
+      { OR: [{ activo: true }, { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" }] },
+      { nombre: { not: "" } },
+      { categorias: { isEmpty: false } },
+      { NOT: { estadoLocal: "RECHAZADO" } },
+    ];
 
     if (categoria && categoria.toLowerCase() !== "sorpréndeme" && categoria.toLowerCase() !== "sorprendeme") {
-      where.categorias = { has: categoria };
+      conditions.push({ categorias: { has: categoria } });
     }
     if (comuna) {
-      where.comuna = { contains: comuna, mode: "insensitive" };
+      conditions.push({ comuna: { contains: comuna, mode: "insensitive" } });
     }
     if (modalidad === "delivery") {
-      where.tieneDelivery = true;
+      conditions.push({ tieneDelivery: true });
     }
-    if (modalidad === "retiro") {
-      // All physical locales qualify
-      where.comuna = where.comuna ?? { not: "" };
-    }
+
+    const where = { AND: conditions };
 
     const locales = await prisma.local.findMany({
       where,
