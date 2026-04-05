@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -68,24 +68,22 @@ export default function Navbar() {
 
   const [reenvioVerif, setReenvioVerif] = useState<"idle" | "sending" | "sent">("idle");
 
+  const verifNotif = { id: "verif-pendiente", tipo: "verificacion", mensaje: "⚠️ Tu cuenta no está verificada. Verifica tu email para participar en concursos y sumar puntos.", leida: false, createdAt: new Date().toISOString(), esVerificacion: true };
+
+  const processNotifs = useCallback((notifsBD: any[], noLeidas: number) => {
+    const needsVerif = user && !user.emailVerificado;
+    if (needsVerif) notifsBD = [verifNotif, ...notifsBD.filter(n => n.id !== "verif-pendiente")];
+    setNotifs(notifsBD);
+    setNotifCount(needsVerif ? Math.max(1, noLeidas + 1) : noLeidas);
+  }, [user?.emailVerificado]);
+
   useEffect(() => {
     if (!user?.id) return;
     fetch(`/api/notificaciones?userId=${user.id}`)
       .then(r => r.json())
-      .then(d => {
-        const notifsBD = d.notificaciones ?? [];
-        let count = d.noLeidas ?? 0;
-        // Add verification notification if not verified
-        if (user && !user.emailVerificado) {
-          const verifNotif = { id: "verif-pendiente", tipo: "verificacion", mensaje: "⚠️ Tu cuenta no está verificada. Verifica tu email para participar en concursos y sumar puntos.", leida: false, createdAt: new Date().toISOString(), esVerificacion: true };
-          notifsBD.unshift(verifNotif);
-          count++;
-        }
-        setNotifCount(count);
-        setNotifs(notifsBD);
-      })
+      .then(d => processNotifs(d.notificaciones ?? [], d.noLeidas ?? 0))
       .catch(() => {});
-  }, [user?.id, user?.emailVerificado]);
+  }, [user?.id, user?.emailVerificado, processNotifs]);
 
   useEffect(() => {
     if (!showNotifs) return;
@@ -132,7 +130,7 @@ export default function Navbar() {
             ) : isAuthenticated && user ? (
               <div className="dc-nav-user">
                 <div ref={notifRef} style={{ position: "relative" }}>
-                  <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifs(d.notificaciones ?? []); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } setNotifCount(0); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
+                  <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
                     <span style={{ fontSize: "1.1rem" }}>🔔</span>
                     {notifCount > 0 && (
                       <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
@@ -176,7 +174,7 @@ export default function Navbar() {
         <div className="dc-nav-mobile-right">
           {isAuthenticated && user && (
             <div ref={notifRef} style={{ position: "relative" }}>
-              <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifs(d.notificaciones ?? []); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } setNotifCount(0); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
+              <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
                 <span style={{ fontSize: "1.1rem" }}>🔔</span>
                 {notifCount > 0 && (
                   <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
