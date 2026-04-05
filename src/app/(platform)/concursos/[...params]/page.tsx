@@ -989,7 +989,8 @@ function ConcursoDetallePage() {
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: 24, maxWidth: 340, width: "90vw" }}>
           <button onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "absolute", top: 12, right: 16, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
           <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>🏆 Entra a este concurso</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16, textAlign: "center" }}>Únete gratis, invita amigos y gana</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 8, textAlign: "center" }}>Únete gratis, invita amigos y gana</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(61,184,158,0.7)", lineHeight: 1.4, marginBottom: 16, textAlign: "center" }}>🎟️ Ganas 1 punto al entrar · Invita amigos y ambos ganan +3</p>
 
           {!showCodigoInput ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
