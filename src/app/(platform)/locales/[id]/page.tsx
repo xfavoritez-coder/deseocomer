@@ -165,6 +165,10 @@ export default function LocalDetailPage() {
   const esImportado = dbLocal?.estadoLocal === 'NO_RECLAMADO'
   const googleRating = dbLocal?.googleRating as number | null
   const googleReviews = dbLocal?.googleReviews as number | null
+  const comunaDisplay = (dbLocal?.comuna as string) || local?.barrio || ''
+  const direccionDisplay = esImportado && local?.direccion
+    ? local.direccion.replace(/,?\s*\d{7}\s*[^,]*/g, '').replace(/,\s*$/, '').trim()
+    : local?.direccion
 
   // Detect owner / local session
   useEffect(() => {
@@ -258,54 +262,6 @@ export default function LocalDetailPage() {
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
       <Navbar />
 
-      {/* Banner importado */}
-      {esImportado && (
-        <div style={{
-          background: 'rgba(167,139,250,0.08)',
-          border: '1px solid rgba(167,139,250,0.25)',
-          borderRadius: '12px',
-          padding: '16px 20px',
-          margin: '16px 24px 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-          maxWidth: '1100px',
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '1.2rem' }}>🗺️</span>
-            <div>
-              <p style={{ fontFamily: 'var(--font-cinzel)', fontSize: '0.8rem', color: '#a78bfa', marginBottom: '2px' }}>Perfil importado desde Google</p>
-              <p style={{ fontFamily: 'var(--font-lato)', fontSize: '0.78rem', color: 'rgba(240,234,214,0.45)', lineHeight: 1.4 }}>
-                {googleRating && `⭐ ${googleRating} (${googleReviews} reseñas en Google) · `}
-                Este local aún no ha sido reclamado por su dueño
-              </p>
-            </div>
-          </div>
-          <a
-            href={`/reclamar-local/${local?.id}`}
-            style={{
-              fontFamily: 'var(--font-cinzel)',
-              fontSize: '0.75rem',
-              letterSpacing: '0.08em',
-              background: 'rgba(167,139,250,0.15)',
-              border: '1px solid rgba(167,139,250,0.4)',
-              color: '#a78bfa',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              textDecoration: 'none',
-              whiteSpace: 'nowrap',
-              fontWeight: 700,
-            }}
-          >
-            ¿Eres el dueño? →
-          </a>
-        </div>
-      )}
-
       {/* Hero */}
       <section style={{ position: "relative", height: "clamp(240px, 40vw, 420px)", overflow: "hidden" }}>
         {local.imagenPortada ? (
@@ -323,13 +279,16 @@ export default function LocalDetailPage() {
           {esFavorito(String(local.id)) ? "💛" : "🤍"}
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
-          <div className="dc-hero-inner" style={{ display: "flex", alignItems: "flex-end", gap: "14px", marginBottom: "10px" }}>
+          <div className="dc-hero-inner" style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "10px" }}>
             <div style={{ width: "clamp(44px, 8vw, 56px)", height: "clamp(44px, 8vw, 56px)", borderRadius: "50%", background: local.imagenLogo ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.9rem, 2vw, 1.1rem)", fontWeight: 700, color: "#fff", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0, overflow: "hidden" }}>
               {local.imagenLogo ? <img src={local.imagenLogo} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : getInitials(local.nombre)}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "6px" }}>
                 <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.3rem, 4vw, 2rem)", fontWeight: 900, color: "#f5d080", lineHeight: 1.1, margin: 0 }}>{local.nombre}</h1>
+                {esImportado && (
+                  <a href={`/reclamar-local/${(local as any)?.slug || local?.id}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>¿Eres el dueño? →</a>
+                )}
                 {local.rating > 0 && (
                   <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0 }}>
                     <span style={{ fontSize: "0.82rem", color: "#e8a84c" }}>★</span>
@@ -340,7 +299,7 @@ export default function LocalDetailPage() {
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{CATEGORIA_EMOJI[local.categoria] ?? "🍽️"} {local.categoria}</span>
                 <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{local.barrio}</span>
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{comunaDisplay || local.barrio}</span>
                 {tieneHorarios && (<>
                   <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "rgba(240,234,214,0.3)", display: "inline-block" }} />
                   <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -399,7 +358,7 @@ export default function LocalDetailPage() {
                     {(local as any).categorias?.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {(local as any).categorias.map((tag: string) => (
+                        {([...new Set((local as any).categorias ?? [])] as string[]).map((tag: string) => (
                           <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
                         ))}
                       </div>
@@ -528,17 +487,19 @@ export default function LocalDetailPage() {
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Información</p>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
-                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.direccion}{local.barrio ? `, ${local.barrio}` : ""}</a></p>}
+                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{direccionDisplay || local.direccion}{!esImportado && local.barrio ? `, ${local.barrio}` : ""}</a></p>}
                       {local.telefono && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Phone size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`tel:${local.telefono.replace(/\s/g, "")}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.telefono}</a></p>}
                       {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
                       {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
                     </div>
-                    {/* Modalidades */}
+                    {/* Modalidades — ocultar para importados */}
+                    {!esImportado && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
                       {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Servicio en mesa</span>}
                       {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Delivery</span>}
                       {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Retiro en local</span>}
                     </div>
+                    )}
                     {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
                       <div style={{ marginBottom: "12px" }}>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "6px" }}>Hacemos delivery a:</p>

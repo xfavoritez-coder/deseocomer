@@ -22,6 +22,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     prisma.local.update({ where: { id: local.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
     const { password: _, ...safe } = local as Record<string, unknown>;
 
+    // Limpiar datos de locales importados
+    if (local.origenImportacion === 'GOOGLE_PLACES') {
+      const comunaLimpia = (local.comuna ?? '')
+        .replace(/,.*$/, '')
+        .replace(/\s*local\s*\d+/gi, '')
+        .replace(/\s*\d{5,}/g, '')
+        .trim();
+      safe.comuna = comunaLimpia || local.comuna;
+
+      const direccionLimpia = (local.direccion ?? '')
+        .replace(/,?\s*\d{7}\s*/g, '')
+        .replace(/,\s*local\s*\d+\s*$/gi, '')
+        .replace(/,\s*región\s*metropolitana.*/gi, '')
+        .trim();
+      safe.direccion = direccionLimpia || local.direccion;
+
+      const cats = local.categorias ?? [];
+      safe.categorias = [...new Set(cats)];
+    }
+
     // Para locales importados: generar horarios desde horarioGoogle si no tiene horarios propios
     if (local.origenImportacion === 'GOOGLE_PLACES' && !local.horarios && local.horarioGoogle) {
       const MAPA_DIAS: Record<string, string> = {
