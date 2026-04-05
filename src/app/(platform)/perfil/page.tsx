@@ -339,6 +339,18 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
         ))}
       </div>
 
+      {/* Código de invitación */}
+      {codigoRef && (
+        <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: 16 }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: 8 }}>Tu código de invitación</p>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", flex: 1 }}>{codigoRef}</span>
+            <button onClick={() => { try { navigator.clipboard.writeText(codigoRef); } catch {} }} style={{ padding: "6px 14px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Copiar</button>
+          </div>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginTop: 8, lineHeight: 1.5 }}>Comparte este código con amigos que ya están en DeseoComer para ganar puntos</p>
+        </div>
+      )}
+
       {/* Banner ganador */}
       {ganados.length > 0 && (
         <div style={{ background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 14, padding: "16px 20px", textAlign: "center" }}>
@@ -674,17 +686,6 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "480px" }}>
-      {/* Código de invitación */}
-      {user?.id && (
-        <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: 8 }}>Tu código de invitación</p>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.3rem", fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", flex: 1 }}>{(user as any).codigoRef || "—"}</span>
-            <button onClick={() => { navigator.clipboard.writeText((user as any).codigoRef || ""); }} style={{ padding: "6px 14px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", cursor: "pointer" }}>Copiar</button>
-          </div>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginTop: 8, lineHeight: 1.5 }}>Comparte este código con amigos para ganar puntos cuando participen en concursos</p>
-        </div>
-      )}
       <div>
         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: 6 }}>Foto de perfil</span>
         <SubirFoto folder="perfiles" circular preview={fotoUrl || null} label="Subir foto" height="80px" onUpload={handleFotoUpload} />
