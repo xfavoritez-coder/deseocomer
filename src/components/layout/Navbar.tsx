@@ -131,37 +131,6 @@ export default function Navbar() {
               </div>
             ) : isAuthenticated && user ? (
               <div className="dc-nav-user">
-                <div ref={notifRef} style={{ position: "relative" }}>
-                  <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
-                    <span style={{ fontSize: "1.1rem" }}>🔔</span>
-                    {notifCount > 0 && (
-                      <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
-                    )}
-                  </button>
-                  {showNotifs && (
-                    <div style={{ position: "absolute", top: "100%", right: 0, width: 300, maxHeight: 320, overflowY: "auto", background: "rgba(10,8,18,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 1000 }}>
-                      <div style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Notificaciones</span>
-                        {notifCount > 0 && <button onClick={async () => { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }); setNotifCount(0); setNotifs(n => n.map(x => ({ ...x, leida: true }))); }} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Marcar todas</button>}
-                      </div>
-                      {notifs.length === 0 ? (
-                        <p style={{ padding: 20, textAlign: "center", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)" }}>Sin notificaciones</p>
-                      ) : notifs.slice(0, 8).map(n => (
-                        n.esVerificacion ? (
-                          <div key={n.id} style={{ padding: "12px 14px", borderBottom: "1px solid rgba(224,85,85,0.15)", background: "rgba(224,85,85,0.06)" }}>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#e05555", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
-                            <button onClick={async () => { if (reenvioVerif !== "idle") return; setReenvioVerif("sending"); try { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user?.email }) }); setReenvioVerif("sent"); setTimeout(() => setReenvioVerif("idle"), 5000); } catch { setReenvioVerif("idle"); } }} style={{ marginTop: 8, background: reenvioVerif === "sent" ? "transparent" : "#e05555", color: reenvioVerif === "sent" ? "#3db89e" : "#fff", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", border: "none", borderRadius: 16, padding: "5px 12px", cursor: reenvioVerif === "idle" ? "pointer" : "default" }}>{reenvioVerif === "sending" ? "Enviando..." : reenvioVerif === "sent" ? "✓ Enviado" : "Reenviar verificación →"}</button>
-                          </div>
-                        ) : (
-                        <div key={n.id} onClick={async () => { if (!n.leida) { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacionId: n.id }) }); setNotifCount(c => Math.max(0, c - 1)); setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, leida: true } : x)); } setShowNotifs(false); }} style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.06)", cursor: "pointer", background: n.leida ? "transparent" : "rgba(232,168,76,0.04)" }}>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                        </div>
-                        )
-                      ))}
-                    </div>
-                  )}
-                </div>
                 <Link href="/perfil" className="dc-nav-avatar" title={user.nombre} style={{ textDecoration: "none" }}>{initials}</Link>
                 <Link href="/perfil" className="dc-nav-username" style={{ textDecoration: "none" }}>{displayName}</Link>
                 <button onClick={logout} className="dc-nav-logout">Salir</button>
@@ -172,9 +141,9 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile notification bell — visible only on mobile for authenticated users */}
+        {/* Notification bell — always visible for authenticated users */}
         {isAuthenticated && user && (
-          <div ref={notifRef} className="dc-mobile-notif" style={{ position: "relative", display: "flex", alignItems: "center" }}>
+          <div ref={notifRef} style={{ position: "relative", display: "flex", alignItems: "center" }}>
             <button onClick={() => { setShowNotifs(!showNotifs); if (!showNotifs && user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { setNotifCount(d.noLeidas ?? 0); setNotifs(d.notificaciones ?? []); }).catch(() => {}); } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
               <span style={{ fontSize: "1.1rem" }}>🔔</span>
               {notifCount > 0 && (
@@ -190,10 +159,17 @@ export default function Navbar() {
                 {notifs.length === 0 ? (
                   <p style={{ padding: 20, textAlign: "center", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)" }}>Sin notificaciones</p>
                 ) : notifs.slice(0, 8).map(n => (
-                  <div key={n.id} onClick={async () => { if (!n.leida) { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacionId: n.id }) }); setNotifCount(c => Math.max(0, c - 1)); setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, leida: true } : x)); } setShowNotifs(false); }} style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.06)", cursor: "pointer", background: n.leida ? "transparent" : "rgba(232,168,76,0.04)" }}>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                  </div>
+                  n.esVerificacion ? (
+                    <div key={n.id} style={{ padding: "12px 14px", borderBottom: "1px solid rgba(224,85,85,0.15)", background: "rgba(224,85,85,0.06)" }}>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#e05555", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
+                      <button onClick={async (e) => { e.stopPropagation(); if (reenvioVerif !== "idle") return; setReenvioVerif("sending"); try { await fetch("/api/emails/verificacion-reenvio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: user?.email }) }); setReenvioVerif("sent"); setTimeout(() => setReenvioVerif("idle"), 5000); } catch { setReenvioVerif("idle"); } }} style={{ marginTop: 8, background: reenvioVerif === "sent" ? "transparent" : "#e05555", color: reenvioVerif === "sent" ? "#3db89e" : "#fff", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", border: "none", borderRadius: 16, padding: "5px 12px", cursor: reenvioVerif === "idle" ? "pointer" : "default" }}>{reenvioVerif === "sending" ? "Enviando..." : reenvioVerif === "sent" ? "✓ Enviado" : "Reenviar verificación →"}</button>
+                    </div>
+                  ) : (
+                    <div key={n.id} onClick={async () => { if (!n.leida) { await fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacionId: n.id }) }); setNotifCount(c => Math.max(0, c - 1)); setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, leida: true } : x)); } }} style={{ padding: "10px 14px", borderBottom: "1px solid rgba(232,168,76,0.06)", cursor: "pointer", background: n.leida ? "transparent" : "rgba(232,168,76,0.04)" }}>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.4, margin: 0 }}>{n.mensaje}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.2)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                    </div>
+                  )
                 ))}
               </div>
             )}
@@ -401,13 +377,10 @@ export default function Navbar() {
         }
 
         .dc-nav-spacer { height: 68px; }
-        .dc-mobile-notif { display: none; }
-
         @media (max-width: 767px) {
           .dc-nav { padding: 14px 20px; }
           .dc-nav-links { display: none; }
           .dc-hamburger { display: flex; }
-          .dc-mobile-notif { display: block; }
           .dc-nav-spacer { height: 56px; }
         }
         @media (min-width: 768px) and (max-width: 1023px) {
