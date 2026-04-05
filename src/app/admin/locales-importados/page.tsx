@@ -101,6 +101,33 @@ export default function LocalesImportadosPage() {
         </p>
       </div>
 
+      {/* Barra de progreso */}
+      {locales.length > 0 && (() => {
+        const total = locales.length
+        const aprobados = locales.filter(l => l.estadoLocal === 'ACTIVO').length
+        const rechazados = locales.filter(l => l.estadoLocal === 'RECHAZADO').length
+        const pendientes = total - aprobados - rechazados
+        const pctAprobados = (aprobados / total) * 100
+        const pctRechazados = (rechazados / total) * 100
+        return (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <span style={{ fontSize: '0.78rem', color: '#888' }}>{total} locales importados</span>
+              <span style={{ fontSize: '0.78rem', color: '#888' }}>{pendientes} pendientes</span>
+            </div>
+            <div style={{ height: '8px', borderRadius: '4px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden', display: 'flex' }}>
+              <div style={{ width: `${pctAprobados}%`, background: '#3db89e', transition: 'width 0.3s' }} />
+              <div style={{ width: `${pctRechazados}%`, background: '#ec4899', transition: 'width 0.3s' }} />
+            </div>
+            <div style={{ display: 'flex', gap: '16px', marginTop: '6px' }}>
+              <span style={{ fontSize: '0.72rem', color: '#3db89e', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: '#3db89e', display: 'inline-block' }} />{aprobados} aprobados</span>
+              <span style={{ fontSize: '0.72rem', color: '#e8a84c', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: '#e8a84c', display: 'inline-block' }} />{pendientes} pendientes</span>
+              {rechazados > 0 && <span style={{ fontSize: '0.72rem', color: '#ec4899', display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: '8px', height: '8px', borderRadius: '2px', background: '#ec4899', display: 'inline-block' }} />{rechazados} rechazados</span>}
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Aprobar todos */}
       {totalAlto > 0 && (
         <button
