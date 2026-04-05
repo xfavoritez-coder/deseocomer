@@ -15,9 +15,13 @@ function VerificarContent() {
   const [referidorNombre, setReferidorNombre] = useState<string | null>(null);
   const [concursoSlug, setConcursoSlug] = useState<string | null>(null);
 
+  const refParam = params.get("ref");
+  const concursoParam = params.get("concurso");
+
   useEffect(() => {
     if (!token) { setStatus("error"); return; }
-    fetch(`/api/verificar-email?token=${token}`)
+    const apiUrl = `/api/verificar-email?token=${token}${refParam ? `&ref=${encodeURIComponent(refParam)}` : ""}${concursoParam ? `&concurso=${encodeURIComponent(concursoParam)}` : ""}`;
+    fetch(apiUrl)
       .then(r => r.json())
       .then(data => {
         if (data.ok) {
