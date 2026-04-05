@@ -292,8 +292,8 @@ export default function LocalDetailPage() {
           </div>
         )}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0.1) 0%, rgba(10,8,18,0.95) 100%)" }} />
-        <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "20px", padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>← Locales</Link>
-        <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "20px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Link href="/locales" style={{ position: "absolute", top: "20px", left: "clamp(16px, 4vw, 32px)", zIndex: 3, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: "44px", height: "44px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "rgba(240,234,214,0.75)", textDecoration: "none" }}>←</Link>
+        <button onClick={() => toggleFavorito(String(local.id), { categoria: local.categoria, comuna: local.barrio })} style={{ position: "absolute", top: "20px", right: "16px", zIndex: 10, width: "44px", height: "44px", borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", fontSize: "1.2rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {esFavorito(String(local.id)) ? "💛" : "🤍"}
         </button>
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "clamp(16px, 4vw, 32px)", zIndex: 2 }}>
@@ -343,36 +343,40 @@ export default function LocalDetailPage() {
 
 
       {esImportado && (
-        <div className="dc-dueno-bar" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 16px',
-          borderBottom: '1px solid rgba(167,139,250,0.15)',
-          background: 'rgba(167,139,250,0.04)',
-        }}>
-          <p style={{
-            fontFamily: 'var(--font-lato)',
-            fontSize: '0.78rem',
-            color: 'rgba(167,139,250,0.6)',
-            margin: 0,
+        <div style={{ borderBottom: '1px solid rgba(167,139,250,0.15)', background: 'rgba(167,139,250,0.04)' }}>
+          <div style={{
+            maxWidth: '1100px',
+            margin: '0 auto',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '12px',
+            flexWrap: 'wrap' as const,
+            padding: '10px 16px',
           }}>
-            Local aún no verificado
-          </p>
-          <a href={`/reclamar-local/${dbLocal?.slug || id}`} style={{
-            fontFamily: 'var(--font-cinzel)',
-            fontSize: '0.7rem',
-            letterSpacing: '0.08em',
-            background: 'rgba(167,139,250,0.12)',
-            border: '1px solid rgba(167,139,250,0.3)',
-            color: '#a78bfa',
-            borderRadius: '8px',
-            padding: '6px 12px',
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-          }}>
-            ¿Eres el dueño? →
-          </a>
+            <p style={{
+              fontFamily: 'var(--font-lato)',
+              fontSize: '0.78rem',
+              color: 'rgba(167,139,250,0.6)',
+              margin: 0,
+            }}>
+              Local aún no verificado
+            </p>
+            <a href={`/reclamar-local/${dbLocal?.slug || id}`} style={{
+              fontFamily: 'var(--font-cinzel)',
+              fontSize: '0.7rem',
+              letterSpacing: '0.08em',
+              background: 'rgba(167,139,250,0.12)',
+              border: '1px solid rgba(167,139,250,0.3)',
+              color: '#a78bfa',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}>
+              ¿Eres el dueño? →
+            </a>
+          </div>
         </div>
       )}
 
@@ -737,9 +741,6 @@ export default function LocalDetailPage() {
         @media (min-width: 1024px) {
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
           .dc-tabs-inner { max-width: 1100px; margin: 0 auto; }
-        }
-        @media (min-width: 768px) {
-          .dc-dueno-bar { display: none; }
         }
         @media (max-width: 767px) {
           .dc-ld-menu-grid { grid-template-columns: 1fr; }
