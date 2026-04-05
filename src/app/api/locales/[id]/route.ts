@@ -33,7 +33,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
       const direccionLimpia = (local.direccion ?? '')
         .replace(/,?\s*\d{7}\s*/g, '')
-        .replace(/,\s*local\s*\d+\s*$/gi, '')
         .replace(/,\s*región\s*metropolitana.*/gi, '')
         .trim();
       safe.direccion = direccionLimpia || local.direccion;
