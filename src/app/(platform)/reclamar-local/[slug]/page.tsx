@@ -24,7 +24,7 @@ export default function ReclamarLocalPage() {
     fetch(`/api/locales/${slug}`)
       .then(r => r.json())
       .then(data => {
-        if (data.estadoLocal !== 'NO_RECLAMADO') {
+        if (data.reclamadoEn || data.activo) {
           router.replace(`/locales/${slug}`)
           return
         }

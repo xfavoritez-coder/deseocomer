@@ -22,7 +22,12 @@ export async function POST(req: NextRequest) {
       select: { id: true, nombre: true, estadoLocal: true, slug: true }
     })
     if (!local) return NextResponse.json({ error: 'Local no encontrado' }, { status: 404 })
-    if (local.estadoLocal !== 'NO_RECLAMADO') {
+    if (local.estadoLocal === 'RECHAZADO' || local.estadoLocal === 'SUSPENDIDO') {
+      return NextResponse.json({ error: 'Este local no está disponible' }, { status: 409 })
+    }
+    // Check select to see if already claimed
+    const localFull = await prisma.local.findUnique({ where: { id: localId }, select: { reclamadoEn: true, activo: true } })
+    if (localFull?.reclamadoEn || localFull?.activo) {
       return NextResponse.json({ error: 'Este local ya fue reclamado' }, { status: 409 })
     }
 
