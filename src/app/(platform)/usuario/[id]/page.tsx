@@ -38,6 +38,9 @@ export default function PerfilUsuarioPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // TEMPORALMENTE DESACTIVADO — reactivar cuando perfiles estén listos
+  useEffect(() => { window.location.href = "/concursos"; }, []);
+
   useEffect(() => {
     fetch(`/api/usuarios/${id}/perfil-publico`)
       .then(r => r.ok ? r.json() : Promise.reject())
