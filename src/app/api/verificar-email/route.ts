@@ -38,6 +38,13 @@ export async function GET(req: NextRequest) {
               const refParticipante = await prisma.participanteConcurso.findUnique({
                 where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidor.id } },
               });
+
+              // Build referral chain — check if referrer has their own referrer (nivel 2)
+              let referidorNivel2Id: string | null = null;
+              if (refParticipante?.referidorDirectoId) {
+                referidorNivel2Id = refParticipante.referidorDirectoId;
+              }
+
               const totalPart = await prisma.participanteConcurso.count({ where: { concursoId: concurso.id } });
               const esMadrugador = totalPart < 10;
               const puntosBase = 1;
@@ -48,7 +55,7 @@ export async function GET(req: NextRequest) {
                 data: {
                   concursoId: concurso.id, usuarioId: usuario.id, referidoPor: referidor.id,
                   puntos: puntosBase + puntosRefBonus + puntosMadrugador,
-                  referidorDirectoId: referidor.id, esMadrugador, puntosMadrugador,
+                  referidorDirectoId: referidor.id, referidorNivel2Id, esMadrugador, puntosMadrugador,
                 },
               });
 
@@ -60,10 +67,26 @@ export async function GET(req: NextRequest) {
                 });
               }
 
-              // Notificación al nuevo participante
-              const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
               const premioCorto = concurso.premio && concurso.premio.length > 30 ? concurso.premio.substring(0, 30) + "..." : (concurso.premio || "un concurso");
               const cSlug = concurso.slug || concurso.id;
+
+              // Give nivel 2 referrer +1 point
+              if (referidorNivel2Id) {
+                const nivel2Part = await prisma.participanteConcurso.findUnique({
+                  where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidorNivel2Id } },
+                });
+                if (nivel2Part && (nivel2Part.puntosNivel2 ?? 0) < 10) {
+                  await prisma.participanteConcurso.update({
+                    where: { id: nivel2Part.id },
+                    data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } },
+                  });
+                  const refDirectoNombre = refParticipante ? (await prisma.usuario.findUnique({ where: { id: referidor.id }, select: { nombre: true } }))?.nombre?.split(" ")[0] : "tu referido";
+                  prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: `La red de ${refDirectoNombre ?? "tu referido"} te sumó +1 punto en "${premioCorto}" 🧞`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                }
+              }
+
+              // Notificación al nuevo participante
+              const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
               prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
 
               // Notificación al referidor
