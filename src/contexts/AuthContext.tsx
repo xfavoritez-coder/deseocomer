@@ -182,6 +182,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password: data.password,
           telefono: data.type === "local" ? data.telefono : null,
           ciudad: data.comuna || null,
+          ...("refCode" in data && { refCode: (data as any).refCode }),
+          ...("concursoId" in data && { concursoId: (data as any).concursoId }),
         }),
       });
       const result = await res.json();

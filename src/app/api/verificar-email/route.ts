@@ -5,6 +5,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
+    const refCodeParam = searchParams.get("ref");
+    const concursoParam = searchParams.get("concurso");
     if (!token) return NextResponse.json({ error: "Token inválido" }, { status: 400 });
 
     const usuario = await prisma.usuario.findFirst({ where: { tokenVerificacion: token } });
@@ -15,6 +17,52 @@ export async function GET(req: NextRequest) {
     if (tokenAge > 48 * 60 * 60 * 1000) return NextResponse.json({ error: "Este enlace ha expirado. Solicita uno nuevo." }, { status: 400 });
 
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, emailVerificadoAt: new Date(), tokenVerificacion: null } });
+
+    // Auto-participate in concurso if referred
+    if (refCodeParam && concursoParam) {
+      try {
+        const referidor = await prisma.usuario.findFirst({ where: { codigoRef: refCodeParam.toUpperCase() }, select: { id: true } });
+        if (referidor) {
+          const concurso = await prisma.concurso.findFirst({
+            where: { OR: [{ id: concursoParam }, { slug: concursoParam }], activo: true },
+          });
+          if (concurso && new Date(concurso.fechaFin) > new Date()) {
+            const yaParticipa = await prisma.participanteConcurso.findUnique({
+              where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: usuario.id } },
+            });
+            if (!yaParticipa) {
+              // Create participation via internal API call logic
+              const refParticipante = await prisma.participanteConcurso.findUnique({
+                where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidor.id } },
+              });
+              const totalPart = await prisma.participanteConcurso.count({ where: { concursoId: concurso.id } });
+              const esMadrugador = totalPart < 10;
+              const puntosBase = 1;
+              const puntosRefBonus = 3;
+              const puntosMadrugador = esMadrugador ? 2 : 0;
+
+              await prisma.participanteConcurso.create({
+                data: {
+                  concursoId: concurso.id, usuarioId: usuario.id, referidoPor: referidor.id,
+                  puntos: puntosBase + puntosRefBonus + puntosMadrugador,
+                  referidorDirectoId: referidor.id, esMadrugador, puntosMadrugador,
+                },
+              });
+
+              // Give referrer +3 points
+              if (refParticipante) {
+                await prisma.participanteConcurso.update({
+                  where: { id: refParticipante.id },
+                  data: { puntos: { increment: 3 }, puntosReferidosNuevos: { increment: 3 } },
+                });
+              }
+
+              prisma.usuario.update({ where: { id: usuario.id }, data: { totalConcursosParticipados: { increment: 1 } } }).catch(() => {});
+            }
+          }
+        }
+      } catch (e) { console.error("[verificar-email] Error auto-participar:", e); }
+    }
 
     // Mover puntos pendientes a reales en concursos activos
     const participaciones = await prisma.participanteConcurso.findMany({

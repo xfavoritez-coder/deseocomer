@@ -105,33 +105,17 @@ function RegistroContent() {
     if (form.password !== form.confirm) return setError("Las contraseñas no coinciden.");
     if (!form.terms) return setError("Debes aceptar los términos.");
     setLoading(true);
-    const res = await register({ type: "user", nombre: form.nombre.trim(), email: form.email.trim(), password: form.password, comuna: "" });
+    const res = await register({ type: "user", nombre: form.nombre.trim(), email: form.email.trim(), password: form.password, comuna: "", ...(refCode && { refCode }), ...(concursoId && { concursoId }) } as any);
     setLoading(false);
     if (res.success) {
       if (res.alertaIP) setAlertaIPMsg("Detectamos que ya existen cuentas registradas desde tu ubicación. Recuerda que crear múltiples cuentas puede resultar en la descalificación de concursos.");
       const pending = getPendingRef(); let msg = ""; let redirectToPath = "/";
       if (pending && res.userId && pending.refCode !== res.userId) {
-        const em = form.email.trim().toLowerCase();
-        if (!hasEmailCounted(pending.concursoId, pending.refCode, em)) {
-          markEmailCounted(pending.concursoId, pending.refCode, em);
-          // Resolve refCode to real userId
-          let referidorId = pending.refCode;
-          try {
-            const refRes = await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`);
-            if (refRes.ok) { const refData = await refRes.json(); referidorId = refData.id; }
-          } catch {}
-          // Create new user's participation with referral (referrer must already be participating)
-          try {
-            await fetch(`/api/concursos/${pending.concursoId}/participar`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ usuarioId: res.userId, referidoPor: referidorId }),
-            });
-          } catch {}
-          const fn = getRefUserName(pending.refCode);
-          const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
-          msg = refName ? `📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a ${refName} y empezar a participar.` : "📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a tu amigo y empezar a participar.";
-          redirectToPath = `/concursos/${pending.concursoId}`;
-        } clearPendingRef();
+        const fn = getRefUserName(pending.refCode);
+        const refName = fn || (await fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(pending.refCode)}`).then(r => r.ok ? r.json() : null).then(d => d?.nombre).catch(() => null));
+        msg = refName ? `📧 Activa tu cuenta desde tu correo para sumarle 3 puntos a ${refName} y ganar tú también 3 puntos.` : "📧 Activa tu cuenta desde tu correo — ambos ganan 3 puntos automáticamente.";
+        redirectToPath = `/concursos/${pending.concursoId}`;
+        clearPendingRef();
       }
       setRefMsg(msg); setSuccess(true);
       // Show verification message
@@ -188,9 +172,10 @@ function RegistroContent() {
               <button onClick={() => { setOnboardingStep(2); }} style={{ background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
             </div>
           ) : onboardingStep === 2 ? (
-            <div style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center", position: "relative" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 16 }}>
-                <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#3db89e" }} />
+                <button onClick={() => setOnboardingStep(1)} style={{ position: "absolute", top: 16, left: 16, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>← Volver</button>
+              <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#3db89e" }} />
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)", letterSpacing: "0.12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>PASO 2 DE 2</span>
                 <div style={{ height: 3, borderRadius: 2, flex: 1, maxWidth: 60, background: "#e8a84c" }} />
               </div>

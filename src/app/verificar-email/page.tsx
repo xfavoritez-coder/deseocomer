@@ -55,16 +55,16 @@ function VerificarContent() {
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "8px" }}>
                   {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa.
                 </p>
-                <div style={{ background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.25)", borderRadius: 12, padding: "14px 18px", marginBottom: "20px" }}>
+                <div style={{ background: "rgba(61,184,158,0.1)", border: "1px solid rgba(61,184,158,0.25)", borderRadius: 12, padding: "14px 18px", marginBottom: "12px" }}>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "#3db89e", lineHeight: 1.6, margin: 0 }}>
-                    🎉 ¡Le sumaste <strong>3 puntos</strong> a <strong>{referidorNombre}</strong>!
+                    🎉 ¡Le sumaste <strong>3 puntos</strong> a <strong>{referidorNombre}</strong> y tú ganaste <strong>3 puntos</strong>!
                   </p>
                 </div>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "20px" }}>
-                  Tú también puedes participar y ganar comida gratis. Comparte tu link e invita amigos para sumar puntos.
+                  Ya estás participando en el concurso. Sube en el ranking invitando amigos para ganar el premio.
                 </p>
                 <a href={concursoSlug ? `/concursos/${concursoSlug}` : "/concursos"} style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none", marginBottom: "10px" }}>
-                  Ver concursos →
+                  {concursoSlug ? "Ver mi concurso →" : "Ver concursos →"}
                 </a>
                 <a href="/" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", textDecoration: "none", marginTop: "8px" }}>
                   Ir al inicio
