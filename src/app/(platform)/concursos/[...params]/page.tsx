@@ -109,7 +109,7 @@ function ConcursoDetallePage() {
             condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
             endsAt: new Date(data.fechaFin).getTime(),
             ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" })),
-            reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
+            reglas: ["Debes estar registrado en DeseoComer para entrar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
@@ -563,7 +563,7 @@ function ConcursoDetallePage() {
 
   // Condiciones unificadas
   const condicionesSistema = [
-    "Se requiere cuenta verificada en DeseoComer para participar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
+    "Se requiere cuenta verificada en DeseoComer para entrar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
     "Queda estrictamente prohibido el uso de correos temporales, cuentas falsas o cualquier método fraudulento para acumular puntos.",
     "El local organizador y DeseoComer se reservan el derecho de descalificar a cualquier participante que presente patrones sospechosos de fraude, sin necesidad de justificación previa.",
     "Cuando alguien entra por tu link de invitación, ambos ganan +3 puntos automáticamente — tú por invitar y tu amigo por unirse. Si el referido ya tenía cuenta, tú ganas +2 puntos.",
@@ -576,7 +576,7 @@ function ConcursoDetallePage() {
   const condicionesLocal = c.condiciones || "";
   const condicionesCortas = condicionesLocal.length > 200 ? condicionesLocal.slice(0, 200) + "..." : condicionesLocal;
   if (condicionesLocal) allRules.push(condicionesCortas);
-  allRules.push("Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre con tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso.");
+  allRules.push("Debes estar registrado en DeseoComer para entrar.", "Cada persona que se registre con tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso.");
   allRules.push(...condicionesSistema);
 
   return (
@@ -697,7 +697,7 @@ function ConcursoDetallePage() {
               <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 16, padding: 24, textAlign: "center" }}>
                 <span style={{ fontSize: 32, display: "block", marginBottom: 12 }}>🔮</span>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 16, color: "#a78bfa", textTransform: "uppercase", marginBottom: 8 }}>Este concurso aún no ha comenzado</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, marginBottom: 12 }}>Sé de los primeros en participar. Avisaremos cuando empiece para que tengas ventaja sobre los demás.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, marginBottom: 12 }}>Sé de los primeros en entrar. Avisaremos cuando empiece para que tengas ventaja sobre los demás.</p>
                 {listaEsperaTotal > 0 && <span style={{ display: "inline-block", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>👁 {listaEsperaTotal} personas esperando</span>}
 
                 {/* Incentivo bonus madrugador */}
@@ -705,7 +705,7 @@ function ConcursoDetallePage() {
                   <span style={{ fontSize: 20, flexShrink: 0 }}>⚡</span>
                   <div>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Ventaja para los primeros</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.55)", lineHeight: 1.5 }}>Los <strong style={{ color: "rgba(240,234,214,0.8)" }}>primeros 10 en participar</strong> cuando el concurso se active reciben <strong style={{ color: "#e8a84c" }}>+2 puntos extra</strong> automáticamente. ¡Anótate y entra antes que todos!</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.55)", lineHeight: 1.5 }}>Los <strong style={{ color: "rgba(240,234,214,0.8)" }}>primeros 10 en entrar</strong> cuando el concurso se active reciben <strong style={{ color: "#e8a84c" }}>+2 puntos extra</strong> automáticamente. ¡Anótate y entra antes que todos!</p>
                   </div>
                 </div>
 
@@ -735,7 +735,7 @@ function ConcursoDetallePage() {
                 <span style={{ fontSize: 24, flexShrink: 0 }}>⚡</span>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", margin: 0 }}>Bonus madrugador</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", margin: "3px 0" }}>Los primeros 10 en participar reciben +2 puntos extra</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", margin: "3px 0" }}>Los primeros 10 en entrar reciben +2 puntos extra</p>
                   <div style={{ background: "rgba(10,8,18,0.5)", borderRadius: 20, height: 6, overflow: "hidden", marginTop: 6 }}>
                     <div style={{ background: "linear-gradient(to right, #e8a84c, #f5d080)", width: `${(totalParts / 10) * 100}%`, height: "100%", borderRadius: 20, transition: "width 0.3s" }} />
                   </div>
@@ -784,7 +784,7 @@ function ConcursoDetallePage() {
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>{isAuthenticated && isParticipating ? "Comparte este link y suma puntos para ganar" : "Únete gratis y compite por el premio"}</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>{isAuthenticated && isParticipating ? "Comparte este link y suma puntos para ganar" : "Invita amigos y sube en el ranking para ganar"}</p>
 
               {isAuthenticated && isParticipating && refLink ? (
                 <div style={{ marginTop: 14 }}>
@@ -814,7 +814,7 @@ function ConcursoDetallePage() {
                 <div style={{ marginTop: 16 }}>
                   <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: esSorteo ? "#ec4899" : "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : esSorteo ? "🎲 Entrar al sorteo" : "🎉 Unirme al concurso"}</button>
                   {joinError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8c00", textAlign: "center", marginTop: 8 }}>{joinError}</p>}
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Únete gratis y comienza a sumar puntos para ganar</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Entra gratis y sube en el ranking para ganar</p>
                 </div>
               ) : !isAuthenticated ? (
                 <div style={{ marginTop: 16 }}>
@@ -894,7 +894,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
                   </div>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros a participar, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.32)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
@@ -987,12 +987,13 @@ function ConcursoDetallePage() {
       {showCodigoModal && (<>
         <div onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: 24, maxWidth: 340, width: "90vw" }}>
-          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>🏆 Participa en este concurso</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16, textAlign: "center" }}>Únete gratis y gana el premio</p>
+          <button onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "absolute", top: 12, right: 16, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
+          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>🏆 Entra a este concurso</h3>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 16, textAlign: "center" }}>Únete gratis, invita amigos y gana</p>
 
           {!showCodigoInput ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={() => doJoinWithCode()} style={{ padding: 14, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>Participar →</button>
+              <button onClick={() => doJoinWithCode()} style={{ padding: 14, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>Entrar al concurso</button>
               <button onClick={() => setShowCodigoInput(true)} style={{ padding: 0, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", cursor: "pointer", textAlign: "center", lineHeight: 1.5 }}>¿Un amigo te invitó? <span style={{ textDecoration: "underline" }}>Ingresa su código y súmale puntos</span></button>
             </div>
           ) : (
@@ -1011,7 +1012,7 @@ function ConcursoDetallePage() {
               {codigoValidacion?.existe && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#3db89e", marginTop: 6 }}>&#10003; Código de {codigoValidacion.nombre}</p>}
               {codigoValidacion && !codigoValidacion.existe && codigoInput.length >= 5 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", marginTop: 6 }}>Código no encontrado</p>}
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
-                <button disabled={codigoInput.length > 0 && (!codigoValidacion?.existe)} onClick={() => doJoinWithCode(codigoInput || undefined)} style={{ padding: 12, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", opacity: (codigoInput.length > 0 && !codigoValidacion?.existe) ? 0.5 : 1 }}>{codigoInput && codigoValidacion?.existe ? `Participar con código de ${codigoValidacion.nombre} →` : "Participar →"}</button>
+                <button disabled={codigoInput.length > 0 && (!codigoValidacion?.existe)} onClick={() => doJoinWithCode(codigoInput || undefined)} style={{ padding: 12, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em", opacity: (codigoInput.length > 0 && !codigoValidacion?.existe) ? 0.5 : 1 }}>{codigoInput && codigoValidacion?.existe ? `Entrar con código de ${codigoValidacion.nombre}` : "Entrar al concurso"}</button>
                 <button onClick={() => { setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ padding: 8, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", cursor: "pointer" }}>← Volver</button>
               </div>
             </div>
@@ -1026,7 +1027,7 @@ function ConcursoDetallePage() {
           <button onClick={() => setShowPhoneModal(false)} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1rem", cursor: "pointer" }}>✕</button>
           <p style={{ fontSize: "2rem", marginBottom: 8 }}>📱</p>
           <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", marginBottom: 10 }}>Necesitamos tu teléfono</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>Para participar en concursos necesitamos tu número de teléfono. Si ganas, el local lo usará para coordinar la entrega del premio.</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>Para entrar a concursos necesitamos tu número de teléfono. Si ganas, el local lo usará para coordinar la entrega del premio.</p>
           {phoneError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8080", marginBottom: 10 }}>⚠️ {phoneError}</p>}
           <input
             type="tel"
@@ -1039,7 +1040,7 @@ function ConcursoDetallePage() {
             onClick={handleSavePhone}
             disabled={phoneSaving || phoneInput.trim().length < 8}
             style={{ width: "100%", padding: 14, background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", borderRadius: 10, border: "none", cursor: phoneSaving ? "wait" : "pointer", opacity: phoneInput.trim().length >= 8 ? 1 : 0.5, letterSpacing: "0.06em" }}
-          >{phoneSaving ? "Guardando..." : "Guardar y participar"}</button>
+          >{phoneSaving ? "Guardando..." : "Guardar y entrar"}</button>
         </div>
       </>)}
 
