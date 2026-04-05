@@ -807,7 +807,7 @@ function ConcursoDetallePage() {
                       <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.12em" }}>{user.codigoRef}</span>
                       </div>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.4)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
                     </div>
                   )}
                 </div>
