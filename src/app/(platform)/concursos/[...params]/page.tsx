@@ -829,10 +829,25 @@ function ConcursoDetallePage() {
               ) : null}
             </div>
             <div style={{ borderTop: "1px solid rgba(232,168,76,0.1)", padding: "10px 20px", textAlign: "center" }}>
-              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>¿Cómo funcionan los concursos? →</Link>
+              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>❓ ¿Cómo funcionan los concursos?</Link>
             </div>
           </div>
           ) : null}
+
+          {/* Banner cómo funciona — solo primera vez */}
+          {!isParticipating && (() => {
+            try { if (localStorage.getItem("dc_concurso_howto_seen")) return null; } catch {}
+            return (
+              <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 12, padding: "14px 18px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <span style={{ fontSize: "1.2rem" }}>💡</span>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.65)", flex: 1, margin: 0, lineHeight: 1.5 }}>¿Primera vez en un concurso? Entra gratis, invita amigos y el que más puntos tenga gana el premio.</p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", padding: "6px 14px", borderRadius: 8, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "#e8a84c", textDecoration: "none", whiteSpace: "nowrap" }}>Ver más</Link>
+                  <button onClick={() => { try { localStorage.setItem("dc_concurso_howto_seen", "1"); } catch {} const el = document.getElementById("howto-banner"); if (el) el.remove(); }} style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", padding: "6px 10px", background: "none", border: "none", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Entendido</button>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* 5. Ranking (mobile) — hidden on desktop where sidebar shows */}
           <div className="dc-cd-ranking-mobile">
