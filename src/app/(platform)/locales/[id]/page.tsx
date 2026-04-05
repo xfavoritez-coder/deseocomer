@@ -162,7 +162,7 @@ export default function LocalDetailPage() {
     categorias: (dbLocal.categorias as string[]) ?? [],
   } : null);
 
-  const esImportado = dbLocal?.estadoLocal === 'NO_RECLAMADO'
+  const esImportado = (dbLocal as any)?.origenImportacion === 'GOOGLE_PLACES' && !dbLocal?.activo
   const googleRating = dbLocal?.googleRating as number | null
   const googleReviews = dbLocal?.googleReviews as number | null
   const comunaDisplay = (dbLocal?.comuna as string) || local?.barrio || ''

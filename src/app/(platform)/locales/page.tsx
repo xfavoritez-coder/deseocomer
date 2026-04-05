@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { boostScore } from "@/lib/personalizacion";
 import Navbar from "@/components/layout/Navbar";
@@ -33,33 +33,69 @@ export default function LocalesPage() {
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
   const CATEGORIAS = ["Todos", ...CATEGORIAS_MASTER];
 
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapLocal = (l: any) => ({
+    id: l.id,
+    slug: l.slug,
+    nombre: l.nombre ?? "",
+    categorias: l.categorias ?? [],
+    comuna: l.comuna ?? "Santiago",
+    rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
+    precio: "",
+    imagenUrl: l.portadaUrl ?? null,
+    logoUrl: l.logoUrl,
+    descripcion: l.descripcion ?? "",
+    horarios: l.horarios,
+    createdAt: l.createdAt,
+    googleRating: l.googleRating ?? null,
+    estadoLocal: l.estadoLocal ?? null,
+    _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },
+  });
+
   useEffect(() => {
-    fetch("/api/locales")
+    fetch("/api/locales?paginated=1&limit=24")
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const mapped = data.map((l: any) => ({
-            id: l.id,
-            slug: l.slug,
-            nombre: l.nombre ?? "",
-            categorias: l.categorias ?? [],
-            comuna: l.comuna ?? "Santiago",
-            rating: (l._count?.resenas ?? 0) > 0 ? 4.5 : 0,
-            precio: "",
-            imagenUrl: l.portadaUrl ?? null,
-            logoUrl: l.logoUrl,
-            descripcion: l.descripcion ?? "",
-            horarios: l.horarios,
-            createdAt: l.createdAt,
-            _count: l._count ?? { favoritos: 0, resenas: 0, concursos: 0, promociones: 0 },
-          }));
-          setLocales(mapped);
+        if (data.locales?.length > 0) {
+          setLocales(data.locales.map(mapLocal));
+          setNextCursor(data.nextCursor);
+          setHasMore(data.hasMore);
         }
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
+
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loadingMore || !nextCursor) return;
+    setLoadingMore(true);
+    try {
+      const res = await fetch(`/api/locales?paginated=1&limit=24&cursor=${nextCursor}`);
+      const data = await res.json();
+      if (data.locales?.length > 0) {
+        setLocales(prev => [...prev, ...data.locales.map(mapLocal)]);
+        setNextCursor(data.nextCursor);
+        setHasMore(data.hasMore);
+      } else {
+        setHasMore(false);
+      }
+    } catch { setHasMore(false); }
+    setLoadingMore(false);
+  }, [hasMore, loadingMore, nextCursor]);
+
+  useEffect(() => {
+    if (!observerRef.current) return;
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) loadMore();
+    }, { threshold: 0.1 });
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   useEffect(() => {
     if (busqueda.length >= 3) {
@@ -294,7 +330,7 @@ export default function LocalesPage() {
                             <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating?.toFixed ? local.rating.toFixed(1) : local.rating}</span>
                             <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
                           </div>
-                        ) : (local as any).googleRating && (local as any).estadoLocal === "NO_RECLAMADO" ? (
+                        ) : (local as any).googleRating && (local as any).estadoLocal !== "RECHAZADO" && (local as any).googleRating ? (
                           <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px", cursor: "help" }} onMouseEnter={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "1"; }} onMouseLeave={e => { const t = e.currentTarget.querySelector(".gtooltip") as HTMLElement; if (t) t.style.opacity = "0"; }}>
                             <span style={{ color: "#e8a84c", opacity: 0.7 }}>★</span>
                             <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(240,234,214,0.5)" }}>{(local as any).googleRating.toFixed(1)}</span>
@@ -319,6 +355,19 @@ export default function LocalesPage() {
         )}
       </section>
 
+      {/* Infinite scroll trigger */}
+      {hasMore && !loading && (
+        <div ref={observerRef} style={{ padding: "40px 0", textAlign: "center" }}>
+          {loadingMore && (
+            <div style={{ display: "flex", justifyContent: "center", gap: "8px" }}>
+              {[1, 2, 3].map(i => (
+                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(232,168,76,0.3)", animation: `dcPulseD 1s ease-in-out ${i * 0.15}s infinite` }} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       <Footer />
 
       <style>{`
@@ -333,6 +382,7 @@ export default function LocalesPage() {
           padding-bottom: 4px;
         }
         .dc-filtros-fila::-webkit-scrollbar { display: none; }
+        @keyframes dcPulseD { 0%,100% { opacity:0.3; transform:scale(1); } 50% { opacity:1; transform:scale(1.3); } }
         .dc-comuna { font-family: var(--font-lato); font-size: 12px; color: rgba(240,234,214,0.4); font-weight: 400; }
         .dc-sep { font-size: 11px; color: rgba(240,234,214,0.2); }
         .dc-categoria { font-family: var(--font-lato); font-size: 12px; color: var(--oasis-bright, #3db89e); font-weight: 500; }

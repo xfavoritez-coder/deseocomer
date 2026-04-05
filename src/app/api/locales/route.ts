@@ -9,8 +9,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const categoria = searchParams.get("categoria");
     const q = searchParams.get("q");
+    const cursor = searchParams.get("cursor");
+    const paginated = searchParams.get("paginated") === "1" || !!cursor;
+    const limit = paginated ? Math.min(Number(searchParams.get("limit")) || 24, 60) : 500;
 
     const locales = await prisma.local.findMany({
+      ...(paginated && { take: limit + 1 }),
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
       where: {
         OR: [
           { activo: true },
@@ -38,6 +43,14 @@ export async function GET(req: NextRequest) {
         concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 3 },
       },
     });
+    if (paginated) {
+      const hasMore = locales.length > limit;
+      const results = hasMore ? locales.slice(0, limit) : locales;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const safe = results.map(({ password: _, ...rest }) => rest);
+      const nextCursor = hasMore ? results[results.length - 1].id : null;
+      return NextResponse.json({ locales: safe, nextCursor, hasMore });
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const safe = locales.map(({ password: _, ...rest }) => rest);
     return NextResponse.json(safe);

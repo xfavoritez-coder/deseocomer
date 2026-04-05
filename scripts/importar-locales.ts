@@ -21,6 +21,24 @@ if (!API_KEY) {
 const COMUNAS = [
   'Providencia, Santiago',
   'Las Condes, Santiago',
+  'Ñuñoa, Santiago',
+  'Santiago Centro, Santiago',
+  'Vitacura, Santiago',
+  'La Reina, Santiago',
+  'Macul, Santiago',
+  'San Miguel, Santiago',
+  'Estación Central, Santiago',
+  'Independencia, Santiago',
+  'Recoleta, Santiago',
+  'Quinta Normal, Santiago',
+  'Lo Barnechea, Santiago',
+  'Peñalolén, Santiago',
+  'La Florida, Santiago',
+  'Maipú, Santiago',
+  'Pudahuel, Santiago',
+  'Cerrillos, Santiago',
+  'San Joaquín, Santiago',
+  'Huechuraba, Santiago',
 ]
 
 // -----------------------------------------------------------------
