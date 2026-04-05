@@ -192,7 +192,7 @@ function ConcursoDetallePage() {
       // Reload ranking from DB
       fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
         if (data) {
-          const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
+          const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" }));
           setRanking(newRanking);
         }
       }).catch(() => {});

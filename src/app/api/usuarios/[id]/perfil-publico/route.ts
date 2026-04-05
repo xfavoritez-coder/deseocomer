@@ -79,6 +79,19 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const parts = (usuario.nombre ?? "Usuario").trim().split(/\s+/);
     const nombrePublico = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0];
 
+    // Calculate stats from real data instead of pre-cached fields
+    const realTotalConcursos = participaciones.length;
+    const realTotalGanados = concursos.filter(c => c.estado === "ganador").length;
+    const realTotalReferidos = concursos.reduce((sum, c) => {
+      const refN = c.desglose.referidosNuevos;
+      const refE = c.desglose.referidosExistentes;
+      // Estimate number of people: nuevos gave 3pts (or 2pts early), existentes gave 2pts
+      const estimatedNew = refN > 0 ? Math.max(1, Math.round(refN / 3)) : 0;
+      const estimatedExist = refE > 0 ? Math.max(1, Math.round(refE / 2)) : 0;
+      return sum + estimatedNew + estimatedExist;
+    }, 0);
+    const realTotalApoyos = concursos.reduce((sum, c) => sum + c.desglose.apoyos, 0);
+
     return NextResponse.json({
       id: usuario.id,
       codigoRef: usuario.codigoRef,
@@ -86,11 +99,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       fotoUrl: usuario.fotoUrl,
       ciudad: usuario.ciudad,
       miembroDesde: usuario.createdAt,
-      totalConcursos: usuario.totalConcursosParticipados ?? 0,
-      totalGanados: usuario.totalConcursosGanados ?? 0,
+      totalConcursos: realTotalConcursos,
+      totalGanados: realTotalGanados,
       mejorPosicion: usuario.mejorPosicion,
-      totalReferidos: totalReferidos._count ?? 0,
-      totalApoyos: concursos.reduce((sum, c) => sum + c.desglose.apoyos, 0),
+      totalReferidos: Math.max(realTotalReferidos, totalReferidos._count ?? 0),
+      totalApoyos: realTotalApoyos,
       concursos,
     });
   } catch (error) {
