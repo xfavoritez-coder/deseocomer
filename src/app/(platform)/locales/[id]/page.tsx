@@ -349,13 +349,14 @@ export default function LocalDetailPage() {
             {tab === "Información" && (
               <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Descripción */}
+                  {/* Descripción — ocultar si importado sin contenido */}
+                  {(local.descripcion || local.historia || (!esImportado && (local as any).categorias?.length > 1)) && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
-                    <p style={bodyStyle}>{local.descripcion}</p>
+                    {local.descripcion && <p style={bodyStyle}>{local.descripcion}</p>}
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {(local as any).categorias?.length > 0 && (
+                    {([...new Set((local as any).categorias ?? [])] as string[]).slice(1).length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {([...new Set((local as any).categorias ?? [])] as string[]).slice(1).map((tag: string) => (
@@ -364,6 +365,7 @@ export default function LocalDetailPage() {
                       </div>
                     )}
                   </div>
+                  )}
 
                   {/* Concurso destacado (solo si hay activos) */}
                   {concursosActivos.length > 0 && (() => {
