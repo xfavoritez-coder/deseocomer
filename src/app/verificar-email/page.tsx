@@ -76,14 +76,37 @@ function VerificarContent() {
               </>
             ) : (
               <>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "24px" }}>
-                  {nombre ? `Hola ${nombre}, tu` : "Tu"} cuenta está activa. Ya puedes participar en concursos y guardar favoritos.
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.95rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: "20px" }}>
+                  {nombre ? `¡${nombre}, ya` : "Ya"} eres parte de DeseoComer. Esto es lo que puedes hacer:
                 </p>
-                <a href="/concursos" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none" }}>
-                  Ver concursos →
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "24px", textAlign: "left" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px" }}>
+                    <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>🏆</span>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#f5d080", margin: "0 0 2px", fontWeight: 700 }}>Concursos</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", margin: 0, lineHeight: 1.4 }}>Participa gratis y gana comida. Invita amigos y ambos ganan puntos.</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px" }}>
+                    <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>🍽️</span>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#f5d080", margin: "0 0 2px", fontWeight: 700 }}>Locales</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", margin: 0, lineHeight: 1.4 }}>Descubre los mejores restaurantes cerca de ti con rating de Google.</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "10px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px" }}>
+                    <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>⚡</span>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#f5d080", margin: "0 0 2px", fontWeight: 700 }}>Promociones</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", margin: 0, lineHeight: 1.4 }}>Ofertas exclusivas de los locales que más te gustan.</p>
+                    </div>
+                  </div>
+                </div>
+                <a href="/concursos" style={{ display: "block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none", textAlign: "center", marginBottom: "8px" }}>
+                  Ver concursos activos →
                 </a>
-                <a href="/" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)", textDecoration: "none", marginTop: "12px" }}>
-                  Ir al inicio
+                <a href="/locales" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", textDecoration: "none", textAlign: "center", marginTop: "4px" }}>
+                  Explorar locales →
                 </a>
               </>
             )}
