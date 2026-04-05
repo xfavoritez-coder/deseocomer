@@ -114,7 +114,11 @@ function ConcursoDetallePage() {
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
           setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0 });
-          setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.id);
+          setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.slug || data.id);
+          // Redirect from ID to slug if needed
+          if (data.slug && slug !== data.slug && slug === data.id) {
+            window.history.replaceState(null, "", `/concursos/${data.slug}`);
+          }
         }
         setDbLoading(false);
       })
