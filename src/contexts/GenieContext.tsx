@@ -391,7 +391,8 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       candidates = candidates.filter(l => l.tieneDelivery === true);
       if (comuna) candidates = candidates.filter(l => l.comunasDelivery?.includes(comuna) || l.comuna.toLowerCase() === comuna.toLowerCase());
     } else if (modalidad === "Retiro en local") {
-      candidates = candidates.filter(l => l.tieneRetiro === true);
+      // Locales con retiro explícito + todos los que sirven en mesa (tienen dirección física)
+      candidates = candidates.filter(l => l.tieneRetiro === true || !!l.comuna);
     }
 
     // Filter by category using categorias array
@@ -420,24 +421,32 @@ export function GenieProvider({ children }: { children: ReactNode }) {
     // If no candidates, return null
     if (candidates.length === 0) return null;
 
-    // Score each candidate
-    const scored = candidates.map(l => {
+    // Prefer well-rated locales (≥4.0), then score with randomness
+    const bienValorados = candidates.filter(l => {
+      const r = l.googleRating ?? l.rating ?? 0;
+      return r >= 4.0;
+    });
+    const pool = bienValorados.length >= 3 ? bienValorados : candidates;
+
+    const scored = pool.map(l => {
       const ratingBase = l.googleRating && l.rating === 0 ? l.googleRating : l.rating;
       let score = (ratingBase ?? 4) * 10;
-      if (l.tieneConcurso) score += 40;
+      if (l.tieneConcurso) score += 20;
       const primaryCat = l.categorias?.[0]?.toLowerCase() ?? l.categoria;
       const catScore = perfil.gustos.categorias[primaryCat] ?? 0;
       const secScore = (l.categorias ?? []).slice(1).reduce((acc, c) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;
       score += catScore * 2 + secScore + comScore;
       if (l.descuento > 0) score += l.descuento * 0.5;
-      score += Math.random() * 3;
-      if (l.estadoLocal === 'NO_RECLAMADO') score -= 8;
+      score += Math.random() * 20; // More randomness to vary results
+      if (l.estadoLocal === 'NO_RECLAMADO') score -= 5;
       return { ...l, score };
     });
 
     scored.sort((a, b) => b.score - a.score);
-    return scored[0] ?? null;
+    // Pick randomly from top 5 instead of always #1
+    const top = scored.slice(0, Math.min(5, scored.length));
+    return top[Math.floor(Math.random() * top.length)] ?? null;
   }, [perfil.gustos, localesDB]);
 
   const showFavoritoToast = useCallback(() => {
