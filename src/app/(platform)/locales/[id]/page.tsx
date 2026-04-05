@@ -295,6 +295,13 @@ export default function LocalDetailPage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#e8a84c" }}>{local.rating.toFixed(1)}</span>
                   </div>
                 )}
+                {!local.rating && googleRating && esImportado && (
+                  <div title="Rating según Google Maps" style={{ display: "flex", alignItems: "center", gap: "4px", background: "rgba(0,0,0,0.4)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "20px", padding: "3px 10px", flexShrink: 0, cursor: "help" }}>
+                    <span style={{ fontSize: "0.82rem", color: "#e8a84c", opacity: 0.7 }}>★</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "rgba(232,168,76,0.7)" }}>{googleRating.toFixed(1)}</span>
+                    <span style={{ fontSize: "0.7rem", color: "rgba(232,168,76,0.4)", fontFamily: "var(--font-lato)" }}>G</span>
+                  </div>
+                )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{CATEGORIA_EMOJI[local.categoria] ?? "🍽️"} {local.categoria}</span>

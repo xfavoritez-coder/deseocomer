@@ -294,6 +294,12 @@ export default function LocalesPage() {
                             <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--sand-gold, #f5d080)" }}>{local.rating?.toFixed ? local.rating.toFixed(1) : local.rating}</span>
                             <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.35)" }}>({local._count?.resenas ?? 0})</span>
                           </div>
+                        ) : (local as any).googleRating && (local as any).estadoLocal === "NO_RECLAMADO" ? (
+                          <div title="Rating según Google Maps" style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0, paddingTop: "2px", cursor: "help" }}>
+                            <span style={{ color: "#e8a84c", opacity: 0.7 }}>★</span>
+                            <span style={{ fontSize: "14px", fontWeight: 600, color: "rgba(240,234,214,0.5)" }}>{(local as any).googleRating.toFixed(1)}</span>
+                            <span style={{ fontSize: "11px", color: "rgba(240,234,214,0.3)", fontFamily: "var(--font-lato)" }}>G</span>
+                          </div>
                         ) : (
                           <span style={{ fontSize: "13px", color: "rgba(240,234,214,0.28)", fontStyle: "italic", flexShrink: 0, paddingTop: "2px", fontFamily: "var(--font-lato)" }}>Sin reseñas</span>
                         )}
