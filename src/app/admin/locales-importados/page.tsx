@@ -101,6 +101,37 @@ export default function LocalesImportadosPage() {
         </p>
       </div>
 
+      {/* Aprobar todos */}
+      {totalAlto > 0 && (
+        <button
+          onClick={async () => {
+            setAccionando('todos')
+            await fetch('/api/admin/locales-importados', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accion: 'aprobar-todos' })
+            })
+            await cargarLocales()
+            setAccionando(null)
+          }}
+          disabled={accionando === 'todos'}
+          style={{
+            background: '#3db89e22',
+            border: '1px solid #3db89e',
+            color: '#3db89e',
+            borderRadius: '10px',
+            padding: '0.6rem 1.2rem',
+            cursor: 'pointer',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            marginBottom: '1.5rem',
+            opacity: accionando === 'todos' ? 0.5 : 1,
+          }}
+        >
+          {accionando === 'todos' ? 'Aprobando...' : `Aprobar todos (score >=80) — ${totalAlto} locales`}
+        </button>
+      )}
+
       {/* Stats */}
       <div style={{
         display: 'grid',

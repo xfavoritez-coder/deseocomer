@@ -57,6 +57,21 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ ok: true, mensaje: 'Local aprobado para el directorio' })
     }
 
+    if (accion === 'aprobar-todos') {
+      const result = await prisma.local.updateMany({
+        where: {
+          origenImportacion: 'GOOGLE_PLACES',
+          estadoLocal: 'NO_RECLAMADO',
+          scoreConfianza: { gte: 80 }
+        },
+        data: {
+          estadoLocal: 'ACTIVO'
+        }
+      })
+
+      return NextResponse.json({ ok: true, mensaje: `${result.count} locales aprobados` })
+    }
+
     if (accion === 'rechazar') {
       await prisma.local.update({
         where: { id },
