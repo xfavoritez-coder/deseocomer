@@ -29,70 +29,39 @@ export async function GET(req: NextRequest) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://deseocomer.com'
     const from = `DeseoComer <${process.env.FROM_EMAIL || 'noreply@deseocomer.com'}>`
 
+    // Marcar como reclamado pero NO activar — requiere aprobación admin
     await prisma.local.update({
       where: { id: localId },
       data: {
-        estadoLocal: 'ACTIVO',
-        activo: true,
         verificado: true,
         reclamadoEn: new Date(),
-        activadoAt: new Date(),
         resetToken: null,
         resetTokenExpira: null,
       }
     })
 
-    // Notificar admin
+    // Notificar admin para que apruebe
     await resend.emails.send({
       from,
       to: 'favoritez@gmail.com',
-      subject: `Local reclamado — ${local.nombre}`,
+      subject: `Nuevo reclamo de local — ${local.nombre}`,
       html: `
         <div style="font-family:sans-serif;padding:20px;">
-          <h2>Local reclamado y activado</h2>
+          <h2>Un dueño reclamó su local</h2>
           <p><strong>Local:</strong> ${local.nombre}</p>
           <p><strong>Email:</strong> ${local.email}</p>
           <p><strong>Encargado:</strong> ${local.nombreEncargado}</p>
           <p><strong>Teléfono:</strong> ${local.celularDueno}</p>
           <p><strong>Comuna:</strong> ${local.comuna}</p>
+          <p style="margin-top:16px"><strong>Acción requerida:</strong> Aprueba o rechaza desde el panel admin.</p>
+          <a href="${appUrl}/admin/locales" style="display:inline-block;background:#e8a84c;color:#0a0812;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:12px;">Ir al admin →</a>
         </div>
       `
     }).catch(err => console.error('[Email admin reclamar]', err))
 
-    // Notificar lista de espera
-    const alertas = await prisma.localAlertaEspera.findMany({
-      where: { localId, notificado: false }
-    })
-
-    for (const alerta of alertas) {
-      await resend.emails.send({
-        from,
-        to: alerta.email,
-        subject: `${local.nombre} ya está en DeseoComer`,
-        html: `
-          <div style="background:#0a0812;color:#f0ead6;font-family:Georgia,serif;padding:40px 20px;max-width:520px;margin:0 auto;">
-            <p style="font-size:2rem;text-align:center;">🧞</p>
-            <h1 style="color:#e8a84c;text-align:center;font-size:1.2rem;">
-              ${local.nombre} ya está activo
-            </h1>
-            <p style="color:rgba(240,234,214,0.6);text-align:center;margin-bottom:28px;">
-              Pediste que te avisáramos cuando este local se uniera a DeseoComer.
-            </p>
-            <a href="${appUrl}/locales/${local.slug}"
-              style="display:block;background:#e8a84c;color:#0a0812;text-decoration:none;text-align:center;padding:14px;border-radius:12px;font-weight:700;">
-              Ver ${local.nombre} →
-            </a>
-          </div>
-        `
-      }).catch(err => console.error('[Email alerta espera]', err))
-      await prisma.localAlertaEspera.update({
-        where: { id: alerta.id },
-        data: { notificado: true, notificadoEn: new Date() }
-      })
-    }
-
+    // Redirigir a página de pendiente
     return NextResponse.redirect(
-      new URL(`/panel?reclamado=1`, req.url)
+      new URL(`/local-pendiente`, req.url)
     )
 
   } catch (error) {

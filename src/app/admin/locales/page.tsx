@@ -43,7 +43,8 @@ export default function AdminLocales() {
   const filtered = locales.filter(l => {
     if (busq && !l.nombre?.toLowerCase().includes(busq.toLowerCase()) && !l.email?.toLowerCase().includes(busq.toLowerCase())) return false;
     if (filtro === "activos" && !l.activo) return false;
-    if (filtro === "pendientes" && l.activo) return false;
+    if (filtro === "pendientes" && (l.activo || l.origenImportacion === "GOOGLE_PLACES")) return false;
+    if (filtro === "reclamados" && !(l.origenImportacion === "GOOGLE_PLACES" && !l.activo && l.estadoLocal !== "RECHAZADO")) return false;
     return true;
   });
 
@@ -237,7 +238,7 @@ export default function AdminLocales() {
 
       <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
         <input style={{ ...inputS, flex: 1, minWidth: "150px" }} placeholder="Buscar..." value={busq} onChange={e => setBusq(e.target.value)} />
-        {["todos", "pendientes", "activos"].map(f => (
+        {["todos", "pendientes", "reclamados", "activos"].map(f => (
           <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.78rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? "#e8a84c" : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f}</button>
         ))}
       </div>
