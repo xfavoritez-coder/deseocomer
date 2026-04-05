@@ -55,8 +55,6 @@ export default function LocalesPage() {
   const [soloConPromociones, setSoloConPromociones] = useState(false);
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
   const [comunaActiva, setComunaActiva] = useState("");
-  const [showComunaDropdown, setShowComunaDropdown] = useState(false);
-  const [busquedaComunaFiltro, setBusquedaComunaFiltro] = useState("");
   const CATEGORIAS = ["Todos", ...CATEGORIAS_MASTER];
 
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -161,19 +159,6 @@ export default function LocalesPage() {
     return [...set].sort((a, b) => a.localeCompare(b));
   }, [locales]);
 
-  useEffect(() => {
-    if (!showComunaDropdown) return;
-    const handler = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest(".dc-comuna-dropdown")) {
-        setShowComunaDropdown(false);
-        setBusquedaComunaFiltro("");
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [showComunaDropdown]);
-
   const localesFiltrados = locales
     .filter(l => {
       if (soloAbiertos) {
@@ -276,26 +261,12 @@ export default function LocalesPage() {
           <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
             ⚡ Con promociones
           </button>
-          <div className="dc-comuna-dropdown" style={{ position: "relative", flexShrink: 0 }}>
-            <button onClick={() => setShowComunaDropdown(!showComunaDropdown)} style={{ padding: "8px 16px", borderRadius: "20px", border: comunaActiva ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: comunaActiva ? "rgba(232,168,76,0.15)" : "transparent", color: comunaActiva ? "#e8a84c" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", whiteSpace: "nowrap", minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
-              📍 {comunaActiva || "Comuna"} ▾
-            </button>
-            {showComunaDropdown && (
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 100, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", padding: "12px", width: "220px", boxShadow: "0 8px 32px rgba(0,0,0,0.5)" }}>
-                <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComunaFiltro} onChange={e => setBusquedaComunaFiltro(e.target.value)} style={{ width: "100%", padding: "8px 12px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "8px" }} autoFocus />
-                <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-                  <button onClick={() => { setComunaActiva(""); setShowComunaDropdown(false); setBusquedaComunaFiltro(""); }} style={{ width: "100%", padding: "8px 10px", background: !comunaActiva ? "rgba(232,168,76,0.1)" : "transparent", border: "none", borderRadius: "8px", color: !comunaActiva ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", cursor: "pointer", textAlign: "left" as const, marginBottom: "2px" }}>
-                    Todas las comunas
-                  </button>
-                  {comunasDisponibles.filter(c => c.toLowerCase().includes(busquedaComunaFiltro.toLowerCase())).map(comuna => (
-                    <button key={comuna} onClick={() => { setComunaActiva(comuna); setShowComunaDropdown(false); setBusquedaComunaFiltro(""); }} style={{ width: "100%", padding: "8px 10px", background: comunaActiva === comuna ? "rgba(232,168,76,0.1)" : "transparent", border: "none", borderRadius: "8px", color: comunaActiva === comuna ? "#e8a84c" : "rgba(240,234,214,0.6)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", cursor: "pointer", textAlign: "left" as const, marginBottom: "2px" }}>
-                      {comuna}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <select value={comunaActiva} onChange={e => setComunaActiva(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: comunaActiva ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: comunaActiva ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.04)", color: comunaActiva ? "#e8a84c" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
+            <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>📍 Todas las comunas</option>
+            {comunasDisponibles.map(comuna => (
+              <option key={comuna} value={comuna} style={{ background: "#0a0812", color: "#f0ead6" }}>{comuna}</option>
+            ))}
+          </select>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
