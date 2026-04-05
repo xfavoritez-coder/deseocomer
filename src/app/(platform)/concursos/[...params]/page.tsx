@@ -417,11 +417,6 @@ function ConcursoDetallePage() {
 
   const handleJoin = async () => {
     if (!user) return;
-    // Check if user has phone number
-    if (!user.telefono) {
-      setShowPhoneModal(true);
-      return;
-    }
     // If no ref in URL, show code modal
     if (!refUserId && !refCodeRaw) {
       setShowCodigoModal(true);

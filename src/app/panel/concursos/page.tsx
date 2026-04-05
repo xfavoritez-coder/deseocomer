@@ -648,7 +648,7 @@ export default function PanelConcursos() {
   return (<div style={{ width: "100%", maxWidth: "100%", overflowX: "hidden", boxSizing: "border-box" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", position: "sticky", top: 0, zIndex: 10, background: "var(--bg-primary)", paddingBottom: "8px", paddingTop: "4px", width: "100%", boxSizing: "border-box" }}>
       <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.4rem", color: "var(--accent)" }}>Concursos</h1>
-      <button onClick={() => setWizard(true)} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0, fontSize: "0.78rem", padding: "10px 16px" }}>+ Concurso</button>
+      <button onClick={() => { setStep(concursos.length > 0 ? 1 : 0); setWizard(true); }} style={{ ...B, whiteSpace: "nowrap", flexShrink: 0, fontSize: "0.78rem", padding: "10px 16px" }}>+ Concurso</button>
     </div>
 
     {/* Filtros */}
@@ -680,7 +680,7 @@ export default function PanelConcursos() {
             </div>
           ))}
         </div>
-        <button onClick={() => setWizard(true)} style={B}>Crear mi primer concurso →</button>
+        <button onClick={() => { setStep(0); setWizard(true); }} style={B}>Crear mi primer concurso →</button>
         <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(240,234,214,0.25)", marginTop: "12px" }}>Es gratis y toma menos de 2 minutos</p>
       </div>
     ) : concursosFiltrados.length === 0 ? (
