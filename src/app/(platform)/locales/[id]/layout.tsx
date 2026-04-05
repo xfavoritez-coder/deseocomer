@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       openGraph: {
         title: `🍽️ ${nombre}${comuna ? ` — ${comuna}` : ""} | DeseoComer`,
         description: desc,
-        ...(local.portadaUrl && { images: [{ url: local.portadaUrl }] }),
+        images: [{ url: local.portadaUrl || "https://deseocomer.com/og-default.png", width: 1200, height: 630 }],
       },
     };
   } catch {

@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       openGraph: {
         title: `⚡ ${promo.titulo} — ${localNombre} | DeseoComer`,
         description: desc,
-        ...(promo.imagenUrl && { images: [{ url: promo.imagenUrl }] }),
+        images: [{ url: promo.imagenUrl || "https://deseocomer.com/og-default.png", width: 1200, height: 630 }],
       },
     };
   } catch {
