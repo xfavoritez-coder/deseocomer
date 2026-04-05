@@ -5,13 +5,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params;
 
-    const usuario = await prisma.usuario.findUnique({
-      where: { id },
+    // Support lookup by id or codigoRef
+    const isCuid = id.length > 20;
+    const usuario = await prisma.usuario.findFirst({
+      where: isCuid ? { id } : { codigoRef: id },
       select: {
         id: true,
         nombre: true,
         fotoUrl: true,
         ciudad: true,
+        codigoRef: true,
         createdAt: true,
         totalConcursosParticipados: true,
         totalConcursosGanados: true,
@@ -23,7 +26,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     // Get concursos with details
     const participaciones = await prisma.participanteConcurso.findMany({
-      where: { usuarioId: id, estado: { not: "descalificado" } },
+      where: { usuarioId: usuario.id, estado: { not: "descalificado" } },
       include: {
         concurso: {
           select: {
@@ -44,7 +47,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     // Count total referidos across all concursos
     const totalReferidos = await prisma.participanteConcurso.aggregate({
-      where: { referidorDirectoId: id },
+      where: { referidorDirectoId: usuario.id },
       _count: true,
     });
 
@@ -70,6 +73,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({
       id: usuario.id,
+      codigoRef: usuario.codigoRef,
       nombre: nombrePublico,
       fotoUrl: usuario.fotoUrl,
       ciudad: usuario.ciudad,

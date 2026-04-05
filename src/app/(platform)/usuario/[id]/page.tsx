@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 interface Concurso {
   id: string;
@@ -42,7 +44,9 @@ export default function PerfilUsuarioPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return (
+  const shell = (content: React.ReactNode) => (<><Navbar /><div style={{ minHeight: "70vh", paddingTop: 20 }}>{content}</div><Footer /></>);
+
+  if (loading) return shell(
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "60px 20px", textAlign: "center" }}>
       <div style={{ width: 64, height: 64, borderRadius: "50%", background: "rgba(232,168,76,0.1)", margin: "0 auto 16px", animation: "dcPulse 1.5s ease-in-out infinite" }} />
       <div style={{ height: 20, width: 140, borderRadius: 8, background: "rgba(232,168,76,0.08)", margin: "0 auto 8px", animation: "dcPulse 1.5s ease-in-out infinite" }} />
@@ -51,7 +55,7 @@ export default function PerfilUsuarioPage() {
     </div>
   );
 
-  if (error || !perfil) return (
+  if (error || !perfil) return shell(
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "60px 20px", textAlign: "center" }}>
       <p style={{ fontSize: "2rem", marginBottom: 12 }}>🧞</p>
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--text-muted)" }}>Usuario no encontrado</p>
@@ -67,7 +71,7 @@ export default function PerfilUsuarioPage() {
     programado: { bg: "rgba(167,139,250,0.08)", border: "rgba(167,139,250,0.25)", color: "#a78bfa", label: "Próximamente" },
   };
 
-  return (
+  return shell(
     <div style={{ maxWidth: 600, margin: "0 auto", padding: "32px 16px 60px" }}>
       {/* Header */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>

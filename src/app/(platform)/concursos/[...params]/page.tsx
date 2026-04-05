@@ -108,7 +108,7 @@ function ConcursoDetallePage() {
             premio: data.premio ?? "", descripcionPremio: data.descripcion ?? "",
             condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
             endsAt: new Date(data.fechaFin).getTime(),
-            ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "" })),
+            ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" })),
             reglas: ["Debes estar registrado en DeseoComer para participar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
@@ -514,8 +514,8 @@ function ConcursoDetallePage() {
               ) : (
                 <div style={{ width: 26, height: 26, borderRadius: "50%", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{r.nombre.charAt(0).toUpperCase()}</div>
               )}
-              {(r as any).usuarioId ? (
-                <Link href={`/usuario/${(r as any).usuarioId}`} style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize", textDecoration: "none" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</Link>
+              {((r as any).codigoRef || (r as any).usuarioId) ? (
+                <Link href={`/usuario/${(r as any).codigoRef || (r as any).usuarioId}`} style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize", textDecoration: "none" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</Link>
               ) : (
                 <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = r.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
               )}
