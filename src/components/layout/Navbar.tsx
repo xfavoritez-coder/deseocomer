@@ -23,6 +23,7 @@ export default function Navbar() {
   const [notifs, setNotifs] = useState<any[]>([]);
   const { user, isAuthenticated, logout } = useAuth();
   const notifRef = useRef<HTMLDivElement>(null);
+  const notifRef2 = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -88,7 +89,9 @@ export default function Navbar() {
   useEffect(() => {
     if (!showNotifs) return;
     const handleClick = (e: MouseEvent) => {
-      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setShowNotifs(false);
+      const inDesktop = notifRef.current?.contains(e.target as Node);
+      const inMobile = notifRef2.current?.contains(e.target as Node);
+      if (!inDesktop && !inMobile) setShowNotifs(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -173,7 +176,7 @@ export default function Navbar() {
         {/* Mobile: bell + hamburger grouped together */}
         <div className="dc-nav-mobile-right">
           {isAuthenticated && user && (
-            <div ref={notifRef} style={{ position: "relative" }}>
+            <div ref={notifRef2} style={{ position: "relative" }}>
               <button onClick={() => { if (showNotifs) { setShowNotifs(false); } else { setShowNotifs(true); if (user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
                 <span style={{ fontSize: "1.1rem" }}>🔔</span>
                 {notifCount > 0 && (
