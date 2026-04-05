@@ -53,6 +53,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 setLocalComuna(info.comuna ?? info.ciudad ?? "");
                 // Check completeness
                 const missing: string[] = [];
+                if (!info.comuna) missing.push("Comuna");
                 if (!info.direccion) missing.push("Dirección");
                 if (!info.categoria && (!info.categorias || info.categorias.length === 0)) missing.push("Categoría");
                 const hrs = info.horarios;
