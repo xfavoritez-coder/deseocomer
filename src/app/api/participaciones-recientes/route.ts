@@ -21,8 +21,7 @@ export async function GET() {
       take: 5,
     });
 
-    return NextResponse.json(
-      recientes.map((p) => {
+    return NextResponse.json(recientes.map((p) => {
         const parts = p.usuario.nombre.trim().split(/\s+/);
         const nombreCorto = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0];
         return {
@@ -33,8 +32,9 @@ export async function GET() {
           slug: p.concurso.slug,
           timestamp: p.createdAt.getTime(),
         };
-      })
-    );
+      }), {
+      headers: { "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" },
+    });
   } catch {
     return NextResponse.json([]);
   }

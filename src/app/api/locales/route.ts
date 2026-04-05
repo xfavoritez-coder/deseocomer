@@ -43,10 +43,17 @@ export async function GET(req: NextRequest) {
         resenas: { select: { rating: true } },
         promociones: { where: { activa: true }, select: { id: true, titulo: true, descripcion: true, horaInicio: true, horaFin: true }, take: 3 },
         concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 3 },
-      } : {
-        _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
-        concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 1 },
-      },
+      } : undefined,
+      ...(!paginated && {
+        select: {
+          id: true, slug: true, nombre: true, categorias: true, comuna: true,
+          googleRating: true, estadoLocal: true, portadaUrl: true, logoUrl: true,
+          tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,
+          horarioGoogle: true, horarios: true,
+          _count: { select: { concursos: true } },
+          concursos: { where: { activo: true, cancelado: false, fechaFin: { gt: new Date() } }, select: { id: true, slug: true, premio: true, fechaFin: true }, take: 1 },
+        },
+      }),
     });
     if (paginated) {
       const addRating = (l: typeof locales[number]) => {
@@ -62,9 +69,13 @@ export async function GET(req: NextRequest) {
       const nextCursor = hasMore ? results[results.length - 1].id : null;
       return NextResponse.json({ locales: safe, nextCursor, hasMore });
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const safe = locales.map(({ password: _, ...rest }) => rest);
-    return NextResponse.json(safe);
+    const safe = locales.map((l: any) => {
+      const { password: _, ...rest } = l;
+      return rest;
+    });
+    return NextResponse.json(safe, {
+      headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
+    });
   } catch (error) {
     console.error("[API /locales GET] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

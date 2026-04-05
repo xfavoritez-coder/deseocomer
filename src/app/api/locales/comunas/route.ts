@@ -20,7 +20,9 @@ export async function GET() {
     const comunas = [...new Set(locales.map(l => l.comuna).filter(Boolean))];
     const comunasDelivery = [...new Set(locales.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]).filter(Boolean))];
 
-    return NextResponse.json({ comunas, comunasDelivery });
+    return NextResponse.json({ comunas, comunasDelivery }, {
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+    });
   } catch {
     return NextResponse.json({ comunas: [], comunasDelivery: [] });
   }
