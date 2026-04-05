@@ -300,7 +300,7 @@ export default function LocalDetailPage() {
                     </div>
                   )}
                   {esImportado && (
-                    <a href={`/reclamar-local/${(local as any)?.slug || local?.id}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap" }}>¿Eres el dueño? →</a>
+                    <a href={`/reclamar-local/${id}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap" }}>¿Eres el dueño? →</a>
                   )}
                 </div>
               </div>
