@@ -97,7 +97,15 @@ function loadPerfil(): GeniePerfil {
   if (typeof window === "undefined") return createEmptyPerfil();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as GeniePerfil) : createEmptyPerfil();
+    if (!raw) return createEmptyPerfil();
+    const parsed = JSON.parse(raw);
+    const empty = createEmptyPerfil();
+    return {
+      ...empty,
+      ...parsed,
+      gustos: { ...empty.gustos, ...parsed.gustos },
+      comportamiento: { ...empty.comportamiento, ...parsed.comportamiento },
+    };
   } catch { return createEmptyPerfil(); }
 }
 
@@ -269,8 +277,14 @@ export function GenieProvider({ children }: { children: ReactNode }) {
 
   const addInteraccion = useCallback((tipo: string, datos: Record<string, string | number>) => {
     updatePerfil(p => {
-      const g = p.gustos;
-      const c = p.comportamiento;
+      const g = p.gustos ?? { categorias: {}, ocasiones: {}, comunas: {}, atributos: {}, precioPreferido: null, horario: {} };
+      const c = p.comportamiento ?? { localesVisitados: [], promocionesAbiertas: [], concursosVistos: [], filtrosUsados: [], sesiones: [] };
+      if (!c.localesVisitados) c.localesVisitados = [];
+      if (!c.concursosVistos) c.concursosVistos = [];
+      if (!c.promocionesAbiertas) c.promocionesAbiertas = [];
+      if (!c.filtrosUsados) c.filtrosUsados = [];
+      p.gustos = g;
+      p.comportamiento = c;
 
       switch (tipo) {
         case "local_visitado": {
