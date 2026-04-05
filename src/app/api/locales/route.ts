@@ -12,18 +12,24 @@ export async function GET(req: NextRequest) {
 
     const locales = await prisma.local.findMany({
       where: {
-        activo: true,
+        OR: [
+          { activo: true },
+          { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" },
+        ],
         nombre: { not: "" },
         categorias: { isEmpty: false },
         direccion: { not: "" },
         comuna: { not: "" },
+        NOT: { estadoLocal: "RECHAZADO" },
         ...(categoria && { categorias: { has: categoria } }),
         ...(q && {
-          OR: [
-            { nombre: { contains: q, mode: "insensitive" as const } },
-            { categorias: { has: q } },
-            { descripcion: { contains: q, mode: "insensitive" as const } },
-          ],
+          AND: [{
+            OR: [
+              { nombre: { contains: q, mode: "insensitive" as const } },
+              { categorias: { has: q } },
+              { descripcion: { contains: q, mode: "insensitive" as const } },
+            ],
+          }],
         }),
       },
       include: {
