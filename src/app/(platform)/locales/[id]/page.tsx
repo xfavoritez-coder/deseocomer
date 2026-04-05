@@ -298,11 +298,6 @@ export default function LocalDetailPage() {
                     <div className="gtooltip" style={{ position: "absolute", bottom: "120%", left: "50%", transform: "translateX(-50%)", background: "rgba(10,8,18,0.95)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "8px", padding: "6px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.7)", whiteSpace: "nowrap", opacity: 0, transition: "opacity 0.2s", pointerEvents: "none", zIndex: 100 }}>Rating según Google Maps</div>
                   </div>
                 )}
-                <div className="dc-hero-acciones" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
-                  {esImportado && (
-                    <a href={`/reclamar-local/${id}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap" }}>¿Eres el dueño? →</a>
-                  )}
-                </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.1em", color: "rgba(240,234,214,0.55)" }}>{CATEGORIA_EMOJI[local.categoria] ?? "🍽️"} {local.categoria}</span>
@@ -316,6 +311,9 @@ export default function LocalDetailPage() {
                   </div>
                 </>)}
               </div>
+              {esImportado && (
+                <a href={`/reclamar-local/${id}`} style={{ display: "inline-block", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", color: "#a78bfa", borderRadius: "8px", padding: "6px 12px", textDecoration: "none", whiteSpace: "nowrap", marginTop: "8px" }}>¿Eres el dueño? →</a>
+              )}
             </div>
           </div>
         </div>
