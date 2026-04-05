@@ -32,14 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `${refNameCapitalized} está participando por ${premioCorto} en ${concurso.local.nombre}. Regístrate gratis, súmale puntos y tú también entras a ganar.`
       : "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
 
-    // OG image dinámica via /api/og
-    const ogTitle = refNameCapitalized
-      ? `${refNameCapitalized} te invita a ganar`
-      : premioCorto;
-    const ogSubtitle = refNameCapitalized
-      ? `${premioCorto} — ${concurso.local.nombre}`
-      : `Participa gratis en ${concurso.local.nombre}`;
-    const ogImage = `https://deseocomer.com/api/og?title=${encodeURIComponent(ogTitle)}&subtitle=${encodeURIComponent(ogSubtitle)}`;
+    // OG image: static fallback for fast loading (Facebook/WhatsApp need < 2s)
+    const ogImage = "https://deseocomer.com/og-default.png";
 
     const url = `https://deseocomer.com/concursos/${slug}`;
 
