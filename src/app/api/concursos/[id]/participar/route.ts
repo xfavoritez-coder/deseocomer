@@ -60,11 +60,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
     });
 
-    // Notificación madrugador (con dedup)
-    if (esMadrugador) {
-      const yaNotifMad = await prisma.notificacion.findFirst({ where: { usuarioId, tipo: "madrugador", createdAt: { gte: new Date(Date.now() - 60000) } } });
-      if (!yaNotifMad) prisma.notificacion.create({ data: { usuarioId, tipo: "madrugador", mensaje: "¡Entraste entre los primeros 10! +2 pts bonus ⚡" } }).catch(() => {});
-    }
+    // Notificación al entrar al concurso
+    const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
+    const msgEntrada = referidoPor
+      ? `¡Entraste al concurso con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`
+      : `¡Entraste al concurso con ${totalPts} punto${totalPts > 1 ? "s" : ""}!${esMadrugador ? " (+2 bonus madrugador ⚡)" : " Invita amigos para sumar más 🚀"}`;
+    prisma.notificacion.create({ data: { usuarioId, tipo: "entrada_concurso", mensaje: msgEntrada } }).catch(() => {});
 
     // Incrementar totalConcursosParticipados
     prisma.usuario.update({

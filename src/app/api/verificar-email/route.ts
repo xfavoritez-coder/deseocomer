@@ -57,6 +57,16 @@ export async function GET(req: NextRequest) {
                 });
               }
 
+              // Notificación al nuevo participante
+              const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
+              prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste al concurso con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉` } }).catch(() => {});
+
+              // Notificación al referidor
+              if (refParticipante) {
+                const nombreRef = usuario.nombre?.split(" ")[0] ?? "Alguien";
+                prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} activó su cuenta con tu link. +3 pts para ti 🎉` } }).catch(() => {});
+              }
+
               prisma.usuario.update({ where: { id: usuario.id }, data: { totalConcursosParticipados: { increment: 1 } } }).catch(() => {});
             }
           }
