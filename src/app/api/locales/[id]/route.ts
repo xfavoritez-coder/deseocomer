@@ -20,7 +20,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
     // Increment view count (fire and forget)
     prisma.local.update({ where: { id: local.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
-    const { password: _, ...safe } = local;
+    const { password: _, ...safe } = local as Record<string, unknown>;
+
+    // Para locales importados: generar horarios desde horarioGoogle si no tiene horarios propios
+    if (local.origenImportacion === 'GOOGLE_PLACES' && !local.horarios && local.horarioGoogle) {
+      const MAPA_DIAS: Record<string, string> = {
+        'lunes': 'Lunes', 'martes': 'Martes', 'miércoles': 'Miércoles',
+        'jueves': 'Jueves', 'viernes': 'Viernes', 'sábado': 'Sábado', 'domingo': 'Domingo'
+      };
+      const hg = local.horarioGoogle as { descripcion?: string[] };
+      if (hg.descripcion) {
+        safe.horarios = hg.descripcion.map((linea: string) => {
+          const [diaRaw, horasRaw] = linea.split(': ');
+          const dia = MAPA_DIAS[diaRaw?.toLowerCase().trim()] ?? diaRaw;
+          if (!horasRaw || horasRaw.toLowerCase().includes('cerrado')) {
+            return { dia, abre: '', cierra: '', cerrado: true };
+          }
+          const separador = horasRaw.includes('–') ? '–' : '-';
+          const [abre, cierra] = horasRaw.split(separador).map((h: string) => h.trim());
+          return { dia, abre: abre ?? '', cierra: cierra ?? '', cerrado: false };
+        });
+      }
+    }
+
     return NextResponse.json(safe);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
