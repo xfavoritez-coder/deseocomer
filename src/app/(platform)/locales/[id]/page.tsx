@@ -316,15 +316,6 @@ export default function LocalDetailPage() {
                   </div>
                 </>)}
               </div>
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {Array.isArray((local as any).categorias) && (local as any).categorias.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "6px" }}>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(local as any).categorias.map((cat: string) => (
-                    <span key={cat} style={{ padding: "2px 8px", borderRadius: "12px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(232,168,76,0.08)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)" }}>{CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}</span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         </div>
