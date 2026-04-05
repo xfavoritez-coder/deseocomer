@@ -839,7 +839,7 @@ function ConcursoDetallePage() {
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>{esSorteo ? "Tus boletos en el sorteo" : "Cómo se gana"}</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                 {[
-  { icon: "🎟️", pts: "+1", label: "Al unirte", id: "tt1", ttTitle: "Al unirte al concurso", ttText: "Por unirte ganas 1 punto base. Si entraste por el link de un amigo, ambos ganan 3 puntos adicionales automáticamente.", ttPts: "+1 punto (o +4 si entraste por un link)" },
+  { icon: "🎟️", pts: "+1", label: "Al entrar", id: "tt1", ttTitle: "Al entrar al concurso", ttText: "Por unirte ganas 1 punto base. Si entraste por el link de un amigo, ambos ganan 3 puntos adicionales automáticamente.", ttPts: "+1 punto (o +4 si entraste por un link)" },
   { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ambos ganan 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos para cada uno" },
   { icon: "👥", pts: "+2", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 2 puntos por cada uno.", ttPts: "+2 puntos" },
   { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
