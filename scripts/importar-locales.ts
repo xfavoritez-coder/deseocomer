@@ -7,7 +7,10 @@
 import { PrismaClient, OrigenLocal, EstadoLocal } from '@prisma/client'
 import * as https from 'https'
 
-const prisma = new PrismaClient()
+// Usar directUrl para no saturar el connection pooler de Supabase
+const prisma = new PrismaClient({
+  datasources: { db: { url: process.env.DIRECT_URL || process.env.DATABASE_URL } },
+})
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY!
 
 if (!API_KEY) {
@@ -342,13 +345,13 @@ async function main() {
 
         for (const lugar of places) {
           await procesarLocal(lugar, stats)
-          await sleep(100)
+          await sleep(300)
         }
 
-        await sleep(500)
+        await sleep(2000)
       }
 
-      await sleep(1000)
+      await sleep(2000)
 
     } catch (error: any) {
       console.error(`   ✗ Error en ${comuna}: ${error.message}`)
