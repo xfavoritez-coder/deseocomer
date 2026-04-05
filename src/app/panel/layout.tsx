@@ -53,12 +53,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 setLocalComuna(info.comuna ?? info.ciudad ?? "");
                 // Check completeness
                 const missing: string[] = [];
-                if (!info.ciudad) missing.push("Ciudad");
-                if (!info.comuna) missing.push("Comuna");
                 if (!info.direccion) missing.push("Dirección");
                 if (!info.categoria && (!info.categorias || info.categorias.length === 0)) missing.push("Categoría");
-                const hrs = info.horarios as { activo: boolean }[] | null;
-                if (!hrs || !Array.isArray(hrs) || !hrs.some(h => h.activo)) missing.push("Horario");
+                const hrs = info.horarios;
+                const tieneHorario = hrs && Array.isArray(hrs) && hrs.length > 0 && (hrs.some((h: any) => h.activo) || hrs.some((h: any) => h.abre));
+                if (!tieneHorario && !info.horarioGoogle) missing.push("Horario");
                 setFaltantes(missing);
                 if (info.slug && !data.slug) {
                   data.slug = info.slug;
