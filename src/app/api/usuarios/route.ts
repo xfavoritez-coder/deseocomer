@@ -41,19 +41,19 @@ export async function POST(req: NextRequest) {
       || req.headers.get("x-real-ip")
       || "unknown";
 
-    // Límite de cuentas por IP (máx 2 en 24h) — DESACTIVADO TEMPORALMENTE
-    // if (ip !== "unknown") {
-    //   const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    //   const cuentasDesdeIP = await prisma.usuario.count({
-    //     where: { ipRegistro: ip, createdAt: { gte: hace24h } },
-    //   });
-    //   if (cuentasDesdeIP >= 2) {
-    //     return NextResponse.json(
-    //       { error: "Has creado demasiadas cuentas recientemente. Intenta más tarde." },
-    //       { status: 429 }
-    //     );
-    //   }
-    // }
+    // Límite de cuentas por IP (máx 3 en 24h)
+    if (ip !== "unknown") {
+      const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const cuentasDesdeIP = await prisma.usuario.count({
+        where: { ipRegistro: ip, createdAt: { gte: hace24h } },
+      });
+      if (cuentasDesdeIP >= 3) {
+        return NextResponse.json(
+          { error: "Has creado demasiadas cuentas recientemente. Intenta más tarde." },
+          { status: 429 }
+        );
+      }
+    }
 
     const hash = await bcrypt.hash(password, 10);
     const tokenVerificacion = crypto.randomBytes(32).toString("hex");
