@@ -12,6 +12,7 @@ function generarPassword(): string {
 export default function RegistroLocalPage() {
   const [nombreLocal, setNombreLocal] = useState("");
   const [ciudad, setCiudad] = useState("Santiago");
+  const [comuna, setComuna] = useState("");
   const [nombreDueno, setNombreDueno] = useState("");
   const [email, setEmail] = useState("");
   const [registroExitoso, setRegistroExitoso] = useState(false);
@@ -22,7 +23,10 @@ export default function RegistroLocalPage() {
     e.preventDefault();
     setError("");
     if (!nombreLocal.trim()) return setError("El nombre del local es obligatorio.");
+    if (nombreLocal.trim().split(/\s+/).length < 2) return setError("Ingresa el nombre completo de tu local (ej: Pizza Napoli, Sushi House).");
+    if (!comuna.trim()) return setError("La comuna es obligatoria.");
     if (!nombreDueno.trim()) return setError("Tu nombre es obligatorio.");
+    if (nombreDueno.trim().split(/\s+/).length < 2) return setError("Ingresa tu nombre y apellido.");
     if (!email.trim() || !email.includes("@")) return setError("Ingresa un email válido.");
     setLoading(true);
     const password = generarPassword();
@@ -38,6 +42,7 @@ export default function RegistroLocalPage() {
           passwordPlain: password,
           registroRapido: true,
           ciudad: ciudad || "Santiago",
+          comuna: comuna.trim(),
         }),
       });
       const data = await res.json();
@@ -103,6 +108,10 @@ export default function RegistroLocalPage() {
               <select style={{ ...inputS, background: "var(--bg-primary)", cursor: "pointer" }} value={ciudad} onChange={e => setCiudad(e.target.value)}>
                 {["Santiago","Valparaíso","Viña del Mar","Concepción","Antofagasta","La Serena","Coquimbo","Temuco","Rancagua","Talca","Arica","Iquique","Puerto Montt","Osorno","Valdivia","Chillán","Los Ángeles","Calama","Copiapó","Punta Arenas","Puerto Natales","Curicó","Linares","San Fernando","Ovalle","Quillota","San Antonio","Melipilla"].map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
               </select>
+            </div>
+            <div>
+              <label style={labelS}>Comuna del local</label>
+              <input style={inputS} type="text" placeholder="Ej: Providencia, Las Condes, Ñuñoa" value={comuna} onChange={e => setComuna(e.target.value)} onFocus={fi} onBlur={fo} />
             </div>
             <div>
               <label style={labelS}>Tu nombre</label>
