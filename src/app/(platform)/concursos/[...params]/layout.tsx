@@ -19,15 +19,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!concurso) return {};
 
-    const premioCorto = concurso.premio.length > 40
-      ? concurso.premio.substring(0, 40).trim() + "..."
-      : concurso.premio;
+    const premioRaw = concurso.premio.replace(/\b\w/g, c => c.toUpperCase());
+    const premioCorto = premioRaw.length > 40
+      ? premioRaw.substring(0, 40).trim() + "..."
+      : premioRaw;
 
     // Personalizar título si viene de un link de referido
     const refNameCapitalized = refName ? refName.charAt(0).toUpperCase() + refName.slice(1) : null;
     const title = refNameCapitalized
-      ? `${refNameCapitalized} te invita a ganar ${premioCorto} | DeseoComer`
-      : `🏆 Premio: ${premioCorto} — ${concurso.local.nombre} | DeseoComer`;
+      ? `${refNameCapitalized} te invita a ganar ${premioCorto} | 🧞 DeseoComer`
+      : `🏆 Premio: ${premioCorto} — ${concurso.local.nombre} | 🧞 DeseoComer`;
     const description = refNameCapitalized
       ? `${refNameCapitalized} está participando por ${premioCorto} en ${concurso.local.nombre}. Regístrate gratis, súmale puntos y tú también entras a ganar.`
       : "Participa gratis y gana este premio. Invita amigos, suma puntos y gana. ¡Únete ahora en DeseoComer!";
