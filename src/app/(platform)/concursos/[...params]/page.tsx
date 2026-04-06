@@ -830,7 +830,6 @@ function ConcursoDetallePage() {
                       <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.12em" }}>{user.codigoRef}</span>
                       </div>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", marginTop: 6 }}>Para amigos que ya están en DeseoComer</p>
                     </div>
                   )}
                 </div>
@@ -928,7 +927,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
                   </div>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.32)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>

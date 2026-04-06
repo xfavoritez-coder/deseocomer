@@ -130,7 +130,7 @@ export default async function ComoFuncionaPage() {
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>El poder de tu red</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Cuando invitas a alguien a un concurso — sea nuevo o ya esté en DeseoComer — y esa persona también invita a otros a participar, tú ganas +1 punto por cada uno que traigan. Así tu red trabaja para ti. Máximo 10 puntos acumulables por esta vía.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros a participar, tú ganas +1 punto por cada uno que traigan. Así tu red trabaja para ti. Máximo 10 puntos acumulables por esta vía.</p>
             <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
@@ -151,6 +151,23 @@ export default async function ComoFuncionaPage() {
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Trae amigos que ya están en DeseoComer</h3>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Si tienes amigos que ya están registrados, puedes invitarlos a participar en cada concurso. Comparte tu link o código personal y gana +2 puntos por cada uno que participe. Tu código aparece en la página de cada concurso cuando estás participando.</p>
+          </div>
+
+          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
+            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Link vs Código de invitación</h3>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Tienes dos formas de invitar amigos a un concurso. Cada una funciona diferente:</p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "16px" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#3db89e", marginBottom: 8 }}>🔗 Tu link personal</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.6, marginBottom: 8 }}>Para personas que <strong style={{ color: "#f0ead6" }}>no tienen cuenta</strong> en DeseoComer. Se registran por tu link y ambos ganan <strong style={{ color: "#3db89e" }}>+3 puntos</strong>.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", fontStyle: "italic" }}>Ideal para compartir por WhatsApp, Instagram o redes sociales.</p>
+              </div>
+              <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "16px" }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", marginBottom: 8 }}>🔑 Tu código de invitación</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.6, marginBottom: 8 }}>Para amigos que <strong style={{ color: "#f0ead6" }}>ya tienen cuenta</strong> en DeseoComer. Ingresan tu código al participar y ambos ganan <strong style={{ color: "#e8a84c" }}>+2 puntos</strong>.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", fontStyle: "italic" }}>Pásales tu código por mensaje para que lo ingresen.</p>
+              </div>
+            </div>
           </div>
 
         </section>
