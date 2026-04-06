@@ -20,7 +20,82 @@ function emptyStats(): StatsData {
   return { busquedas: {}, comunas: {}, categorias: {}, paginas: {}, promocionesVistas: {}, totalBusquedas: 0, totalFiltrosComunas: 0, totalFiltrosCategorias: 0, totalPromocionesVistas: 0, updatedAt: new Date().toISOString() };
 }
 
-// POST: receive a batch of events and merge into stats (1 read + 1 write)
+// ── In-memory buffer: absorbs all incoming events, writes to DB max every 30s ──
+let pendingEvents: { tipo: string; valor: string }[] = [];
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let flushing = false;
+
+async function flushToDB() {
+  if (flushing || pendingEvents.length === 0) return;
+  flushing = true;
+  const batch = pendingEvents.splice(0, 500);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const row = await tx.configSite.findUnique({ where: { clave: CLAVE } });
+      const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
+
+      for (const e of batch) {
+        const val = (e.valor ?? "").toLowerCase().trim();
+        if (!val || val.length > 100) continue;
+
+        switch (e.tipo) {
+          case "busqueda":
+            stats.busquedas[val] = (stats.busquedas[val] ?? 0) + 1;
+            stats.totalBusquedas++;
+            break;
+          case "comuna":
+            stats.comunas[val] = (stats.comunas[val] ?? 0) + 1;
+            stats.totalFiltrosComunas++;
+            break;
+          case "categoria":
+            stats.categorias[val] = (stats.categorias[val] ?? 0) + 1;
+            stats.totalFiltrosCategorias++;
+            break;
+          case "pagina":
+            stats.paginas[val] = (stats.paginas[val] ?? 0) + 1;
+            break;
+          case "promocion_vista":
+            stats.promocionesVistas[val] = (stats.promocionesVistas[val] ?? 0) + 1;
+            stats.totalPromocionesVistas++;
+            break;
+        }
+      }
+
+      for (const key of ["busquedas", "comunas", "categorias", "paginas", "promocionesVistas"] as const) {
+        const entries = Object.entries(stats[key]);
+        if (entries.length > 200) {
+          entries.sort((a, b) => b[1] - a[1]);
+          stats[key] = Object.fromEntries(entries.slice(0, 200));
+        }
+      }
+
+      stats.updatedAt = new Date().toISOString();
+
+      await tx.configSite.upsert({
+        where: { clave: CLAVE },
+        update: { valor: JSON.stringify(stats) },
+        create: { id: CLAVE, clave: CLAVE, valor: JSON.stringify(stats) },
+      });
+    });
+  } catch (err) {
+    // Put events back if flush failed so they aren't lost
+    pendingEvents.unshift(...batch);
+    console.error("[Stats flush]", err);
+  } finally {
+    flushing = false;
+  }
+}
+
+function scheduleFlush() {
+  if (flushTimer) return;
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    flushToDB();
+  }, 30000); // Write to DB max every 30 seconds
+}
+
+// POST: accept events instantly, buffer in memory, write to DB periodically
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -29,58 +104,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Cap batch size to prevent abuse
-    const batch = eventos.slice(0, 50);
+    // Add to in-memory buffer (instant, no DB hit)
+    pendingEvents.push(...eventos.slice(0, 50));
 
-    // Single read
-    const row = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
-    const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
-
-    // Merge events
-    for (const e of batch) {
-      const val = (e.valor ?? "").toLowerCase().trim();
-      if (!val || val.length > 100) continue;
-
-      switch (e.tipo) {
-        case "busqueda":
-          stats.busquedas[val] = (stats.busquedas[val] ?? 0) + 1;
-          stats.totalBusquedas++;
-          break;
-        case "comuna":
-          stats.comunas[val] = (stats.comunas[val] ?? 0) + 1;
-          stats.totalFiltrosComunas++;
-          break;
-        case "categoria":
-          stats.categorias[val] = (stats.categorias[val] ?? 0) + 1;
-          stats.totalFiltrosCategorias++;
-          break;
-        case "pagina":
-          stats.paginas[val] = (stats.paginas[val] ?? 0) + 1;
-          break;
-        case "promocion_vista":
-          stats.promocionesVistas[val] = (stats.promocionesVistas[val] ?? 0) + 1;
-          stats.totalPromocionesVistas++;
-          break;
-      }
+    // Cap buffer to prevent memory issues
+    if (pendingEvents.length > 5000) {
+      pendingEvents = pendingEvents.slice(-2000);
     }
 
-    // Keep only top 200 per category to prevent unbounded growth
-    for (const key of ["busquedas", "comunas", "categorias", "paginas", "promocionesVistas"] as const) {
-      const entries = Object.entries(stats[key]);
-      if (entries.length > 200) {
-        entries.sort((a, b) => b[1] - a[1]);
-        stats[key] = Object.fromEntries(entries.slice(0, 200));
-      }
-    }
+    // Schedule a DB write if not already scheduled
+    scheduleFlush();
 
-    stats.updatedAt = new Date().toISOString();
-
-    // Single write
-    const existing = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
-    if (existing) {
-      await prisma.configSite.update({ where: { clave: CLAVE }, data: { valor: JSON.stringify(stats) } });
-    } else {
-      await prisma.configSite.create({ data: { id: CLAVE, clave: CLAVE, valor: JSON.stringify(stats) } });
+    // If buffer is getting large, flush now
+    if (pendingEvents.length >= 200) {
+      flushToDB();
     }
 
     return NextResponse.json({ ok: true });
@@ -89,9 +126,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: return stats for admin
+// GET: flush pending events first, then return fresh stats
 export async function GET() {
   try {
+    // Flush any pending events so admin sees up-to-date data
+    if (pendingEvents.length > 0) await flushToDB();
+
     const row = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
     const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
     return NextResponse.json(stats, {
