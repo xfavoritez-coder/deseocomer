@@ -24,24 +24,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
-    // Turnstile verification
-    if (turnstileToken) {
+    // Turnstile verification — required for all registrations
+    const tsSecret = process.env.TURNSTILE_SECRET_KEY;
+    if (tsSecret) {
+      if (!turnstileToken) {
+        return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
+      }
       const tsRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          secret: process.env.TURNSTILE_SECRET_KEY || "",
-          response: turnstileToken,
-          remoteip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "",
-        }),
+        body: new URLSearchParams({ secret: tsSecret, response: turnstileToken, remoteip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "" }),
       });
       const tsData = await tsRes.json();
       if (!tsData.success) {
         return NextResponse.json({ error: "Verificación de seguridad fallida. Recarga la página e intenta de nuevo." }, { status: 403 });
       }
-    } else if (process.env.TURNSTILE_SECRET_KEY) {
-      // If Turnstile is configured but no token provided, block
-      return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
     }
 
     // Blacklist de dominios desechables
