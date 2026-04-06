@@ -11,7 +11,8 @@ function flush() {
   // Use sendBeacon for reliability on page unload, fetch as fallback
   const body = JSON.stringify({ eventos: batch });
   if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-    navigator.sendBeacon("/api/stats", body);
+    const blob = new Blob([body], { type: "application/json" });
+    navigator.sendBeacon("/api/stats", blob);
   } else {
     fetch("/api/stats", { method: "POST", body, headers: { "Content-Type": "application/json" }, keepalive: true }).catch(() => {});
   }
