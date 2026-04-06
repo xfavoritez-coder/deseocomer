@@ -10,13 +10,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (authErr) return authErr;
   try {
     const { id: concursoId } = await params;
-    const { userId, enviarEmail, motivo } = await req.json();
+    const { userId, enviarEmail, motivo, borrarReferidos } = await req.json();
     if (!userId) return NextResponse.json({ error: "Falta userId" }, { status: 400 });
 
-    // Get participant and concurso info
     const participante = await prisma.participanteConcurso.findFirst({
       where: { concursoId, usuarioId: userId },
-      include: { usuario: { select: { id: true, nombre: true, email: true } } },
+      include: { usuario: { select: { id: true, nombre: true, email: true, ipRegistro: true } } },
     });
     if (!participante) return NextResponse.json({ error: "Participante no encontrado" }, { status: 404 });
 
@@ -28,58 +27,49 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { estado: "descalificado", puntos: 0, puntosReferidosNuevos: 0, puntosReferidosExistentes: 0, puntosNivel2: 0 },
     });
 
-    // 2. Find and delete fake referral accounts (Gmail dot trick + VPN IPs)
+    // 2. Get all referrals
     const referidos = await prisma.participanteConcurso.findMany({
       where: { concursoId, referidorDirectoId: userId },
-      include: { usuario: { select: { id: true, email: true, ipRegistro: true } } },
+      include: { usuario: { select: { id: true, email: true, nombre: true } } },
     });
 
-    const DC_PREFIXES = ["51.158.", "51.159.", "51.81.", "62.210.", "15.204.", "15.235.", "94.242.", "146.70.", "141.95."];
-    const userEmail = participante.usuario.email ?? "";
-    const [userLocal] = userEmail.split("@");
-    const userNorm = userLocal.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "");
+    let cuentasEliminadas = 0;
 
-    const cuentasFalsas = referidos.filter(r => {
-      const email = (r.usuario.email ?? "").toLowerCase();
-      const [local, domain] = email.split("@");
-      const ip = r.usuario.ipRegistro ?? "";
-      // Gmail dot trick
-      if (domain === "gmail.com") {
-        const norm = local.replace(/\./g, "").replace(/\+.*$/, "");
-        // Check if normalized matches any other referral
-        const otherNorms = referidos
-          .filter(o => o.id !== r.id && (o.usuario.email ?? "").endsWith("@gmail.com"))
-          .map(o => (o.usuario.email ?? "").split("@")[0].toLowerCase().replace(/\./g, "").replace(/\+.*$/, ""));
-        if (otherNorms.includes(norm)) return true;
-      }
-      // VPN IP
-      if (DC_PREFIXES.some(p => ip.startsWith(p))) return true;
-      // Same IP as the fraudster
-      if (ip === (participante.usuario as any).ipRegistro && ip !== "unknown" && ip !== "") return true;
-      return false;
-    });
-
-    // Descalificar participaciones falsas
-    if (cuentasFalsas.length > 0) {
+    if (borrarReferidos !== false && referidos.length > 0) {
+      // Descalificar todas las participaciones de referidos
       await prisma.participanteConcurso.updateMany({
-        where: { id: { in: cuentasFalsas.map(c => c.id) } },
+        where: { id: { in: referidos.map(r => r.id) } },
         data: { estado: "descalificado", puntos: 0 },
       });
 
-      // Delete fake user accounts and their related data
-      const fakeUserIds = cuentasFalsas.map(c => c.usuario.id);
-      await prisma.participanteConcurso.deleteMany({ where: { usuarioId: { in: fakeUserIds } } });
-      await prisma.notificacion.deleteMany({ where: { usuarioId: { in: fakeUserIds } } });
-      await prisma.favorito.deleteMany({ where: { usuarioId: { in: fakeUserIds } } });
-      await prisma.toastDismissed.deleteMany({ where: { usuarioId: { in: fakeUserIds } } });
-      await prisma.mensajeVisto.deleteMany({ where: { usuarioId: { in: fakeUserIds } } });
-      await prisma.usuario.deleteMany({ where: { id: { in: fakeUserIds } } });
+      // Delete referral user accounts and all related data
+      const refUserIds = referidos.map(r => r.usuario.id);
+      await prisma.participanteConcurso.deleteMany({ where: { usuarioId: { in: refUserIds } } });
+      await prisma.notificacion.deleteMany({ where: { usuarioId: { in: refUserIds } } });
+      await prisma.favorito.deleteMany({ where: { usuarioId: { in: refUserIds } } });
+      await prisma.toastDismissed.deleteMany({ where: { usuarioId: { in: refUserIds } } });
+      await prisma.mensajeVisto.deleteMany({ where: { usuarioId: { in: refUserIds } } });
+      await prisma.usuario.deleteMany({ where: { id: { in: refUserIds } } });
+      cuentasEliminadas = refUserIds.length;
     }
 
-    // 3. Enviar email si se solicitó
+    // 3. Also descalify this user in ALL other concursos
+    await prisma.participanteConcurso.updateMany({
+      where: { usuarioId: userId, concursoId: { not: concursoId }, estado: { not: "descalificado" } },
+      data: { estado: "descalificado", puntos: 0 },
+    });
+
+    // 4. Block user permanently from future concursos
+    await prisma.usuario.update({
+      where: { id: userId },
+      data: { tipo: "bloqueado" },
+    });
+
+    // 4. Send email if requested
     let emailEnviado = false;
     if (enviarEmail && participante.usuario.email) {
       try {
+        const infracciones = motivo || "Actividad fraudulenta detectada en tu cuenta.";
         await resend.emails.send({
           from: FROM,
           to: participante.usuario.email,
@@ -96,19 +86,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
               </p>
               <p style="color: #c0a060; font-size: 0.9rem; line-height: 1.8; margin-bottom: 16px;">
                 Tras una revisión de tu actividad en el concurso <strong style="color: #e8a84c;">"${concurso?.premio ?? "Concurso"}"</strong>,
-                hemos detectado actividad fraudulenta en tu cuenta.
+                hemos detectado las siguientes infracciones:
               </p>
-              ${motivo ? `<p style="color: #c0a060; font-size: 0.9rem; line-height: 1.8; margin-bottom: 16px;"><strong>Motivo:</strong> ${motivo}</p>` : ""}
               <div style="background: rgba(224,85,85,0.1); border: 1px solid rgba(224,85,85,0.3); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;">
-                <p style="color: #e05555; font-size: 0.85rem; margin: 0;">
-                  <strong>Consecuencias:</strong><br/>
-                  • Tu participación fue descalificada y tus puntos removidos<br/>
-                  ${cuentasFalsas.length > 0 ? `• ${cuentasFalsas.length} cuentas asociadas fueron eliminadas<br/>` : ""}
-                  • Esto viola nuestros <a href="https://deseocomer.com/terminos" style="color: #3db89e;">Términos y Condiciones</a>
-                </p>
+                <p style="color: #e05555; font-size: 0.85rem; line-height: 1.8; margin: 0; white-space: pre-wrap;">${infracciones}</p>
               </div>
+              <p style="color: #c0a060; font-size: 0.9rem; line-height: 1.8; margin-bottom: 16px;">
+                <strong>Consecuencias aplicadas:</strong>
+              </p>
+              <ul style="color: #c0a060; font-size: 0.85rem; line-height: 1.8; margin-bottom: 16px; padding-left: 20px;">
+                <li>Tu participación fue descalificada y tus puntos removidos</li>
+                ${cuentasEliminadas > 0 ? `<li>${cuentasEliminadas} cuentas asociadas fueron eliminadas</li>` : ""}
+                <li>Has sido descalificado de todos los concursos activos</li>
+                <li>Esto viola nuestros <a href="https://deseocomer.com/terminos" style="color: #3db89e;">Términos y Condiciones</a></li>
+              </ul>
               <p style="color: #c0a060; font-size: 0.9rem; line-height: 1.8;">
-                Si crees que es un error, puedes contactarnos respondiendo a este correo.
+                Si consideras que esta decisión es un error, puedes contactarnos respondiendo a este correo.
               </p>
               <hr style="border: none; border-top: 1px solid rgba(232,168,76,0.15); margin: 24px 0;" />
               <p style="color: rgba(240,234,214,0.3); font-size: 0.75rem; text-align: center;">DeseoComer — Concursos justos para todos</p>
@@ -124,7 +117,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({
       ok: true,
       descalificado: participante.usuario.nombre,
-      cuentasEliminadas: cuentasFalsas.length,
+      cuentasEliminadas,
       emailEnviado,
     });
   } catch (e) {

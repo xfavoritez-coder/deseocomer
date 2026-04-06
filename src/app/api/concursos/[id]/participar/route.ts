@@ -9,8 +9,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const { usuarioId, referidoPor } = await req.json();
     if (!usuarioId) return NextResponse.json({ error: "Falta usuarioId" }, { status: 400 });
 
-    // Verify user has confirmed email
-    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { emailVerificado: true } });
+    // Verify user has confirmed email and is not blocked
+    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { emailVerificado: true, tipo: true } });
+    if (usuario?.tipo === "bloqueado") {
+      return NextResponse.json({ error: "Tu cuenta ha sido suspendida por actividad fraudulenta. No puedes participar en concursos.", codigo: "CUENTA_BLOQUEADA" }, { status: 403 });
+    }
     if (!usuario?.emailVerificado) {
       return NextResponse.json({ error: "Debes verificar tu email para participar. Revisa tu bandeja de entrada.", codigo: "EMAIL_NO_VERIFICADO" }, { status: 403 });
     }
@@ -27,18 +30,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
     if (existing) return NextResponse.json({ error: "Ya participas en este concurso" }, { status: 400 });
 
-    // Build referral chain
+    // Build referral chain — skip if referrer is blocked/descalificado
     let referidorDirectoId: string | null = null;
     let referidorNivel2Id: string | null = null;
+    let refBloqueado = false;
 
     if (referidoPor) {
-      referidorDirectoId = referidoPor;
-      // Check if the direct referrer has their own referrer (level 2)
-      const refDirecto = await prisma.participanteConcurso.findUnique({
+      const refUser = await prisma.usuario.findUnique({ where: { id: referidoPor }, select: { tipo: true } });
+      const refParticipacion = await prisma.participanteConcurso.findUnique({
         where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
       });
-      if (refDirecto?.referidorDirectoId) {
-        referidorNivel2Id = refDirecto.referidorDirectoId;
+
+      if (refUser?.tipo === "bloqueado" || refParticipacion?.estado === "descalificado") {
+        // Referrer is blocked — let user participate but without referral bonus
+        refBloqueado = true;
+      } else if (refParticipacion) {
+        referidorDirectoId = referidoPor;
+        if (refParticipacion.referidorDirectoId) {
+          referidorNivel2Id = refParticipacion.referidorDirectoId;
+        }
       }
     }
 
@@ -65,7 +75,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     // Create participation: 1 base + 3 bonus referido + 2 bonus madrugador
     const puntosBase = 1;
-    const puntosRefBonus = referidoPor ? 3 : 0;
+    const puntosRefBonus = (referidorDirectoId && !refBloqueado) ? 3 : 0;
     const puntosMadrugador = esMadrugador ? 2 : 0;
     const participante = await prisma.participanteConcurso.create({
       data: {

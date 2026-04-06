@@ -31,6 +31,8 @@ export default function AdminConcursos() {
       const r = await adminFetch(`/api/admin/concursos/${sel.id}/investigar?userId=${userId}`);
       const data = await r.json();
       setInvestigacion(data);
+      // Pre-fill motivo with auto-generated summary
+      if (data.analisis?.resumenMotivo) setMotivoDesc(data.analisis.resumenMotivo);
     } catch { setInvestigacion(null); }
   };
 
@@ -387,32 +389,22 @@ export default function AdminConcursos() {
                     </div>
                     {investigandoId === p.usuarioId && investigacion && (
                       <div style={{ marginTop: 8, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(120,140,220,0.2)", borderRadius: 8, padding: 12 }}>
+                        {/* Risk badge + summary metrics */}
                         <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", padding: "3px 10px", borderRadius: 20, background: investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.2)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.2)" : "rgba(61,184,158,0.15)", color: investigacion.analisis.riesgo >= 60 ? "#ff6b6b" : investigacion.analisis.riesgo >= 30 ? "#e8a84c" : "#3db89e", border: `1px solid ${investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.4)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.4)" : "rgba(61,184,158,0.3)"}` }}>Riesgo: {investigacion.analisis.riesgo}%</span>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.totalReferidos} referidos</span>
-                          {investigacion.analisis.ipsVPN > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>🚨 {investigacion.analisis.ipsVPN} IPs VPN</span>}
-                          {investigacion.analisis.mismaIP > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>⚠️ {investigacion.analisis.mismaIP} misma IP</span>}
-                          {investigacion.analisis.emailsDuplicados.length > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>📧 {investigacion.analisis.emailsDuplicados.length} emails duplicados</span>}
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.participante.puntos} pts (campos suman {investigacion.analisis.sumaFields})</span>
                         </div>
-                        {investigacion.analisis.registrosRapidos.length > 0 && (
-                          <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(232,168,76,0.7)", marginBottom: 6 }}>⚡ {investigacion.analisis.registrosRapidos.length} registros rápidos (&lt;30 min)</p>
-                        )}
-                        {investigacion.analisis.ipsRepetidas.length > 0 && (
-                          <div style={{ marginBottom: 6 }}>
-                            <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", textTransform: "uppercase", marginBottom: 4 }}>IPs repetidas</p>
-                            {investigacion.analisis.ipsRepetidas.map((ip: { ip: string; count: number }) => (
-                              <span key={ip.ip} style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)", marginRight: 8 }}>{ip.ip}: {ip.count}x</span>
-                            ))}
-                          </div>
-                        )}
-                        {investigacion.analisis.emailsDuplicados.length > 0 && (
-                          <div style={{ marginBottom: 6 }}>
-                            <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", textTransform: "uppercase", marginBottom: 4 }}>Emails Gmail duplicados</p>
-                            {investigacion.analisis.emailsDuplicados.map((e: { email: string; cuentas: string[] }) => (
-                              <p key={e.email} style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: "2px 0" }}>{e.email} → {e.cuentas.join(", ")}</p>
-                            ))}
-                          </div>
-                        )}
+                        {/* Alerts */}
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
+                          {investigacion.analisis.ipsVPN > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: 0 }}>🚨 {investigacion.analisis.ipsVPN} registros desde IPs de VPN/datacenter</p>}
+                          {investigacion.analisis.mismaIP > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: 0 }}>⚠️ {investigacion.analisis.mismaIP} cuentas con la misma IP del participante</p>}
+                          {investigacion.analisis.emailsDuplicados.length > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: 0 }}>📧 {investigacion.analisis.emailsDuplicados.reduce((a: number, e: { cuentas: string[] }) => a + e.cuentas.length, 0)} cuentas con emails duplicados (Gmail dot trick)</p>}
+                          {investigacion.analisis.registrosRapidos.length > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#e8a84c", margin: 0 }}>⚡ {investigacion.analisis.registrosRapidos.length} registros rápidos (&lt;30 min entre sí)</p>}
+                          {investigacion.analisis.nombresSospechosos?.length > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#e8a84c", margin: 0 }}>🎭 Nombres ficticios: {investigacion.analisis.nombresSospechosos.join(", ")}</p>}
+                          {investigacion.analisis.puntosFantasma > 5 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: 0 }}>👻 {investigacion.analisis.puntosFantasma} puntos sin respaldo en tracking</p>}
+                          {investigacion.analisis.ipsRepetidas.length > 0 && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>🔁 IPs compartidas: {investigacion.analisis.ipsRepetidas.map((ip: { ip: string; count: number }) => `${ip.ip} (${ip.count}x)`).join(", ")}</p>}
+                        </div>
                         <details style={{ marginTop: 6 }}>
                           <summary style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(120,140,220,0.7)", cursor: "pointer" }}>Ver {investigacion.totalReferidos} referidos</summary>
                           <div style={{ marginTop: 6, maxHeight: 200, overflowY: "auto" }}>

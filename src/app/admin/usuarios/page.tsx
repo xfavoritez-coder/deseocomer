@@ -139,7 +139,8 @@ export default function AdminUsuarios() {
         <div style={{ minWidth: 0 }}>
           <h2 style={{ fontFamily: "Georgia", color: "#f5d080", fontSize: "1.3rem", margin: 0 }}>{sel.nombre}</h2>
           <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.55)", fontSize: "0.95rem", margin: "3px 0 0", wordBreak: "break-all" }}>{sel.email}</p>
-          {sel.tipo && sel.tipo !== "usuario" && <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#8040d0", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "10px", padding: "3px 10px", marginTop: "4px", display: "inline-block" }}>{sel.tipo}</span>}
+          {sel.tipo === "bloqueado" && <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#ff6b6b", background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "10px", padding: "3px 10px", marginTop: "4px", display: "inline-block" }}>🔒 Bloqueado</span>}
+          {sel.tipo && sel.tipo !== "usuario" && sel.tipo !== "bloqueado" && <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#8040d0", background: "rgba(128,64,208,0.1)", border: "1px solid rgba(128,64,208,0.3)", borderRadius: "10px", padding: "3px 10px", marginTop: "4px", display: "inline-block" }}>{sel.tipo}</span>}
         </div>
       </div>
 
@@ -502,6 +503,13 @@ export default function AdminUsuarios() {
           {sel.emailVerificado && (
             <button onClick={async () => { if (await action("desactivar")) { setSel({ ...sel, emailVerificado: false }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, emailVerificado: false } : u)); show("Usuario desactivado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ Desactivar cuenta</button>
           )}
+          <button onClick={async () => {
+            const nuevoTipo = sel.tipo === "bloqueado" ? "usuario" : "bloqueado";
+            const r = await adminFetch(`/api/admin/usuarios/${sel.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ tipo: nuevoTipo }) });
+            if (r.ok) { setSel({ ...sel, tipo: nuevoTipo }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, tipo: nuevoTipo } : u)); show(nuevoTipo === "bloqueado" ? "🚫 Usuario bloqueado permanentemente" : "✓ Usuario desbloqueado"); }
+          }} disabled={loading} style={{ ...btnOutlineS, color: sel.tipo === "bloqueado" ? "#3db89e" : "#ff6b6b", borderColor: sel.tipo === "bloqueado" ? "rgba(61,184,158,0.4)" : "rgba(255,80,80,0.3)" }}>
+            {sel.tipo === "bloqueado" ? "✓ Desbloquear participación" : "🔒 Bloquear de concursos (permanente)"}
+          </button>
           <button onClick={() => { resetModes(); setDescalificarConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8c00", borderColor: "rgba(255,140,0,0.4)" }}>🚫 Descalificar de concursos</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar usuario</button>
         </div>
