@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState, useEffect, useRef, useCallback } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,28 +46,21 @@ function RegistroContent() {
   const [redirectTo, setRedirectTo] = useState("/");
   const [turnstileToken, setTurnstileToken] = useState("");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
-  const turnstileRef = useRef<HTMLDivElement>(null);
-  const turnstileRendered = useRef(false);
   useEffect(() => {
-    // Load Turnstile script
     if (!document.querySelector('script[src*="turnstile"]')) {
       const s = document.createElement("script");
-      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
       s.async = true;
       document.head.appendChild(s);
     }
-    // Poll until both script and ref are ready
+    // Listen for Turnstile callback via hidden input
     const interval = setInterval(() => {
-      if (turnstileRendered.current || !turnstileRef.current || !(window as any).turnstile) return;
-      turnstileRendered.current = true;
-      clearInterval(interval);
-      (window as any).turnstile.render(turnstileRef.current, {
-        sitekey: "0x4AAAAAAC1ee9SIwC2tB47_",
-        callback: (token: string) => setTurnstileToken(token),
-        "expired-callback": () => setTurnstileToken(""),
-        theme: "dark",
-      });
-    }, 500);
+      const input = document.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]');
+      if (input?.value && input.value !== turnstileToken) {
+        setTurnstileToken(input.value);
+        clearInterval(interval);
+      }
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
@@ -353,7 +346,7 @@ function RegistroContent() {
               <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><OjoIcon visible={showPw} /></button></div></div>
               <div><label style={labelS}>Confirmar</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showConf ? "text" : "password"} placeholder="Repite contraseña" value={form.confirm} onChange={e => set("confirm", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowConf(s => !s)} style={eyeS}><OjoIcon visible={showConf} /></button></div></div>
               <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}><input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px", marginTop: "2px", flexShrink: 0 }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>Acepto los <a href="/terminos" style={{ color: "var(--accent)", textDecoration: "none" }}>Términos</a> y <a href="/privacidad" style={{ color: "var(--accent)", textDecoration: "none" }}>Privacidad</a></span></label>
-              <div ref={turnstileRef} style={{ display: "flex", justifyContent: "center" }} />
+              <div className="cf-turnstile" data-sitekey="0x4AAAAAAC1ee9SIwC2tB47_" data-theme="dark" style={{ display: "flex", justifyContent: "center" }} />
               <button type="submit" disabled={loading || !turnstileToken} style={{ ...btnS, opacity: loading || !turnstileToken ? 0.5 : 1 }}>{loading ? "Creando..." : "Crear cuenta gratis →"}</button>
             </form>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.2)" }}>¿Tienes un local?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
