@@ -53,8 +53,40 @@ export async function GET(
   const esSorteo = concurso.modalidadConcurso === "sorteo";
   const esProximamente = concurso.estado === "programado";
 
+  // Check if ends today
+  const now = new Date();
+  const fechaFin = new Date(concurso.fechaFin);
+  const terminaHoy = !esProximamente && concurso.activo &&
+    fechaFin.getFullYear() === now.getFullYear() &&
+    fechaFin.getMonth() === now.getMonth() &&
+    fechaFin.getDate() === now.getDate();
+
+  // Format closing hour
+  const horaCierre = terminaHoy
+    ? `${String(fechaFin.getHours()).padStart(2, "0")}:${String(fechaFin.getMinutes()).padStart(2, "0")} hrs`
+    : "";
+
   // Theme per type
-  const theme = esProximamente
+  const theme = terminaHoy
+    ? {
+        badgeColor: "#e05555",
+        badgeText: "\u00daLTIMA OPORTUNIDAD",
+        overlayColor: "rgba(10,8,18,0.6)",
+        gradientTop: "rgba(40,8,8,0.8)",
+        accentColor: "#ff8080",
+        titleColor: "#ffd4d4",
+        emoji: "\u23F0",           // ⏰
+        headerText: "Este concurso termina HOY",
+        subtitulo: "\u00daltimas horas para participar gratis",
+        cta: "Entra antes de que cierre",
+        ctaIcon: "\u{1F6A8}",     // 🚨
+        ctaBg: "rgba(224,85,85,0.15)",
+        ctaBorder: "rgba(224,85,85,0.5)",
+        ctaIconBg: "rgba(224,85,85,0.15)",
+        ctaIconBorder: "rgba(224,85,85,0.4)",
+        dividerColor: "rgba(224,85,85,0.3)",
+      }
+    : esProximamente
     ? {
         badgeColor: "#a78bfa",
         badgeText: "PR\u00d3XIMAMENTE",
@@ -62,9 +94,11 @@ export async function GET(
         gradientTop: "rgba(30,15,60,0.8)",
         accentColor: "#c4b5fd",
         titleColor: "#ddd6fe",
-        emoji: "\u{1F52E}",       // 🔮
+        emoji: "\u{1F52E}",
+        headerText: "Nuevo concurso",
         subtitulo: "S\u00e9 de los primeros y gana ventaja",
         cta: "Avisame gratis",
+        ctaIcon: "\u{1F514}",
         ctaBg: "rgba(167,139,250,0.15)",
         ctaBorder: "rgba(167,139,250,0.4)",
         ctaIconBg: "rgba(167,139,250,0.15)",
@@ -79,9 +113,11 @@ export async function GET(
         gradientTop: "rgba(40,10,30,0.75)",
         accentColor: "#f472b6",
         titleColor: "#fce7f3",
-        emoji: "\u{1F3B2}",       // 🎲
+        emoji: "\u{1F3B2}",
+        headerText: "Sorteo de premio",
         subtitulo: "Cada punto es un boleto \u2014 m\u00e1s boletos, m\u00e1s chances",
         cta: "Entra al sorteo",
+        ctaIcon: "\u{1F3B0}",
         ctaBg: "rgba(236,72,153,0.15)",
         ctaBorder: "rgba(236,72,153,0.4)",
         ctaIconBg: "rgba(236,72,153,0.15)",
@@ -89,16 +125,17 @@ export async function GET(
         dividerColor: "rgba(236,72,153,0.25)",
       }
     : {
-        // Mérito (default)
         badgeColor: "#3db89e",
         badgeText: "CONCURSO",
         overlayColor: "rgba(10,8,18,0.45)",
         gradientTop: "rgba(10,8,18,0.7)",
         accentColor: "#e8a84c",
         titleColor: "#f5d080",
-        emoji: "\u{1F3C6}",       // 🏆
+        emoji: "\u{1F3C6}",
+        headerText: "Gana gratis este premio",
         subtitulo: "Invita amigos, suma puntos y gana",
         cta: "Participa gratis",
+        ctaIcon: "\u{1F517}",
         ctaBg: "rgba(232,168,76,0.15)",
         ctaBorder: "rgba(232,168,76,0.3)",
         ctaIconBg: "rgba(232,168,76,0.15)",
@@ -116,25 +153,21 @@ export async function GET(
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: theme.overlayColor, display: "flex" }} />
         {/* Top gradient */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to bottom, ${theme.gradientTop}, transparent)`, display: "flex" }} />
-        {/* Bottom gradient for sorteo/proximamente */}
-        {(esSorteo || esProximamente) && (
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
-        )}
+        {/* Bottom gradient */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
         {/* Badge ribbon */}
-        <div style={{ position: "absolute", top: "88px", right: "-112px", width: "480px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", transform: "rotate(45deg)" }}>
-          <span style={{ fontFamily: "Cinzel", fontSize: "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em", textTransform: "uppercase" }}>{theme.badgeText}</span>
+        <div style={{ position: "absolute", top: "88px", right: "-112px", width: terminaHoy ? "620px" : "560px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", transform: "rotate(45deg)" }}>
+          <span style={{ fontSize: "32px" }}>{theme.emoji}</span>
+          <span style={{ fontFamily: "Cinzel", fontSize: terminaHoy ? "30px" : "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
           {/* Local name */}
           <span style={{ fontFamily: "Lato", fontSize: "44px", color: "rgba(240,234,214,0.8)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
-          {/* Emoji + subtitle */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px" }}>
-            <span style={{ fontSize: "52px" }}>{theme.emoji}</span>
-            <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 800, color: theme.accentColor, letterSpacing: "0.16em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
-              {esProximamente ? "Nuevo concurso" : esSorteo ? "Sorteo de premio" : "Gana gratis este premio"}
-            </span>
-          </div>
+          {/* Header text */}
+          <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 800, color: theme.accentColor, letterSpacing: "0.16em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
+            {theme.headerText}
+          </span>
           {/* Prize title */}
           <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
           {/* Divider */}
@@ -143,11 +176,13 @@ export async function GET(
           <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
           {/* CTA button */}
           <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
-            <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>
-              {esProximamente ? "\u{1F514}" : esSorteo ? "\u{1F3B0}" : "\u{1F517}"}
-            </div>
+            <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
             <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
           </div>
+          {/* Closing time for termina hoy */}
+          {terminaHoy && (
+            <span style={{ fontFamily: "Lato", fontSize: "40px", fontWeight: 700, color: "#e05555", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>Cierra a las {horaCierre}</span>
+          )}
         </div>
       </div>
     ),
