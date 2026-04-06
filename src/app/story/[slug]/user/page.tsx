@@ -32,14 +32,14 @@ export default function StoryUserPage() {
 
       {/* Instrucciones */}
       <div style={{ maxWidth: 400, width: "100%", marginTop: "20px" }}>
-        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "14px", color: "#E1306C", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "12px" }}>
+        <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "16px", color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "14px" }}>
           ¿Cómo compartir en Instagram?
         </h3>
-        <div style={{ fontFamily: "var(--font-lato)", fontSize: "12px", color: "rgba(240,234,214,0.4)", lineHeight: 1.7 }}>
-          <p style={{ margin: "0 0 4px" }}>1. Mantén presionada la imagen y guárdala</p>
-          <p style={{ margin: "0 0 4px" }}>2. Abre Instagram y crea una nueva historia</p>
-          <p style={{ margin: "0 0 4px" }}>3. Selecciona la imagen guardada</p>
-          <p style={{ margin: "0 0 12px" }}>4. Agrega el sticker de link apuntando al botón y pon este link:</p>
+        <div style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: "rgba(240,234,214,0.7)", lineHeight: 1.8 }}>
+          <p style={{ margin: "0 0 6px" }}>1. Mantén presionada la imagen y guárdala</p>
+          <p style={{ margin: "0 0 6px" }}>2. Abre Instagram y crea una nueva historia</p>
+          <p style={{ margin: "0 0 6px" }}>3. Selecciona la imagen guardada</p>
+          <p style={{ margin: "0 0 14px" }}>4. Agrega el sticker de link apuntando al botón y pon este link:</p>
         </div>
 
         {/* Link box */}
