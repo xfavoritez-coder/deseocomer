@@ -71,10 +71,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar que el dominio tenga registros MX válidos
-    if (domain) {
+    // Verificar que el dominio tenga registros MX válidos (con timeout de 3s)
+    if (domain && !["gmail.com", "hotmail.com", "outlook.com", "yahoo.com", "live.cl", "live.com", "icloud.com"].includes(domain)) {
       try {
-        const mx = await dns.resolveMx(domain);
+        const mxPromise = dns.resolveMx(domain);
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000));
+        const mx = await Promise.race([mxPromise, timeout]) as { exchange: string }[];
         if (!mx || mx.length === 0) {
           return NextResponse.json(
             { error: "El dominio de tu correo no parece válido. Verifica que esté bien escrito." },
@@ -95,21 +97,28 @@ export async function POST(req: NextRequest) {
     }
 
     // Gmail dot trick detection: gmail ignores dots, so a.b@gmail = ab@gmail
+    // Lightweight check: search by prefix pattern instead of full table scan
     if (domain === "gmail.com") {
       const [localPart] = email.split("@");
       const normalized = localPart.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "");
-      // Search for accounts with the same base (without dots) using LIKE patterns
-      // Generate a pattern: insert % between each char to match any dot placement
-      const likePattern = normalized.split("").join("%") + "@gmail.com";
-      const duplicates: { email: string }[] = await prisma.$queryRawUnsafe(
-        `SELECT email FROM "Usuario" WHERE LOWER(REPLACE(SPLIT_PART(email, '@', 1), '.', '')) = $1 AND LOWER(SPLIT_PART(email, '@', 2)) = 'gmail.com'`,
-        normalized
-      );
-      if (duplicates.length >= 2) {
-        return NextResponse.json(
-          { error: "Ya existen cuentas asociadas a este correo. No se permiten variaciones del mismo email." },
-          { status: 400 }
-        );
+      // Build LIKE pattern from first 4 chars with wildcards: "came%" matches camile, came.le, etc.
+      const prefix = normalized.slice(0, 4);
+      if (prefix.length >= 4) {
+        const candidates = await prisma.usuario.findMany({
+          where: { email: { startsWith: prefix, endsWith: "@gmail.com", mode: "insensitive" } },
+          select: { email: true },
+          take: 10,
+        });
+        const dupes = candidates.filter(c => {
+          const [cLocal] = c.email.split("@");
+          return cLocal.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") === normalized;
+        });
+        if (dupes.length >= 2) {
+          return NextResponse.json(
+            { error: "Ya existen cuentas asociadas a este correo. No se permiten variaciones del mismo email." },
+            { status: 400 }
+          );
+        }
       }
     }
 
