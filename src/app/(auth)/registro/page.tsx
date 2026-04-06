@@ -48,25 +48,28 @@ function RegistroContent() {
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileRendered = useRef(false);
-  const renderTurnstile = useCallback(() => {
-    if (turnstileRendered.current || !turnstileRef.current || !(window as any).turnstile) return;
-    turnstileRendered.current = true;
-    (window as any).turnstile.render(turnstileRef.current, {
-      sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAC1ee9SIwC2tB47_",
-      callback: (token: string) => setTurnstileToken(token),
-      theme: "dark",
-      size: "flexible",
-    });
-  }, []);
   useEffect(() => {
-    if ((window as any).turnstile) { renderTurnstile(); return; }
-    const s = document.createElement("script");
-    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
-    s.async = true;
-    (window as any).onTurnstileLoad = renderTurnstile;
-    document.head.appendChild(s);
-    return () => { delete (window as any).onTurnstileLoad; };
-  }, [renderTurnstile]);
+    // Load Turnstile script
+    if (!document.querySelector('script[src*="turnstile"]')) {
+      const s = document.createElement("script");
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    // Poll until both script and ref are ready
+    const interval = setInterval(() => {
+      if (turnstileRendered.current || !turnstileRef.current || !(window as any).turnstile) return;
+      turnstileRendered.current = true;
+      clearInterval(interval);
+      (window as any).turnstile.render(turnstileRef.current, {
+        sitekey: "0x4AAAAAAC1ee9SIwC2tB47_",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        theme: "dark",
+      });
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
   useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasDB(data); }).catch(() => {}); }, []);
 
