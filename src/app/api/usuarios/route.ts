@@ -108,6 +108,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check blacklist (IPs and emails of known fraudsters)
+    try {
+      const blRow = await prisma.configSite.findUnique({ where: { clave: "blacklist_infractores" } });
+      if (blRow?.valor) {
+        const bl = JSON.parse(blRow.valor) as { ips?: string[]; emails?: string[] };
+        if (bl.ips && ip !== "unknown" && bl.ips.includes(ip)) {
+          return NextResponse.json({ error: "No se permite el registro desde esta red." }, { status: 403 });
+        }
+        if (bl.emails) {
+          const [localPart] = email.split("@");
+          const emailNorm = domain === "gmail.com" ? localPart.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : email.toLowerCase();
+          if (bl.emails.includes(emailNorm)) {
+            return NextResponse.json({ error: "Este correo no está permitido." }, { status: 403 });
+          }
+        }
+      }
+    } catch { /* blacklist check is best-effort */ }
+
     // Límite de cuentas por IP (máx 3 en 24h)
     if (ip !== "unknown") {
       const hace24h = new Date(Date.now() - 24 * 60 * 60 * 1000);

@@ -65,6 +65,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { tipo: "bloqueado" },
     });
 
+    // 5. Add to blacklist for future detection
+    try {
+      const blRow = await prisma.configSite.findUnique({ where: { clave: "blacklist_infractores" } });
+      const bl = blRow?.valor ? JSON.parse(blRow.valor) : { ips: [], emails: [], infractores: [] };
+      const userIp = participante.usuario.ipRegistro ?? "";
+      const [local, dom] = (participante.usuario.email ?? "").split("@");
+      const emailNorm = dom === "gmail.com" ? local.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : (participante.usuario.email ?? "").toLowerCase();
+      if (userIp && !bl.ips.includes(userIp)) bl.ips.push(userIp);
+      if (emailNorm && !bl.emails.includes(emailNorm)) bl.emails.push(emailNorm);
+      bl.infractores.push({ nombre: participante.usuario.nombre, email: participante.usuario.email, ip: userIp, motivo: motivo || "Descalificado por fraude", fecha: new Date().toISOString() });
+      bl.updatedAt = new Date().toISOString();
+      await prisma.configSite.update({ where: { clave: "blacklist_infractores" }, data: { valor: JSON.stringify(bl) } });
+    } catch { /* best effort */ }
+
     // 4. Send email if requested
     let emailEnviado = false;
     if (enviarEmail && participante.usuario.email) {
