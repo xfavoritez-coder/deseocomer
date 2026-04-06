@@ -393,7 +393,19 @@ export default function AdminConcursos() {
                         <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", padding: "3px 10px", borderRadius: 20, background: investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.2)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.2)" : "rgba(61,184,158,0.15)", color: investigacion.analisis.riesgo >= 60 ? "#ff6b6b" : investigacion.analisis.riesgo >= 30 ? "#e8a84c" : "#3db89e", border: `1px solid ${investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.4)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.4)" : "rgba(61,184,158,0.3)"}` }}>Riesgo: {investigacion.analisis.riesgo}%</span>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.totalReferidos} referidos</span>
-                          <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.participante.puntos} pts (campos suman {investigacion.analisis.sumaFields})</span>
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.participante.puntos} pts</span>
+                        </div>
+                        {/* Points breakdown */}
+                        <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(240,234,214,0.05)", color: "rgba(240,234,214,0.5)" }}>Base +1</span>
+                          {investigacion.participante.madrugador > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(232,168,76,0.08)", color: "#e8a84c" }}>Madrugador +{investigacion.participante.madrugador}</span>}
+                          {investigacion.participante.bonusRef > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>Bonus ref +{investigacion.participante.bonusRef}</span>}
+                          {investigacion.participante.refNuevos > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>Ref nuevos +{investigacion.participante.refNuevos}</span>}
+                          {investigacion.participante.refExistentes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.06)", color: "#3db89e" }}>Ref existentes +{investigacion.participante.refExistentes}</span>}
+                          {investigacion.participante.nivel2 > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(128,64,208,0.08)", color: "#a070e0" }}>Nivel 2 +{investigacion.participante.nivel2}</span>}
+                          {investigacion.participante.apoyos > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(224,80,144,0.08)", color: "#e05090" }}>Apoyos +{investigacion.participante.apoyos}</span>}
+                          {investigacion.participante.pendientes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(255,80,80,0.08)", color: "#ff8080" }}>Pendientes +{investigacion.participante.pendientes}</span>}
+                          {investigacion.analisis.puntosFantasma > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(255,80,80,0.12)", color: "#ff6b6b" }}>Sin respaldo +{investigacion.analisis.puntosFantasma}</span>}
                         </div>
                         {/* Alerts */}
                         <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 8 }}>
