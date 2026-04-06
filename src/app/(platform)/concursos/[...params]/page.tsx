@@ -115,7 +115,7 @@ function ConcursoDetallePage() {
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
-          setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0 });
+          setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0, descalificados: data.descalificados ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.slug || data.id);
           // Redirect from ID to slug if needed
           if (data.slug && slug !== data.slug && slug === data.id) {
@@ -566,6 +566,14 @@ function ConcursoDetallePage() {
           </>
         );
       })()}
+      {((concursoData as any)?.descalificados ?? 0) > 0 && (
+        <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(224,85,85,0.15)", display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 12 }}>🚫</span>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(224,85,85,0.6)" }}>
+            {(concursoData as any).descalificados} participante{(concursoData as any).descalificados !== 1 ? "s" : ""} descalificado{(concursoData as any).descalificados !== 1 ? "s" : ""} por fraude
+          </span>
+        </div>
+      )}
     </div>
   );
 

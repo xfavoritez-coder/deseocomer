@@ -56,9 +56,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Este email ya está registrado" }, { status: 400 });
     }
 
+    // Gmail dot trick detection: gmail ignores dots, so a.b@gmail = ab@gmail
+    if (domain === "gmail.com") {
+      const [localPart] = email.split("@");
+      const normalized = localPart.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "");
+      // Search for accounts with the same base (without dots) using LIKE patterns
+      // Generate a pattern: insert % between each char to match any dot placement
+      const likePattern = normalized.split("").join("%") + "@gmail.com";
+      const duplicates: { email: string }[] = await prisma.$queryRawUnsafe(
+        `SELECT email FROM "Usuario" WHERE LOWER(REPLACE(SPLIT_PART(email, '@', 1), '.', '')) = $1 AND LOWER(SPLIT_PART(email, '@', 2)) = 'gmail.com'`,
+        normalized
+      );
+      if (duplicates.length >= 2) {
+        return NextResponse.json(
+          { error: "Ya existen cuentas asociadas a este correo. No se permiten variaciones del mismo email." },
+          { status: 400 }
+        );
+      }
+    }
+
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
       || req.headers.get("x-real-ip")
       || "unknown";
+
+    // Block known datacenter/VPN IP ranges (common bot sources)
+    const DC_PREFIXES = ["51.158.", "51.159.", "51.81.", "62.210.", "15.204.", "15.235.", "94.242.", "146.70.", "141.95.", "54.36.", "51.77.", "51.75.", "198.27.", "66.70."];
+    if (ip !== "unknown" && DC_PREFIXES.some(p => ip.startsWith(p))) {
+      return NextResponse.json(
+        { error: "No se permite el registro desde esta red. Si estás usando VPN, desactívala e intenta de nuevo." },
+        { status: 403 }
+      );
+    }
 
     // Límite de cuentas por IP (máx 3 en 24h)
     if (ip !== "unknown") {

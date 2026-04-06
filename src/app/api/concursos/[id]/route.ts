@@ -15,6 +15,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
+    // Count disqualified participants for public transparency
+    const descalificados = await prisma.participanteConcurso.count({
+      where: { concursoId: concurso.id, estado: "descalificado" },
+    });
+
     // Increment view count (fire and forget)
     prisma.concurso.update({ where: { id: concurso.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
 
@@ -94,10 +99,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
         },
       });
-      return NextResponse.json(updated);
+      return NextResponse.json({ ...updated, descalificados });
     }
 
-    return NextResponse.json(concurso);
+    return NextResponse.json({ ...concurso, descalificados });
   } catch (error) {
     console.error("[API /concursos/[id]] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

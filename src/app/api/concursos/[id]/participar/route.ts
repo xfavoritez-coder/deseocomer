@@ -42,6 +42,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
+    // Rate limit: if referrer got 5+ referrals in last 15 min, mark as suspicious
+    if (referidorDirectoId) {
+      const hace15min = new Date(Date.now() - 15 * 60 * 1000);
+      const refRecientes = await prisma.participanteConcurso.count({
+        where: { concursoId: concurso.id, referidorDirectoId, createdAt: { gte: hace15min } },
+      });
+      if (refRecientes >= 5) {
+        // Mark referrer as suspicious
+        await prisma.participanteConcurso.updateMany({
+          where: { concursoId: concurso.id, usuarioId: referidorDirectoId, estado: "activo" },
+          data: { estado: "sospechoso" },
+        });
+      }
+    }
+
     // Bonus madrugador: primeros 10 participantes
     const totalParticipantes = await prisma.participanteConcurso.count({
       where: { concursoId: concurso.id }
