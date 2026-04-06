@@ -24,12 +24,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
 
-    // Turnstile verification — required for all registrations
+    // Turnstile verification — always required
+    if (!turnstileToken) {
+      return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
+    }
     const tsSecret = process.env.TURNSTILE_SECRET_KEY;
     if (tsSecret) {
-      if (!turnstileToken) {
-        return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
-      }
       const tsRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
