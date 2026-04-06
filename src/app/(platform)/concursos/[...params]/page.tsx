@@ -111,7 +111,7 @@ function ConcursoDetallePage() {
             condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
             endsAt: new Date(data.fechaFin).getTime(),
             ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" })),
-            reglas: ["Debes estar registrado en DeseoComer para entrar.", "Cada persona que se registre usando tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso."],
+            reglas: ["Debes estar registrado en DeseoComer para entrar.", "El ganador es quien más puntos tenga al cierre del concurso."],
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
@@ -574,9 +574,6 @@ function ConcursoDetallePage() {
     "Se requiere cuenta verificada en DeseoComer para entrar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
     "Queda estrictamente prohibido el uso de correos temporales, cuentas falsas o cualquier método fraudulento para acumular puntos.",
     "El local organizador y DeseoComer se reservan el derecho de descalificar a cualquier participante que presente patrones sospechosos de fraude, sin necesidad de justificación previa.",
-    "Cuando alguien entra por tu link de invitación, ambos ganan +3 puntos automáticamente — tú por invitar y tu amigo por unirse. Si el referido ya tenía cuenta, tú ganas +1 punto.",
-    "Los referidos de tus referidos suman +1 punto adicional para ti, con un máximo de 10 puntos acumulables por esta vía en cada concurso.",
-    "Los puntos de segundo nivel no se acreditan si se detecta que los registros provienen de la misma dirección IP o si fueron realizados en menos de 1 hora entre sí.",
     "DeseoComer actúa como plataforma intermediaria. La entrega del premio es responsabilidad exclusiva del local organizador.",
     "La participación en este concurso implica la aceptación total de estos términos y los Términos y Condiciones de DeseoComer.",
   ];
@@ -584,7 +581,7 @@ function ConcursoDetallePage() {
   const condicionesLocal = c.condiciones || "";
   const condicionesCortas = condicionesLocal.length > 200 ? condicionesLocal.slice(0, 200) + "..." : condicionesLocal;
   if (condicionesLocal) allRules.push(condicionesCortas);
-  allRules.push("Debes estar registrado en DeseoComer para entrar.", "Cada persona que se registre con tu link cuenta como 1 referido.", "El ganador es quien más puntos tenga al cierre del concurso.");
+  allRules.push("Debes estar registrado en DeseoComer para entrar.", "El ganador es quien más puntos tenga al cierre del concurso.");
   allRules.push(...condicionesSistema);
 
   return (
