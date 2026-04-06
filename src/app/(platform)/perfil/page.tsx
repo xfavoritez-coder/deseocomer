@@ -302,9 +302,15 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "8px" }}>
         {estadoBadge(p.estado)}
         {p.estado === "activo" && (
-          <button onClick={e => { e.stopPropagation(); copyLink(p.slug || p.concursoId); }} style={{ marginLeft: "auto", background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "4px 10px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--accent)" }}>
-            {copied === (p.slug || p.concursoId) ? "✓ Copiado" : "📋 Copiar link"}
-          </button>
+          <div style={{ marginLeft: "auto", display: "flex", gap: "6px" }}>
+            <button onClick={e => { e.stopPropagation(); const url = `/api/concursos/${p.slug || p.concursoId}/story-user?userId=${userId}`; const a = document.createElement("a"); a.href = url; a.download = `story-${p.slug || p.concursoId}.png`; a.click(); }} style={{ background: "rgba(225,48,108,0.1)", border: "1px solid rgba(225,48,108,0.25)", borderRadius: "8px", padding: "4px 10px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "#E1306C", display: "flex", alignItems: "center", gap: "4px" }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1.5" fill="#E1306C" stroke="none" /></svg>
+              Story
+            </button>
+            <button onClick={e => { e.stopPropagation(); copyLink(p.slug || p.concursoId); }} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "4px 10px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", color: "var(--accent)" }}>
+              {copied === (p.slug || p.concursoId) ? "✓ Copiado" : "📋 Link"}
+            </button>
+          </div>
         )}
       </div>
       {expandedConcurso === p.concursoId && (

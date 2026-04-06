@@ -810,14 +810,27 @@ function ConcursoDetallePage() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
                     Compartir por WhatsApp
                   </button>
+                  {/* Instagram story */}
+                  <button onClick={() => { const url = `/api/concursos/${concursoId}/story-user?userId=${user?.id}`; const a = document.createElement("a"); a.href = url; a.download = `story-${c?.slug || concursoId}.png`; a.click(); }} style={{ width: "100%", marginTop: 8, background: "rgba(225,48,108,0.1)", border: "1px solid rgba(225,48,108,0.3)", borderRadius: 10, padding: 13, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#E1306C", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E1306C" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5" /><circle cx="12" cy="12" r="5" /><circle cx="17.5" cy="6.5" r="1.5" fill="#E1306C" stroke="none" /></svg>
+                    Compartir por Instagram
+                  </button>
                   {/* Código personal */}
                   {user?.codigoRef && (
                     <div style={{ marginTop: 12 }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: 6 }}>Tu código de invitación</p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", margin: 0 }}>Tu código de invitación</p>
+                        <button onClick={() => setTooltipActivo(tooltipActivo === "codigoRef" ? null : "codigoRef")} style={{ width: 16, height: 16, borderRadius: "50%", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, fontWeight: 800, color: "rgba(232,168,76,0.6)", fontStyle: "italic", padding: 0, lineHeight: 1 }}>i</button>
+                      </div>
+                      {tooltipActivo === "codigoRef" && (
+                        <div style={{ background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 8 }}>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>Este código es para amigos que <strong style={{ color: "#e8a84c" }}>ya tienen cuenta</strong> en DeseoComer. Si lo ingresan en un concurso, ambos ganan <strong style={{ color: "#3db89e" }}>+2 puntos</strong>. Para amigos nuevos, mejor comparte tu link — les da <strong style={{ color: "#3db89e" }}>+3 puntos</strong> a cada uno.</p>
+                        </div>
+                      )}
                       <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.12em" }}>{user.codigoRef}</span>
                       </div>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.4)", marginTop: 6 }}>Comparte este código con amigos que ya están en DeseoComer</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", marginTop: 6 }}>Para amigos que ya están en DeseoComer</p>
                     </div>
                   )}
                 </div>
@@ -834,7 +847,7 @@ function ConcursoDetallePage() {
               ) : null}
             </div>
             <div style={{ borderTop: "1px solid rgba(232,168,76,0.1)", padding: "10px 20px", textAlign: "center" }}>
-              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px" }}>❓ ¿Cómo funcionan los concursos?</Link>
+              <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(232,168,76,0.6)", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>¿Cómo funcionan los concursos?</Link>
             </div>
           </div>
           ) : null}

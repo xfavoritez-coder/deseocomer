@@ -8,6 +8,7 @@ export async function GET(
 ) {
  try {
   const { id } = await params;
+  const userId = request.nextUrl.searchParams.get("userId");
 
   const concurso = await prisma.concurso.findFirst({
     where: { OR: [{ id }, { slug: id }] },
@@ -18,7 +19,15 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  // Load fonts dynamically via Google Fonts CSS API (always returns valid URLs)
+  // Get user name
+  let userName = "Alguien";
+  if (userId) {
+    const user = await prisma.usuario.findUnique({ where: { id: userId }, select: { nombre: true } });
+    if (user) userName = user.nombre.split(" ")[0];
+  }
+  const userNameCap = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+  // Load fonts
   async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
     const cssUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&display=swap`;
     const css = await fetch(cssUrl, { headers: { "User-Agent": "Mozilla/5.0 (Linux; Android 10)" } }).then(r => r.text());
@@ -37,7 +46,7 @@ export async function GET(
       fetchFont("Lato", 700),
     ]);
   } catch (fontErr) {
-    console.error("[story-image] Font load error:", fontErr);
+    console.error("[story-user] Font load error:", fontErr);
     return new Response(`Font load failed: ${fontErr}`, { status: 500 });
   }
 
@@ -53,7 +62,6 @@ export async function GET(
   const esSorteo = concurso.modalidadConcurso === "sorteo";
   const esProximamente = concurso.estado === "programado";
 
-  // Theme per type
   const theme = esProximamente
     ? {
         badgeColor: "#a78bfa",
@@ -62,9 +70,11 @@ export async function GET(
         gradientTop: "rgba(30,15,60,0.8)",
         accentColor: "#c4b5fd",
         titleColor: "#ddd6fe",
-        emoji: "\u{1F52E}",       // 🔮
-        subtitulo: "S\u00e9 de los primeros y gana ventaja",
+        emoji: "\u{1F52E}",
+        headerText: `${userNameCap} se est\u00e1 anotando en...`,
+        subtitulo: "An\u00f3tate conmigo y gana ventaja",
         cta: "Avisame gratis",
+        ctaIcon: "\u{1F514}",
         ctaBg: "rgba(167,139,250,0.15)",
         ctaBorder: "rgba(167,139,250,0.4)",
         ctaIconBg: "rgba(167,139,250,0.15)",
@@ -79,9 +89,11 @@ export async function GET(
         gradientTop: "rgba(40,10,30,0.75)",
         accentColor: "#f472b6",
         titleColor: "#fce7f3",
-        emoji: "\u{1F3B2}",       // 🎲
-        subtitulo: "Cada punto es un boleto \u2014 m\u00e1s boletos, m\u00e1s chances",
+        emoji: "\u{1F3B2}",
+        headerText: `${userNameCap} est\u00e1 participando por...`,
+        subtitulo: "Entra por mi link y ambos sumamos boletos",
         cta: "Entra al sorteo",
+        ctaIcon: "\u{1F3B0}",
         ctaBg: "rgba(236,72,153,0.15)",
         ctaBorder: "rgba(236,72,153,0.4)",
         ctaIconBg: "rgba(236,72,153,0.15)",
@@ -89,16 +101,17 @@ export async function GET(
         dividerColor: "rgba(236,72,153,0.25)",
       }
     : {
-        // Mérito (default)
         badgeColor: "#3db89e",
         badgeText: "CONCURSO",
         overlayColor: "rgba(10,8,18,0.45)",
         gradientTop: "rgba(10,8,18,0.7)",
         accentColor: "#e8a84c",
         titleColor: "#f5d080",
-        emoji: "\u{1F3C6}",       // 🏆
-        subtitulo: "Invita amigos, suma puntos y gana",
+        emoji: "\u{1F3C6}",
+        headerText: `${userNameCap} est\u00e1 participando por...`,
+        subtitulo: "Entra por mi link y ambos ganamos 3 puntos",
         cta: "Participa gratis",
+        ctaIcon: "\u{1F517}",
         ctaBg: "rgba(232,168,76,0.15)",
         ctaBorder: "rgba(232,168,76,0.3)",
         ctaIconBg: "rgba(232,168,76,0.15)",
@@ -116,38 +129,33 @@ export async function GET(
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: theme.overlayColor, display: "flex" }} />
         {/* Top gradient */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to bottom, ${theme.gradientTop}, transparent)`, display: "flex" }} />
-        {/* Bottom gradient for sorteo/proximamente */}
-        {(esSorteo || esProximamente) && (
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
-        )}
+        {/* Bottom gradient */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
         {/* Badge ribbon */}
         <div style={{ position: "absolute", top: "88px", right: "-112px", width: "480px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", transform: "rotate(45deg)" }}>
           <span style={{ fontFamily: "Cinzel", fontSize: "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em", textTransform: "uppercase" }}>{theme.badgeText}</span>
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
+          {/* User header — personal touch */}
+          <span style={{ fontFamily: "Lato", fontSize: "48px", fontWeight: 700, color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.headerText}</span>
           {/* Local name */}
-          <span style={{ fontFamily: "Lato", fontSize: "44px", color: "rgba(240,234,214,0.8)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
-          {/* Emoji + subtitle */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px" }}>
-            <span style={{ fontSize: "52px" }}>{theme.emoji}</span>
-            <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 800, color: theme.accentColor, letterSpacing: "0.16em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
-              {esProximamente ? "Nuevo concurso" : esSorteo ? "Sorteo de premio" : "Gana gratis este premio"}
-            </span>
-          </div>
+          <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.6)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
+          {/* Emoji */}
+          <span style={{ fontSize: "72px" }}>{theme.emoji}</span>
           {/* Prize title */}
           <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
-          {/* Description text */}
+          {/* Motivation text */}
           <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
           {/* CTA button */}
           <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
-            <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>
-              {esProximamente ? "\u{1F514}" : esSorteo ? "\u{1F3B0}" : "\u{1F517}"}
-            </div>
+            <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
             <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
           </div>
+          {/* Subtle personal invite text */}
+          <span style={{ fontFamily: "Lato", fontSize: "28px", color: "rgba(240,234,214,0.3)", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>{userNameCap} te invita</span>
         </div>
       </div>
     ),
@@ -158,7 +166,7 @@ export async function GET(
     }
   );
  } catch (err) {
-  console.error("[story-image] Error:", err);
-  return new Response(`Story image error: ${err instanceof Error ? err.message : String(err)}`, { status: 500 });
+  console.error("[story-user] Error:", err);
+  return new Response(`Story user image error: ${err instanceof Error ? err.message : String(err)}`, { status: 500 });
  }
 }
