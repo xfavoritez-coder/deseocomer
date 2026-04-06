@@ -7,7 +7,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const concurso = await prisma.concurso.findFirst({
       where: { OR: [{ id }, { slug: id }] },
       include: {
-        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true } },
+        local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true, categorias: true } },
         participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true, email: true, telefono: true, codigoRef: true } } }, orderBy: { puntos: "desc" } },
         ganadorActual: { select: { id: true, nombre: true } },
         _count: { select: { participantes: { where: { estado: { not: "descalificado" } } }, listaEspera: true } },
@@ -88,7 +88,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       const updated = await prisma.concurso.findFirst({
         where: { id: concurso.id },
         include: {
-          local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true } },
+          local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true, categorias: true } },
           participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true } } }, orderBy: { puntos: "desc" } },
           ganadorActual: { select: { id: true, nombre: true } },
           _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },

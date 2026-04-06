@@ -20,10 +20,13 @@ import {
 type Filter = "todos" | "activos" | "por_terminar" | "finalizados";
 interface TimeLeft { dias: number; horas: number; minutos: number; segundos: number; ended: boolean }
 
+const isVegano = (cats: string[]) => cats.some(c => /vegan[oa]?/i.test(c));
+
 export default function ConcursosPage() {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
   const [filter, setFilter] = useState<Filter>("todos");
+  const [soloVegano, setSoloVegano] = useState(false);
   const [timers, setTimers] = useState<Record<string, TimeLeft>>({});
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [concursos, setConcursos] = useState<any[]>([]);
@@ -45,7 +48,7 @@ export default function ConcursosPage() {
           participantes: c._count?.participantes ?? 0,
           endsAt: new Date(c.fechaFin).getTime(),
           createdAt: c.createdAt ?? c.fechaInicio ?? null,
-          localCategoria: c.local?.categoria ?? "",
+          localCategorias: c.local?.categorias ?? [],
           localComuna: c.local?.comuna ?? "",
           estado: c.estado ?? "activo",
           modalidadConcurso: c.modalidadConcurso ?? "meritos",
@@ -105,7 +108,10 @@ export default function ConcursosPage() {
     return score;
   }
 
+  const hayVeganos = concursos.some(c => isVegano(c.localCategorias ?? []));
+
   const sorted = [...concursos].filter(c => {
+    if (soloVegano && !isVegano(c.localCategorias ?? [])) return false;
     const ended = getTimeLeft(c.endsAt).ended;
     const sa = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() : null;
     const soon = isSoonEnding(c.endsAt, sa);
@@ -158,6 +164,11 @@ export default function ConcursosPage() {
               {key === "por_terminar" && <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#ff4444", marginLeft: 7, verticalAlign: "middle", boxShadow: "0 0 6px #ff4444" }} />}
             </button>
           ))}
+          {hayVeganos && (
+            <button onClick={() => setSoloVegano(!soloVegano)} style={{ fontFamily: "var(--font-lato)", fontSize: 12, padding: "5px 12px", borderRadius: 20, cursor: "pointer", border: soloVegano ? "1px solid rgba(76,175,80,0.5)" : "1px solid rgba(240,234,214,0.1)", background: soloVegano ? "rgba(76,175,80,0.15)" : "transparent", color: soloVegano ? "#66bb6a" : "rgba(240,234,214,0.35)", transition: "all 0.2s", whiteSpace: "nowrap" as const }}>
+              🌱 Vegano
+            </button>
+          )}
         </div>
 
         {filter === "finalizados" ? (
@@ -324,6 +335,7 @@ export default function ConcursosPage() {
                       {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
                         : <div style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "#0a0812", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c" }}>{localInitial}</div>}
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{c.local}</span>
+                      {isVegano(c.localCategorias ?? []) && <span style={{ fontSize: 10, color: "rgba(76,175,80,0.7)", fontFamily: "var(--font-lato)", letterSpacing: "0.04em" }}>🌱</span>}
                     </div>
                     {/* Título */}
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}><span style={{ fontSize: 16 }}>🏆 </span>{c.premio}</div>

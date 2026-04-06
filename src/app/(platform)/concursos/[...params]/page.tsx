@@ -104,6 +104,8 @@ function ConcursoDetallePage() {
             id: data.id ?? 0, slug: data.slug ?? "", local: data.local?.nombre ?? "Local",
             localId: data.local?.id ?? "", localSlug: data.local?.slug ?? "",
             localLogoUrl: data.local?.logoUrl ?? null,
+            localCategoria: data.local?.categorias?.[0] ?? null,
+            localCategorias: data.local?.categorias ?? [],
             imagen: "🏆", imagenUrl: data.imagenUrl ?? data.local?.portadaUrl ?? "",
             premio: data.premio ?? "", descripcionPremio: data.descripcion ?? "",
             condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
@@ -1001,7 +1003,11 @@ function ConcursoDetallePage() {
             {c.localLogoUrl ? <img src={c.localLogoUrl} alt={c.local} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.3)", flexShrink: 0 }} />
               : <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "2px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{localInitials}</div>}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>{c.local}</p>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>{c.local}</p>
+                {((c as any).localCategorias ?? []).some((cat: string) => /vegan[oa]?/i.test(cat)) && <span style={{ fontSize: 10, color: "rgba(76,175,80,0.7)", fontFamily: "var(--font-lato)" }}>🌱</span>}
+              </div>
+              {(c as any).localCategoria && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", margin: "0 0 4px", textTransform: "capitalize" }}>{(c as any).localCategoria}</p>}
               <Link href={`/locales/${c.localSlug || c.localId}`} style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "#3db89e", textDecoration: "none" }}>Ver perfil completo →</Link>
             </div>
           </div>
@@ -1127,10 +1133,10 @@ function ConcursoDetallePage() {
         }
         .dc-como-card { cursor: default; }
         @media (min-width: 1024px) {
-          .dc-como-card { cursor: pointer; }
+          .dc-como-card { cursor: default; }
           .dc-como-card .dc-como-tooltip { display: none !important; }
-          .dc-como-card:hover .dc-como-tooltip { display: block !important; }
-          .dc-como-card .dc-como-info-btn { pointer-events: none; }
+          .dc-como-info-btn:hover + .dc-como-tooltip,
+          .dc-como-info-btn:focus + .dc-como-tooltip { display: block !important; }
         }
         @keyframes dc-pd { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes dc-slideUp { from{opacity:0;transform:translateX(-50%) translateY(16px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
