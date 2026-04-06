@@ -6,6 +6,26 @@ import * as crypto from "crypto";
 import { promises as dns } from "dns";
 import disposableDomains from "disposable-email-domains";
 
+// In-memory blacklist cache (refreshed every 5 minutes)
+let cachedBlacklist: { ips: string[]; emails: string[] } | null = null;
+let blacklistLoadedAt = 0;
+async function getBlacklist() {
+  if (cachedBlacklist && Date.now() - blacklistLoadedAt < 5 * 60 * 1000) return cachedBlacklist;
+  try {
+    const row = await prisma.configSite.findUnique({ where: { clave: "blacklist_infractores" } });
+    if (row?.valor) {
+      const bl = JSON.parse(row.valor);
+      cachedBlacklist = { ips: bl.ips ?? [], emails: bl.emails ?? [] };
+    } else {
+      cachedBlacklist = { ips: [], emails: [] };
+    }
+  } catch {
+    cachedBlacklist = cachedBlacklist ?? { ips: [], emails: [] };
+  }
+  blacklistLoadedAt = Date.now();
+  return cachedBlacklist;
+}
+
 async function generarCodigoRef(nombre: string): Promise<string> {
   const base = nombre.replace(/\s/g, '').slice(0, 4).toUpperCase().replace(/[^A-Z]/g, 'X');
   for (let i = 0; i < 10; i++) {
@@ -105,23 +125,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check blacklist (IPs and emails of known fraudsters)
-    try {
-      const blRow = await prisma.configSite.findUnique({ where: { clave: "blacklist_infractores" } });
-      if (blRow?.valor) {
-        const bl = JSON.parse(blRow.valor) as { ips?: string[]; emails?: string[] };
-        if (bl.ips && ip !== "unknown" && bl.ips.includes(ip)) {
-          return NextResponse.json({ error: "No se permite el registro desde esta red." }, { status: 403 });
-        }
-        if (bl.emails) {
-          const [localPart] = email.split("@");
-          const emailNorm = domain === "gmail.com" ? localPart.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : email.toLowerCase();
-          if (bl.emails.includes(emailNorm)) {
-            return NextResponse.json({ error: "Este correo no está permitido." }, { status: 403 });
-          }
-        }
-      }
-    } catch { /* blacklist check is best-effort */ }
+    // Check blacklist (cached in memory, no DB query)
+    const bl = await getBlacklist();
+    if (ip !== "unknown" && bl.ips.includes(ip)) {
+      return NextResponse.json({ error: "No se permite el registro desde esta red." }, { status: 403 });
+    }
+    const [localPart] = email.split("@");
+    const emailNorm = domain === "gmail.com" ? localPart.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : email.toLowerCase();
+    if (bl.emails.includes(emailNorm)) {
+      return NextResponse.json({ error: "Este correo no está permitido." }, { status: 403 });
+    }
 
     // Límite de cuentas por IP (máx 3 en 24h)
     if (ip !== "unknown") {
