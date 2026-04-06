@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 
 export default function StoryUserPage() {
@@ -7,7 +7,20 @@ export default function StoryUserPage() {
   const searchParams = useSearchParams();
   const userId = searchParams.get("userId") || "";
   const [copied, setCopied] = useState(false);
-  const link = `deseocomer.com/concursos/${slug}`;
+  const [refCode, setRefCode] = useState("");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    if (!userId) return;
+    fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(userId)}`).then(r => r.ok ? r.json() : null).then(d => {
+      if (d?.codigoRef) setRefCode(d.codigoRef);
+      if (d?.nombre) setUserName(d.nombre.split(" ")[0]);
+    }).catch(() => {});
+  }, [userId]);
+
+  const link = refCode
+    ? `deseocomer.com/concursos/${slug}/${encodeURIComponent(userName || "amigo")}/${refCode}`
+    : `deseocomer.com/concursos/${slug}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(`https://${link}`).then(() => {
