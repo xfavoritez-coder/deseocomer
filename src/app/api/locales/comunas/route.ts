@@ -10,10 +10,10 @@ export async function GET() {
 
     if (cached?.valor) {
       try {
-        const data = JSON.parse(cached.valor) as { conteo: Record<string, number>; conteoDelivery: Record<string, number>; totalLocales?: number };
+        const data = JSON.parse(cached.valor) as { conteo: Record<string, number>; conteoDelivery: Record<string, number>; conteoCategorias?: Record<string, number>; totalLocales?: number };
         const comunas = Object.keys(data.conteo).sort((a, b) => a.localeCompare(b));
         const comunasDelivery = Object.keys(data.conteoDelivery).sort((a, b) => a.localeCompare(b));
-        return NextResponse.json({ comunas, comunasDelivery, conteo: data.conteo, conteoDelivery: data.conteoDelivery, totalLocales: data.totalLocales ?? 0 }, {
+        return NextResponse.json({ comunas, comunasDelivery, conteo: data.conteo, conteoDelivery: data.conteoDelivery, conteoCategorias: data.conteoCategorias ?? {}, totalLocales: data.totalLocales ?? 0 }, {
           headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
         });
       } catch { /* fall through to live query */ }
@@ -54,10 +54,13 @@ export async function GET() {
     const comunas = Object.keys(conteo).sort((a, b) => a.localeCompare(b));
     const comunasDelivery = Object.keys(conteoDelivery).sort((a, b) => a.localeCompare(b));
 
-    return NextResponse.json({ comunas, comunasDelivery, conteo, conteoDelivery, totalLocales: locales.length }, {
+    const conteoCategorias: Record<string, number> = {};
+    for (const l of locales) { for (const cat of (l as any).categorias ?? []) { if (cat) conteoCategorias[cat] = (conteoCategorias[cat] ?? 0) + 1; } }
+
+    return NextResponse.json({ comunas, comunasDelivery, conteo, conteoDelivery, conteoCategorias, totalLocales: locales.length }, {
       headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
     });
   } catch {
-    return NextResponse.json({ comunas: [], comunasDelivery: [], conteo: {}, conteoDelivery: {}, totalLocales: 0 });
+    return NextResponse.json({ comunas: [], comunasDelivery: [], conteo: {}, conteoDelivery: {}, conteoCategorias: {}, totalLocales: 0 });
   }
 }

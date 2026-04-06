@@ -72,7 +72,7 @@ const PREGUNTA: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSi
 const CHIP: React.CSSProperties = { background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" };
 
 export default function GeniePanel() {
-  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales, comunasDelivery, comunasConteo, comunasConteoDelivery, quickRec, setQuickRec } = useGenie();
+  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales, comunasDelivery, comunasConteo, comunasConteoDelivery, conteoCategorias, quickRec, setQuickRec } = useGenie();
   const COMUNAS_CON_COBERTURA = useMemo(() => comunasConLocales, [comunasConLocales]);
   const COMUNAS_DELIVERY = useMemo(() => comunasDelivery, [comunasDelivery]);
 
@@ -321,7 +321,15 @@ export default function GeniePanel() {
               <button onClick={() => setStepActual(2)} style={VOLVER}>← Volver</button>
               <p style={PREGUNTA}>¿Qué te provoca hoy?</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {CATEGORIAS.map(c => <button key={c.label} onClick={() => handleCategoria(c.label)} style={CHIP}>{c.emoji} {c.label}</button>)}
+                {CATEGORIAS.map(c => {
+                  const count = conteoCategorias[c.label] ?? 0;
+                  return (
+                    <button key={c.label} onClick={() => handleCategoria(c.label)} style={{ ...CHIP, display: "flex", alignItems: "center", gap: "6px" }}>
+                      {c.emoji} {c.label}
+                      {count > 0 && <span style={{ fontSize: "0.68rem", color: "rgba(61,184,158,0.7)", fontWeight: 600 }}>{count}</span>}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

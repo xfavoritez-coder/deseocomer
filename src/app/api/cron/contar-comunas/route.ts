@@ -14,19 +14,19 @@ export async function GET() {
         comuna: { not: "" },
         NOT: { estadoLocal: "RECHAZADO" },
       },
-      select: { comuna: true, tieneDelivery: true, comunasDelivery: true },
+      select: { comuna: true, tieneDelivery: true, comunasDelivery: true, categorias: true },
     });
 
     // Count locals per comuna (only valid comunas)
     const conteo: Record<string, number> = {};
     const conteoDelivery: Record<string, number> = {};
+    const conteoCategorias: Record<string, number> = {};
 
     for (const l of locales) {
       const c = l.comuna;
       if (c && esComunaValida(c)) {
         conteo[c] = (conteo[c] ?? 0) + 1;
       }
-      // Delivery: count the local's own comuna + all delivery comunas
       if (l.tieneDelivery && c && esComunaValida(c)) {
         conteoDelivery[c] = (conteoDelivery[c] ?? 0) + 1;
       }
@@ -35,9 +35,12 @@ export async function GET() {
           conteoDelivery[dc] = (conteoDelivery[dc] ?? 0) + 1;
         }
       }
+      for (const cat of l.categorias ?? []) {
+        if (cat) conteoCategorias[cat] = (conteoCategorias[cat] ?? 0) + 1;
+      }
     }
 
-    const data = JSON.stringify({ conteo, conteoDelivery, totalLocales: locales.length, updatedAt: new Date().toISOString() });
+    const data = JSON.stringify({ conteo, conteoDelivery, conteoCategorias, totalLocales: locales.length, updatedAt: new Date().toISOString() });
 
     await prisma.configSite.upsert({
       where: { clave: "comunas_conteo" },
