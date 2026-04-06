@@ -10,4 +10,5 @@ export const prisma =
     log: process.env.NODE_ENV === "development" ? ["query"] : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// Always cache the instance to reuse connections across requests (Fluid Compute)
+globalForPrisma.prisma = prisma;
