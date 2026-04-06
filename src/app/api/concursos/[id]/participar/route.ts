@@ -97,7 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       console.error("[Email primer participante] Error:", emailErr);
     }
 
-    // Referral points: +3 si referido es nuevo (< 7 días), +2 si existente
+    // Referral points: +3 si referido es nuevo (< 7 días), +1 si existente
     if (referidoPor) {
       const refParticipante = await prisma.participanteConcurso.findUnique({
         where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidoPor } },
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       if (refParticipante) {
         const referidoUser = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { createdAt: true, emailVerificado: true, ipRegistro: true } });
         const esNuevo = referidoUser && (Date.now() - new Date(referidoUser.createdAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
-        const puntosRef = esNuevo ? 3 : 2;
+        const puntosRef = esNuevo ? 3 : 1;
 
         if (referidoUser?.emailVerificado) {
           // Usuario ya verificado → acreditar puntos directamente

@@ -114,7 +114,7 @@ export default async function ComoFuncionaPage() {
           <div className="cf-puntos">
             {[
               { icon: "🆕", pts: "+3", color: "#e8a84c", label: "Traes a alguien nuevo a DeseoComer", highlight: true },
-              { icon: "👥", pts: "+2", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
+              { icon: "👥", pts: "+1", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
               { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
               { icon: "🔗", pts: "+1", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
               { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
@@ -135,7 +135,7 @@ export default async function ComoFuncionaPage() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
                 Invitas a María (nueva en DC) → <strong style={{ color: "#3db89e" }}>+3 puntos</strong> para ti<br/>
-                Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+2 puntos</strong> para ti<br/>
+                Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+1 punto</strong> para ti<br/>
                 María invita a Juan → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong><br/>
                 María invita a Ana → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong>
               </p>
@@ -150,7 +150,7 @@ export default async function ComoFuncionaPage() {
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Trae amigos que ya están en DeseoComer</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Si tienes amigos que ya están registrados, puedes invitarlos a participar en cada concurso. Comparte tu link o código personal y gana +2 puntos por cada uno que participe. Tu código aparece en la página de cada concurso cuando estás participando.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Si tienes amigos que ya están registrados, puedes invitarlos a participar en cada concurso. Comparte tu link o código personal y gana +1 punto por cada uno que participe. Tu código aparece en la página de cada concurso cuando estás participando.</p>
           </div>
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
@@ -164,7 +164,7 @@ export default async function ComoFuncionaPage() {
               </div>
               <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "16px" }}>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", marginBottom: 8 }}>🔑 Tu código de invitación</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.6, marginBottom: 8 }}>Para amigos que <strong style={{ color: "#f0ead6" }}>ya tienen cuenta</strong> en DeseoComer. Ingresan tu código al participar y ambos ganan <strong style={{ color: "#e8a84c" }}>+2 puntos</strong>.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.6, marginBottom: 8 }}>Para amigos que <strong style={{ color: "#f0ead6" }}>ya tienen cuenta</strong> en DeseoComer. Ingresan tu código al participar y ambos ganan <strong style={{ color: "#e8a84c" }}>+1 punto</strong>.</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", fontStyle: "italic" }}>Pásales tu código por mensaje para que lo ingresen.</p>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default async function ComoFuncionaPage() {
               { q: "¿Cómo sé que el concurso es real?", a: "Todos los locales en DeseoComer están verificados. Puedes ver el historial completo de ganadores anteriores con nombre y fecha." },
               { q: "¿Puedo participar en más de un concurso?", a: "Sí, puedes participar en todos los concursos activos al mismo tiempo con la misma cuenta." },
               { q: "¿Qué pasa si gano?", a: "Te contactamos por email dentro de las 24 horas siguientes al cierre del concurso para coordinar cómo retirar tu premio." },
-              { q: "¿Los referidos deben ser cuentas nuevas?", a: "No necesariamente. Si traes a alguien nuevo a DeseoComer ganas +3 puntos, y si invitas a un amigo que ya tiene cuenta ganas +2 puntos. En ambos casos deben usar tu link o código." },
+              { q: "¿Los referidos deben ser cuentas nuevas?", a: "No necesariamente. Si traes a alguien nuevo a DeseoComer ganas +3 puntos, y si invitas a un amigo que ya tiene cuenta ganas +1 punto. En ambos casos deben usar tu link o código." },
               { q: "¿Cada cuánto puedo apoyar a un participante?", a: "Puedes darle +1 punto a cada participante una vez al día. Al día siguiente puedes volver a apoyarlo." },
               { q: "¿El premio es canjeable por efectivo?", a: "No. El premio es el producto o servicio indicado en el concurso, no es canjeable por dinero." },
             ].map((faq, i) => (

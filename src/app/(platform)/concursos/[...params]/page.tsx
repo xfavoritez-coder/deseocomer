@@ -572,7 +572,7 @@ function ConcursoDetallePage() {
     "Se requiere cuenta verificada en DeseoComer para entrar. Los puntos de referidos solo se acreditan una vez que el referido verifica su correo.",
     "Queda estrictamente prohibido el uso de correos temporales, cuentas falsas o cualquier método fraudulento para acumular puntos.",
     "El local organizador y DeseoComer se reservan el derecho de descalificar a cualquier participante que presente patrones sospechosos de fraude, sin necesidad de justificación previa.",
-    "Cuando alguien entra por tu link de invitación, ambos ganan +3 puntos automáticamente — tú por invitar y tu amigo por unirse. Si el referido ya tenía cuenta, tú ganas +2 puntos.",
+    "Cuando alguien entra por tu link de invitación, ambos ganan +3 puntos automáticamente — tú por invitar y tu amigo por unirse. Si el referido ya tenía cuenta, tú ganas +1 punto.",
     "Los referidos de tus referidos suman +1 punto adicional para ti, con un máximo de 10 puntos acumulables por esta vía en cada concurso.",
     "Los puntos de segundo nivel no se acreditan si se detecta que los registros provienen de la misma dirección IP o si fueron realizados en menos de 1 hora entre sí.",
     "DeseoComer actúa como plataforma intermediaria. La entrega del premio es responsabilidad exclusiva del local organizador.",
@@ -824,7 +824,7 @@ function ConcursoDetallePage() {
                       </div>
                       {tooltipActivo === "codigoRef" && (
                         <div style={{ background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 14px", marginBottom: 8 }}>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>Este código es para amigos que <strong style={{ color: "#e8a84c" }}>ya tienen cuenta</strong> en DeseoComer. Si lo ingresan en un concurso, ambos ganan <strong style={{ color: "#3db89e" }}>+2 puntos</strong>. Para amigos nuevos, mejor comparte tu link — les da <strong style={{ color: "#3db89e" }}>+3 puntos</strong> a cada uno.</p>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>Este código es para amigos que <strong style={{ color: "#e8a84c" }}>ya tienen cuenta</strong> en DeseoComer. Si lo ingresan en un concurso, ambos ganan <strong style={{ color: "#3db89e" }}>+1 punto</strong>. Para amigos nuevos, mejor comparte tu link — les da <strong style={{ color: "#3db89e" }}>+3 puntos</strong> a cada uno.</p>
                         </div>
                       )}
                       <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 10, padding: "10px 16px", textAlign: "center" }}>
@@ -874,7 +874,7 @@ function ConcursoDetallePage() {
                 {[
   { icon: "🎟️", pts: "+1", label: "Al entrar", id: "tt1", ttTitle: "Al entrar al concurso", ttText: "Por unirte ganas 1 punto base. Si entraste por el link de un amigo, ambos ganan 3 puntos adicionales automáticamente.", ttPts: "+1 punto (o +4 si entraste por un link)" },
   { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ambos ganan 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos para cada uno" },
-  { icon: "👥", pts: "+2", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 2 puntos por cada uno.", ttPts: "+2 puntos" },
+  { icon: "👥", pts: "+1", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 1 punto por cada uno.", ttPts: "+1 punto" },
   { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
   { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
   { icon: "💛", pts: "+1", label: "Al recibir apoyo", id: "tt6", ttTitle: "Al recibir apoyo", ttText: "Cuando otro participante toca el corazón en tu perfil del ranking, tú ganas +1 punto. Solo puedes recibir un apoyo por persona cada 24 horas.", ttPts: "+1 punto para ti" },

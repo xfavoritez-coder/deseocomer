@@ -120,7 +120,7 @@ export default function QueEsDeseoComerPage() {
             <div style={{ display: "flex", gap: 10 }}>
               {[
                 { pts: "+1", label: "Al registrarte" },
-                { pts: "+2", label: "Por referido" },
+                { pts: "+3", label: "Referido nuevo" },
                 { pts: "+1", label: "Al recibir apoyo" },
               ].map(p => (
                 <div key={p.label} style={{ flex: 1, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 12, padding: "14px 8px", textAlign: "center" }}>
