@@ -18,10 +18,30 @@ async function generarCodigoRef(nombre: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { nombre, email, password, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, estiloAlimentario, comidasFavoritas, refCode, concursoId: refConcursoId } = await req.json();
+    const { nombre, email, password, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, estiloAlimentario, comidasFavoritas, refCode, concursoId: refConcursoId, turnstileToken } = await req.json();
 
     if (!nombre || !email || !password) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
+    }
+
+    // Turnstile verification
+    if (turnstileToken) {
+      const tsRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          secret: process.env.TURNSTILE_SECRET_KEY || "",
+          response: turnstileToken,
+          remoteip: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "",
+        }),
+      });
+      const tsData = await tsRes.json();
+      if (!tsData.success) {
+        return NextResponse.json({ error: "Verificación de seguridad fallida. Recarga la página e intenta de nuevo." }, { status: 403 });
+      }
+    } else if (process.env.TURNSTILE_SECRET_KEY) {
+      // If Turnstile is configured but no token provided, block
+      return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
     }
 
     // Blacklist de dominios desechables

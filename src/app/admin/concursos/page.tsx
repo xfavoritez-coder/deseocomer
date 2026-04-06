@@ -16,6 +16,46 @@ export default function AdminConcursos() {
   const [participantesAdmin, setParticipantesAdmin] = useState<Participante[]>([]);
   const [loadingParticipantes, setLoadingParticipantes] = useState(false);
   const [editando, setEditando] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [investigacion, setInvestigacion] = useState<any>(null);
+  const [investigandoId, setInvestigandoId] = useState<string | null>(null);
+  const [enviarEmailDesc, setEnviarEmailDesc] = useState(true);
+  const [motivoDesc, setMotivoDesc] = useState("Uso de cuentas múltiples y/o métodos fraudulentos para acumular puntos.");
+  const [descLoading, setDescLoading] = useState(false);
+  const [descResult, setDescResult] = useState<string | null>(null);
+
+  const investigar = async (userId: string) => {
+    if (investigandoId === userId) { setInvestigacion(null); setInvestigandoId(null); setDescResult(null); return; }
+    setInvestigandoId(userId); setDescResult(null);
+    try {
+      const r = await adminFetch(`/api/admin/concursos/${sel.id}/investigar?userId=${userId}`);
+      const data = await r.json();
+      setInvestigacion(data);
+    } catch { setInvestigacion(null); }
+  };
+
+  const ejecutarDescalificacion = async () => {
+    if (!investigandoId || !sel) return;
+    setDescLoading(true);
+    try {
+      const r = await adminFetch(`/api/admin/concursos/${sel.id}/descalificar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: investigandoId, enviarEmail: enviarEmailDesc, motivo: motivoDesc }),
+      });
+      const data = await r.json();
+      if (data.ok) {
+        setDescResult(`✅ ${data.descalificado} descalificado. ${data.cuentasEliminadas} cuentas eliminadas.${data.emailEnviado ? " Email enviado." : ""}`);
+        // Refresh participants
+        const r2 = await adminFetch(`/api/admin/concursos/${sel.id}/participantes`);
+        const pData = await r2.json();
+        if (Array.isArray(pData)) setParticipantesAdmin(pData);
+      } else {
+        setDescResult(`❌ Error: ${data.error}`);
+      }
+    } catch { setDescResult("❌ Error al descalificar"); }
+    setDescLoading(false);
+  };
   const [editPremio, setEditPremio] = useState("");
   const [editDescripcion, setEditDescripcion] = useState("");
   const [editCondiciones, setEditCondiciones] = useState("");
@@ -343,7 +383,69 @@ export default function AdminConcursos() {
                       {p.estado !== "descalificado" && (
                         <button onClick={() => cambiarEstado(p.id, "descalificado")} style={{ background: "none", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", cursor: "pointer" }}>✗ Descalificar</button>
                       )}
+                      <button onClick={() => investigar(p.usuarioId)} style={{ background: "none", border: "1px solid rgba(120,140,220,0.3)", borderRadius: "6px", color: "rgba(120,140,220,0.7)", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", cursor: "pointer" }}>{investigandoId === p.usuarioId ? "Cerrar" : "🔍 Investigar"}</button>
                     </div>
+                    {investigandoId === p.usuarioId && investigacion && (
+                      <div style={{ marginTop: 8, background: "rgba(0,0,0,0.3)", border: "1px solid rgba(120,140,220,0.2)", borderRadius: 8, padding: 12 }}>
+                        <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", padding: "3px 10px", borderRadius: 20, background: investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.2)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.2)" : "rgba(61,184,158,0.15)", color: investigacion.analisis.riesgo >= 60 ? "#ff6b6b" : investigacion.analisis.riesgo >= 30 ? "#e8a84c" : "#3db89e", border: `1px solid ${investigacion.analisis.riesgo >= 60 ? "rgba(255,80,80,0.4)" : investigacion.analisis.riesgo >= 30 ? "rgba(232,168,76,0.4)" : "rgba(61,184,158,0.3)"}` }}>Riesgo: {investigacion.analisis.riesgo}%</span>
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)" }}>{investigacion.totalReferidos} referidos</span>
+                          {investigacion.analisis.ipsVPN > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>🚨 {investigacion.analisis.ipsVPN} IPs VPN</span>}
+                          {investigacion.analisis.mismaIP > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>⚠️ {investigacion.analisis.mismaIP} misma IP</span>}
+                          {investigacion.analisis.emailsDuplicados.length > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b" }}>📧 {investigacion.analisis.emailsDuplicados.length} emails duplicados</span>}
+                        </div>
+                        {investigacion.analisis.registrosRapidos.length > 0 && (
+                          <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(232,168,76,0.7)", marginBottom: 6 }}>⚡ {investigacion.analisis.registrosRapidos.length} registros rápidos (&lt;30 min)</p>
+                        )}
+                        {investigacion.analisis.ipsRepetidas.length > 0 && (
+                          <div style={{ marginBottom: 6 }}>
+                            <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", textTransform: "uppercase", marginBottom: 4 }}>IPs repetidas</p>
+                            {investigacion.analisis.ipsRepetidas.map((ip: { ip: string; count: number }) => (
+                              <span key={ip.ip} style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)", marginRight: 8 }}>{ip.ip}: {ip.count}x</span>
+                            ))}
+                          </div>
+                        )}
+                        {investigacion.analisis.emailsDuplicados.length > 0 && (
+                          <div style={{ marginBottom: 6 }}>
+                            <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", textTransform: "uppercase", marginBottom: 4 }}>Emails Gmail duplicados</p>
+                            {investigacion.analisis.emailsDuplicados.map((e: { email: string; cuentas: string[] }) => (
+                              <p key={e.email} style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", margin: "2px 0" }}>{e.email} → {e.cuentas.join(", ")}</p>
+                            ))}
+                          </div>
+                        )}
+                        <details style={{ marginTop: 6 }}>
+                          <summary style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(120,140,220,0.7)", cursor: "pointer" }}>Ver {investigacion.totalReferidos} referidos</summary>
+                          <div style={{ marginTop: 6, maxHeight: 200, overflowY: "auto" }}>
+                            {investigacion.referidos.map((r: { nombre: string; email: string; ip: string; verificado: boolean; createdAt: string; estado: string }, ri: number) => (
+                              <div key={ri} style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)", padding: "3px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                                <span style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.6)" }}>{r.nombre}</span>{" "}
+                                <span style={{ color: "rgba(240,234,214,0.3)" }}>{r.email}</span>{" "}
+                                <span style={{ color: "rgba(240,234,214,0.25)" }}>IP:{r.ip}</span>{" "}
+                                {!r.verificado && <span style={{ color: "#e8a84c" }}>NO✓</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                        {investigacion.participante.estado !== "descalificado" && (
+                          <div style={{ marginTop: 10, padding: "10px 0", borderTop: "1px solid rgba(255,80,80,0.15)" }}>
+                            <textarea value={motivoDesc} onChange={e => setMotivoDesc(e.target.value)} rows={2} style={{ width: "100%", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 6, padding: "6px 8px", fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.6)", resize: "vertical", boxSizing: "border-box" as const, marginBottom: 6 }} placeholder="Motivo de descalificación..." />
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                              <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+                                <input type="checkbox" checked={enviarEmailDesc} onChange={e => setEnviarEmailDesc(e.target.checked)} style={{ accentColor: "#e8a84c" }} />
+                                <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.5)" }}>Enviar email de notificación</span>
+                              </label>
+                            </div>
+                            <button onClick={ejecutarDescalificacion} disabled={descLoading} style={{ background: "rgba(255,80,80,0.15)", border: "1px solid rgba(255,80,80,0.4)", borderRadius: 6, padding: "6px 14px", fontFamily: "Georgia", fontSize: "0.75rem", color: "#ff6b6b", cursor: descLoading ? "wait" : "pointer", fontWeight: 700 }}>
+                              {descLoading ? "Procesando..." : `🚫 Descalificar y eliminar ${investigacion.analisis.ipsVPN + investigacion.analisis.emailsDuplicados.length > 0 ? "cuentas falsas" : "participante"}`}
+                            </button>
+                            {descResult && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: descResult.startsWith("✅") ? "#3db89e" : "#ff6b6b", marginTop: 6 }}>{descResult}</p>}
+                          </div>
+                        )}
+                        {investigacion.participante.estado === "descalificado" && (
+                          <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#ff6b6b", marginTop: 8 }}>🚫 Ya descalificado</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (

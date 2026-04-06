@@ -184,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ciudad: data.comuna || null,
           ...("refCode" in data && { refCode: (data as any).refCode }),
           ...("concursoId" in data && { concursoId: (data as any).concursoId }),
+          ...("turnstileToken" in data && { turnstileToken: (data as any).turnstileToken }),
         }),
       });
       const result = await res.json();

@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,7 +44,29 @@ function RegistroContent() {
   const [categoriasDB, setCategoriasDB] = useState<{ nombre: string; slug: string; emoji: string; tipo: string; estiloExcluido: string[] }[]>([]);
   const [registeredUserId, setRegisteredUserId] = useState("");
   const [redirectTo, setRedirectTo] = useState("/");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const set = (k: string, v: string | boolean) => setForm(f => ({ ...f, [k]: v }));
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileRendered = useRef(false);
+  const renderTurnstile = useCallback(() => {
+    if (turnstileRendered.current || !turnstileRef.current || !(window as any).turnstile) return;
+    turnstileRendered.current = true;
+    (window as any).turnstile.render(turnstileRef.current, {
+      sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAC1ee9SIwC2tB47_",
+      callback: (token: string) => setTurnstileToken(token),
+      theme: "dark",
+      size: "flexible",
+    });
+  }, []);
+  useEffect(() => {
+    if ((window as any).turnstile) { renderTurnstile(); return; }
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
+    s.async = true;
+    (window as any).onTurnstileLoad = renderTurnstile;
+    document.head.appendChild(s);
+    return () => { delete (window as any).onTurnstileLoad; };
+  }, [renderTurnstile]);
   useEffect(() => { if (refCode && concursoId) savePendingRef(refCode, concursoId); }, [refCode, concursoId]);
   useEffect(() => { fetch("/api/categorias").then(r => r.json()).then(data => { if (Array.isArray(data)) setCategoriasDB(data); }).catch(() => {}); }, []);
 
@@ -109,7 +131,8 @@ function RegistroContent() {
     if (form.password !== form.confirm) return setError("Las contraseñas no coinciden.");
     if (!form.terms) return setError("Debes aceptar los términos.");
     setLoading(true);
-    const res = await register({ type: "user", nombre: form.nombre.trim(), email: form.email.trim(), password: form.password, comuna: "", ...(refCode && { refCode }), ...(concursoId && { concursoId }) } as any);
+    if (!turnstileToken) return setError("Esperando verificación de seguridad. Intenta de nuevo en unos segundos.");
+    const res = await register({ type: "user", nombre: form.nombre.trim(), email: form.email.trim(), password: form.password, comuna: "", ...(refCode && { refCode }), ...(concursoId && { concursoId }), turnstileToken } as any);
     setLoading(false);
     if (res.success) {
       if (res.alertaIP) setAlertaIPMsg("Detectamos que ya existen cuentas registradas desde tu ubicación. Recuerda que crear múltiples cuentas puede resultar en la descalificación de concursos.");
@@ -327,7 +350,8 @@ function RegistroContent() {
               <div><label style={labelS}>Contraseña</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showPw ? "text" : "password"} placeholder="Mínimo 8 caracteres" value={form.password} onChange={e => set("password", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowPw(s => !s)} style={eyeS}><OjoIcon visible={showPw} /></button></div></div>
               <div><label style={labelS}>Confirmar</label><div style={{ position: "relative" }}><input style={{ ...inputS, paddingRight: "48px" }} type={showConf ? "text" : "password"} placeholder="Repite contraseña" value={form.confirm} onChange={e => set("confirm", e.target.value)} onFocus={fi} onBlur={fo} /><button type="button" onClick={() => setShowConf(s => !s)} style={eyeS}><OjoIcon visible={showConf} /></button></div></div>
               <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}><input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ accentColor: "var(--accent)", width: "18px", height: "18px", marginTop: "2px", flexShrink: 0 }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", lineHeight: 1.5 }}>Acepto los <a href="/terminos" style={{ color: "var(--accent)", textDecoration: "none" }}>Términos</a> y <a href="/privacidad" style={{ color: "var(--accent)", textDecoration: "none" }}>Privacidad</a></span></label>
-              <button type="submit" disabled={loading} style={btnS}>{loading ? "Creando..." : "Crear cuenta gratis →"}</button>
+              <div ref={turnstileRef} style={{ display: "flex", justifyContent: "center" }} />
+              <button type="submit" disabled={loading || !turnstileToken} style={{ ...btnS, opacity: loading || !turnstileToken ? 0.5 : 1 }}>{loading ? "Creando..." : "Crear cuenta gratis →"}</button>
             </form>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /><span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.2)" }}>¿Tienes un local?</span><div style={{ flex: 1, height: "1px", background: "rgba(255,255,255,0.06)" }} /></div>
             <Link href="/registro-local" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.12)", borderRadius: "10px", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textDecoration: "none" }}>🏪 Registra tu local →</Link>
