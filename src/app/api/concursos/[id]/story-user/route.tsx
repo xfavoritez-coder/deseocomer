@@ -145,8 +145,6 @@ export async function GET(
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
-          {/* User header */}
-          <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 700, color: "rgba(240,234,214,0.5)", textAlign: "center", letterSpacing: "0.15em", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.headerText}</span>
           {/* Local name with logo */}
           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
             {concurso.local.logoUrl ? (
@@ -162,8 +160,8 @@ export async function GET(
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Motivation text */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-            <span style={{ fontFamily: "Lato", fontSize: "38px", fontWeight: 700, color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>Entra por mi link y ambos</span>
-            <span style={{ fontFamily: "Lato", fontSize: "38px", fontWeight: 700, color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>ganamos 3 puntos</span>
+            <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>Entra por mi link y ambos</span>
+            <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>ganamos 3 puntos</span>
           </div>
           {/* CTA button */}
           <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
