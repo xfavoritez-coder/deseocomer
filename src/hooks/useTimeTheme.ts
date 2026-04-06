@@ -87,7 +87,7 @@ export function applyThemeVars(theme: TimeTheme) {
 }
 
 function getPeriod(hour: number): TimePeriod {
-  if (hour >= 7 && hour < 20) return "dia";
+  if (hour >= 7 && hour < 19) return "dia";
   return "noche";
 }
 

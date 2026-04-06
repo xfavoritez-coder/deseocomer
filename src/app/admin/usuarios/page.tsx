@@ -360,7 +360,16 @@ export default function AdminUsuarios() {
               {/* Referido por */}
               {r.referidoPorNombre && (
                 <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", marginBottom: "8px" }}>
-                  Referido por: <button onClick={() => { const u = usuarios.find(x => x.id === r.referidoPorId); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textDecoration: "underline" }}>{r.referidoPorNombre}</button>
+                  Referido por: <button onClick={async () => {
+                    let u = usuarios.find(x => x.id === r.referidoPorId);
+                    if (!u && r.referidoPorId) {
+                      try {
+                        const res = await adminFetch(`/api/admin/usuarios/${r.referidoPorId}`);
+                        if (res.ok) u = await res.json();
+                      } catch {}
+                    }
+                    if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); }
+                  }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textDecoration: "underline" }}>{r.referidoPorNombre}</button>
                 </p>
               )}
 

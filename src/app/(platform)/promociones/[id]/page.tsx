@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { trackStat } from "@/lib/stats-client";
 import {
   PROMOCIONES,
   TIPO_LABELS,
@@ -87,6 +88,7 @@ export default function PromocionDetailPage() {
   useEffect(() => {
     if (promo) {
       addInteraccion("promocion_vista", { id: String(promo.id || ""), categoria: (promo as any).categoriaLocal || "", comuna: promo.comuna || "" });
+      trackStat("promocion_vista", promo.titulo || String(promo.id));
     }
   }, [promo?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 

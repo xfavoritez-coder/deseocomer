@@ -7,14 +7,17 @@ interface StatsData {
   busquedas: Record<string, number>;
   comunas: Record<string, number>;
   categorias: Record<string, number>;
+  paginas: Record<string, number>;
+  promocionesVistas: Record<string, number>;
   totalBusquedas: number;
   totalFiltrosComunas: number;
   totalFiltrosCategorias: number;
+  totalPromocionesVistas: number;
   updatedAt: string;
 }
 
 function emptyStats(): StatsData {
-  return { busquedas: {}, comunas: {}, categorias: {}, totalBusquedas: 0, totalFiltrosComunas: 0, totalFiltrosCategorias: 0, updatedAt: new Date().toISOString() };
+  return { busquedas: {}, comunas: {}, categorias: {}, paginas: {}, promocionesVistas: {}, totalBusquedas: 0, totalFiltrosComunas: 0, totalFiltrosCategorias: 0, totalPromocionesVistas: 0, updatedAt: new Date().toISOString() };
 }
 
 // POST: receive a batch of events and merge into stats (1 read + 1 write)
@@ -51,11 +54,18 @@ export async function POST(req: NextRequest) {
           stats.categorias[val] = (stats.categorias[val] ?? 0) + 1;
           stats.totalFiltrosCategorias++;
           break;
+        case "pagina":
+          stats.paginas[val] = (stats.paginas[val] ?? 0) + 1;
+          break;
+        case "promocion_vista":
+          stats.promocionesVistas[val] = (stats.promocionesVistas[val] ?? 0) + 1;
+          stats.totalPromocionesVistas++;
+          break;
       }
     }
 
     // Keep only top 200 per category to prevent unbounded growth
-    for (const key of ["busquedas", "comunas", "categorias"] as const) {
+    for (const key of ["busquedas", "comunas", "categorias", "paginas", "promocionesVistas"] as const) {
       const entries = Object.entries(stats[key]);
       if (entries.length > 200) {
         entries.sort((a, b) => b[1] - a[1]);

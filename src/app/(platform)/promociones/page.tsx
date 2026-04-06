@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { boostScore } from "@/lib/personalizacion";
 import { useGenie } from "@/contexts/GenieContext";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, normalizeTipo, type Promocion } from "@/lib/mockPromociones";
+import { trackStat } from "@/lib/stats-client";
 
 const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
 const DIAS_NOMBRE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
@@ -57,6 +58,7 @@ export default function PromocionesPage() {
   const categoriasComida = [...new Set(promos.map(p => (p as any).localCategoria).filter(Boolean))].sort();
 
   // Fetch from BD
+  useEffect(() => { trackStat("pagina", "promociones"); }, []);
   useEffect(() => {
     fetch("/api/promociones").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {

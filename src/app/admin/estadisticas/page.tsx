@@ -6,9 +6,12 @@ interface StatsData {
   busquedas: Record<string, number>;
   comunas: Record<string, number>;
   categorias: Record<string, number>;
+  paginas: Record<string, number>;
+  promocionesVistas: Record<string, number>;
   totalBusquedas: number;
   totalFiltrosComunas: number;
   totalFiltrosCategorias: number;
+  totalPromocionesVistas: number;
   updatedAt: string;
 }
 
@@ -62,11 +65,12 @@ export default function EstadisticasPage() {
         Datos de la sección /locales — actualizado {stats.updatedAt ? new Date(stats.updatedAt).toLocaleString("es-CL") : "nunca"}
       </p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
         {[
           { label: "Búsquedas", value: stats.totalBusquedas, icon: "🔍" },
           { label: "Filtros comuna", value: stats.totalFiltrosComunas, icon: "📍" },
           { label: "Filtros categoría", value: stats.totalFiltrosCategorias, icon: "🍽️" },
+          { label: "Promos vistas", value: stats.totalPromocionesVistas ?? 0, icon: "⚡" },
         ].map(c => (
           <div key={c.label} style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 10, padding: "14px 16px", textAlign: "center" }}>
             <div style={{ fontSize: "1.4rem", marginBottom: 4 }}>{c.icon}</div>
@@ -76,11 +80,24 @@ export default function EstadisticasPage() {
         ))}
       </div>
 
+      {/* Visitas a páginas */}
+      {stats.paginas && Object.keys(stats.paginas).length > 0 && (
+        <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", gap: 16, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", alignSelf: "center" }}>Visitas:</span>
+          {Object.entries(stats.paginas).sort((a, b) => b[1] - a[1]).map(([page, count]) => (
+            <span key={page} style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "rgba(240,234,214,0.6)" }}>/{page}: <strong style={{ color: "#e8a84c" }}>{count}</strong></span>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         <TopTable title="Top búsquedas" data={stats.busquedas} total={stats.totalBusquedas} />
         <TopTable title="Top comunas" data={stats.comunas} total={stats.totalFiltrosComunas} />
       </div>
-      <TopTable title="Top categorías" data={stats.categorias} total={stats.totalFiltrosCategorias} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+        <TopTable title="Top categorías" data={stats.categorias} total={stats.totalFiltrosCategorias} />
+        <TopTable title="Promociones más vistas" data={stats.promocionesVistas ?? {}} total={stats.totalPromocionesVistas ?? 0} />
+      </div>
     </div>
   );
 }
