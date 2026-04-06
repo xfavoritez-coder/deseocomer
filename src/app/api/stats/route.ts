@@ -66,11 +66,12 @@ export async function POST(req: NextRequest) {
     stats.updatedAt = new Date().toISOString();
 
     // Single write
-    await prisma.configSite.upsert({
-      where: { clave: CLAVE },
-      update: { valor: JSON.stringify(stats) },
-      create: { clave: CLAVE, valor: JSON.stringify(stats) },
-    });
+    const existing = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
+    if (existing) {
+      await prisma.configSite.update({ where: { clave: CLAVE }, data: { valor: JSON.stringify(stats) } });
+    } else {
+      await prisma.configSite.create({ data: { id: CLAVE, clave: CLAVE, valor: JSON.stringify(stats) } });
+    }
 
     return NextResponse.json({ ok: true });
   } catch {
