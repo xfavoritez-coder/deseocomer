@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
 import bcrypt from "bcryptjs";
 import * as crypto from "crypto";
-import { promises as dns } from "dns";
 import disposableDomains from "disposable-email-domains";
 
 // In-memory blacklist cache (refreshed every 5 minutes)
@@ -71,25 +70,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar que el dominio tenga registros MX válidos (con timeout de 3s)
-    if (domain && !["gmail.com", "hotmail.com", "outlook.com", "yahoo.com", "live.cl", "live.com", "icloud.com"].includes(domain)) {
-      try {
-        const mxPromise = dns.resolveMx(domain);
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000));
-        const mx = await Promise.race([mxPromise, timeout]) as { exchange: string }[];
-        if (!mx || mx.length === 0) {
-          return NextResponse.json(
-            { error: "El dominio de tu correo no parece válido. Verifica que esté bien escrito." },
-            { status: 400 }
-          );
-        }
-      } catch {
-        return NextResponse.json(
-          { error: "El dominio de tu correo no parece válido. Verifica que esté bien escrito." },
-          { status: 400 }
-        );
-      }
-    }
 
     const existe = await prisma.usuario.findUnique({ where: { email } });
     if (existe) {
