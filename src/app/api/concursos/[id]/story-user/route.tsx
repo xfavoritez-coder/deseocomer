@@ -12,12 +12,16 @@ export async function GET(
 
   const concurso = await prisma.concurso.findFirst({
     where: { OR: [{ id }, { slug: id }] },
-    include: { local: { select: { nombre: true } } },
+    include: { local: { select: { nombre: true, logoUrl: true } } },
   });
 
   if (!concurso) {
     return new Response("Not found", { status: 404 });
   }
+
+  const totalParticipantes = await prisma.participanteConcurso.count({
+    where: { concursoId: concurso.id },
+  });
 
   // Get user name
   let userName = "Alguien";
@@ -26,6 +30,9 @@ export async function GET(
     if (user) userName = user.nombre.split(" ")[0];
   }
   const userNameCap = userName.charAt(0).toUpperCase() + userName.slice(1);
+
+  // Local initials fallback
+  const localInitials = concurso.local.nombre.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
 
   // Load fonts
   async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
@@ -139,21 +146,33 @@ export async function GET(
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
           {/* User header — personal touch */}
           <span style={{ fontFamily: "Lato", fontSize: "48px", fontWeight: 700, color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.headerText}</span>
-          {/* Local name */}
-          <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.6)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
-          {/* Emoji */}
-          <span style={{ fontSize: "72px" }}>{theme.emoji}</span>
-          {/* Prize title */}
-          <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
+          {/* Local name with logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+            {concurso.local.logoUrl ? (
+              <img src={concurso.local.logoUrl} style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "3px solid rgba(232,168,76,0.4)" }} />
+            ) : (
+              <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "3px solid rgba(232,168,76,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Cinzel", fontSize: "28px", fontWeight: 700, color: "#e8a84c" }}>{localInitials}</div>
+            )}
+            <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.95)", letterSpacing: "0.1em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
+          </div>
+          {/* Prize title with emoji */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px" }}>
+            <span style={{ fontSize: "72px", flexShrink: 0 }}>{theme.emoji}</span>
+            <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
+          </div>
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Motivation text */}
-          <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
+          <span style={{ fontFamily: "Lato", fontSize: "48px", color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
           {/* CTA button */}
           <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
             <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
             <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
           </div>
+          {/* Participants count */}
+          {totalParticipantes > 0 && (
+            <span style={{ fontFamily: "Lato", fontSize: "36px", color: "rgba(240,234,214,0.5)", textAlign: "center" }}>{totalParticipantes} personas ya participando</span>
+          )}
           {/* Subtle personal invite text */}
           <span style={{ fontFamily: "Lato", fontSize: "28px", color: "rgba(240,234,214,0.3)", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>{userNameCap} te invita</span>
         </div>
