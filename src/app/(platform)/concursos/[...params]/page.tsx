@@ -883,14 +883,12 @@ function ConcursoDetallePage() {
                   return (
                   <div key={s.label} className="dc-como-card" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 10, padding: "12px 8px", textAlign: "center", position: "relative" }}>
                     <button className="dc-como-info-btn" onClick={(e) => { e.stopPropagation(); setInfoTooltip(infoTooltip === s.id ? null : s.id); }} style={{ position: "absolute", top: 6, right: 6, width: 16, height: 16, borderRadius: "50%", background: infoTooltip === s.id ? "rgba(232,168,76,0.2)" : "rgba(232,168,76,0.12)", border: infoTooltip === s.id ? "1px solid rgba(232,168,76,0.5)" : "1px solid rgba(232,168,76,0.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 9, fontWeight: 800, color: infoTooltip === s.id ? "#e8a84c" : "rgba(232,168,76,0.6)", fontStyle: "italic", padding: 0, lineHeight: 1 }}>i</button>
-                    {infoTooltip === s.id && (
-                      <div className="dc-como-tooltip" style={{ position: "absolute", width: 200, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, bottom: "calc(100% + 8px)", top: "auto", ...(col === 0 ? { left: 0, transform: "none" } : col === 2 ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
+                      <div className="dc-como-tooltip" style={{ position: "absolute", width: 200, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, bottom: "calc(100% + 8px)", top: "auto", display: infoTooltip === s.id ? "block" : "none", ...(col === 0 ? { left: 0, transform: "none" } : col === 2 ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
                         <div style={{ position: "absolute", top: "100%", borderTop: "6px solid rgba(232,168,76,0.3)", borderBottom: "none", left: "50%", transform: "translateX(-50%)", borderLeft: "6px solid transparent", borderRight: "6px solid transparent" }} />
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 5 }}>{s.ttTitle}</p>
                         <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.5, margin: 0 }}>{s.ttText}</p>
                         <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#3db89e", marginTop: 6, fontWeight: 700 }}>{s.ttPts}</p>
                       </div>
-                    )}
                     <div style={{ fontSize: 18, marginBottom: 4 }}>{s.icon}</div>
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 24, color: "#e8a84c", fontWeight: 700, lineHeight: 1 }}>{s.pts}</div>
                     <div style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: 6 }}>{s.label}</div>
@@ -1123,7 +1121,9 @@ function ConcursoDetallePage() {
           .dc-cd-cta-btn { max-width: 320px !important; margin-left: auto !important; margin-right: auto !important; }
           .dc-cd-hero-desc { max-width: 500px; margin-left: auto; margin-right: auto; }
         }
+        .dc-como-card { cursor: default; }
         @media (min-width: 1024px) {
+          .dc-como-card { cursor: pointer; }
           .dc-como-card .dc-como-tooltip { display: none !important; }
           .dc-como-card:hover .dc-como-tooltip { display: block !important; }
           .dc-como-card .dc-como-info-btn { pointer-events: none; }
