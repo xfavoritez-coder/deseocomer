@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // 2. Get all referrals
     const referidos = await prisma.participanteConcurso.findMany({
       where: { concursoId, referidorDirectoId: userId },
-      include: { usuario: { select: { id: true, email: true, nombre: true } } },
+      include: { usuario: { select: { id: true, email: true, nombre: true, ipRegistro: true } } },
     });
 
     let cuentasEliminadas = 0;
@@ -65,16 +65,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { tipo: "bloqueado" },
     });
 
-    // 5. Add to blacklist for future detection
+    // 5. Add ALL IPs and emails (infractor + referidos) to blacklist
     try {
       const blRow = await prisma.configSite.findUnique({ where: { clave: "blacklist_infractores" } });
       const bl = blRow?.valor ? JSON.parse(blRow.valor) : { ips: [], emails: [], infractores: [] };
+      // Add infractor's IP and email
       const userIp = participante.usuario.ipRegistro ?? "";
       const [local, dom] = (participante.usuario.email ?? "").split("@");
       const emailNorm = dom === "gmail.com" ? local.toLowerCase().replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : (participante.usuario.email ?? "").toLowerCase();
-      if (userIp && !bl.ips.includes(userIp)) bl.ips.push(userIp);
+      if (userIp && userIp !== "unknown" && !bl.ips.includes(userIp)) bl.ips.push(userIp);
       if (emailNorm && !bl.emails.includes(emailNorm)) bl.emails.push(emailNorm);
-      bl.infractores.push({ nombre: participante.usuario.nombre, email: participante.usuario.email, ip: userIp, motivo: motivo || "Descalificado por fraude", fecha: new Date().toISOString() });
+      // Add ALL referral IPs and emails
+      for (const r of referidos) {
+        const refIp = r.usuario.ipRegistro ?? "";
+        if (refIp && refIp !== "unknown" && !bl.ips.includes(refIp)) bl.ips.push(refIp);
+        const refEmail = (r.usuario.email ?? "").toLowerCase();
+        const [refLocal, refDom] = refEmail.split("@");
+        const refNorm = refDom === "gmail.com" ? refLocal.replace(/\./g, "").replace(/\+.*$/, "") + "@gmail.com" : refEmail;
+        if (refNorm && !bl.emails.includes(refNorm)) bl.emails.push(refNorm);
+      }
+      bl.infractores.push({ nombre: participante.usuario.nombre, email: participante.usuario.email, ip: userIp, motivo: motivo || "Descalificado por fraude", fecha: new Date().toISOString(), referidosEliminados: cuentasEliminadas });
       bl.updatedAt = new Date().toISOString();
       await prisma.configSite.update({ where: { clave: "blacklist_infractores" }, data: { valor: JSON.stringify(bl) } });
     } catch { /* best effort */ }
