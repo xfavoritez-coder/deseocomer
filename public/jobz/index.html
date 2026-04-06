@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>La Historia de DeseoComer</title>
+<title>DeseoComer — 10 dias, 1 plataforma</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;800&family=Lato:wght@300;400;700&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,61 +11,57 @@
 
   .hero {
     min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.15) 0%, transparent 60%);
-    text-align: center; padding: 40px 20px; position: relative;
+    background: radial-gradient(ellipse at 50% 30%, rgba(232,168,76,0.12) 0%, transparent 60%);
+    text-align: center; padding: 40px 24px; position: relative;
   }
-  .hero::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e8a84c' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.5;
+  .hero-genie { font-size: 5rem; margin-bottom: 16px; animation: float 3s ease-in-out infinite; }
+  .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(2.2rem, 6vw, 4rem); color: #e8a84c; margin-bottom: 12px; text-shadow: 0 0 80px rgba(232,168,76,0.3); }
+  .hero .tagline { font-size: clamp(1rem, 2.5vw, 1.2rem); color: rgba(240,234,214,0.45); max-width: 500px; line-height: 1.7; margin-bottom: 48px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; max-width: 600px; width: 100%; }
+  .stat { text-align: center; background: rgba(232,168,76,0.04); border: 1px solid rgba(232,168,76,0.1); border-radius: 12px; padding: 20px 8px; }
+  .stat-n { font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: #e8a84c; }
+  .stat-l { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,234,214,0.3); margin-top: 4px; }
+
+  .scroll-hint { position: absolute; bottom: 28px; animation: bounce 2s infinite; }
+  .scroll-hint span { display: block; width: 18px; height: 18px; border-right: 2px solid rgba(232,168,76,0.3); border-bottom: 2px solid rgba(232,168,76,0.3); transform: rotate(45deg); }
+
+  .journey { max-width: 680px; margin: 0 auto; padding: 60px 24px 40px; }
+  .journey h2 { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(232,168,76,0.5); text-align: center; margin-bottom: 40px; }
+
+  .day {
+    display: grid; grid-template-columns: 80px 1fr; gap: 0; margin-bottom: 0;
+    opacity: 0; transform: translateY(20px); transition: all 0.5s ease;
   }
-  .hero-genie { font-size: 6rem; margin-bottom: 20px; animation: float 3s ease-in-out infinite; position: relative; z-index: 1; }
-  .hero h1 { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 6vw, 4.5rem); color: #e8a84c; letter-spacing: 0.02em; margin-bottom: 16px; position: relative; z-index: 1; text-shadow: 0 0 80px rgba(232,168,76,0.3); }
-  .hero .subtitle { font-family: 'Lato', sans-serif; font-size: clamp(1rem, 2.5vw, 1.3rem); color: rgba(240,234,214,0.5); max-width: 600px; line-height: 1.8; position: relative; z-index: 1; }
-  .hero .stats-row { display: flex; gap: 40px; margin-top: 40px; position: relative; z-index: 1; flex-wrap: wrap; justify-content: center; }
-  .stat { text-align: center; }
-  .stat-number { font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 800; color: #e8a84c; }
-  .stat-label { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(240,234,214,0.35); margin-top: 4px; }
-
-  .scroll-hint { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; z-index: 1; }
-  .scroll-hint span { display: block; width: 20px; height: 20px; border-right: 2px solid rgba(232,168,76,0.4); border-bottom: 2px solid rgba(232,168,76,0.4); transform: rotate(45deg); }
-
-  .timeline { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; position: relative; }
-  .timeline::before { content: ''; position: absolute; left: 24px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, rgba(232,168,76,0.3), rgba(232,168,76,0.05)); }
-
-  .day { margin-bottom: 60px; position: relative; opacity: 0; transform: translateY(30px); transition: all 0.6s ease; }
   .day.visible { opacity: 1; transform: translateY(0); }
 
-  .day-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; position: relative; }
-  .day-dot { width: 14px; height: 14px; border-radius: 50%; background: #e8a84c; border: 3px solid #0a0812; box-shadow: 0 0 0 2px rgba(232,168,76,0.4), 0 0 20px rgba(232,168,76,0.2); flex-shrink: 0; position: relative; left: 18px; z-index: 1; }
-  .day-date { font-family: 'Cinzel', serif; font-size: 1.1rem; color: #e8a84c; font-weight: 700; }
-  .day-count { font-family: 'Lato', sans-serif; font-size: 0.75rem; color: rgba(240,234,214,0.3); background: rgba(232,168,76,0.08); border: 1px solid rgba(232,168,76,0.15); border-radius: 20px; padding: 2px 10px; }
+  .day-left { display: flex; flex-direction: column; align-items: center; padding-top: 2px; }
+  .day-num { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 800; color: #e8a84c; line-height: 1; }
+  .day-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,234,214,0.25); margin-top: 2px; }
+  .day-line { width: 1px; flex: 1; background: linear-gradient(to bottom, rgba(232,168,76,0.25), rgba(232,168,76,0.05)); margin-top: 12px; }
 
-  .day-items { margin-left: 50px; display: flex; flex-direction: column; gap: 6px; }
-  .item { font-family: 'Lato', sans-serif; font-size: 0.88rem; color: rgba(240,234,214,0.6); line-height: 1.6; padding: 6px 0; border-bottom: 1px solid rgba(232,168,76,0.04); display: flex; align-items: flex-start; gap: 10px; }
-  .item-icon { font-size: 0.75rem; flex-shrink: 0; margin-top: 4px; }
-  .item.feat { color: rgba(240,234,214,0.75); }
-  .item.feat .item-icon { color: #3db89e; }
-  .item.fix .item-icon { color: #e8a84c; }
-  .item.perf .item-icon { color: #7b9aff; }
+  .day-right { padding: 0 0 40px 20px; }
+  .day-title { font-family: 'Cinzel', serif; font-size: 1rem; color: rgba(240,234,214,0.85); font-weight: 700; margin-bottom: 4px; }
+  .day-subtitle { font-family: 'Lato', sans-serif; font-size: 0.82rem; color: rgba(240,234,214,0.35); line-height: 1.6; margin-bottom: 12px; }
+  .day-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { font-family: 'Lato', sans-serif; font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; background: rgba(232,168,76,0.06); border: 1px solid rgba(232,168,76,0.12); color: rgba(240,234,214,0.5); }
+  .pill.feat { background: rgba(61,184,158,0.08); border-color: rgba(61,184,158,0.2); color: rgba(61,184,158,0.7); }
+  .pill.big { background: rgba(232,168,76,0.1); border-color: rgba(232,168,76,0.25); color: #e8a84c; font-weight: 700; }
 
-  .day-label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(240,234,214,0.2); margin-left: 50px; margin-bottom: 8px; }
-
-  .footer { text-align: center; padding: 60px 20px; border-top: 1px solid rgba(232,168,76,0.1); }
-  .footer p { font-family: 'Lato', sans-serif; font-size: 0.85rem; color: rgba(240,234,214,0.3); line-height: 1.8; }
-  .footer .heart { color: #e8a84c; font-size: 1.2rem; animation: pulse 1.5s ease-in-out infinite; display: inline-block; }
-
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-  @keyframes bounce { 0%,20%,50%,80%,100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(10px); } 60% { transform: translateX(-50%) translateY(5px); } }
-  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.2); } }
-
-  @media (max-width: 640px) {
-    .timeline::before { left: 14px; }
-    .day-dot { left: 8px; }
-    .day-items { margin-left: 36px; }
-    .day-label { margin-left: 36px; }
-    .hero .stats-row { gap: 24px; }
+  .finale {
+    text-align: center; padding: 80px 24px 60px;
+    background: radial-gradient(ellipse at 50% 100%, rgba(232,168,76,0.08) 0%, transparent 50%);
   }
+  .finale .counter { font-family: 'Cinzel', serif; font-size: clamp(3rem, 8vw, 5rem); font-weight: 800; color: #e8a84c; margin-bottom: 8px; }
+  .finale .counter-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(240,234,214,0.3); margin-bottom: 32px; }
+  .finale p { font-size: 0.9rem; color: rgba(240,234,214,0.4); line-height: 1.8; max-width: 440px; margin: 0 auto 16px; }
+  .finale .heart { color: #e8a84c; animation: pulse 1.5s ease-in-out infinite; display: inline-block; }
+  .finale .brand { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(240,234,214,0.15); margin-top: 32px; }
+
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+  @keyframes bounce { 0%,20%,50%,80%,100%{transform:translateY(0)} 40%{transform:translateY(8px)} 60%{transform:translateY(4px)} }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+  @media(max-width:500px) { .stats{grid-template-columns:repeat(2,1fr)} .day{grid-template-columns:56px 1fr} .day-num{font-size:1.4rem} }
 </style>
 </head>
 <body>
@@ -73,216 +69,74 @@
 <section class="hero">
   <div class="hero-genie">🧞</div>
   <h1>DeseoComer</h1>
-  <p class="subtitle">
-    De una idea a una plataforma con 4.465 locales, concursos reales y una comunidad creciendo cada dia.
-    Esta es la historia de cada linea de codigo, cada fix a las 3am, cada feature que nacio de una conversacion.
-  </p>
-  <div class="stats-row">
-    <div class="stat"><div class="stat-number">652</div><div class="stat-label">Commits</div></div>
-    <div class="stat"><div class="stat-number">10</div><div class="stat-label">Dias</div></div>
-    <div class="stat"><div class="stat-number">4.465</div><div class="stat-label">Locales</div></div>
-    <div class="stat"><div class="stat-number">100+</div><div class="stat-label">Participantes</div></div>
+  <p class="tagline">Una plataforma completa construida en 10 dias.<br>Esta es la historia.</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">652</div><div class="stat-l">Commits</div></div>
+    <div class="stat"><div class="stat-n">10</div><div class="stat-l">Dias</div></div>
+    <div class="stat"><div class="stat-n">4.465</div><div class="stat-l">Locales</div></div>
+    <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Usuarios</div></div>
   </div>
   <div class="scroll-hint"><span></span></div>
 </section>
 
-<div class="timeline">
+<div class="journey">
+  <h2>El camino</h2>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">28 de Marzo</span><span class="day-count">El inicio</span></div>
-    <div class="day-label">Donde todo comenzo</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Primer commit — DeseoComer v1 nace al mundo</div>
-      <div class="item feat"><span class="item-icon">+</span>Hero rediseñado con tipografia elegante y paleta dorada</div>
-      <div class="item feat"><span class="item-icon">+</span>Cards de locales con diseño premium</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de referidos — la base del crecimiento viral</div>
-      <div class="item fix"><span class="item-icon">~</span>Hero responsivo corregido para movil</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">1</div><div class="day-label">28 Mar</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">El primer commit</div><div class="day-subtitle">De cero a un sitio con identidad. Paleta dorada, cards, referidos.</div>
+  <div class="day-pills"><span class="pill big">Next.js + Vercel</span><span class="pill">Diseño premium</span><span class="pill">Referidos</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">29 de Marzo</span><span class="day-count">84 cambios</span></div>
-    <div class="day-label">El Genio cobra vida</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>El Genio 🧞 — asistente magico flotante con recomendaciones personalizadas</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de puntos: referidos, apoyos y madrugadores</div>
-      <div class="item feat"><span class="item-icon">+</span>Pagina de perfil con tabs, cumpleaños y filtros de promociones</div>
-      <div class="item feat"><span class="item-icon">+</span>Links de referido amigables con nombre y codigo</div>
-      <div class="item feat"><span class="item-icon">+</span>Landing para locales /solo-locales con hero y beneficios</div>
-      <div class="item feat"><span class="item-icon">+</span>Registro y login exclusivos para locales + panel protegido</div>
-      <div class="item feat"><span class="item-icon">+</span>Panel de locales completo: dashboard, mi local, concursos, promos</div>
-      <div class="item feat"><span class="item-icon">+</span>Cumpleaños inline en toast del Genio</div>
-      <div class="item feat"><span class="item-icon">+</span>Ficha de local publica con mapa Leaflet estilo oscuro</div>
-      <div class="item feat"><span class="item-icon">+</span>Conexion a Supabase/PostgreSQL con Prisma</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de emails con Resend: bienvenida y reset password</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de favoritos completo con hook, API y Genio</div>
-      <div class="item fix"><span class="item-icon">~</span>Menu movil interceptaba clicks — fix definitivo</div>
-      <div class="item fix"><span class="item-icon">~</span>Flash de colores en carga eliminado con script inline</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">2</div><div class="day-label">29 Mar</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Nace el Genio 🧞</div><div class="day-subtitle">Asistente magico que recomienda restaurantes y recuerda tus gustos. 84 cambios en un dia.</div>
+  <div class="day-pills"><span class="pill big">El Genio</span><span class="pill feat">84 cambios</span><span class="pill">Panel locales</span><span class="pill">Supabase</span><span class="pill">Emails</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">30 de Marzo</span><span class="day-count">89 cambios</span></div>
-    <div class="day-label">Conectando todo a la base de datos</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Panel admin maestro /admin con auth y gestion completa</div>
-      <div class="item feat"><span class="item-icon">+</span>Verificacion de email obligatoria para usuarios</div>
-      <div class="item feat"><span class="item-icon">+</span>Rediseño completo de /promociones, /locales y detalle de concurso</div>
-      <div class="item feat"><span class="item-icon">+</span>Genio contextual por pagina y experiencia de cumpleaños</div>
-      <div class="item feat"><span class="item-icon">+</span>Slugs amigables para locales y concursos</div>
-      <div class="item feat"><span class="item-icon">+</span>Sello dorado PREMIO GRATIS en concursos</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de comunas en Genio + lista de espera</div>
-      <div class="item feat"><span class="item-icon">+</span>Pagina /contacto con formulario y API email</div>
-      <div class="item feat"><span class="item-icon">+</span>Pagina /concursos/como-funciona</div>
-      <div class="item fix"><span class="item-icon">~</span>Auto-login al verificar email</div>
-      <div class="item fix"><span class="item-icon">~</span>Drawer movil desde la derecha con iconos SVG</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">3</div><div class="day-label">30 Mar</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Admin y base de datos</div><div class="day-subtitle">Todo conectado a datos reales. Admin completo, verificacion email, el Genio aprende.</div>
+  <div class="day-pills"><span class="pill big">Panel admin</span><span class="pill feat">89 cambios</span><span class="pill">Email verificado</span><span class="pill">Comunas</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">31 de Marzo</span><span class="day-count">75 cambios</span></div>
-    <div class="day-label">Lanzamiento — el sitio sale al mundo</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Vaciar mocks — solo datos reales de la base de datos</div>
-      <div class="item feat"><span class="item-icon">+</span>Flujo de aprobacion de locales: registro pendiente, login bloqueado</div>
-      <div class="item feat"><span class="item-icon">+</span>Admin locales: aprobacion/rechazo con email via Resend</div>
-      <div class="item feat"><span class="item-icon">+</span>Panel mi-local: upload Supabase, mapa, ciudades de Chile</div>
-      <div class="item feat"><span class="item-icon">+</span>Navbar: estado de local logueado + banner dueño en ficha</div>
-      <div class="item feat"><span class="item-icon">+</span>Estado abierto/cerrado calculado en tiempo real</div>
-      <div class="item feat"><span class="item-icon">+</span>Rediseño cards de concursos con modo urgencia</div>
-      <div class="item fix"><span class="item-icon">~</span>Fix critico hydration error #418</div>
-      <div class="item fix"><span class="item-icon">~</span>Sitio web del local + direccion con comuna en ficha</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">4</div><div class="day-label">31 Mar</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Lanzamiento</div><div class="day-subtitle">Cero mocks. Locales reales se registran, se aprueban, aparecen. El primer concurso esta listo.</div>
+  <div class="day-pills"><span class="pill big">Sitio en produccion</span><span class="pill">Aprobacion locales</span><span class="pill">Upload fotos</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">1 de Abril</span><span class="day-count">53 cambios</span></div>
-    <div class="day-label">Los primeros usuarios reales</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Flujo completo de entrega de premios + emails de recordatorio</div>
-      <div class="item feat"><span class="item-icon">+</span>Skeleton shimmer en todas las paginas de detalle</div>
-      <div class="item feat"><span class="item-icon">+</span>Promociones server-side, paginas /qr y /unete</div>
-      <div class="item feat"><span class="item-icon">+</span>Admin rediseño completo mobile-first + gestion usuarios</div>
-      <div class="item feat"><span class="item-icon">+</span>OG meta tags para compartir en redes sociales</div>
-      <div class="item feat"><span class="item-icon">+</span>Participacion directa en concursos + email primer participante</div>
-      <div class="item feat"><span class="item-icon">+</span>Sesiones mutuamente excluyentes: usuario y local</div>
-      <div class="item fix"><span class="item-icon">~</span>Navbar transparente solo en home, solido en el resto</div>
-      <div class="item fix"><span class="item-icon">~</span>Modal referido funcional al visitar con link</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">5</div><div class="day-label">1 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Primeros usuarios reales</div><div class="day-subtitle">Gente participando, ganando premios. Entrega, recordatorios. Todo funciona.</div>
+  <div class="day-pills"><span class="pill big">Concursos en vivo</span><span class="pill">Premios reales</span><span class="pill">Compartir en redes</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">2 de Abril</span><span class="day-count">40 cambios</span></div>
-    <div class="day-label">Captadores y campañas</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Programa de Captadores completo</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de campañas de email masivo con tracking</div>
-      <div class="item feat"><span class="item-icon">+</span>Pagina /que-es-deseocomer</div>
-      <div class="item feat"><span class="item-icon">+</span>Foto perfil usuario + Genio con filtrado estricto</div>
-      <div class="item feat"><span class="item-icon">+</span>Perfil del Genio sincronizado a BD</div>
-      <div class="item feat"><span class="item-icon">+</span>Story images con @vercel/og para Instagram</div>
-      <div class="item feat"><span class="item-icon">+</span>Flujo completo cierre de concursos y entrega de premios</div>
-      <div class="item fix"><span class="item-icon">~</span>Login redirige a ?next URL despues de iniciar sesion</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">6</div><div class="day-label">2 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Captadores y viralizacion</div><div class="day-subtitle">Red de personas trayendo locales. Email masivo. Instagram Stories para compartir.</div>
+  <div class="day-pills"><span class="pill big">Captadores</span><span class="pill">Campañas email</span><span class="pill">Stories</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">3 de Abril</span><span class="day-count">74 cambios</span></div>
-    <div class="day-label">Referidos multinivel y personalizacion</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Sistema de referidos multinivel (2 niveles) en concursos</div>
-      <div class="item feat"><span class="item-icon">+</span>Personalizacion: orden de locales y concursos segun gustos</div>
-      <div class="item feat"><span class="item-icon">+</span>Google Analytics integrado</div>
-      <div class="item feat"><span class="item-icon">+</span>Onboarding de gustos al registrarse</div>
-      <div class="item feat"><span class="item-icon">+</span>Delivery, retiro y modalidades en toda la plataforma</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema de mensajes del Genio con admin y tracking</div>
-      <div class="item feat"><span class="item-icon">+</span>Recordatorio 24h a participantes cuando concurso termina hoy</div>
-      <div class="item feat"><span class="item-icon">+</span>Notificaciones para apoyo recibido y nivel 2</div>
-      <div class="item feat"><span class="item-icon">+</span>Lista unificada de especialidades de comida</div>
-      <div class="item perf"><span class="item-icon">*</span>Optimizar queries para connection_limit bajo</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">7</div><div class="day-label">3 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">Referidos multinivel</div><div class="day-subtitle">Tu referido refiere y tu ganas. Delivery, personalizacion, el Genio cada vez mas inteligente.</div>
+  <div class="day-pills"><span class="pill big">Nivel 2</span><span class="pill feat">74 cambios</span><span class="pill">Delivery</span><span class="pill">IA personalizada</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">4 de Abril</span><span class="day-count">87 cambios</span></div>
-    <div class="day-label">Google Places y crecimiento explosivo</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Importador Google Places — de 50 locales a 4.465</div>
-      <div class="item feat"><span class="item-icon">+</span>Concursos programados (estado proximamente)</div>
-      <div class="item feat"><span class="item-icon">+</span>Categorias dinamicas + comidas custom en onboarding</div>
-      <div class="item feat"><span class="item-icon">+</span>Campañas de email masivo + cupos founder + tracking</div>
-      <div class="item feat"><span class="item-icon">+</span>Modalidad Sorteo para concursos</div>
-      <div class="item feat"><span class="item-icon">+</span>Perfil publico de usuario + nombres clickeables en ranking</div>
-      <div class="item feat"><span class="item-icon">+</span>Pagina actividad detallada de usuario en admin</div>
-      <div class="item feat"><span class="item-icon">+</span>Toast de actividad en vivo — notifica cuando alguien se une</div>
-      <div class="item feat"><span class="item-icon">+</span>Wizard concursos didactico con tips contextuales</div>
-      <div class="item feat"><span class="item-icon">+</span>Infinite scroll + filtros server-side en /locales</div>
-      <div class="item feat"><span class="item-icon">+</span>Soporte de comunas para todas las ciudades de Chile</div>
-      <div class="item feat"><span class="item-icon">+</span>Banner reclamar local para locales importados</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">8</div><div class="day-label">4 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">4.465 locales en una noche</div><div class="day-subtitle">Google Places API importa miles de restaurantes. Chile entero en DeseoComer. El dia mas intenso.</div>
+  <div class="day-pills"><span class="pill big">Google Places</span><span class="pill feat">87 cambios — record</span><span class="pill">Sorteos</span><span class="pill">Perfiles publicos</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">5 de Abril</span><span class="day-count">70 cambios</span></div>
-    <div class="day-label">Referidos reales y notificaciones</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Sistema de puntos "ambos ganan" al referir</div>
-      <div class="item feat"><span class="item-icon">+</span>Notificaciones para todos los tipos de puntos</div>
-      <div class="item feat"><span class="item-icon">+</span>Campanita de notificaciones visible en mobile</div>
-      <div class="item feat"><span class="item-icon">+</span>Cron alerta ranking — email cuando estas cerca del podio</div>
-      <div class="item feat"><span class="item-icon">+</span>Cron recordatorios — 3 niveles (48h, 7d, 14d)</div>
-      <div class="item feat"><span class="item-icon">+</span>Sitemap.xml y robots.txt dinamicos para SEO</div>
-      <div class="item feat"><span class="item-icon">+</span>Mis concursos en perfil con datos reales</div>
-      <div class="item feat"><span class="item-icon">+</span>Genio recomienda locales variados bien valorados</div>
-      <div class="item feat"><span class="item-icon">+</span>Verificacion MX records al registrarse</div>
-      <div class="item feat"><span class="item-icon">+</span>COMUNAS_MAESTRAS como fuente unica de verdad</div>
-      <div class="item perf"><span class="item-icon">*</span>Cache headers + select ligero para reducir egress Supabase</div>
-      <div class="item perf"><span class="item-icon">*</span>GenieContext ya no trae todos los locales al inicio</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">9</div><div class="day-label">5 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">La comunidad crece</div><div class="day-subtitle">100+ participantes en concursos con premios reales. Notificaciones en vivo, SEO, monitoreo.</div>
+  <div class="day-pills"><span class="pill big">100+ participantes</span><span class="pill">Notificaciones</span><span class="pill">SEO</span><span class="pill">Cron jobs</span></div></div></div>
 
-  <div class="day">
-    <div class="day-header"><div class="day-dot"></div><span class="day-date">6 de Abril</span><span class="day-count">43 cambios</span></div>
-    <div class="day-label">La batalla contra el fraude</div>
-    <div class="day-items">
-      <div class="item feat"><span class="item-icon">+</span>Instagram Stories: pagina de compartir por usuario con diseño premium</div>
-      <div class="item feat"><span class="item-icon">+</span>Badge vegano 🌱 + filtro en concursos y genio</div>
-      <div class="item feat"><span class="item-icon">+</span>Comunas agrupadas Santiago / Otras ciudades con conteo de locales</div>
-      <div class="item feat"><span class="item-icon">+</span>Conteo de categorias en el paso de comida del Genio</div>
-      <div class="item feat"><span class="item-icon">+</span>Health check /api/health para monitoreo</div>
-      <div class="item feat"><span class="item-icon">+</span>Estadisticas de busqueda en /admin/estadisticas</div>
-      <div class="item feat"><span class="item-icon">+</span>Turnstile captcha invisible de Cloudflare en registro</div>
-      <div class="item feat"><span class="item-icon">+</span>Sistema anti-fraude: deteccion Gmail dot trick, IPs VPN, registros rapidos</div>
-      <div class="item feat"><span class="item-icon">+</span>Investigador de fraude en admin con score de riesgo automatico</div>
-      <div class="item feat"><span class="item-icon">+</span>Descalificacion con un click: borra referidos, bloquea, envia email</div>
-      <div class="item feat"><span class="item-icon">+</span>Blacklist persistente de IPs y emails de infractores</div>
-      <div class="item feat"><span class="item-icon">+</span>Historial publico de descalificados en ranking</div>
-      <div class="item feat"><span class="item-icon">+</span>Bloqueo permanente de usuarios fraudulentos</div>
-      <div class="item perf"><span class="item-icon">*</span>Prisma reutilizado en produccion — fix critico de estabilidad</div>
-      <div class="item perf"><span class="item-icon">*</span>Blacklist cacheada en memoria — 0 queries extra</div>
-      <div class="item perf"><span class="item-icon">*</span>DNS check eliminado para reducir latencia</div>
-    </div>
-  </div>
+  <div class="day"><div class="day-left"><div class="day-num">10</div><div class="day-label">6 Abr</div><div class="day-line"></div></div>
+  <div class="day-right"><div class="day-title">La batalla contra el fraude</div><div class="day-subtitle">50 usuarios simultaneos. Alguien intenta hacer trampa con bots. Se construye un sistema anti-fraude completo en horas.</div>
+  <div class="day-pills"><span class="pill big">Anti-fraude</span><span class="pill feat">43 cambios bajo fuego</span><span class="pill">Captcha Cloudflare</span><span class="pill">Blacklist</span><span class="pill">Investigador admin</span></div></div></div>
 
 </div>
 
-<div class="footer">
-  <p style="font-size: 2rem; margin-bottom: 16px;">🧞</p>
-  <p style="font-family: 'Cinzel', serif; font-size: 1.2rem; color: #e8a84c; margin-bottom: 12px;">652 commits. 10 dias. 1 sueño.</p>
-  <p>Cada linea de codigo fue escrita con la conviccion de que<br>la comida conecta personas y los sueños se construyen un commit a la vez.</p>
-  <p style="margin-top: 24px;">Hecho con <span class="heart">♥</span> en Chile</p>
-  <p style="margin-top: 8px; font-size: 0.75rem; color: rgba(240,234,214,0.2);">DeseoComer — 28 de Marzo al 6 de Abril, 2026</p>
+<div class="finale">
+  <div class="counter">652</div>
+  <div class="counter-label">commits en 10 dias</div>
+  <p>Cada commit fue una decision.<br>Cada fix fue un acto de fe.<br>Cada feature, un paso mas cerca.</p>
+  <p style="color:rgba(240,234,214,0.55);margin-top:24px">Hecho con <span class="heart">♥</span> en Chile</p>
+  <p class="brand">DESEOCOMER — MARZO / ABRIL 2026</p>
 </div>
 
 <script>
-  // Animate days on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.day').forEach(el => observer.observe(el));
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.day').forEach(el => obs.observe(el));
 </script>
-
 </body>
 </html>
