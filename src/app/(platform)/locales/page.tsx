@@ -7,7 +7,8 @@ import Footer from "@/components/layout/Footer";
 import BotonFavorito from "@/components/BotonFavorito";
 import { useGenie } from "@/contexts/GenieContext";
 import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
-import { esComunaValida } from "@/lib/comunas";
+import { esComunaValida, COMUNAS_RM } from "@/lib/comunas";
+import { trackStat } from "@/lib/stats-client";
 
 function nameToHue(name: string): number {
   let hash = 0;
@@ -45,7 +46,7 @@ function parseHorarioGoogle(hg: any): any[] | null {
 const localesMock: any[] = [];
 
 export default function LocalesPage() {
-  const { addInteraccion } = useGenie();
+  const { addInteraccion, comunasConLocales, totalLocales } = useGenie();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [locales, setLocales] = useState<any[]>(localesMock);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,7 @@ export default function LocalesPage() {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [filteredCount, setFilteredCount] = useState<number | null>(null);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -88,12 +90,13 @@ export default function LocalesPage() {
     const params = new URLSearchParams({ paginated: "1", limit: "24" });
     if (categoriaActiva !== "Todos") params.set("categoria", categoriaActiva);
     if (busqueda.trim().length >= 2) params.set("q", busqueda.trim());
+    if (comunaActiva) params.set("comuna", comunaActiva);
     if (cursor) params.set("cursor", cursor);
     return `/api/locales?${params}`;
-  }, [categoriaActiva, busqueda]);
+  }, [categoriaActiva, busqueda, comunaActiva]);
 
   const fetchLocales = useCallback(async (reset = false) => {
-    if (reset) { setLoading(true); setLocales([]); setNextCursor(null); setHasMore(true); }
+    if (reset) { setLoading(true); setLocales([]); setNextCursor(null); setHasMore(true); setFilteredCount(null); }
     try {
       const res = await fetch(buildUrl(reset ? null : undefined));
       const data = await res.json();
@@ -101,9 +104,11 @@ export default function LocalesPage() {
         setLocales(reset ? data.locales.map(mapLocal) : prev => [...prev, ...data.locales.map(mapLocal)]);
         setNextCursor(data.nextCursor);
         setHasMore(data.hasMore);
+        if (reset && data.totalCount !== undefined) setFilteredCount(data.totalCount);
       } else if (reset) {
         setLocales([]);
         setHasMore(false);
+        setFilteredCount(0);
       }
     } catch { if (reset) setLocales([]); setHasMore(false); }
     setLoading(false);
@@ -114,7 +119,7 @@ export default function LocalesPage() {
   // Initial load + reload on filter change
   useEffect(() => {
     fetchLocales(true);
-  }, [categoriaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [categoriaActiva, comunaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounced search
   useEffect(() => {
@@ -152,15 +157,19 @@ export default function LocalesPage() {
 
   useEffect(() => {
     if (busqueda.length >= 3) {
-      const t = setTimeout(() => addInteraccion("busqueda", { query: busqueda }), 1500);
+      const t = setTimeout(() => { addInteraccion("busqueda", { query: busqueda }); trackStat("busqueda", busqueda); }, 1500);
       return () => clearTimeout(t);
     }
   }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => { if (comunaActiva) trackStat("comuna", comunaActiva); }, [comunaActiva]);
+  useEffect(() => { if (categoriaActiva !== "Todos") trackStat("categoria", categoriaActiva); }, [categoriaActiva]);
+
   const comunasDisponibles = useMemo(() => {
+    if (comunasConLocales.length > 0) return [...comunasConLocales].sort((a, b) => a.localeCompare(b));
     const set = new Set(locales.map(l => l.comuna).filter(c => c && esComunaValida(c)));
     return [...set].sort((a, b) => a.localeCompare(b));
-  }, [locales]);
+  }, [comunasConLocales, locales]);
 
   const localesFiltrados = locales
     .filter(l => {
@@ -266,9 +275,20 @@ export default function LocalesPage() {
           </button>
           <select value={comunaActiva} onChange={e => setComunaActiva(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: comunaActiva ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: comunaActiva ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.04)", color: comunaActiva ? "#e8a84c" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>📍 Todas las comunas</option>
-            {comunasDisponibles.map(comuna => (
-              <option key={comuna} value={comuna} style={{ background: "#0a0812", color: "#f0ead6" }}>{comuna}</option>
-            ))}
+            {(() => {
+              const santiago = comunasDisponibles.filter(c => COMUNAS_RM.has(c));
+              const otras = comunasDisponibles.filter(c => !COMUNAS_RM.has(c));
+              return (<>
+                <optgroup label="Santiago" style={{ background: "#0a0812", color: "rgba(240,234,214,0.5)", fontStyle: "normal" }}>
+                  {santiago.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
+                </optgroup>
+                {otras.length > 0 && (
+                  <optgroup label="Otras ciudades" style={{ background: "#0a0812", color: "rgba(240,234,214,0.5)", fontStyle: "normal" }}>
+                    {otras.map(c => <option key={c} value={c} style={{ background: "#0a0812", color: "#f0ead6" }}>{c}</option>)}
+                  </optgroup>
+                )}
+              </>);
+            })()}
           </select>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
@@ -327,7 +347,7 @@ export default function LocalesPage() {
         ) : (
           <>
             <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: "20px" }}>
-              {localesFiltrados.length} local{localesFiltrados.length !== 1 ? "es" : ""} encontrado{localesFiltrados.length !== 1 ? "s" : ""}
+              {hayFiltros ? `${filteredCount !== null ? filteredCount.toLocaleString("es-CL") : localesFiltrados.length} local${(filteredCount ?? localesFiltrados.length) !== 1 ? "es" : ""} encontrado${(filteredCount ?? localesFiltrados.length) !== 1 ? "s" : ""}` : `Explora ${totalLocales > 0 ? totalLocales.toLocaleString("es-CL") : localesFiltrados.length} locales`}
             </p>
             <div className="dc-loc-grid">
               {localesFiltrados.map(local => {

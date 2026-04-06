@@ -6,7 +6,7 @@ import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categori
 
 const OCASIONES = ["Almuerzo solo", "Con amigos", "Cena romántica", "Antojo rápido", "Para llevar"];
 
-import { COMUNAS_MAESTRAS } from "@/lib/comunas";
+import { COMUNAS_MAESTRAS, COMUNAS_RM } from "@/lib/comunas";
 
 // Frases del genio por ocasión
 const FRASES: Record<string, Record<string, string>> = {
@@ -238,21 +238,32 @@ export default function GeniePanel() {
                 const isDelivery = modalidad === "Delivery a domicilio";
                 const cobertura = isDelivery ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
                 const conteoMap = isDelivery ? comunasConteoDelivery : comunasConteo;
-                const filtered = cobertura.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase())).sort((a, b) => a.localeCompare(b));
+                const all = cobertura.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()));
+                const santiago = all.filter(c => COMUNAS_RM.has(c)).sort((a, b) => a.localeCompare(b));
+                const otras = all.filter(c => !COMUNAS_RM.has(c)).sort((a, b) => a.localeCompare(b));
                 const noActivas = busquedaComuna.length >= 2
                   ? [...COMUNAS_MAESTRAS].filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()) && !cobertura.some(cb => cb.toLowerCase() === c.toLowerCase())).sort((a, b) => a.localeCompare(b))
                   : [];
+                const comunaBtn = (c: string) => (
+                  <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)", display: "flex", alignItems: "center", gap: "6px" }}>
+                    {c}
+                    {conteoMap[c] ? <span style={{ fontSize: "0.68rem", color: "rgba(61,184,158,0.7)", fontWeight: 600 }}>{conteoMap[c]}</span> : null}
+                  </button>
+                );
                 return (
                   <div style={{ maxHeight: "220px", overflowY: "auto" }}>
-                    {filtered.length > 0 && (
+                    {santiago.length > 0 && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
-                        {filtered.map(c => (
-                          <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)", display: "flex", alignItems: "center", gap: "6px" }}>
-                            {c}
-                            {conteoMap[c] ? <span style={{ fontSize: "0.68rem", color: "rgba(61,184,158,0.7)", fontWeight: 600 }}>{conteoMap[c]}</span> : null}
-                          </button>
-                        ))}
+                        {santiago.map(comunaBtn)}
                       </div>
+                    )}
+                    {otras.length > 0 && (
+                      <>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(245,208,128,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Otras ciudades</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
+                          {otras.map(comunaBtn)}
+                        </div>
+                      </>
                     )}
                     {noActivas.length > 0 && (
                       <>
@@ -266,7 +277,7 @@ export default function GeniePanel() {
                         </div>
                       </>
                     )}
-                    {filtered.length === 0 && noActivas.length === 0 && busquedaComuna.length > 0 && (
+                    {santiago.length === 0 && otras.length === 0 && noActivas.length === 0 && busquedaComuna.length > 0 && (
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.35)", textAlign: "center", padding: "12px 0" }}>No encontramos esa comuna</p>
                     )}
                   </div>

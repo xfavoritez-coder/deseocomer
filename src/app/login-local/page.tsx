@@ -51,7 +51,7 @@ export default function LoginLocalPage() {
       <Link href="/" style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textDecoration: "none", marginBottom: "24px", alignSelf: "center", maxWidth: "400px", width: "100%" }}>← Volver al inicio</Link>
       <div style={cardS}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
+          <Link href="/" style={{ fontSize: "2rem", marginBottom: "8px", display: "block", textDecoration: "none" }}>🧞</Link>
           <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.2em", color: "var(--oasis-bright)", textTransform: "uppercase", marginTop: "4px" }}>Para locales y restaurantes</p>
         </div>

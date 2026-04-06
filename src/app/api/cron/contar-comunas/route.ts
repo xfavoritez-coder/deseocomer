@@ -37,7 +37,7 @@ export async function GET() {
       }
     }
 
-    const data = JSON.stringify({ conteo, conteoDelivery, updatedAt: new Date().toISOString() });
+    const data = JSON.stringify({ conteo, conteoDelivery, totalLocales: locales.length, updatedAt: new Date().toISOString() });
 
     await prisma.configSite.upsert({
       where: { clave: "comunas_conteo" },

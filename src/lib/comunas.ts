@@ -25,6 +25,17 @@ export const COMUNAS_MAESTRAS = [
 
 export type ComunaValida = (typeof COMUNAS_MAESTRAS)[number];
 
+export const COMUNAS_RM = new Set([
+  "Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura",
+  "San Miguel", "Maipú", "La Florida", "Pudahuel", "Peñalolén", "Macul",
+  "La Reina", "Lo Barnechea", "Huechuraba", "Recoleta", "Independencia",
+  "Estación Central", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque",
+  "La Cisterna", "La Granja", "La Pintana", "Lo Espejo", "Lo Prado",
+  "Quilicura", "Quinta Normal", "Renca", "San Bernardo", "San Joaquín",
+  "San Ramón", "Padre Hurtado", "Puente Alto", "Pirque", "Colina", "Lampa",
+  "Melipilla", "Talagante", "Pedro Aguirre Cerda", "Buin",
+]);
+
 // Aliases comunes → comuna maestra
 const ALIASES: Record<string, string> = {
   "santiago": "Santiago Centro",

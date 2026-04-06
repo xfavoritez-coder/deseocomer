@@ -9,15 +9,15 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const categoria = searchParams.get("categoria");
+    const comuna = searchParams.get("comuna");
     const q = searchParams.get("q");
     const cursor = searchParams.get("cursor");
     const paginated = searchParams.get("paginated") === "1" || !!cursor;
     const limit = paginated ? Math.min(Number(searchParams.get("limit")) || 24, 60) : 500;
 
-    const locales = await prisma.local.findMany({
-      take: paginated ? limit + 1 : limit,
-      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-      where: {
+    const hayFiltros = !!(categoria || comuna || q);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const whereClause: any = {
         AND: [
           // Base: only active locales
           { OR: [{ activo: true }, { estadoLocal: "ACTIVO", origenImportacion: "GOOGLE_PLACES" }] },
@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
           { NOT: { estadoLocal: "RECHAZADO" } },
           // Category filter
           ...(categoria ? [{ categorias: { has: categoria } }] : []),
+          // Comuna filter
+          ...(comuna ? [{ comuna }] : []),
           // Search query
           ...(q ? [{
             OR: [
@@ -36,7 +38,17 @@ export async function GET(req: NextRequest) {
             ],
           }] : []),
         ],
-      },
+      };
+
+    // Count only on first page with filters (no cursor = first page)
+    const totalCount = (paginated && hayFiltros && !cursor)
+      ? await prisma.local.count({ where: whereClause })
+      : undefined;
+
+    const locales = await prisma.local.findMany({
+      take: paginated ? limit + 1 : limit,
+      ...(cursor && { cursor: { id: cursor }, skip: 1 }),
+      where: whereClause,
       include: paginated ? {
         _count: { select: { favoritos: true, resenas: true, concursos: true, promociones: true } },
         resenas: { select: { rating: true } },
@@ -66,7 +78,7 @@ export async function GET(req: NextRequest) {
       const results = hasMore ? locales.slice(0, limit) : locales;
       const safe = results.map(addRating);
       const nextCursor = hasMore ? results[results.length - 1].id : null;
-      return NextResponse.json({ locales: safe, nextCursor, hasMore });
+      return NextResponse.json({ locales: safe, nextCursor, hasMore, ...(totalCount !== undefined && { totalCount }) });
     }
     const safe = locales.map((l: any) => {
       const { password: _, ...rest } = l;

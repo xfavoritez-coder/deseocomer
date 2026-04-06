@@ -61,7 +61,7 @@ function LoginContent() {
 
       <div style={cardS}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <div style={{ fontSize: "2rem", marginBottom: "8px" }}>🧞</div>
+          <Link href="/" style={{ fontSize: "2rem", marginBottom: "8px", display: "block", textDecoration: "none" }}>🧞</Link>
           <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", letterSpacing: "0.2em" }}>DeseoComer</p>
         </div>
 

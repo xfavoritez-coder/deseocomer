@@ -10,10 +10,10 @@ export async function GET() {
 
     if (cached?.valor) {
       try {
-        const data = JSON.parse(cached.valor) as { conteo: Record<string, number>; conteoDelivery: Record<string, number> };
+        const data = JSON.parse(cached.valor) as { conteo: Record<string, number>; conteoDelivery: Record<string, number>; totalLocales?: number };
         const comunas = Object.keys(data.conteo).sort((a, b) => a.localeCompare(b));
         const comunasDelivery = Object.keys(data.conteoDelivery).sort((a, b) => a.localeCompare(b));
-        return NextResponse.json({ comunas, comunasDelivery, conteo: data.conteo, conteoDelivery: data.conteoDelivery }, {
+        return NextResponse.json({ comunas, comunasDelivery, conteo: data.conteo, conteoDelivery: data.conteoDelivery, totalLocales: data.totalLocales ?? 0 }, {
           headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
         });
       } catch { /* fall through to live query */ }
@@ -54,10 +54,10 @@ export async function GET() {
     const comunas = Object.keys(conteo).sort((a, b) => a.localeCompare(b));
     const comunasDelivery = Object.keys(conteoDelivery).sort((a, b) => a.localeCompare(b));
 
-    return NextResponse.json({ comunas, comunasDelivery, conteo, conteoDelivery }, {
+    return NextResponse.json({ comunas, comunasDelivery, conteo, conteoDelivery, totalLocales: locales.length }, {
       headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
     });
   } catch {
-    return NextResponse.json({ comunas: [], comunasDelivery: [], conteo: {}, conteoDelivery: {} });
+    return NextResponse.json({ comunas: [], comunasDelivery: [], conteo: {}, conteoDelivery: {}, totalLocales: 0 });
   }
 }

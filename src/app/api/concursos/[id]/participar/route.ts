@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: {
         concursoId: concurso.id, usuarioId, referidoPor: referidoPor || null, puntos: puntosBase + puntosRefBonus + puntosMadrugador,
         referidorDirectoId: referidorDirectoId || null, referidorNivel2Id: referidorNivel2Id || null,
-        esMadrugador, puntosMadrugador,
+        esMadrugador, puntosMadrugador, bonusRef: puntosRefBonus,
       },
     });
 
