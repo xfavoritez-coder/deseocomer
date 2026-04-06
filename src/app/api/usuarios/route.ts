@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     if (!turnstileToken) {
       return NextResponse.json({ error: "Verificación de seguridad requerida. Recarga la página." }, { status: 403 });
     }
-    const tsSecret = process.env.TURNSTILE_SECRET_KEY;
+    const tsSecret = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_KEY || "";
     if (tsSecret) {
       const tsRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
         method: "POST",
