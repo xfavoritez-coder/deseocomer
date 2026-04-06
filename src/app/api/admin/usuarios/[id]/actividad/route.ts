@@ -103,6 +103,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       puntosNivel2: p.puntosNivel2,
       puntosNivel2Pendientes: p.puntosNivel2Pendientes,
       puntosMadrugador: p.puntosMadrugador,
+      puntosApoyos: p.puntosApoyos,
       esMadrugador: p.esMadrugador,
       createdAt: p.createdAt,
     })),

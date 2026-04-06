@@ -66,7 +66,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const ipsRepetidas = Object.entries(ips).filter(([, v]) => v > 1);
 
     // Math check
-    const sumaFields = 1 + (participante.puntosMadrugador ?? 0) + (participante.bonusRef ?? 0) + (participante.puntosReferidosNuevos ?? 0) + (participante.puntosReferidosExistentes ?? 0) + (participante.puntosNivel2 ?? 0) + (participante.puntosPendientes ?? 0);
+    const sumaFields = 1 + (participante.puntosMadrugador ?? 0) + (participante.bonusRef ?? 0) + (participante.puntosReferidosNuevos ?? 0) + (participante.puntosReferidosExistentes ?? 0) + (participante.puntosNivel2 ?? 0) + (participante.puntosPendientes ?? 0) + (participante.puntosApoyos ?? 0);
     const puntosFantasma = participante.puntos - sumaFields;
 
     // Risk score
@@ -106,6 +106,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         nivel2: participante.puntosNivel2,
         madrugador: participante.puntosMadrugador,
         bonusRef: participante.bonusRef,
+        apoyos: participante.puntosApoyos,
         pendientes: participante.puntosPendientes,
       },
       totalReferidos: referidos.length,

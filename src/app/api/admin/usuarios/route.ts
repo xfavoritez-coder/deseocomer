@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = [];
-    if (busq) conditions.push({ OR: [{ nombre: { contains: busq, mode: "insensitive" as const } }, { email: { contains: busq, mode: "insensitive" as const } }] });
+    if (busq) conditions.push({ OR: [{ id: busq }, { nombre: { contains: busq, mode: "insensitive" as const } }, { email: { contains: busq, mode: "insensitive" as const } }] });
     if (filtro === "verificados") conditions.push({ emailVerificado: true });
     if (filtro === "no_verificados") conditions.push({ emailVerificado: false });
 

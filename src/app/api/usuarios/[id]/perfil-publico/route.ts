@@ -70,7 +70,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
           referidosExistentes: p.puntosReferidosExistentes ?? 0,
           nivel2: p.puntosNivel2 ?? 0,
           madrugador: p.puntosMadrugador ?? 0,
-          apoyos: Math.max(0, (p.puntos ?? 0) - 1 - (p.puntosReferidosNuevos ?? 0) - (p.puntosReferidosExistentes ?? 0) - (p.puntosNivel2 ?? 0) - (p.puntosMadrugador ?? 0)),
+          apoyos: p.puntosApoyos ?? 0,
         },
         estado: esGanador ? "ganador" : ended ? "finalizado" : p.concurso.estado === "programado" ? "programado" : "activo",
         participantes: p.concurso._count.participantes,

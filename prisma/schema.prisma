@@ -225,6 +225,7 @@ model ParticipanteConcurso {
   puntosReferidosExistentes Int      @default(0)
   codigoInvitacion          String?
   bonusRef         Int      @default(0)
+  puntosApoyos     Int      @default(0)
   puntos           Int      @default(1)
   puntosPendientes Int      @default(0)
   estado           String   @default("activo")

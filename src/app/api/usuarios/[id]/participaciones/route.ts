@@ -15,6 +15,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         puntosMadrugador: true,
         puntosReferidosNuevos: true,
         puntosReferidosExistentes: true,
+        puntosApoyos: true,
         referidorDirectoId: true,
         concurso: {
           select: {
@@ -32,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       const ended = new Date(p.concurso.fechaFin).getTime() <= Date.now();
       const esGanador = p.concurso.ganadorActualId === id;
       const bonusRef = p.referidorDirectoId ? 3 : 0;
-      const apoyos = Math.max(0, p.puntos - 1 - bonusRef - (p.puntosMadrugador ?? 0) - (p.puntosReferidosNuevos ?? 0) - (p.puntosReferidosExistentes ?? 0) - (p.puntosNivel2 ?? 0));
+      const apoyos = p.puntosApoyos ?? 0;
       return {
         concursoId: p.concursoId,
         slug: p.concurso.slug,

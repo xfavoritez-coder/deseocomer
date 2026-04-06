@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     await prisma.participanteConcurso.update({
       where: { id: target.id },
-      data: { puntos: { increment: 1 } },
+      data: { puntos: { increment: 1 }, puntosApoyos: { increment: 1 } },
     });
 
     // Email primer apoyo recibido (una sola vez por usuario, fire-and-forget)

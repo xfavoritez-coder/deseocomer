@@ -364,8 +364,8 @@ export default function AdminUsuarios() {
                     let u = usuarios.find(x => x.id === r.referidoPorId);
                     if (!u && r.referidoPorId) {
                       try {
-                        const res = await adminFetch(`/api/admin/usuarios/${r.referidoPorId}`);
-                        if (res.ok) u = await res.json();
+                        const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(r.referidoPorId)}&limit=1`);
+                        if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; }
                       } catch {}
                     }
                     if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); }
@@ -385,7 +385,7 @@ export default function AdminUsuarios() {
                     <div key={ref.id} style={{ padding: "8px 10px", marginBottom: "4px", background: ref.verificado ? "rgba(61,184,158,0.04)" : "rgba(255,80,80,0.03)", border: `1px solid ${ref.verificado ? "rgba(61,184,158,0.12)" : "rgba(255,80,80,0.1)"}`, borderRadius: "8px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
                         <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }} />
-                        <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, textAlign: "left", fontWeight: 600 }}>{ref.nombre}</button>
+                        <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, textAlign: "left", fontWeight: 600 }}>{ref.nombre}</button>
                         <span style={{ marginLeft: "auto", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(232,168,76,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#e8a84c" : "rgba(240,234,214,0.25)", fontWeight: 700, flexShrink: 0 }}>{ref.verificado ? "+3 pts" : "+3 pendiente"}</span>
                       </div>
                       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", paddingLeft: "12px" }}>
@@ -408,7 +408,7 @@ export default function AdminUsuarios() {
                   {r.referidosNivel2.map((ref) => (
                     <div key={ref.id} style={{ padding: "6px 10px", marginBottom: "3px", background: "rgba(128,64,208,0.03)", border: "1px solid rgba(128,64,208,0.08)", borderRadius: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }} />
-                      <button onClick={() => { const u = usuarios.find(x => x.id === ref.id); if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.7)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
+                      <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.7)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
                       <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)" }}>{ref.ipRegistro || ""}</span>
                       <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 6px", borderRadius: "6px", background: ref.verificado ? "rgba(128,64,208,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }}>{ref.verificado ? "+1 pt" : "pendiente"}</span>
                     </div>
