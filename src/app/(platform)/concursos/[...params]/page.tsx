@@ -772,6 +772,11 @@ function ConcursoDetallePage() {
             </div>
           )}
 
+          {/* 5. Ranking (mobile) — hidden on desktop where sidebar shows */}
+          <div className="dc-cd-ranking-mobile">
+            {rankingBlock}
+          </div>
+
           {/* 4. Link de participación (solo activos) / CTA concursos (finalizados) */}
           {esLocal && !isEnded ? (
             <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, padding: 20, textAlign: "center" }}>
@@ -848,11 +853,6 @@ function ConcursoDetallePage() {
               </div>
             );
           })()}
-
-          {/* 5. Ranking (mobile) — hidden on desktop where sidebar shows */}
-          <div className="dc-cd-ranking-mobile">
-            {rankingBlock}
-          </div>
 
           {/* 6. Cómo se gana */}
           {!isEnded && (

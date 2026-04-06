@@ -10,13 +10,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Email inválido" }, { status: 400 });
     }
 
-    const concurso = await prisma.concurso.findUnique({ where: { id } });
+    const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id }, { slug: id }] } });
     if (!concurso || concurso.estado !== "programado") {
       return NextResponse.json({ error: "Concurso no disponible" }, { status: 404 });
     }
 
+    const concursoRealId = concurso.id;
+
     const existing = await prisma.listaEsperaConcurso.findUnique({
-      where: { concursoId_email: { concursoId: id, email: email.toLowerCase().trim() } },
+      where: { concursoId_email: { concursoId: concursoRealId, email: email.toLowerCase().trim() } },
     });
     if (existing) {
       return NextResponse.json({ ok: true, yaRegistrado: true });
@@ -24,14 +26,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     await prisma.listaEsperaConcurso.create({
       data: {
-        concursoId: id,
+        concursoId: concursoRealId,
         email: email.toLowerCase().trim(),
         nombre: nombre?.trim() || null,
         usuarioId: usuarioId || null,
       },
     });
 
-    const total = await prisma.listaEsperaConcurso.count({ where: { concursoId: id } });
+    const total = await prisma.listaEsperaConcurso.count({ where: { concursoId: concursoRealId } });
     return NextResponse.json({ ok: true, total });
   } catch (e: any) {
     if (e?.code === "P2002") {
@@ -44,7 +46,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const total = await prisma.listaEsperaConcurso.count({ where: { concursoId: id } });
+    const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id }, { slug: id }] } });
+    const concursoRealId = concurso?.id ?? id;
+    const total = await prisma.listaEsperaConcurso.count({ where: { concursoId: concursoRealId } });
     return NextResponse.json({ total });
   } catch {
     return NextResponse.json({ total: 0 });
