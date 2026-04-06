@@ -7,7 +7,6 @@ import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categori
 const OCASIONES = ["Almuerzo solo", "Con amigos", "Cena romántica", "Antojo rápido", "Para llevar"];
 
 import { COMUNAS_MAESTRAS } from "@/lib/comunas";
-const COMUNAS = [...COMUNAS_MAESTRAS];
 
 // Frases del genio por ocasión
 const FRASES: Record<string, Record<string, string>> = {
@@ -73,7 +72,7 @@ const PREGUNTA: React.CSSProperties = { fontFamily: "var(--font-cinzel)", fontSi
 const CHIP: React.CSSProperties = { background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" };
 
 export default function GeniePanel() {
-  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales, comunasDelivery, quickRec, setQuickRec } = useGenie();
+  const { setIsOpen, addInteraccion, getRecomendacion, isLoggedIn, userName, sessionCount, comunasConLocales, comunasDelivery, comunasConteo, comunasConteoDelivery, quickRec, setQuickRec } = useGenie();
   const COMUNAS_CON_COBERTURA = useMemo(() => comunasConLocales, [comunasConLocales]);
   const COMUNAS_DELIVERY = useMemo(() => comunasDelivery, [comunasDelivery]);
 
@@ -236,24 +235,24 @@ export default function GeniePanel() {
               <input type="text" placeholder="🔍 Buscar comuna..." value={busquedaComuna} onChange={e => setBusquedaComuna(e.target.value)}
                 style={{ width: "100%", padding: "10px 14px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "10px", color: "var(--accent)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none", boxSizing: "border-box" as const, marginBottom: "10px" }} />
               {(() => {
-                const cobertura = modalidad === "Delivery a domicilio" ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
-                const coberturaLower = cobertura.map(c => c.toLowerCase());
-                const filtered = COMUNAS.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()));
-                const activas = filtered.filter(c => coberturaLower.includes(c.toLowerCase())).sort((a, b) => a.localeCompare(b));
-                const noActivas = filtered.filter(c => !coberturaLower.includes(c.toLowerCase())).sort((a, b) => a.localeCompare(b));
+                const isDelivery = modalidad === "Delivery a domicilio";
+                const cobertura = isDelivery ? COMUNAS_DELIVERY : COMUNAS_CON_COBERTURA;
+                const conteoMap = isDelivery ? comunasConteoDelivery : comunasConteo;
+                const filtered = cobertura.filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase())).sort((a, b) => a.localeCompare(b));
+                const noActivas = busquedaComuna.length >= 2
+                  ? [...COMUNAS_MAESTRAS].filter(c => c.toLowerCase().includes(busquedaComuna.toLowerCase()) && !cobertura.some(cb => cb.toLowerCase() === c.toLowerCase())).sort((a, b) => a.localeCompare(b))
+                  : [];
                 return (
                   <div style={{ maxHeight: "220px", overflowY: "auto" }}>
-                    {activas.length > 0 && (
-                      <>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "#3db89e", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>{modalidad === "Delivery a domicilio" ? "Delivery disponible" : "Disponibles"}</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
-                          {activas.map(c => (
-                            <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)" }}>
-                              {c}<span style={{ marginLeft: "4px", fontSize: "0.72rem", color: "#3db89e" }}>●</span>
-                            </button>
-                          ))}
-                        </div>
-                      </>
+                    {filtered.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "12px" }}>
+                        {filtered.map(c => (
+                          <button key={c} onClick={() => handleComuna(c)} style={{ background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "20px", padding: "8px 14px", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.85)", display: "flex", alignItems: "center", gap: "6px" }}>
+                            {c}
+                            {conteoMap[c] ? <span style={{ fontSize: "0.68rem", color: "rgba(61,184,158,0.7)", fontWeight: 600 }}>{conteoMap[c]}</span> : null}
+                          </button>
+                        ))}
+                      </div>
                     )}
                     {noActivas.length > 0 && (
                       <>
@@ -267,10 +266,12 @@ export default function GeniePanel() {
                         </div>
                       </>
                     )}
+                    {filtered.length === 0 && noActivas.length === 0 && busquedaComuna.length > 0 && (
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(245,208,128,0.35)", textAlign: "center", padding: "12px 0" }}>No encontramos esa comuna</p>
+                    )}
                   </div>
                 );
               })()}
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "rgba(245,208,128,0.3)", marginTop: "8px" }}>● {modalidad === "Delivery a domicilio" ? "Delivery disponible" : "Disponible en DeseoComer"}</p>
             </div>
           )}
 

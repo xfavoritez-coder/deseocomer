@@ -65,6 +65,8 @@ interface GenieContextType {
   showFavoritoToast: () => void;
   comunasConLocales: string[];
   comunasDelivery: string[];
+  comunasConteo: Record<string, number>;
+  comunasConteoDelivery: Record<string, number>;
   quickRec: LocalRecomendado | null;
   setQuickRec: (r: LocalRecomendado | null) => void;
 }
@@ -152,12 +154,16 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   const [quickRec, setQuickRec] = useState<LocalRecomendado | null>(null);
   const [comunasFromDB, setComunasFromDB] = useState<string[]>([]);
   const [comunasDeliveryFromDB, setComunasDeliveryFromDB] = useState<string[]>([]);
+  const [comunasConteoFromDB, setComunasConteoFromDB] = useState<Record<string, number>>({});
+  const [comunasConteoDeliveryFromDB, setComunasConteoDeliveryFromDB] = useState<Record<string, number>>({});
 
   // Fetch only comunas (lightweight) instead of all locales
   useEffect(() => {
     fetch("/api/locales/comunas").then(r => r.json()).then(data => {
       if (data.comunas) setComunasFromDB(data.comunas);
       if (data.comunasDelivery) setComunasDeliveryFromDB(data.comunasDelivery);
+      if (data.conteo) setComunasConteoFromDB(data.conteo);
+      if (data.conteoDelivery) setComunasConteoDeliveryFromDB(data.conteoDelivery);
     }).catch(() => {});
   }, []);
 
@@ -434,7 +440,7 @@ export function GenieProvider({ children }: { children: ReactNode }) {
   }, [addInteraccion, showFavoritoToast]);
 
   return (
-    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: comunasFromDB.length > 0 ? comunasFromDB : [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: comunasDeliveryFromDB.length > 0 ? comunasDeliveryFromDB : [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))], quickRec, setQuickRec }}>
+    <GenieContext.Provider value={{ perfil, isOpen, setIsOpen, toastActivo, setToastActivo, addInteraccion, addRespuestaGenio, getRecomendacion, isLoggedIn, userName, sessionCount, showFavoritoToast, comunasConLocales: comunasFromDB.length > 0 ? comunasFromDB : [...new Set(localesDB.map(l => l.comuna))], comunasDelivery: comunasDeliveryFromDB.length > 0 ? comunasDeliveryFromDB : [...new Set(localesDB.flatMap(l => [...(l.comunasDelivery ?? []), ...(l.tieneDelivery ? [l.comuna] : [])]))], comunasConteo: comunasConteoFromDB, comunasConteoDelivery: comunasConteoDeliveryFromDB, quickRec, setQuickRec }}>
       {children}
     </GenieContext.Provider>
   );
