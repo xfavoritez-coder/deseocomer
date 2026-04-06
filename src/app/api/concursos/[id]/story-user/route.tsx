@@ -139,13 +139,14 @@ export async function GET(
         {/* Bottom gradient */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
         {/* Badge ribbon */}
-        <div style={{ position: "absolute", top: "88px", right: "-112px", width: "480px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", transform: "rotate(45deg)" }}>
-          <span style={{ fontFamily: "Cinzel", fontSize: "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em", textTransform: "uppercase" }}>{theme.badgeText}</span>
+        <div style={{ position: "absolute", top: "88px", right: "-112px", width: "560px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", transform: "rotate(45deg)" }}>
+          <span style={{ fontSize: "32px" }}>{theme.emoji}</span>
+          <span style={{ fontFamily: "Cinzel", fontSize: "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
-          {/* User header — personal touch */}
-          <span style={{ fontFamily: "Lato", fontSize: "48px", fontWeight: 700, color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.headerText}</span>
+          {/* User header */}
+          <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 700, color: "rgba(240,234,214,0.5)", textAlign: "center", letterSpacing: "0.15em", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.headerText}</span>
           {/* Local name with logo */}
           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
             {concurso.local.logoUrl ? (
@@ -155,15 +156,15 @@ export async function GET(
             )}
             <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.95)", letterSpacing: "0.1em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
           </div>
-          {/* Prize title with emoji */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "24px" }}>
-            <span style={{ fontSize: "72px", flexShrink: 0 }}>{theme.emoji}</span>
-            <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
-          </div>
+          {/* Prize title */}
+          <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Motivation text */}
-          <span style={{ fontFamily: "Lato", fontSize: "48px", color: "rgba(240,234,214,0.95)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+            <span style={{ fontFamily: "Lato", fontSize: "38px", fontWeight: 700, color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>Entra por mi link y ambos</span>
+            <span style={{ fontFamily: "Lato", fontSize: "38px", fontWeight: 700, color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>ganamos 3 puntos</span>
+          </div>
           {/* CTA button */}
           <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
             <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
@@ -173,8 +174,6 @@ export async function GET(
           {totalParticipantes > 0 && (
             <span style={{ fontFamily: "Lato", fontSize: "36px", color: "rgba(240,234,214,0.5)", textAlign: "center" }}>{totalParticipantes} personas ya participando</span>
           )}
-          {/* Subtle personal invite text */}
-          <span style={{ fontFamily: "Lato", fontSize: "28px", color: "rgba(240,234,214,0.3)", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>{userNameCap} te invita</span>
         </div>
       </div>
     ),
