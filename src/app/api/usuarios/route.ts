@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       const cuentasDesdeIP = await prisma.usuario.count({
         where: { ipRegistro: ip, createdAt: { gte: hace24h } },
       });
-      if (cuentasDesdeIP >= 4) {
+      if (cuentasDesdeIP >= 3) {
         return NextResponse.json(
           { error: "Has creado demasiadas cuentas recientemente. Intenta más tarde." },
           { status: 429 }
