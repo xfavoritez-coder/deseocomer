@@ -147,6 +147,16 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ ok: true });
     }
 
+    if (accion === "verificar-telefono") {
+      await prisma.usuario.update({ where: { id }, data: { telefonoVerificado: true, telefonoVerificadoAt: new Date() } });
+      return NextResponse.json({ ok: true });
+    }
+
+    if (accion === "desverificar-telefono") {
+      await prisma.usuario.update({ where: { id }, data: { telefonoVerificado: false, telefonoVerificadoAt: null } });
+      return NextResponse.json({ ok: true });
+    }
+
     if (accion === "reenviar-verificacion") {
       const token = crypto.randomBytes(32).toString("hex");
       await prisma.usuario.update({ where: { id }, data: { tokenVerificacion: token } });

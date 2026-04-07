@@ -144,14 +144,15 @@ export default function AdminUsuarios() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "0.92rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "6px 16px" }}>{sel.emailVerificado ? "✓ Verificado" : "⏳ Sin verificar"}</span>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.85rem", fontWeight: 700, color: sel.emailVerificado ? "#3db89e" : "#ff8080", background: sel.emailVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,100,100,0.1)", border: `1px solid ${sel.emailVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,100,100,0.3)"}`, borderRadius: "20px", padding: "5px 14px" }}>{sel.emailVerificado ? "✉️ Activado" : "⏳ Sin activar"}</span>
+        <span style={{ fontSize: "0.85rem", fontWeight: 700, color: sel.telefonoVerificado ? "#3db89e" : "rgba(240,234,214,0.35)", background: sel.telefonoVerificado ? "rgba(61,184,158,0.1)" : "rgba(255,255,255,0.03)", border: `1px solid ${sel.telefonoVerificado ? "rgba(61,184,158,0.3)" : "rgba(255,255,255,0.08)"}`, borderRadius: "20px", padding: "5px 14px" }}>{sel.telefonoVerificado ? "📱 Verificado" : "📱 Sin verificar"}</span>
         {isIPDuplicada(sel.ipRegistro) && <span style={ipBadgeS}>⚠️ IP compartida</span>}
       </div>
 
       <div style={cardS}>
         <p style={cardTitleS}>Información</p>
-        {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })], ["Cuenta activada", sel.emailVerificadoAt ? new Date(sel.emailVerificadoAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : (sel.emailVerificado ? "Sí (fecha no registrada)" : "No")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
+        {[["Nombre", sel.nombre], ["Email", sel.email], ["Teléfono", sel.telefono || "—"], ["Tipo", sel.tipo || "usuario"], ["Foto", sel.fotoUrl ? "Sí" : "Sin foto"], ["IP Registro", sel.ipRegistro || "—"], ["Cumpleaños", sel.cumpleDia ? `${sel.cumpleDia}/${sel.cumpleMes}${sel.cumpleAnio ? `/${sel.cumpleAnio}` : ""}` : "No registrado"], ["Registro", new Date(sel.createdAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })], ["Cuenta activada", sel.emailVerificadoAt ? new Date(sel.emailVerificadoAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : (sel.emailVerificado ? "Sí (fecha no registrada)" : "No")], ["Celular verificado", sel.telefonoVerificadoAt ? new Date(sel.telefonoVerificadoAt).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : (sel.telefonoVerificado ? "Sí (fecha no registrada)" : "No")]].map(([l, v]) => <Row key={l} label={l} value={v ?? "—"} />)}
         {sel.estiloAlimentario && (
           <div style={{ padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "rgba(240,234,214,0.55)" }}>Estilo</span>
@@ -510,7 +511,13 @@ export default function AdminUsuarios() {
             </>
           )}
           {sel.emailVerificado && (
-            <button onClick={async () => { if (await action("desactivar")) { setSel({ ...sel, emailVerificado: false }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, emailVerificado: false } : u)); show("Usuario desactivado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ Desactivar cuenta</button>
+            <button onClick={async () => { if (await action("desactivar")) { setSel({ ...sel, emailVerificado: false }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, emailVerificado: false } : u)); show("Cuenta desactivada"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ Desactivar cuenta (email)</button>
+          )}
+          {!sel.telefonoVerificado && (
+            <button onClick={async () => { if (await action("verificar-telefono")) { setSel({ ...sel, telefonoVerificado: true }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, telefonoVerificado: true } : u)); show("📱 Celular verificado manualmente"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>📱 Verificar celular manualmente</button>
+          )}
+          {sel.telefonoVerificado && (
+            <button onClick={async () => { if (await action("desverificar-telefono")) { setSel({ ...sel, telefonoVerificado: false }); setUsuarios(p => p.map(u => u.id === sel.id ? { ...u, telefonoVerificado: false } : u)); show("Verificación de celular removida"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ Quitar verificación celular</button>
           )}
           <button onClick={async () => {
             const nuevoTipo = sel.tipo === "bloqueado" ? "usuario" : "bloqueado";
@@ -536,8 +543,9 @@ export default function AdminUsuarios() {
       <div style={{ display: "flex", gap: "8px", marginBottom: "12px", flexWrap: "wrap", alignItems: "center" }}>
         {[
           { key: "", label: "Todos" },
-          { key: "verificados", label: "✓ Verificados" },
-          { key: "no_verificados", label: "⏳ Sin verificar" },
+          { key: "activados", label: "✉️ Activados" },
+          { key: "verificados", label: "📱 Verificados" },
+          { key: "no_verificados", label: "⏳ Sin activar" },
         ].map(f => (
           <button key={f.key} onClick={() => setFiltroEstado(f.key)} style={{ padding: "6px 14px", borderRadius: "20px", border: filtroEstado === f.key ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.1)", background: filtroEstado === f.key ? "rgba(232,168,76,0.12)" : "transparent", color: filtroEstado === f.key ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer" }}>{f.label}</button>
         ))}
@@ -567,7 +575,8 @@ export default function AdminUsuarios() {
             </div>
             <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "3px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <span style={{ fontSize: "0.85rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✓" : "⏳"}</span>
+                <span style={{ fontSize: "0.75rem", color: u.emailVerificado ? "#3db89e" : "#ff8080" }}>{u.emailVerificado ? "✉️" : "⏳"}</span>
+                {u.telefonoVerificado && <span style={{ fontSize: "0.75rem", color: "#3db89e" }}>📱</span>}
                 {isIPDuplicada(u.ipRegistro) && <span style={ipBadgeS}>⚠️ IP</span>}
               </div>
               {(u._count?.participaciones > 0 || u._count?.favoritos > 0) && (

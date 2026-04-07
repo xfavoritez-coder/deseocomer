@@ -21,6 +21,7 @@ import {
 import {
   REFS_KEY,
   savePendingRef,
+  getPendingRef,
   getRefCount,
   incrementRef,
   hasVisited,
@@ -139,6 +140,20 @@ function ConcursoDetallePage() {
   const [myRefs, setMyRefs] = useState(0);
   const [refBannerName, setRefBannerName] = useState<string | null | undefined>(undefined);
   const [refBannerDismissed, setRefBannerDismissed] = useState(false);
+  const [pendingRefName, setPendingRefName] = useState<string | null>(null);
+  useEffect(() => {
+    if (hasRefLink || isAuthenticated) return;
+    try {
+      const p = getPendingRef();
+      if (p?.refCode && String(p.concursoId) === String(concursoId)) {
+        const local = findUserByRefCode(p.refCode.toUpperCase());
+        if (local) { setPendingRefName(local.nombre.split(" ")[0]); return; }
+        fetch(`/api/usuarios/by-refcode?code=${encodeURIComponent(p.refCode)}`).then(r => r.ok ? r.json() : null).then(data => {
+          if (data?.nombre) setPendingRefName(data.nombre.split(" ")[0]);
+        }).catch(() => {});
+      }
+    } catch {}
+  }, [hasRefLink, isAuthenticated, concursoId]);
   const [tooltipActivo, setTooltipActivo] = useState<string | null>(null);
   const [showAllRanking, setShowAllRanking] = useState(false);
   const [infoTooltip, setInfoTooltip] = useState<string | null>(null);
@@ -636,6 +651,14 @@ function ConcursoDetallePage() {
         </>);
       })()}
 
+      {/* Sticky referral reminder — shows after dismissing modal */}
+      {!isAuthenticated && refBannerDismissed && pendingRefName && !isEnded && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100, background: "linear-gradient(135deg, rgba(45,26,8,0.98), rgba(26,14,5,0.98))", borderTop: "1px solid rgba(232,168,76,0.35)", padding: "12px 20px", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, backdropFilter: "blur(10px)" }}>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#f5d080", margin: 0, lineHeight: 1.4 }}>🏮 <strong>{pendingRefName}</strong> te invitó — Ambos ganan 3 puntos</p>
+          <Link href={`/registro?ref=${getPendingRef()?.refCode}&concurso=${concursoId}`} style={{ flexShrink: 0, background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", fontWeight: 700, padding: "8px 16px", borderRadius: 8, textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Registrarme gratis</Link>
+        </div>
+      )}
+
       {/* 1. HERO */}
       <section className="dc-cd-hero" style={{ position: "relative", height: "280px", overflow: "hidden" }}>
         {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
@@ -844,7 +867,7 @@ function ConcursoDetallePage() {
                     <button onClick={copyLink} style={{ background: "rgba(232,168,76,0.18)", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 6, padding: "4px 10px", fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>{copied ? "✓ Copiado" : "Copiar"}</button>
                   </div>
                   {/* WhatsApp */}
-                  <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); window.open(`https://wa.me/?text=${encodeURIComponent(`Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Si entras por mi link AMBOS ganamos 3 puntos — es gratis 👉 ${refLink}`)}`, "_blank"); }} style={{ width: "100%", marginTop: 8, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.3)", borderRadius: 10, padding: 13, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#25d366", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); window.open(`https://wa.me/?text=${encodeURIComponent(`Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Entra por este link y ambos ganamos 3 puntos — es gratis y toma 1 minuto 👉 ${refLink}`)}`, "_blank"); }} style={{ width: "100%", marginTop: 8, background: "rgba(37,211,102,0.1)", border: "1px solid rgba(37,211,102,0.3)", borderRadius: 10, padding: 13, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#25d366", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
                     Compartir por WhatsApp
                   </button>
@@ -879,7 +902,15 @@ function ConcursoDetallePage() {
                 </div>
               ) : !isAuthenticated ? (
                 <div style={{ marginTop: 16 }}>
-                  <Link className="dc-cd-cta-btn" href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, textDecoration: "none", textAlign: "center", letterSpacing: "0.06em" }}>Iniciar sesión para participar</Link>
+                  {pendingRefName ? (
+                    <>
+                      <Link className="dc-cd-cta-btn" href={`/registro?ref=${getPendingRef()?.refCode}&concurso=${concursoId}`} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, textDecoration: "none", textAlign: "center", letterSpacing: "0.06em" }}>Registrarme y sumarle puntos a {pendingRefName}</Link>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>Ambos ganan 3 puntos gratis</p>
+                      <Link href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", textDecoration: "none", textAlign: "center", marginTop: 6 }}>¿Ya tienes cuenta? Inicia sesión</Link>
+                    </>
+                  ) : (
+                    <Link className="dc-cd-cta-btn" href={`/login?next=/concursos/${c.slug || slug}`} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, textDecoration: "none", textAlign: "center", letterSpacing: "0.06em" }}>Iniciar sesión para participar</Link>
+                  )}
                 </div>
               ) : null}
             </div>
@@ -1124,7 +1155,7 @@ function ConcursoDetallePage() {
           <p style={{ fontSize: 36, marginBottom: 12 }}>🎉</p>
           <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", marginBottom: 8, letterSpacing: "0.04em" }}>¡Estás dentro! Ahora sube al ranking 🧞</h3>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, marginBottom: 24 }}>Tienes 1 punto. Para ganar necesitas subir en el ranking invitando amigos. Cada amigo que entre por tu link te da <strong style={{ color: "#e8a84c" }}>+3 puntos</strong> — y él también gana <strong style={{ color: "#e8a84c" }}>+3 puntos</strong> por entrar.</p>
-          <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); window.open(`https://wa.me/?text=${encodeURIComponent(`Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Si entras por mi link AMBOS ganamos 3 puntos — es gratis 👉 ${refLink}`)}`, "_blank"); }} style={{ width: "100%", padding: 16, background: "#25d366", border: "none", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); window.open(`https://wa.me/?text=${encodeURIComponent(`Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Entra por este link y ambos ganamos 3 puntos — es gratis y toma 1 minuto 👉 ${refLink}`)}`, "_blank"); }} style={{ width: "100%", padding: 16, background: "#25d366", border: "none", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
             Compartir por WhatsApp
           </button>

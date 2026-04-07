@@ -17,7 +17,9 @@ export async function GET(req: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = [];
     if (busq) conditions.push({ OR: [{ id: busq }, { nombre: { contains: busq, mode: "insensitive" as const } }, { email: { contains: busq, mode: "insensitive" as const } }] });
-    if (filtro === "verificados") conditions.push({ emailVerificado: true });
+    if (filtro === "verificados") conditions.push({ emailVerificado: true, telefonoVerificado: true });
+    if (filtro === "activados") conditions.push({ emailVerificado: true });
+    if (filtro === "sin_activar") conditions.push({ emailVerificado: false });
     if (filtro === "no_verificados") conditions.push({ emailVerificado: false });
 
     const where = conditions.length > 0 ? { AND: conditions } : {};
@@ -35,7 +37,8 @@ export async function GET(req: NextRequest) {
         take: limit,
         select: {
           id: true, nombre: true, email: true, tipo: true, telefono: true, fotoUrl: true,
-          emailVerificado: true, emailVerificadoAt: true, ipRegistro: true,
+          emailVerificado: true, emailVerificadoAt: true,
+          telefonoVerificado: true, telefonoVerificadoAt: true, ipRegistro: true,
           cumpleDia: true, cumpleMes: true, cumpleAnio: true, createdAt: true,
           estiloAlimentario: true, comidasFavoritas: true,
           _count: { select: { favoritos: true, resenas: true, participaciones: true } },
