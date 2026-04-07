@@ -336,6 +336,15 @@ export default function LocalDetailPage() {
                   </div>
                 </>)}
               </div>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {([...new Set((local as any).categorias ?? [])] as string[]).length > 1 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginTop: "8px" }}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {([...new Set((local as any).categorias ?? [])] as string[]).map((tag: string, i: number) => (
+                    <span key={tag} style={{ padding: "3px 10px", borderRadius: "16px", border: i === 0 ? "1px solid rgba(232,168,76,0.4)" : "1px solid rgba(240,234,214,0.12)", background: i === 0 ? "rgba(232,168,76,0.15)" : "rgba(240,234,214,0.04)", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: i === 0 ? "#e8a84c" : "rgba(240,234,214,0.45)", fontWeight: i === 0 ? 700 : 400 }}>{CATEGORIA_EMOJI[tag] ?? ""} {tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -385,13 +394,13 @@ export default function LocalDetailPage() {
         <div className="dc-tabs-inner" style={{ display: "flex", padding: "0 24px" }}>
         {[
           { key: "Información" as Tab, label: "Información", count: null, countColor: "", countBg: "" },
-          { key: "Concursos" as Tab, label: "Concursos", count: concursosActivos.length > 0 ? concursosActivos.length : (concursosLocal.length > 0 ? concursosLocal.length : null), countColor: concursosActivos.length > 0 ? "#1a0e05" : "rgba(240,234,214,0.5)", countBg: concursosActivos.length > 0 ? "#e8a84c" : "rgba(255,255,255,0.1)" },
-          { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#c97060" },
-          { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)" },
+          { key: "Concursos" as Tab, label: "Concursos", count: concursosActivos.length > 0 ? concursosActivos.length : (concursosLocal.length > 0 ? concursosLocal.length : null), countColor: concursosActivos.length > 0 ? "#1a0e05" : "rgba(240,234,214,0.5)", countBg: concursosActivos.length > 0 ? "#e8a84c" : "rgba(255,255,255,0.1)", alwaysHighlight: concursosActivos.length > 0 },
+          { key: "Promociones" as Tab, label: "Promociones", count: promosLocal.length > 0 ? promosLocal.length : null, countColor: "#1a0e05", countBg: "#e8a84c", alwaysHighlight: promosLocal.length > 0 },
+          { key: "Reseñas" as Tab, label: "Reseñas", count: local.totalResenas > 0 ? local.totalResenas : null, countColor: "rgba(240,234,214,0.4)", countBg: "rgba(240,234,214,0.1)", alwaysHighlight: false },
         ].map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.12em", textTransform: "uppercase", color: tab === t.key ? "var(--accent)" : "var(--text-muted)", background: "none", border: "none", borderBottom: tab === t.key ? "2px solid var(--accent)" : "2px solid transparent", padding: "14px 14px", cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "6px" }}>
             {t.label}
-            {t.count !== null && <span style={{ background: tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)", color: tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)", fontSize: "0.72rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
+            {t.count !== null && <span style={{ background: t.alwaysHighlight ? "#e8a84c" : (tab === t.key ? (t.countBg || "rgba(232,168,76,0.2)") : "rgba(255,255,255,0.08)"), color: t.alwaysHighlight ? "#1a0e05" : (tab === t.key ? (t.countColor || "var(--accent)") : "rgba(240,234,214,0.35)"), fontSize: "0.72rem", fontWeight: 700, borderRadius: "10px", padding: "1px 6px", minWidth: "16px", textAlign: "center", transition: "all 0.2s" }}>{t.count}</span>}
           </button>
         ))}
         </div>
@@ -412,15 +421,6 @@ export default function LocalDetailPage() {
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre este local</p>
                     {local.descripcion && <p style={bodyStyle}>{local.descripcion}</p>}
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
-                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                    {([...new Set((local as any).categorias ?? [])] as string[]).slice(1).length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "14px" }}>
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {([...new Set((local as any).categorias ?? [])] as string[]).slice(1).map((tag: string) => (
-                          <span key={tag} style={{ padding: "4px 12px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.15)", background: "rgba(232,168,76,0.06)", fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)" }}>{tag}</span>
-                        ))}
-                      </div>
-                    )}
                     {tieneUbicacion && (
                       <>
                         {(local.descripcion || local.historia) && <div style={{ height: "1px", background: "rgba(232,168,76,0.08)", margin: "16px 0" }} />}
@@ -462,72 +462,6 @@ export default function LocalDetailPage() {
                   )}
                 </div>
 
-                <div className="dc-local-concursos-promos" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Concurso destacado (solo si hay activos) */}
-                  {concursosActivos.length > 0 && (() => {
-                    const c = concursosActivos[0];
-                    return (
-                      <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Concurso activo</p>
-                        <Link href={`/concursos/${c.slug || c.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
-                          {c.imagenUrl ? (
-                            <img src={c.imagenUrl} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
-                          ) : (
-                            <span style={{ fontSize: "1.5rem" }}>🏆</span>
-                          )}
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{c.premio}</p>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{c._count?.participantes ?? c.participantes ?? 0} participantes</p>
-                          </div>
-                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
-                        </Link>
-                        {concursosActivos.length > 1 && (
-                          <button onClick={() => setTab("Concursos")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todos ({concursosActivos.length}) →</button>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {/* Promoción destacada (solo la más reciente) */}
-                  {promosLocal.length > 0 && (() => {
-                    const p = promosLocal[0];
-                    return (
-                      <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Promoción activa</p>
-                        <Link href={`/promociones/${(p as any).slug || p.id}`} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.18)", borderRadius: "12px", textDecoration: "none" }}>
-                          {p.imagenUrl ? (
-                            <img src={p.imagenUrl as string} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} />
-                          ) : (
-                            <span style={{ fontSize: "1.5rem" }}>⚡</span>
-                          )}
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.82rem", color: "#f0ead6", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: "2px" }}>{p.titulo as string}</p>
-                            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.4)" }}>{TIPO_LABEL[p.tipo as string] || p.tipo as string} · {p.horaInicio as string} – {p.horaFin as string}</p>
-                          </div>
-                          <span style={{ color: "rgba(240,234,214,0.25)", fontSize: "1rem", flexShrink: 0 }}>→</span>
-                        </Link>
-                        {promosLocal.length > 1 && (
-                          <button onClick={() => setTab("Promociones")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(232,168,76,0.5)", marginTop: "10px", padding: 0 }}>Ver todas ({promosLocal.length}) →</button>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {/* Sin concursos ni promociones */}
-                  {concursosActivos.length === 0 && promosLocal.length === 0 && (
-                    <div style={{ background: "rgba(255,255,255,0.02)", border: "0.5px solid rgba(232,168,76,0.08)", borderRadius: "14px", padding: "24px", textAlign: "center" }}>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", marginBottom: esPropioDueno ? "14px" : "0" }}>Sin concursos ni promociones activas</p>
-                      {esPropioDueno && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.55)", lineHeight: 1.5, marginBottom: "4px" }}>Publica un concurso o promoción para que más personas te encuentren</p>
-                          <a href="/panel/concursos" style={{ display: "block", padding: "11px", background: "#e8a84c", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#0a0812", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Crear concurso →</a>
-                          <a href="/panel/promociones" style={{ display: "block", padding: "11px", background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#e8a84c", textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em" }}>Publicar promoción →</a>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                </div>
 
                 {/* Horarios — inline en móvil, sidebar en desktop */}
                 {tieneHorarios && (
@@ -739,14 +673,12 @@ export default function LocalDetailPage() {
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
         @media (max-width: 1023px) {
           .dc-local-main-content { order: 0; }
-          .dc-local-concursos-promos { order: 1; }
           .dc-local-horarios-section { order: 2; }
           .dc-local-resenas-section { order: 3; }
         }
         @media (min-width: 1024px) {
           .dc-local-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: none; align-items: start; }
           .dc-local-main-content { grid-column: 1; }
-          .dc-local-concursos-promos { grid-column: 1; }
           .dc-local-horarios-section { grid-column: 2; grid-row: 1 / -1; position: sticky; top: 100px; }
           .dc-local-resenas-section { grid-column: 1; }
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
