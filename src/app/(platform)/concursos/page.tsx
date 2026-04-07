@@ -412,7 +412,7 @@ export default function ConcursosPage() {
                     {/* Participantes / En espera */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.estado === "programado" ? "En espera" : c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.estado === "programado" ? `🔔 ${c.listaEsperaCount ?? 0} personas` : `${c.participantes}${c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}`}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600 }}>{c.estado === "programado" ? `${c.listaEsperaCount ?? 0} personas` : `${c.participantes}${c.modalidadConcurso === "sorteo" ? " 🎟️" : ""}`}</span>
                     </div>
 
                     {/* Top 3 */}
