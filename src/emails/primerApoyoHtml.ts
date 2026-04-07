@@ -26,7 +26,11 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal, no
     </div>
 
     <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">
-      Esto significa que ${apoyoNombre} quiere que ganes. ¡Sigue sumando puntos compartiendo tu link y subiendo en el ranking!
+      Este es tu <strong style="color:#f5d080">primer punto de apoyo</strong> — significa que ${apoyoNombre} quiere que ganes. ¡Sigue sumando puntos compartiendo tu link y subiendo en el ranking!
+    </p>
+
+    <p style="color:#8a7040;font-size:13px;line-height:1.6;margin-bottom:16px;font-style:italic">
+      Este correo solo se envía una vez, con tu primer apoyo. No recibirás más emails por apoyos futuros.
     </p>
 
     <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:28px">
