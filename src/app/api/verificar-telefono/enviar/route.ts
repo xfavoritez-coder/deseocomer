@@ -47,8 +47,9 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ ok: true, telefono: phone });
-  } catch (error) {
-    console.error("[SMS enviar]", error);
-    return NextResponse.json({ error: "Error al enviar SMS. Verifica el número e intenta de nuevo." }, { status: 500 });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[SMS enviar]", msg, error);
+    return NextResponse.json({ error: `Error al enviar SMS: ${msg}` }, { status: 500 });
   }
 }
