@@ -150,6 +150,7 @@ function ConcursoDetallePage() {
   }, [infoTooltip]);
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
+  const [participationChecked, setParticipationChecked] = useState(false);
   const [esLocal, setEsLocal] = useState(false);
   const [localId, setLocalId] = useState<string | null>(null);
   useEffect(() => {
@@ -230,6 +231,7 @@ function ConcursoDetallePage() {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
           setIsParticipating(!!me);
+          setParticipationChecked(true);
           // Check if user was surpassed
           if (isAuthenticated) {
             const myNewIdx = newRanking.findIndex((r: { usuarioId?: string }) => r.usuarioId === user.id);
@@ -821,6 +823,13 @@ function ConcursoDetallePage() {
               )}
             </div>
           ) : !isEnded && !isProgramado ? (
+          isAuthenticated && !participationChecked ? (
+          <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, padding: 20 }}>
+            <div style={{ height: 14, width: "60%", margin: "0 auto 10px", background: "rgba(232,168,76,0.08)", borderRadius: 6, animation: "dcPulse 1.5s ease-in-out infinite" }} />
+            <div style={{ height: 12, width: "80%", margin: "0 auto 16px", background: "rgba(232,168,76,0.05)", borderRadius: 6, animation: "dcPulse 1.5s ease-in-out infinite" }} />
+            <div style={{ height: 44, width: "100%", background: "rgba(232,168,76,0.06)", borderRadius: 10, animation: "dcPulse 1.5s ease-in-out infinite" }} />
+          </div>
+          ) : (
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
@@ -878,7 +887,7 @@ function ConcursoDetallePage() {
               <Link href="/concursos/como-funciona" style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(232,168,76,0.6)", textDecoration: "none", display: "inline-flex", alignItems: "center" }}>¿Cómo funcionan los concursos?</Link>
             </div>
           </div>
-          ) : null}
+          )) : null}
 
           {/* Banner cómo funciona — solo primera vez */}
           {!isParticipating && (() => {
