@@ -55,30 +55,26 @@ export default function StoryUserPage() {
           <p style={{ margin: "0 0 14px" }}>4. Agrega el sticker de link apuntando al botón y pon este link:</p>
         </div>
 
-        {/* Link box */}
-        <div style={{ background: "rgba(225,48,108,0.08)", border: "1px solid rgba(225,48,108,0.2)", borderRadius: "8px", padding: "10px 14px", marginBottom: "10px" }}>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "13px", color: "#E1306C", wordBreak: "break-all", margin: 0 }}>{link}</p>
-        </div>
-
-        {/* Boton copiar */}
+        {/* Link box — tap to copy */}
         <button
           onClick={copyLink}
           style={{
             width: "100%",
-            padding: "12px",
-            background: copied ? "rgba(61,184,158,0.15)" : "rgba(225,48,108,0.1)",
-            border: `1px solid ${copied ? "rgba(61,184,158,0.4)" : "rgba(225,48,108,0.25)"}`,
-            borderRadius: "10px",
-            color: copied ? "#3db89e" : "#E1306C",
-            fontFamily: "var(--font-cinzel)",
-            fontSize: "13px",
-            fontWeight: 700,
+            background: copied ? "rgba(61,184,158,0.1)" : "rgba(225,48,108,0.06)",
+            border: `1px solid ${copied ? "rgba(61,184,158,0.35)" : "rgba(225,48,108,0.2)"}`,
+            borderRadius: "14px",
+            padding: "16px",
             cursor: "pointer",
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
+            textAlign: "center",
+            transition: "all 0.3s",
           }}
         >
-          {copied ? "✓ Link copiado" : "Copiar link"}
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "12px", color: copied ? "#3db89e" : "rgba(240,234,214,0.4)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            {copied ? "✓ Copiado al portapapeles" : "Toca para copiar tu link"}
+          </p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "14px", color: copied ? "#3db89e" : "#E1306C", wordBreak: "break-all", margin: 0, fontWeight: 600 }}>
+            {link}
+          </p>
         </button>
       </div>
     </div>

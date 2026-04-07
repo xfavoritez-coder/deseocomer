@@ -168,25 +168,16 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
             const isActiva     = mounted ? isPromocionActivaAhora(promo) : false;
             const isUltimas    = mounted ? terminaEnMenos2Horas(promo)   : false;
             const timer        = timers[promo.id];
-            const isHH         = promo.tipo === "happy_hour";
-            const accentColor  = isHH ? "#d4a017" : "var(--accent)";
+            const isHH         = false;
+            const accentColor  = "var(--accent)";
             const tLower       = promo.tipo?.toLowerCase() ?? "";
-            const badge        = isHH || tLower === "happy hour"
-              ? { text: "HAPPY HOUR", color: "#d4a017" }
-              : tLower === "cumpleanos" || tLower === "cumpleaños"
-              ? { text: "CUMPLEAÑOS", color: "#e05090" }
-              : tLower === "2x1"
-              ? { text: "2×1", color: "#3db89e" }
-              : tLower === "descuento" || tLower === "descuento %"
-              ? { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" }
-              : tLower === "cupon" || tLower === "cupón"
-              ? { text: "COMBO", color: "#e8a84c" }
-              : tLower === "precio_especial" || tLower === "especial"
-              ? { text: "COMBO", color: "#e8a84c" }
-              : tLower === "combo" || tLower === "promo"
-              ? { text: "COMBO", color: "#e8a84c" }
-              : tLower === "regalo"
-              ? { text: "REGALO", color: "#e8a84c" }
+            const diasNombre   = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+            const isCumple     = tLower === "cumpleanos" || tLower === "cumpleaños";
+            const esSoloDia    = promo.diasSemana.length === 1;
+            const badge        = isCumple
+              ? { text: "🎂 CUMPLEAÑOS", color: "#e05090" }
+              : esSoloDia
+              ? { text: `Solo los ${diasNombre[promo.diasSemana[0]]}`, color: "#7b9aff" }
               : null;
 
             return (

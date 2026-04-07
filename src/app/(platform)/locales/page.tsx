@@ -155,6 +155,7 @@ export default function LocalesPage() {
     return () => observer.disconnect();
   }, [loadMore]);
 
+  useEffect(() => { trackStat("pagina", "locales"); }, []);
   useEffect(() => {
     if (busqueda.length >= 3) {
       const t = setTimeout(() => { addInteraccion("busqueda", { query: busqueda }); trackStat("busqueda", busqueda); }, 1500);

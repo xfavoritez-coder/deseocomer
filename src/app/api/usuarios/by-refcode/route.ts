@@ -11,23 +11,23 @@ export async function GET(req: NextRequest) {
     // First: search by codigoRef (the real referral code)
     const byCode = await prisma.usuario.findFirst({
       where: { codigoRef: upper },
-      select: { id: true, nombre: true },
+      select: { id: true, nombre: true, codigoRef: true },
     });
-    if (byCode) return NextResponse.json({ id: byCode.id, nombre: byCode.nombre.split(" ")[0] });
+    if (byCode) return NextResponse.json({ id: byCode.id, nombre: byCode.nombre.split(" ")[0], codigoRef: byCode.codigoRef });
 
     // Second: search by ID (in case someone passed the full userId)
     const byId = await prisma.usuario.findUnique({
       where: { id: code },
-      select: { id: true, nombre: true },
+      select: { id: true, nombre: true, codigoRef: true },
     });
-    if (byId) return NextResponse.json({ id: byId.id, nombre: byId.nombre.split(" ")[0] });
+    if (byId) return NextResponse.json({ id: byId.id, nombre: byId.nombre.split(" ")[0], codigoRef: byId.codigoRef });
 
     // Third: legacy fallback - search by last 6 chars of ID (old getRefCode format)
     const byLegacy = await prisma.usuario.findFirst({
       where: { id: { endsWith: code.toLowerCase() } },
-      select: { id: true, nombre: true },
+      select: { id: true, nombre: true, codigoRef: true },
     });
-    if (byLegacy) return NextResponse.json({ id: byLegacy.id, nombre: byLegacy.nombre.split(" ")[0] });
+    if (byLegacy) return NextResponse.json({ id: byLegacy.id, nombre: byLegacy.nombre.split(" ")[0], codigoRef: byLegacy.codigoRef });
 
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   } catch {

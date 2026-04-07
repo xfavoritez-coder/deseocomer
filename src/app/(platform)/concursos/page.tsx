@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import SelloGratis from "@/components/SelloGratis";
+import { trackStat } from "@/lib/stats-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { boostScore } from "@/lib/personalizacion";
 
@@ -36,6 +37,7 @@ export default function ConcursosPage() {
   const [loading, setLoading] = useState(true);
   const [misConcursos, setMisConcursos] = useState<Set<string>>(new Set());
 
+  useEffect(() => { trackStat("pagina", "concursos"); }, []);
   useEffect(() => {
     fetch("/api/concursos").then(r => r.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) {

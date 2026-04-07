@@ -30,8 +30,11 @@ function isCumple(tipo: string | undefined): boolean {
   return t === "cumpleanos" || t === "cumpleaños";
 }
 
+const DIAS_BADGE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+
 function getSello(promo: Promocion): { text: string; color: string } | null {
   if (isCumple(promo.tipo)) return { text: "🎂 CUMPLEAÑOS", color: "#e05090" };
+  if (promo.diasSemana.length === 1) return { text: `Solo los ${DIAS_BADGE[promo.diasSemana[0]]}`, color: "#7b9aff" };
   return null;
 }
 
@@ -43,10 +46,7 @@ export default function PromocionesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroActivas, setFiltroActivas] = useState(false);
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
-  const [diaSeleccionado, setDiaSeleccionado] = useState<string>(() => {
-    const dias = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-    return dias[new Date().getDay()];
-  });
+  const [diaSeleccionado, setDiaSeleccionado] = useState<string>("Todos");
   const [esCumple, setEsCumple] = useState(false);
   const [filtroComuna, setFiltroComuna] = useState("");
   const [filtroCategoria, setFiltroCategoria] = useState("");
@@ -176,7 +176,7 @@ export default function PromocionesPage() {
 
         {/* Fila 3 — Filtro por día */}
         <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
-          {["Hoy", "Todos", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => {
+          {["Todos", "Hoy", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => {
             const isHoy = d === "Hoy";
             const active = diaSeleccionado === d || (d === "Hoy" && diaSeleccionado === ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][new Date().getDay()]);
             const sel = diaSeleccionado === d;

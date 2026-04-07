@@ -41,6 +41,7 @@ function RegistroContent() {
   const [comidasSel, setComidasSel] = useState<string[]>([]);
   const [customComidas, setCustomComidas] = useState<string[]>([]);
   const [customInput, setCustomInput] = useState("");
+  const [comidasError, setComidasError] = useState(false);
   const [categoriasDB, setCategoriasDB] = useState<{ nombre: string; slug: string; emoji: string; tipo: string; estiloExcluido: string[] }[]>([]);
   const [registeredUserId, setRegisteredUserId] = useState("");
   const [redirectTo, setRedirectTo] = useState("/");
@@ -220,7 +221,7 @@ function RegistroContent() {
                     const maxed = totalSel >= 5 && !sel;
                     const orden = sel ? comidasSel.indexOf(c) + 1 : 0;
                     return (
-                      <button key={c} disabled={maxed} onClick={() => setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c])} style={{
+                      <button key={c} disabled={maxed} onClick={() => { setComidasError(false); setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c]); }} style={{
                         padding: "8px 16px", borderRadius: "20px", cursor: maxed ? "default" : "pointer",
                         background: sel ? "rgba(232,168,76,0.15)" : "transparent",
                         border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)",
@@ -282,9 +283,12 @@ function RegistroContent() {
                   >+</button>
                 </div>
               )}
-              {(comidasSel.length + customComidas.length) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: (comidasSel.length + customComidas.length) < 2 ? "#e8a84c" : "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length + customComidas.length}/5 seleccionadas{(comidasSel.length + customComidas.length) < 2 ? " (mínimo 2)" : ""}</p>}
+              {(comidasSel.length + customComidas.length) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length + customComidas.length}/5 seleccionadas</p>}
+              {comidasError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff6b6b", marginBottom: 10 }}>Selecciona al menos 2 comidas favoritas</p>}
               <button onClick={async () => {
                 const todasSel = comidasSel.length + customComidas.length;
+                if (todasSel < 2) { setComidasError(true); return; }
+                setComidasError(false);
                 if (registeredUserId && (estilo || todasSel > 0)) {
                   try {
                     await fetch("/api/usuarios/preferencias", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: registeredUserId, estiloAlimentario: estilo, comidasFavoritas: comidasSel }) });
@@ -316,7 +320,7 @@ function RegistroContent() {
                   } catch {}
                 }
                 setOnboardingStep(3);
-              }} disabled={(comidasSel.length + customComidas.length) < 2} style={{ ...btnS, opacity: (comidasSel.length + customComidas.length) < 2 ? 0.4 : 1, cursor: (comidasSel.length + customComidas.length) < 2 ? "default" : "pointer" }}>{(comidasSel.length + customComidas.length) >= 2 ? "¡Listo, vamos!" : "Elige al menos 2"}</button>
+              }} style={btnS}>¡Listo, vamos!</button>
               <button onClick={() => setOnboardingStep(3)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
             </div>
           ) : onboardingStep === 3 ? (

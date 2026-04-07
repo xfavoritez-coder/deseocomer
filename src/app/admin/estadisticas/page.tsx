@@ -81,6 +81,8 @@ export default function EstadisticasPage() {
   const [userStats, setUserStats] = useState<UserStatsData | null>(null);
   const [error, setError] = useState(false);
   const [regStats, setRegStats] = useState<{ total: number; porDia: { dia: string; registros: number }[] } | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [shareStats, setShareStats] = useState<any>(null);
   const [tab, setTab] = useState<"busquedas" | "usuarios" | "registros">("busquedas");
 
   useEffect(() => {
@@ -90,6 +92,7 @@ export default function EstadisticasPage() {
     adminFetch("/api/admin/stats-cache").then(r => r.json()).then(d => {
       if (d.usuarios) setUserStats(d.usuarios);
       if (d.registros) setRegStats(d.registros);
+      if (d.shares) setShareStats(d.shares);
     }).catch(() => {});
   }, []);
 
@@ -147,6 +150,39 @@ export default function EstadisticasPage() {
             <TopTable title="Top categorías" data={stats.categorias} total={stats.totalFiltrosCategorias} />
             <TopTable title="Promociones más vistas" data={stats.promocionesVistas ?? {}} total={stats.totalPromocionesVistas ?? 0} />
           </div>
+
+          {/* Compartidos */}
+          {shareStats && (shareStats.totalWA > 0 || shareStats.totalIG > 0) && (
+            <div style={{ ...sectionS, marginTop: 16 }}>
+              <h3 style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#25d366", marginBottom: 14 }}>Compartidos por usuarios</h3>
+              <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
+                <div style={{ textAlign: "center", flex: 1, background: "rgba(37,211,102,0.06)", borderRadius: 10, padding: "12px 8px" }}>
+                  <div style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#25d366", fontWeight: 700 }}>{shareStats.totalWA}</div>
+                  <div style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>WhatsApp</div>
+                </div>
+                <div style={{ textAlign: "center", flex: 1, background: "rgba(225,48,108,0.06)", borderRadius: 10, padding: "12px 8px" }}>
+                  <div style={{ fontFamily: "Georgia", fontSize: "1.5rem", color: "#E1306C", fontWeight: 700 }}>{shareStats.totalIG}</div>
+                  <div style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Instagram</div>
+                </div>
+              </div>
+              {shareStats.top?.length > 0 && (
+                <>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.35)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Top compartidores</p>
+                  {shareStats.top.map((s: { nombre: string; concurso: string; wa: number; ig: number; total: number }, i: number) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: i < 3 ? "#e8a84c" : "rgba(240,234,214,0.4)", width: 20, textAlign: "center", fontWeight: 700 }}>{i + 1}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", fontWeight: 600 }}>{s.nombre}</span>
+                        <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", marginLeft: 6 }}>{s.concurso}</span>
+                      </div>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#25d366" }}>WA:{s.wa}</span>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#E1306C" }}>IG:{s.ig}</span>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
         </>
       )}
 
