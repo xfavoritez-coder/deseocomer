@@ -25,6 +25,9 @@ export async function GET(req: NextRequest) {
         OR: [
           { activo: true },
           { estado: "programado" },
+          { estado: "finalizado" },
+          { estado: "completado" },
+          { estado: "en_revision" },
         ],
         local: {
           activo: true,

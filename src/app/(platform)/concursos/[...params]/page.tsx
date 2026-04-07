@@ -116,7 +116,7 @@ function ConcursoDetallePage() {
             descripcionLocal: "",
           };
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
-          setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0, descalificados: data.descalificados ?? 0 });
+          setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fotoGanador: data.fotoGanador ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0, descalificados: data.descalificados ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.slug || data.id);
           // Redirect from ID to slug if needed
           if (data.slug && slug !== data.slug && slug === data.id) {
@@ -176,12 +176,21 @@ function ConcursoDetallePage() {
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
 
+  const [justEnded, setJustEnded] = useState(false);
   useEffect(() => {
     if (!concursoData) return;
-    const tick = () => setTimer(getTimeLeft(concursoData.endsAt));
+    const tick = () => {
+      const t = getTimeLeft(concursoData.endsAt);
+      setTimer(t);
+      // When countdown reaches 0, reload data to show finalized state
+      if (t.ended && !justEnded) {
+        setJustEnded(true);
+        setTimeout(() => window.location.reload(), 2000);
+      }
+    };
     const iid = setInterval(tick, 1000);
     return () => clearInterval(iid);
-  }, [concursoData?.endsAt]);
+  }, [concursoData?.endsAt, justEnded]);
 
   useEffect(() => {
     if (!refUserId || refProcessed.current) return;
@@ -492,12 +501,13 @@ function ConcursoDetallePage() {
           )}
         </div>
       ) : (() => {
+        const maxVisible = isEnded ? 3 : 6;
         const conMasDe1 = ranking.filter(r => r.referidos > 1);
         const con1 = ranking.filter(r => r.referidos <= 1);
-        const allVisibles = conMasDe1.length > 0 ? conMasDe1 : ranking.slice(0, 5);
-        const allOcultos = conMasDe1.length > 0 ? con1 : ranking.slice(5);
-        const visibles = allVisibles.slice(0, 6);
-        const ocultos = [...allVisibles.slice(6), ...allOcultos];
+        const allVisibles = isEnded ? ranking.slice(0, 3) : (conMasDe1.length > 0 ? conMasDe1 : ranking.slice(0, 5));
+        const allOcultos = isEnded ? ranking.slice(3) : (conMasDe1.length > 0 ? con1 : ranking.slice(5));
+        const visibles = allVisibles.slice(0, maxVisible);
+        const ocultos = [...allVisibles.slice(maxVisible), ...allOcultos];
         const myName = user?.nombre?.split(" ")[0] ?? "";
         const myIndex = ranking.findIndex(r => isAuthenticated && user && r.nombre.startsWith(myName));
         const myEntry = myIndex >= 0 ? ranking[myIndex] : null;
@@ -649,37 +659,42 @@ function ConcursoDetallePage() {
         <div className="dc-cd-main" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Estado-based banners for non-active concursos */}
-          {dbEstado === "finalizado" && (
-            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#f5d080", fontWeight: 700, marginBottom: 8 }}>Concurso finalizado</p>
-              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", marginBottom: 4 }}>Ganador: <strong style={{ color: "#e8a84c" }}>{c.ganadorActualNombre}</strong></p>}
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Esperando confirmación de entrega del premio</p>
-            </div>
-          )}
-          {dbEstado === "en_revision" && (
-            <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#f5d080", fontWeight: 700, marginBottom: 8 }}>Verificando resultados...</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.5)", lineHeight: 1.6 }}>El concurso ha finalizado. Estamos verificando los resultados para anunciar al ganador oficial.</p>
-              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", marginTop: 8 }}>Ganador provisorio: {c.ganadorActualNombre} (sujeto a verificación antifraude)</p>}
+          {(dbEstado === "finalizado" || dbEstado === "en_revision") && (
+            <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 16, padding: "28px 24px", textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontSize: 28, marginBottom: 8 }}>🏆</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#f5d080", fontWeight: 700, marginBottom: 10 }}>Concurso finalizado</p>
+              {c.ganadorActualNombre && (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 16, color: "rgba(240,234,214,0.7)", margin: 0 }}>Ganador: <strong style={{ color: "#e8a84c" }}>{c.ganadorActualNombre}</strong></p>
+                  <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 8, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "#e8a84c", fontFamily: "var(--font-lato)", whiteSpace: "nowrap", cursor: "help" }} title="Estamos confirmando que el ganador pueda retirar su premio. Este proceso toma unos días.">verificando</span>
+                </div>
+              )}
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", lineHeight: 1.6 }}>Estamos coordinando con el ganador y el local la entrega del premio</p>
             </div>
           )}
           {dbEstado === "completado" && (
-            <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#3db89e", fontWeight: 700, marginBottom: 8 }}>Concurso completado</p>
-              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 15, color: "rgba(240,234,214,0.6)", marginBottom: 4 }}>Ganador oficial: <strong style={{ color: "#3db89e" }}>{c.ganadorActualNombre}</strong> 🏆</p>}
-              {c.premioConfirmadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Premio entregado el {new Date(c.premioConfirmadoAt).toLocaleDateString("es-CL")}</p>}
+            <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.25)", borderRadius: 16, padding: "28px 24px", textAlign: "center", marginTop: 20 }}>
+              {c.fotoGanador && (
+                <div style={{ marginBottom: 16 }}>
+                  <img src={c.fotoGanador} alt="Ganador retirando premio" style={{ width: "100%", maxWidth: 320, borderRadius: 14, border: "2px solid rgba(61,184,158,0.3)" }} />
+                </div>
+              )}
+              <p style={{ fontSize: 28, marginBottom: 8 }}>🎉</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#3db89e", fontWeight: 700, marginBottom: 10 }}>Premio entregado</p>
+              {c.ganadorActualNombre && <p style={{ fontFamily: "var(--font-lato)", fontSize: 16, color: "rgba(240,234,214,0.7)", marginBottom: 6 }}>Ganador: <strong style={{ color: "#3db89e" }}>{c.ganadorActualNombre}</strong> 🏆</p>}
+              {c.premioConfirmadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Entregado el {new Date(c.premioConfirmadoAt).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>}
               <Link href="/concursos" style={{ display: "inline-block", marginTop: 16, fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textDecoration: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "8px 20px" }}>Ver más concursos →</Link>
             </div>
           )}
           {dbEstado === "expirado" && (
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "rgba(240,234,214,0.5)", fontWeight: 700, marginBottom: 8 }}>Este concurso ha expirado</p>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.35)" }}>El premio no fue reclamado</p>
               <Link href="/concursos" style={{ display: "inline-block", marginTop: 16, fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#e8a84c", textDecoration: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "8px 20px" }}>Ver concursos activos →</Link>
             </div>
           )}
           {dbEstado === "en_disputa" && (
-            <div style={{ background: "rgba(255,80,80,0.06)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 14, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
+            <div style={{ background: "rgba(255,80,80,0.06)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 16, padding: "24px 20px", textAlign: "center", marginTop: 20 }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, color: "#ff8080", fontWeight: 700, marginBottom: 8 }}>Verificando entrega del premio</p>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.4)" }}>Nuestro equipo está investigando este caso</p>
             </div>

@@ -194,6 +194,7 @@ model Concurso {
   segundoNotificadoAt DateTime?
   terceroNotificadoAt DateTime?
   premioConfirmadoAt  DateTime?
+  fotoGanador         String?
   premioExpiradoAt    DateTime?
   disputaAt           DateTime?
   ganadorDescartadoRazon String?
