@@ -294,8 +294,9 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
       const urls = confirmUrls(c.id, token);
 
       try {
+        const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
         await emailGanador(emailData, ganadorData, urls.confirm, urls.disputa);
-        await emailLocal(emailData, c.local.email, ganadorData);
+        await emailLocal({ ...emailData, coordinarUrl }, c.local.email, ganadorData);
         await prisma.concurso.update({
           where: { id: c.id },
           data: { ganadorNotificadoAt: now, localNotificadoAt: now },
@@ -365,8 +366,9 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
             const urls = confirmUrls(c.id, token);
 
             try {
+              const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
               await emailNuevoGanador(emailData, nuevoGanador, siguiente.orden, diasSiguiente, urls.confirm, urls.disputa);
-              await emailLocal(emailData, c.local.email, nuevoGanador);
+              await emailLocal({ ...emailData, coordinarUrl }, c.local.email, nuevoGanador);
               log.push(`[PASO_SIGUIENTE] ${c.id} - ${siguiente.orden}° lugar: ${nuevoGanador.email}`);
             } catch (e) { log.push(`[ERROR_EMAIL] ${c.id} nuevo ganador - ${e}`); }
           }

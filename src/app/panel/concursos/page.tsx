@@ -479,7 +479,7 @@ export default function PanelConcursos() {
           {[
             { icon: "🎁", title: "Tú pones el premio", desc: "Puede ser un menú, un descuento, un plato gratis... algo que motive a participar. Tú decides qué ofrecer." },
             { icon: "🔗", title: "Los participantes comparten tu local", desc: "Cada persona que participa recibe un link único. Mientras más amigos inviten, más puntos ganan y más personas conocen tu local." },
-            { icon: "🏆", title: "El ganador recibe el premio", desc: "Al terminar el concurso, te avisamos quién ganó. Tú coordinas la entrega del premio directamente con el ganador." },
+            { icon: "🏆", title: "El ganador recibe el premio", desc: "Al terminar el concurso, te enviamos un email para que propongas una fecha de entrega. El ganador recibe la fecha y se presenta con su código." },
             { icon: "📈", title: "Tu local gana visibilidad real", desc: "Cada concurso genera decenas de compartidos orgánicos. Personas reales recomendando tu local a personas reales." },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", gap: "12px", alignItems: "flex-start", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: "12px", padding: "14px" }}>
@@ -624,8 +624,8 @@ export default function PanelConcursos() {
           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
             {[
               "Al terminar el concurso, te mostramos quién ganó con su nombre y datos",
-              "El ganador recibirá un código único que deberá presentarte",
-              "Tú verificas el código y entregas el premio directamente",
+              "Te enviaremos un email para que propongas una fecha de entrega",
+              "El ganador se presenta con su código y tú verificas su identidad",
               "Todo queda registrado en tu panel para tu tranquilidad",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
