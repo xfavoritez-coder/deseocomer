@@ -405,11 +405,11 @@ export default function LocalDetailPage() {
             {/* TAB: Información */}
             {tab === "Información" && (
               <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
+                {/* Sobre este local — descripción + contacto + mapa fusionados */}
                 <div className="dc-local-main-content" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Descripción — ocultar si no hay contenido real */}
-                  {(local.descripcion || local.historia) && (
+                  {(local.descripcion || local.historia || tieneUbicacion) && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre este local</p>
                     {local.descripcion && <p style={bodyStyle}>{local.descripcion}</p>}
                     {local.historia && <p style={{ ...bodyStyle, marginTop: "12px" }}>{local.historia}</p>}
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -421,10 +421,47 @@ export default function LocalDetailPage() {
                         ))}
                       </div>
                     )}
+                    {tieneUbicacion && (
+                      <>
+                        {(local.descripcion || local.historia) && <div style={{ height: "1px", background: "rgba(232,168,76,0.08)", margin: "16px 0" }} />}
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: local.linkPedido || local.lat ? "16px" : "0" }}>
+                          {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={(dbLocal?.googleMapsUrl as string) || (local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`)} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{direccionDisplay || local.direccion}{esImportado && comunaDisplay ? `, ${comunaDisplay}` : !esImportado && local.barrio ? `, ${local.barrio}` : ""}{esImportado && dbLocal?.ciudad ? `, ${(dbLocal.ciudad as string).charAt(0).toUpperCase() + (dbLocal.ciudad as string).slice(1)}` : ""}</a></p>}
+                          {local.telefono && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Phone size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`tel:${local.telefono.replace(/\s/g, "")}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.telefono}</a></p>}
+                          {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
+                          {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
+                        </div>
+                        {!esImportado && (
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
+                          {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Servicio en mesa</span>}
+                          {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Delivery</span>}
+                          {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Retiro en local</span>}
+                        </div>
+                        )}
+                        {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
+                          <div style={{ marginBottom: "12px" }}>
+                            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "6px" }}>Hacemos delivery a:</p>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+                              {(local.comunasDelivery ?? []).map((c: string) => <span key={c} style={{ fontSize: "0.7rem", padding: "3px 10px", borderRadius: "20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", color: "rgba(240,234,214,0.5)" }}>{c}</span>)}
+                            </div>
+                          </div>
+                        )}
+                        {local.linkPedido && (() => {
+                          const esWA = /^(\+?56)?[0-9]{8,9}$/.test(local.linkPedido.replace(/\s/g, ""));
+                          const rawUrl = local.linkPedido;
+                          const href = esWA ? `https://wa.me/${rawUrl.replace(/\D/g, "").replace(/^(?!56)/, "56")}` : (rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`);
+                          return <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", padding: "12px 20px", borderRadius: "10px", background: esWA ? "rgba(37,211,102,0.1)" : "rgba(61,184,158,0.1)", border: `1px solid ${esWA ? "rgba(37,211,102,0.3)" : "rgba(61,184,158,0.3)"}`, color: esWA ? "#25d366" : "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", textDecoration: "none", textAlign: "center", marginBottom: "12px", boxSizing: "border-box" as const }}>{esWA ? "Pedir por WhatsApp" : "Pedir online"}</a>;
+                        })()}
+                        {local.lat && (
+                          <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
+                            <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                   )}
-
                 </div>
+
                 <div className="dc-local-concursos-promos" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Concurso destacado (solo si hay activos) */}
                   {concursosActivos.length > 0 && (() => {
@@ -491,44 +528,6 @@ export default function LocalDetailPage() {
                   )}
 
                 </div>
-                {/* Encuéntranos — extracted for ordering */}
-                {tieneUbicacion && (
-                <div className="dc-local-encuentranos" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Encuéntranos</p>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "16px" }}>
-                      {local.direccion && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><MapPin size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={(dbLocal?.googleMapsUrl as string) || (local.lat && local.lng ? `https://www.google.com/maps?q=${local.lat},${local.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(local.direccion + (local.barrio ? `, ${local.barrio}` : "") + ", Santiago, Chile")}`)} target="_blank" rel="noopener" style={{ color: "var(--text-muted)", textDecoration: "none" }}>{direccionDisplay || local.direccion}{esImportado && comunaDisplay ? `, ${comunaDisplay}` : !esImportado && local.barrio ? `, ${local.barrio}` : ""}{esImportado && dbLocal?.ciudad ? `, ${(dbLocal.ciudad as string).charAt(0).toUpperCase() + (dbLocal.ciudad as string).slice(1)}` : ""}</a></p>}
-                      {local.telefono && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Phone size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`tel:${local.telefono.replace(/\s/g, "")}`} style={{ color: "var(--text-muted)", textDecoration: "none" }}>{local.telefono}</a></p>}
-                      {local.instagram && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><AtSign size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={`https://instagram.com/${local.instagram.replace("@", "")}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.instagram.replace("@", "")}</a></p>}
-                      {local.sitioWeb && <p style={{ ...bodyStyle, display: "flex", alignItems: "center", gap: 8 }}><Globe size={15} color="#e8a84c" strokeWidth={1.5} style={{ flexShrink: 0 }} /><a href={local.sitioWeb.startsWith("http") ? local.sitioWeb : `https://${local.sitioWeb}`} target="_blank" rel="noopener" style={{ color: "var(--oasis-bright)", textDecoration: "none" }}>{local.sitioWeb.replace(/^https?:\/\//, "")}</a></p>}
-                    </div>
-                    {!esImportado && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "12px" }}>
-                      {(local.sirveEnMesa ?? true) && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Servicio en mesa</span>}
-                      {local.tieneDelivery && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Delivery</span>}
-                      {local.tieneRetiro && <span style={{ fontSize: "0.75rem", padding: "4px 12px", borderRadius: "20px", background: "rgba(240,234,214,0.04)", border: "1px solid rgba(240,234,214,0.12)", color: "rgba(240,234,214,0.5)" }}>Retiro en local</span>}
-                    </div>
-                    )}
-                    {local.tieneDelivery && (local.comunasDelivery ?? []).length > 0 && (
-                      <div style={{ marginBottom: "12px" }}>
-                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "6px" }}>Hacemos delivery a:</p>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-                          {(local.comunasDelivery ?? []).map((c: string) => <span key={c} style={{ fontSize: "0.7rem", padding: "3px 10px", borderRadius: "20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", color: "rgba(240,234,214,0.5)" }}>{c}</span>)}
-                        </div>
-                      </div>
-                    )}
-                    {local.linkPedido && (() => {
-                      const esWA = /^(\+?56)?[0-9]{8,9}$/.test(local.linkPedido.replace(/\s/g, ""));
-                      const rawUrl = local.linkPedido;
-                      const href = esWA ? `https://wa.me/${rawUrl.replace(/\D/g, "").replace(/^(?!56)/, "56")}` : (rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`);
-                      return <a href={href} target="_blank" rel="noopener noreferrer" style={{ display: "block", width: "100%", padding: "12px 20px", borderRadius: "10px", background: esWA ? "rgba(37,211,102,0.1)" : "rgba(61,184,158,0.1)", border: `1px solid ${esWA ? "rgba(37,211,102,0.3)" : "rgba(61,184,158,0.3)"}`, color: esWA ? "#25d366" : "#3db89e", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", textDecoration: "none", textAlign: "center", marginBottom: "12px", boxSizing: "border-box" as const }}>{esWA ? "Pedir por WhatsApp" : "Pedir online"}</a>;
-                    })()}
-                    <div style={{ overflow: "hidden", borderRadius: "14px", position: "relative", width: "100%", maxWidth: "100%" }}>
-                      <MapaLocal lat={local.lat} lng={local.lng} nombre={local.nombre} />
-                    </div>
-                  </div>
-                </div>
-                )}
 
                 {/* Horarios — inline en móvil, sidebar en desktop */}
                 {tieneHorarios && (
@@ -734,7 +733,6 @@ export default function LocalDetailPage() {
         .dc-local-single { max-width: 680px; }
         .dc-local-main-content { }
         .dc-local-concursos-promos { }
-        .dc-local-encuentranos { }
         .dc-local-horarios-section { }
         .dc-local-resenas-section { }
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
@@ -742,15 +740,13 @@ export default function LocalDetailPage() {
         @media (max-width: 1023px) {
           .dc-local-main-content { order: 0; }
           .dc-local-concursos-promos { order: 1; }
-          .dc-local-encuentranos { order: 2; }
-          .dc-local-horarios-section { order: 3; }
-          .dc-local-resenas-section { order: 4; }
+          .dc-local-horarios-section { order: 2; }
+          .dc-local-resenas-section { order: 3; }
         }
         @media (min-width: 1024px) {
-          .dc-local-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; max-width: none; align-items: start; }
+          .dc-local-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: none; align-items: start; }
           .dc-local-main-content { grid-column: 1; }
           .dc-local-concursos-promos { grid-column: 1; }
-          .dc-local-encuentranos { grid-column: 1; }
           .dc-local-horarios-section { grid-column: 2; grid-row: 1 / -1; position: sticky; top: 100px; }
           .dc-local-resenas-section { grid-column: 1; }
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }

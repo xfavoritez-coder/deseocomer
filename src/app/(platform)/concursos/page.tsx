@@ -373,7 +373,9 @@ export default function ConcursosPage() {
                               ))}
                             </div>
                           </div>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
+                          <div style={{ textAlign: "center" }}>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
+                          </div>
                         </div>
                       );
                     })()}

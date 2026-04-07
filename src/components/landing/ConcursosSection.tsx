@@ -201,16 +201,32 @@ export default function ConcursosSection() {
                       </div>
                     </div>
                   )}
-                  {esProgramado && (
-                    <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
-                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.1em", color: "#a78bfa", textTransform: "uppercase" }}>Se activa pronto</span>
-                      {c.fechaActivacion && (
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "12px", color: "rgba(167,139,250,0.6)", marginTop: "4px" }}>
-                          {new Date(c.fechaActivacion).toLocaleDateString("es-CL", { day: "numeric", month: "short" })}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  {esProgramado && (() => {
+                    const actMs = c.fechaActivacion ? Math.max(0, new Date(c.fechaActivacion).getTime() - Date.now()) : 0;
+                    const actDias = Math.floor(actMs / 86400000);
+                    const actHoras = Math.floor((actMs % 86400000) / 3600000);
+                    const actMin = Math.floor((actMs % 3600000) / 60000);
+                    return (
+                      <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "12px", padding: "12px 8px", textAlign: "center", marginBottom: "14px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, justifyContent: "center" }}>
+                          <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#a78bfa", animation: "dcPulse 1.8s ease-in-out infinite" }} />
+                          <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#a78bfa" }}>Se activa en</span>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                          {[
+                            ...(actDias > 0 ? [{ v: actDias, l: "días" }] : []),
+                            { v: actHoras, l: "hrs" },
+                            { v: actMin, l: "min" },
+                          ].map(({ v, l }) => (
+                            <div key={l} style={{ textAlign: "center", minWidth: 36 }}>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.2rem", fontWeight: 700, color: "#a78bfa", lineHeight: 1 }}>{String(v).padStart(2, "0")}</div>
+                              <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(167,139,250,0.5)", marginTop: 2 }}>{l}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   {ended && (
                     <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "12px", textAlign: "center", marginBottom: "14px" }}>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", letterSpacing: "0.1em" }}>Concurso finalizado</span>
@@ -220,7 +236,7 @@ export default function ConcursosSection() {
                   {/* Footer */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                      {esProgramado ? <>🔔 {c.listaEspera ?? 0} en espera</> : c.modalidadConcurso === "sorteo" ? <>🎟️ {c.participantes} boleto{c.participantes !== 1 ? "s" : ""}</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
+                      {esProgramado ? <>{c.listaEspera ?? 0} en espera</> : c.modalidadConcurso === "sorteo" ? <>🎟️ {c.participantes} boleto{c.participantes !== 1 ? "s" : ""}</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
                     </span>
                     {!ended && (
                       <span className={esProgramado ? "dc-cst-btn dc-cst-btn-prog" : esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : c.modalidadConcurso === "sorteo" ? "dc-cst-btn dc-cst-btn-sorteo" : "dc-cst-btn"} style={{
