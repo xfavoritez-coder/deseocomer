@@ -61,58 +61,56 @@ export async function GET(req: NextRequest) {
       let riesgo = 0;
       const flags: string[] = [];
       const refs = refsByUser[p.usuario.id] ?? [];
+      if (refs.length === 0) continue; // Skip users without referrals
 
-      // 1. Referrals from same IP as participant
+      // Same scoring as investigar/route.ts
+      // 1. Same IP as participant (+10)
       const sameIPRefs = refs.filter(r => r.usuario.ipRegistro && r.usuario.ipRegistro === p.usuario.ipRegistro);
       if (sameIPRefs.length > 0) {
-        riesgo += 25;
+        riesgo += 10;
         flags.push(`${sameIPRefs.length} ref misma IP`);
       }
 
-      // 2. Referrals sharing IPs with each other
+      // 2. IPs shared between referrals (+10 if any has >2)
       const refIPs: Record<string, number> = {};
       for (const r of refs) {
         const ip = r.usuario.ipRegistro;
         if (ip && ip !== "unknown") refIPs[ip] = (refIPs[ip] ?? 0) + 1;
       }
-      const sharedIPs = Object.entries(refIPs).filter(([, c]) => c > 1);
+      const sharedIPs = Object.entries(refIPs).filter(([, c]) => c > 2);
       if (sharedIPs.length > 0) {
-        riesgo += 20;
-        flags.push(`${sharedIPs.reduce((a, [, c]) => a + c, 0)} refs IPs compartidas`);
+        riesgo += 10;
+        flags.push(`IPs con 3+ cuentas`);
       }
 
-      // 3. Rapid registrations among referrals
+      // 3. Rapid registrations (+8 or +15)
       const refsSorted = [...refs].sort((a, b) => new Date(a.usuario.createdAt).getTime() - new Date(b.usuario.createdAt).getTime());
       let rapidos = 0;
       for (let i = 1; i < refsSorted.length; i++) {
         const diff = (new Date(refsSorted[i].usuario.createdAt).getTime() - new Date(refsSorted[i - 1].usuario.createdAt).getTime()) / 60000;
-        if (diff < 15) rapidos++;
+        if (diff < 30) rapidos++;
       }
-      if (rapidos > 2) {
+      if (rapidos > 5) {
         riesgo += 15;
-        flags.push(`${rapidos} registros <15min`);
+        flags.push(`${rapidos} registros rápidos`);
+      } else if (rapidos > 2) {
+        riesgo += 8;
+        flags.push(`${rapidos} registros rápidos`);
       }
 
-      // 4. VPN IPs among referrals
+      // 4. VPN IPs (+30)
       const vpnRefs = refs.filter(r => DC_PREFIXES.some(prefix => (r.usuario.ipRegistro ?? "").startsWith(prefix)));
       if (vpnRefs.length > 0) {
-        riesgo += 20;
+        riesgo += 30;
         flags.push(`${vpnRefs.length} ref VPN`);
       }
 
-      // 5. Ghost points
+      // 5. Ghost points (+10 if >5)
       const suma = 1 + (p.bonusRef ?? 0) + (p.puntosMadrugador ?? 0) + (p.puntosReferidosNuevos ?? 0) + (p.puntosReferidosExistentes ?? 0) + (p.puntosNivel2 ?? 0) + (p.puntosPendientes ?? 0) + (p.puntosApoyos ?? 0);
       const fantasma = p.puntos - suma;
-      if (fantasma > 3) {
+      if (fantasma > 5) {
         riesgo += 10;
         flags.push(`${fantasma} pts fantasma`);
-      }
-
-      // 6. Participant IP is shared with other unrelated accounts
-      const ipUsers = ipMap[p.usuario.ipRegistro ?? ""] ?? [];
-      if (ipUsers.length > 2) {
-        riesgo += 10;
-        flags.push(`IP compartida ${ipUsers.length} cuentas`);
       }
 
       if (riesgo > 0) {
