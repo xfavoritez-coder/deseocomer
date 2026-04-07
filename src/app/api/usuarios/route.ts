@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
 function buildVerificationHtml(nombre: string, url: string, refNombre?: string | null): string {
   const header = `<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>`;
   const footer = `<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div>`;
-  const spam = `<p style="color:#5a4028;font-size:12px;line-height:1.5;margin-top:12px;font-style:italic">¿No ves el botón? Revisa tu carpeta de spam o correo no deseado.</p>`;
+  const spam = `<p style="color:#c0a060;font-size:14px;line-height:1.5;margin-top:16px;text-align:center">¿No ves el botón? Revisa tu carpeta de <strong>spam</strong> o correo no deseado.</p>`;
   const wrap = (c: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0"><div style="max-width:560px;margin:0 auto;padding:40px 24px">${header}<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">${c}</div>${footer}</div></body></html>`;
   const btn = (href: string, label: string) => `<div style="text-align:center;margin-bottom:24px"><a href="${href}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">${label}</a></div>`;
   const firstName = nombre.split(" ")[0];
@@ -198,15 +198,15 @@ function buildVerificationHtml(nombre: string, url: string, refNombre?: string |
   if (refNombre) {
     return wrap([
       `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡${refNombre} te invitó a un concurso!</h2>`,
-      `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px">Hola ${firstName}, activa tu cuenta para entrar al concurso y competir por comida gratis.</p>`,
+      `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px">Hola ${firstName}, activa tu cuenta para entrar al concurso y ganar comida gratis.</p>`,
       `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
       `<p style="color:#f5d080;font-size:14px;font-weight:bold;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.08em">Así funciona:</p>`,
       `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">① Activa tu cuenta con el botón de abajo</p>`,
-      `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">② Verifica tu celular en el concurso (30 seg)</p>`,
+      `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">② Verifica tu cuenta con tu celular</p>`,
       `<p style="color:#3db89e;font-size:15px;line-height:2;margin:0">③ <strong>Ambos ganan +3 puntos</strong> automáticamente</p>`,
       `</div>`,
       btn(url, `Activar mi cuenta →`),
-      `<p style="color:#5a4028;font-size:13px;line-height:1.6">Los puntos de referido se acreditan al verificar tu celular. Es rápido y solo necesitas hacerlo una vez.</p>`,
+      `<p style="color:#c0a060;font-size:14px;line-height:1.6;margin-top:8px">Los puntos de referido se acreditan cuando verificas tu cuenta con tu celular. Solo necesitas hacerlo una vez.</p>`,
       spam,
     ].join(""));
   }

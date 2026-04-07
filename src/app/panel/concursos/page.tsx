@@ -343,7 +343,8 @@ export default function PanelConcursos() {
               {/* Foto + confirmar — visible después de enviar mensaje */}
               {yaEnvioFecha && (
                 <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", paddingTop: 14 }}>
-                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 8 }}>Subir foto del ganador (opcional)</label>
+                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Subir foto del ganador (opcional pero recomendado)</label>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", lineHeight: 1.5, marginBottom: 10 }}>Sube una foto del ganador recibiendo su premio. Aparecerá en tu perfil y en la sección de ganadores, generando confianza en futuros participantes.</p>
                   <SubirFoto folder="concursos" preview={detalle.fotoGanador ?? ""} onUpload={(url: string) => setDetalle({ ...detalle, fotoGanador: url })} label="Foto del ganador con su premio" height="160px" />
                   <button onClick={async () => {
                     const s = getSession();
@@ -737,15 +738,15 @@ export default function PanelConcursos() {
           const parts = c._count?.participantes ?? 0;
           return (
             <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: (ended && c.estado !== "completado" && c.estado !== "expirado" && c.estado !== "cancelado") ? "1px solid rgba(255,100,100,0.3)" : "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", maxWidth: 800, boxSizing: "border-box", minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "stretch" }}>
-              <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
+              <div onClick={() => setDetalle(c)} style={{ display: "flex", alignItems: "stretch", cursor: "pointer" }}>
+              <div style={{ flexShrink: 0 }}>
                 {c.imagenUrl ? (
                   <img src={c.imagenUrl} alt="" style={{ width: "clamp(80px, 10vw, 120px)", height: "clamp(80px, 10vw, 120px)", objectFit: "cover", display: "block" }} />
                 ) : (
                   <div style={{ width: "clamp(80px, 10vw, 120px)", height: "clamp(80px, 10vw, 120px)", background: "linear-gradient(135deg, rgba(232,168,76,0.1), rgba(45,26,8,0.9))", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>🏆</div>
                 )}
-              </a>
-              <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, minWidth: 0, textDecoration: "none" }}>
+              </div>
+              <div style={{ flex: 1, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, minWidth: 0 }}>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>{c.premio}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                   {c.estado === "programado" ? (
@@ -770,14 +771,25 @@ export default function PanelConcursos() {
                 {c.estado === "programado" && c.fechaActivacion && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", margin: 0 }}>Se activa el {new Date(c.fechaActivacion).toLocaleDateString("es-CL")} a las {new Date(c.fechaActivacion).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}</p>}
                 {c.estado === "programado" && (c._count?.listaEspera ?? 0) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "#a78bfa", margin: 0 }}>{c._count?.listaEspera ?? 0} personas en lista de espera</p>}
                 {c.estado !== "programado" && <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", margin: 0 }}>{parts} {parts === 1 ? "participante" : "participantes"}</p>}
-              </a>
+              </div>
               </div>
               <div style={{ display: "flex", gap: 6, padding: "8px 12px", borderTop: "1px solid rgba(232,168,76,0.06)" }}>
-                {c.estado !== "cancelado" && !c.cancelado && (
+                {/* Compartir: solo concursos activos */}
+                {!ended && c.estado !== "cancelado" && !c.cancelado && (
                   <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer" }}>📸 Compartir</button>
                 )}
-                <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer" }}>Editar</button>
-                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: ended && c.estado !== "completado" && c.estado !== "expirado" ? 2 : 1, background: ended && c.estado !== "completado" && c.estado !== "expirado" ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.04)", border: ended && c.estado !== "completado" && c.estado !== "expirado" ? "1px solid rgba(232,168,76,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: ended && c.estado !== "completado" && c.estado !== "expirado" ? 11 : 10, fontWeight: ended && c.estado !== "completado" && c.estado !== "expirado" ? 700 : 400, color: ended && c.estado !== "completado" && c.estado !== "expirado" ? "#e8a84c" : "rgba(240,234,214,0.4)", cursor: "pointer" }}>{ended && c.estado !== "completado" && c.estado !== "expirado" ? "Coordinar entrega →" : "Detalle"}</button>
+                {/* Editar: solo concursos activos sin participantes */}
+                {!ended && c.estado !== "cancelado" && (
+                  <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer" }}>Editar</button>
+                )}
+                {/* Coordinar entrega: concursos finalizados pendientes */}
+                {ended && c.estado !== "completado" && c.estado !== "expirado" && c.estado !== "cancelado" ? (
+                  <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: 1, background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", cursor: "pointer" }}>Coordinar entrega →</button>
+                ) : (
+                  <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Ver detalle</button>
+                )}
+                {/* Ver concurso público */}
+                <button onClick={e => { e.stopPropagation(); window.open(`/concursos/${c.slug || c.id}`, "_blank"); }} style={{ flex: 0, background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>↗</button>
               </div>
             </div>
           );
