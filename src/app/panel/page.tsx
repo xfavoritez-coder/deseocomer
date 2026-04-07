@@ -41,6 +41,7 @@ function DashboardContent() {
   const [pct, setPct] = useState(0);
   const [checks, setChecks] = useState<PerfilCheck[]>([]);
   const [stats, setStats] = useState({ favoritos: 0, resenas: 0, concursos: 0, promociones: 0 });
+  const [concursosPendientes, setConcursosPendientes] = useState(0);
 
   useEffect(() => {
     try {
@@ -58,6 +59,7 @@ function DashboardContent() {
               concursos: data._count?.concursos ?? data.concursos?.length ?? 0,
               promociones: data._count?.promociones ?? data.promociones?.length ?? 0,
             });
+            if (typeof data.concursosPendientes === "number") setConcursosPendientes(data.concursosPendientes);
             const merged = { ...cached, ...data };
             localStorage.setItem(LOCAL_DATA_KEY, JSON.stringify(merged));
           }
@@ -81,6 +83,26 @@ function DashboardContent() {
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "var(--oasis-bright)", marginBottom: "6px", fontWeight: 700 }}>🎉 ¡Bienvenido a DeseoComer!</p>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Tu local está registrado. Completa tu perfil en <Link href="/panel/mi-local" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 600 }}>Datos Local</Link> para empezar a publicar concursos y promociones.</p>
         </div>
+      )}
+
+      {/* Pending contest delivery alert */}
+      {concursosPendientes > 0 && (
+        <Link href="/panel/concursos" style={{ display: "block", background: "rgba(255,68,68,0.06)", border: "1px solid rgba(255,68,68,0.25)", borderRadius: 14, padding: "16px 20px", marginBottom: 20, textDecoration: "none" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,68,68,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <span style={{ fontSize: "1.1rem" }}>🏆</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#ff6b6b", fontWeight: 700, margin: "0 0 2px" }}>
+                {concursosPendientes === 1 ? "Tienes un concurso pendiente por coordinar" : `Tienes ${concursosPendientes} concursos pendientes por coordinar`}
+              </p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>
+                Coordina la entrega del premio con el ganador
+              </p>
+            </div>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)" }}>→</span>
+          </div>
+        </Link>
       )}
 
       {/* Stats */}

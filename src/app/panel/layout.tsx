@@ -48,7 +48,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
           if (!sessionData) sessionStorage.setItem(SESSION_KEY, raw);
           // Fetch fresh data (logo, comuna)
           if (data.id) {
-            fetch(`/api/locales/${data.id}`).then(r => r.ok ? r.json() : null).then(info => {
+            fetch(`/api/locales/${data.id}/resumen`).then(r => r.ok ? r.json() : null).then(info => {
               if (info) {
                 setLocalLogo(info.logoUrl ?? "");
                 setLocalComuna(info.comuna ?? info.ciudad ?? "");
