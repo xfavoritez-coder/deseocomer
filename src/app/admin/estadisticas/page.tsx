@@ -84,16 +84,32 @@ export default function EstadisticasPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [shareStats, setShareStats] = useState<any>(null);
   const [tab, setTab] = useState<"busquedas" | "usuarios" | "registros">("busquedas");
+  const [cacheLoaded, setCacheLoaded] = useState(false);
+  const [calculadoAt, setCalculadoAt] = useState<string | null>(null);
+  const [recalculando, setRecalculando] = useState(false);
 
-  useEffect(() => {
-    // Load search stats (lightweight)
-    adminFetch("/api/stats").then(r => r.json()).then(setStats).catch(() => setError(true));
-    // Load precalculated admin stats from cache
+  const loadCache = () => {
     adminFetch("/api/admin/stats-cache").then(r => r.json()).then(d => {
       if (d.usuarios) setUserStats(d.usuarios);
       if (d.registros) setRegStats(d.registros);
       if (d.shares) setShareStats(d.shares);
-    }).catch(() => {});
+      if (d.calculadoAt) setCalculadoAt(d.calculadoAt);
+      setCacheLoaded(true);
+    }).catch(() => setCacheLoaded(true));
+  };
+
+  const recalcular = async () => {
+    setRecalculando(true);
+    try {
+      await adminFetch("/api/cron/calcular-stats-admin");
+      loadCache();
+    } catch {}
+    setRecalculando(false);
+  };
+
+  useEffect(() => {
+    adminFetch("/api/stats").then(r => r.json()).then(setStats).catch(() => setError(true));
+    loadCache();
   }, []);
 
   if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ color: "#ff6b6b", fontFamily: "Georgia" }}>Error al cargar estadísticas</p></div>;
@@ -110,6 +126,10 @@ export default function EstadisticasPage() {
         <button onClick={() => setTab("busquedas")} style={tabS(tab === "busquedas")}>Búsquedas</button>
         <button onClick={() => setTab("usuarios")} style={tabS(tab === "usuarios")}>Gustos de usuarios</button>
         <button onClick={() => setTab("registros")} style={tabS(tab === "registros")}>Registros</button>
+        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+          {calculadoAt && <span style={{ fontFamily: "Georgia", fontSize: "0.65rem", color: "rgba(240,234,214,0.25)" }}>{new Date(calculadoAt).toLocaleString("es-CL")}</span>}
+          <button onClick={recalcular} disabled={recalculando} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(61,184,158,0.3)", background: recalculando ? "rgba(61,184,158,0.05)" : "rgba(61,184,158,0.1)", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.7rem", cursor: recalculando ? "wait" : "pointer" }}>{recalculando ? "Calculando..." : "Actualizar"}</button>
+        </div>
       </div>
 
       {tab === "busquedas" && stats && (
@@ -189,7 +209,10 @@ export default function EstadisticasPage() {
       {tab === "usuarios" && (
         <>
           {!userStats ? (
-            <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: 40 }}>Cargando datos de usuarios...</p>
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", marginBottom: 12 }}>{cacheLoaded ? "Sin datos aún" : "Cargando..."}</p>
+              {cacheLoaded && <button onClick={recalcular} disabled={recalculando} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(61,184,158,0.3)", background: "rgba(61,184,158,0.1)", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer" }}>{recalculando ? "Calculando..." : "Calcular ahora"}</button>}
+            </div>
           ) : (
             <>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
@@ -254,7 +277,10 @@ export default function EstadisticasPage() {
       {tab === "registros" && (
         <>
           {!regStats ? (
-            <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: 40 }}>Cargando...</p>
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", marginBottom: 12 }}>{cacheLoaded ? "Sin datos aún" : "Cargando..."}</p>
+              {cacheLoaded && <button onClick={recalcular} disabled={recalculando} style={{ padding: "10px 20px", borderRadius: 10, border: "1px solid rgba(61,184,158,0.3)", background: "rgba(61,184,158,0.1)", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer" }}>{recalculando ? "Calculando..." : "Calcular ahora"}</button>}
+            </div>
           ) : (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
