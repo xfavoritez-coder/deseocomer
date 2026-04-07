@@ -111,7 +111,7 @@ export default function PromocionesPage() {
   const filtered = promos.filter(p => {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
-    if (filtrosTipo.length > 0 && !filtrosTipo.includes(p.tipo)) return false;
+    if (filtrosTipo.length > 0 && !filtrosTipo.some(f => f.toLowerCase() === p.tipo?.toLowerCase() || (f === "cumpleanos" && p.tipo === "Cumpleaños") || (f === "descuento" && p.tipo?.startsWith("Descuento")))) return false;
     if (filtroComuna && p.comuna?.toLowerCase() !== filtroComuna.toLowerCase()) return false;
     if (filtroCategoria) {
       const catLower = filtroCategoria.toLowerCase();
@@ -163,6 +163,7 @@ export default function PromocionesPage() {
         {/* Fila 2 — Filtros de tipo */}
         <div className="dc-filtros-tipo" style={{ display: "flex", gap: "8px", overflowX: "auto", flexWrap: "wrap", marginBottom: "12px", paddingBottom: "4px", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {[
+            { key: "todas", label: "Todas", color: "var(--accent)" },
             { key: "activas", label: "Activas ahora", color: "var(--oasis-bright)" },
             { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
             { key: "descuento", label: "Descuento", color: "#ff6644" },
@@ -170,9 +171,9 @@ export default function PromocionesPage() {
             { key: "combo", label: "Combo", color: "#e8a84c" },
             { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
           ].map(({ key, label, color }) => {
-            const isActive = key === "activas" ? filtroActivas : filtrosTipo.includes(key);
+            const isActive = key === "todas" ? (filtrosTipo.length === 0 && !filtroActivas) : key === "activas" ? filtroActivas : filtrosTipo.includes(key);
             return (
-              <button key={key} onClick={() => { if (key === "activas") setFiltroActivas(!filtroActivas); else toggleTipo(key); }} style={{ padding: "8px 16px", borderRadius: "20px", border: isActive ? `1px solid ${color}` : "1px solid rgba(232,168,76,0.2)", background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : "transparent", color: isActive ? color : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: "5px", transition: "all 0.2s" }}>
+              <button key={key} onClick={() => { if (key === "todas") { setFiltrosTipo([]); setFiltroActivas(false); } else if (key === "activas") setFiltroActivas(!filtroActivas); else toggleTipo(key); }} style={{ padding: "8px 16px", borderRadius: "20px", border: isActive ? `1px solid ${color}` : "1px solid rgba(232,168,76,0.2)", background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : "transparent", color: isActive ? color : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, display: "flex", alignItems: "center", gap: "5px", transition: "all 0.2s" }}>
                 {key === "activas" && isActive && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: color, display: "inline-block", animation: "dc-ps-blink 1.5s infinite" }} />}
                 {label}
               </button>
