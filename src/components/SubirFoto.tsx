@@ -26,12 +26,37 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
     if (preview) setPreviewUrl(preview);
   }, [preview]);
 
-  const handleFile = async (file: File) => {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) { setError("Solo se permiten imágenes"); return; }
-    if (file.size > 5 * 1024 * 1024) { setError("Máximo 5MB por imagen"); return; }
+  const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      if (file.size < 500 * 1024) { resolve(file); return; } // Skip if <500KB
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ratio = Math.min(maxWidth / img.width, 1);
+        canvas.width = img.width * ratio;
+        canvas.height = img.height * ratio;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (blob && blob.size < file.size) {
+            resolve(new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" }));
+          } else {
+            resolve(file);
+          }
+        }, "image/jpeg", quality);
+      };
+      img.onerror = () => resolve(file);
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFile = async (rawFile: File) => {
+    if (!rawFile) return;
+    if (!rawFile.type.startsWith("image/")) { setError("Solo se permiten imágenes"); return; }
+    if (rawFile.size > 10 * 1024 * 1024) { setError("Máximo 10MB por imagen"); return; }
     setUploading(true);
     setError(null);
+    const file = await compressImage(rawFile);
     setPreviewUrl(URL.createObjectURL(file));
 
     try {

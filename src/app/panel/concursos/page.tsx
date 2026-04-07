@@ -330,52 +330,83 @@ export default function PanelConcursos() {
                 </div>
               );
             }
-            // estado === "finalizado" — esperando confirmación
+            // estado === "finalizado" — coordinar y entregar
+            const ganadorTel = detalle.ganadorActual?.telefono || (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0]?.usuario?.telefono || "";
+            const ganadorEmail = detalle.ganadorActual?.email || (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0]?.usuario?.email || "";
             return (
               <div style={{ marginTop: "16px", padding: "20px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px" }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", fontWeight: 700, marginBottom: "12px" }}>Concurso finalizado — Esperando confirmación</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", fontWeight: 700, marginBottom: "12px" }}>🏆 Concurso finalizado — Coordinar entrega</p>
 
-                <div style={{ marginBottom: "16px" }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "4px" }}>Ganador: {ganadorActualNombre}</p>
-                  {detalle.ganadorNotificadoAt && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>Notificado por email el {new Date(detalle.ganadorNotificadoAt).toLocaleDateString("es-CL")}</p>}
-                  {codigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>Código de verificación: <strong style={{ color: "var(--accent)", letterSpacing: "0.05em" }}>{codigo}</strong></p>}
+                <div style={{ marginBottom: "16px", background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 14 }}>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "4px" }}>Ganador: <strong style={{ color: "#e8a84c" }}>{ganadorActualNombre}</strong></p>
+                  {ganadorEmail && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Email: {ganadorEmail}</p>}
+                  {ganadorTel && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Teléfono: {ganadorTel}</p>}
+                  {codigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>Código verificación: <strong style={{ color: "var(--accent)", letterSpacing: "0.05em" }}>{codigo}</strong></p>}
                 </div>
 
                 {/* Timeline */}
                 <div style={{ textAlign: "left", marginBottom: "16px" }}>
                   {[
                     { done: true, label: "Concurso finalizado" },
-                    { done: !!detalle.ganadorNotificadoAt, label: "Ganador notificado" },
-                    { done: false, active: true, label: "Esperando confirmación de entrega" },
-                    { done: false, label: "Premio confirmado" },
-                  ].map((step, i) => (
+                    { done: !!detalle.ganadorNotificadoAt, label: "Ganador notificado por email" },
+                    { done: false, active: true, label: "Coordinar entrega del premio" },
+                    { done: false, label: "Foto + confirmar entrega" },
+                  ].map((st, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0" }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: step.done ? "#3db89e" : step.active ? "#e8a84c" : "rgba(240,234,214,0.25)" }}>
-                        {step.done ? "✓" : step.active ? "⏳" : "○"}
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "#e8a84c" : "rgba(240,234,214,0.25)" }}>
+                        {st.done ? "✓" : st.active ? "⏳" : "○"}
                       </span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: step.done ? "#3db89e" : step.active ? "var(--text-primary)" : "rgba(240,234,214,0.3)" }}>{step.label}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "var(--text-primary)" : "rgba(240,234,214,0.3)" }}>{st.label}</span>
                     </div>
                   ))}
                 </div>
 
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: "16px" }}>
-                  El ganador fue notificado por email con tus datos de contacto. Si se presenta en tu local, verifica su identidad pidiendo el código: <strong style={{ color: "var(--accent)" }}>{codigo}</strong>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.6, marginBottom: "16px" }}>
+                  Contacta al ganador para coordinar la entrega. Cuando entregues el premio, sube una foto y confirma la entrega.
                 </p>
 
-                <button onClick={async () => {
-                  const s = getSession();
-                  try {
-                    const res = await fetch(`/api/concursos/${detalle.id}/confirmar-entrega`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id }) });
-                    if (res.ok) {
-                      setDetalle({ ...detalle, estado: "completado", premioEntregado: true, premioEntregadoAt: new Date().toISOString(), premioConfirmadoAt: new Date().toISOString() });
-                      setConcursos(prev => prev.map(c => c.id === detalle.id ? { ...c, estado: "completado", premioEntregado: true } : c));
-                      setActionToast("✓ Entrega del premio confirmada");
-                      setTimeout(() => setActionToast(""), 3000);
-                    } else { const d = await res.json(); setActionToast(d.error ?? "Error"); setTimeout(() => setActionToast(""), 3000); }
-                  } catch { setActionToast("Error de conexión"); setTimeout(() => setActionToast(""), 3000); }
-                }} style={{ width: "100%", padding: "12px 28px", background: "#3db89e", color: "#fff", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", fontWeight: 700, cursor: "pointer" }}>
-                  Confirmar entrega del premio
-                </button>
+                {/* Proponer fecha al ganador por email */}
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Proponer fecha y hora al ganador</label>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input id={`fecha-${detalle.id}`} type="text" placeholder="Ej: Miércoles 10 abril, 18:00 hrs" style={{ flex: 1, padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
+                    <button onClick={async () => {
+                      const input = document.getElementById(`fecha-${detalle.id}`) as HTMLInputElement;
+                      const fecha = input?.value?.trim();
+                      if (!fecha) { setActionToast("Escribe una fecha"); setTimeout(() => setActionToast(""), 3000); return; }
+                      const s = getSession();
+                      try {
+                        const res = await fetch(`/api/concursos/${detalle.id}/proponer-fecha`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fecha }) });
+                        if (res.ok) { setActionToast("✓ Propuesta enviada al ganador por email"); input.value = ""; }
+                        else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
+                      } catch { setActionToast("Error de conexión"); }
+                      setTimeout(() => setActionToast(""), 4000);
+                    }} style={{ padding: "10px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>
+                      Enviar
+                    </button>
+                  </div>
+                </div>
+
+                {/* Subir foto y confirmar */}
+                <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", paddingTop: 16 }}>
+                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 8 }}>Subir foto del ganador (opcional)</label>
+                  <SubirFoto folder="concursos" preview={detalle.fotoGanador ?? ""} onUpload={(url: string) => setDetalle({ ...detalle, fotoGanador: url })} label="Foto del ganador con su premio" height="160px" />
+
+                  <button onClick={async () => {
+                    const s = getSession();
+                    try {
+                      const res = await fetch(`/api/concursos/${detalle.id}/confirmar-entrega`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fotoGanador: detalle.fotoGanador || null }) });
+                      if (res.ok) {
+                        setDetalle({ ...detalle, estado: "completado", premioEntregado: true, premioEntregadoAt: new Date().toISOString(), premioConfirmadoAt: new Date().toISOString() });
+                        setConcursos(prev => prev.map(c => c.id === detalle.id ? { ...c, estado: "completado", premioEntregado: true } : c));
+                        setActionToast("✓ Premio entregado confirmado");
+                      } else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
+                    } catch { setActionToast("Error de conexión"); }
+                    setTimeout(() => setActionToast(""), 3000);
+                  }} style={{ width: "100%", marginTop: 12, padding: "14px 28px", background: "#3db89e", color: "#fff", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                    Confirmar entrega del premio
+                  </button>
+                </div>
               </div>
             );
           })()}

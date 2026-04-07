@@ -86,11 +86,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-// POST: Local confirma entrega manualmente (legacy + nuevo)
+// POST: Local confirma entrega manualmente con foto opcional
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const { localId } = await req.json();
+    const { localId, fotoGanador } = await req.json();
     if (!localId) return NextResponse.json({ error: "Falta localId" }, { status: 400 });
 
     const concurso = await prisma.concurso.findFirst({
@@ -107,6 +107,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         premioEntregadoAt: new Date(),
         estado: "completado",
         premioConfirmadoAt: new Date(),
+        ...(fotoGanador ? { fotoGanador } : {}),
       },
     });
 
