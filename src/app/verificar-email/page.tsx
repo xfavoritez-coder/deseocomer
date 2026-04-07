@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import VerificarTelefono from "@/components/VerificarTelefono";
 
 export default function VerificarEmailPage() {
   return <Suspense><VerificarContent /></Suspense>;
@@ -15,6 +16,8 @@ function VerificarContent() {
   const [referidorNombre, setReferidorNombre] = useState<string | null>(null);
   const [concursoSlug, setConcursoSlug] = useState<string | null>(null);
   const [telVerificado, setTelVerificado] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   const refParam = params.get("ref");
   const concursoParam = params.get("concurso");
@@ -28,6 +31,7 @@ function VerificarContent() {
         if (data.ok) {
           setStatus("ok");
           setNombre(data.nombre ?? "");
+          setUserId(data.id ?? "");
           setReferidorNombre(data.referidorNombre ?? null);
           setConcursoSlug(data.concursoSlug ?? null);
           setTelVerificado(!!data.telefonoVerificado);
@@ -94,18 +98,33 @@ function VerificarContent() {
                         <div>
                           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#f5d080", margin: "0 0 2px" }}>Verificar celular</p>
                           <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)", margin: 0, lineHeight: 1.5 }}>
-                            Verifica tu celular en el concurso para activar tus <strong style={{ color: "#3db89e" }}>+3 puntos</strong> y sumarle <strong style={{ color: "#3db89e" }}>+3 puntos</strong> a {referidorNombre}.
+                            Verifica tu celular para activar tus <strong style={{ color: "#3db89e" }}>+3 puntos</strong> y sumarle <strong style={{ color: "#3db89e" }}>+3 puntos</strong> a {referidorNombre}.
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <a href={concursoSlug ? `/concursos/${concursoSlug}` : "/concursos"} style={{ display: "block", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "15px 32px", borderRadius: 12, textDecoration: "none", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
-                      Ir al concurso y verificar celular →
+                    <button onClick={() => setShowPhoneModal(true)} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "15px 32px", borderRadius: 12, border: "none", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 10 }}>
+                      Verificar mi celular ahora
+                    </button>
+                    <a href={concursoSlug ? `/concursos/${concursoSlug}` : "/concursos"} style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", textDecoration: "none", textAlign: "center" }}>
+                      Ir al concurso →
                     </a>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", lineHeight: 1.5 }}>
-                      Solo toma 30 segundos. Necesitas hacerlo una sola vez.
-                    </p>
+
+                    {showPhoneModal && userId && (
+                      <VerificarTelefono
+                        userId={userId}
+                        onVerificado={() => {
+                          setShowPhoneModal(false);
+                          setTelVerificado(true);
+                          try {
+                            const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+                            localStorage.setItem("deseocomer_session", JSON.stringify({ ...s, telefonoVerificado: true }));
+                          } catch {}
+                        }}
+                        onCerrar={() => setShowPhoneModal(false)}
+                      />
+                    )}
                   </>
                 ) : (
                   <>

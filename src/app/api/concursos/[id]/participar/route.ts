@@ -24,9 +24,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!concurso) return NextResponse.json({ error: "Concurso no encontrado o inactivo" }, { status: 404 });
     if (new Date(concurso.fechaFin) <= new Date()) return NextResponse.json({ error: "Concurso finalizado" }, { status: 400 });
 
-    // Check phone verification for contests that require it
-    if (concurso.requiereTelefono && !usuario.telefonoVerificado) {
-      return NextResponse.json({ error: "Debes verificar tu número de celular para participar en este concurso.", codigo: "TELEFONO_NO_VERIFICADO" }, { status: 403 });
+    // Phone verification required for all contests
+    if (!usuario.telefonoVerificado) {
+      return NextResponse.json({ error: "Debes verificar tu número de celular para participar.", codigo: "TELEFONO_NO_VERIFICADO" }, { status: 403 });
     }
 
     // Check if already participating
