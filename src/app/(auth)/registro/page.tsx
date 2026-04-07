@@ -206,7 +206,7 @@ function RegistroContent() {
               </div>
               <div style={{ fontSize: "2rem", marginBottom: "12px" }}>😋</div>
               <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Qué te encanta comer?</h2>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige hasta 3 favoritos</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige entre 2 y 5 favoritos</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "12px" }}>
                 {(() => {
                   const usarDB = categoriasDB.length > 0;
@@ -217,7 +217,7 @@ function RegistroContent() {
                   const totalSel = comidasSel.length + customComidas.length;
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);
-                    const maxed = totalSel >= 3 && !sel;
+                    const maxed = totalSel >= 5 && !sel;
                     return (
                       <button key={c} disabled={maxed} onClick={() => setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c])} style={{
                         padding: "8px 16px", borderRadius: "20px", cursor: maxed ? "default" : "pointer",
@@ -239,7 +239,7 @@ function RegistroContent() {
                   }}>{c} ✕</button>
                 ))}
               </div>
-              {comidasSel.length + customComidas.length < 3 && (
+              {comidasSel.length + customComidas.length < 5 && (
                 <div style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "12px", maxWidth: "280px", margin: "0 auto 12px" }}>
                   <input
                     type="text"
@@ -281,7 +281,7 @@ function RegistroContent() {
                   >+</button>
                 </div>
               )}
-              {(comidasSel.length + customComidas.length) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length + customComidas.length}/3 seleccionadas</p>}
+              {(comidasSel.length + customComidas.length) > 0 && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: (comidasSel.length + customComidas.length) < 2 ? "#e8a84c" : "rgba(240,234,214,0.3)", marginBottom: "12px" }}>{comidasSel.length + customComidas.length}/5 seleccionadas{(comidasSel.length + customComidas.length) < 2 ? " (mínimo 2)" : ""}</p>}
               <button onClick={async () => {
                 const todasSel = comidasSel.length + customComidas.length;
                 if (registeredUserId && (estilo || todasSel > 0)) {
@@ -315,7 +315,7 @@ function RegistroContent() {
                   } catch {}
                 }
                 setOnboardingStep(3);
-              }} style={btnS}>{(comidasSel.length + customComidas.length) > 0 ? "¡Listo, vamos!" : "Continuar"}</button>
+              }} disabled={(comidasSel.length + customComidas.length) < 2} style={{ ...btnS, opacity: (comidasSel.length + customComidas.length) < 2 ? 0.4 : 1, cursor: (comidasSel.length + customComidas.length) < 2 ? "default" : "pointer" }}>{(comidasSel.length + customComidas.length) >= 2 ? "¡Listo, vamos!" : "Elige al menos 2"}</button>
               <button onClick={() => setOnboardingStep(3)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
             </div>
           ) : onboardingStep === 3 ? (
