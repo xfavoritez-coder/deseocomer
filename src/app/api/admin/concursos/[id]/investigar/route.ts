@@ -123,6 +123,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         puntosFantasma,
         sumaFields,
         ipsRepetidas: ipsRepetidas.map(([ip, count]) => ({ ip, count })),
+        ipsDuplicadas: Object.keys(Object.fromEntries(ipsRepetidas)),
+        ipParticipante: participante.usuario.ipRegistro,
         ipsVPN,
         mismaIP,
         emailsDuplicados: emailsDuplicados.map(([norm, names]) => ({ email: norm + "@gmail.com", cuentas: names })),

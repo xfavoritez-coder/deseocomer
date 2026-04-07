@@ -419,15 +419,33 @@ export default function AdminConcursos() {
                         </div>
                         <details style={{ marginTop: 6 }}>
                           <summary style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(120,140,220,0.7)", cursor: "pointer" }}>Ver {investigacion.totalReferidos} referidos</summary>
-                          <div style={{ marginTop: 6, maxHeight: 200, overflowY: "auto" }}>
-                            {investigacion.referidos.map((r: { nombre: string; email: string; ip: string; verificado: boolean; createdAt: string; estado: string }, ri: number) => (
-                              <div key={ri} style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)", padding: "3px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                                <span style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.6)" }}>{r.nombre}</span>{" "}
-                                <span style={{ color: "rgba(240,234,214,0.3)" }}>{r.email}</span>{" "}
-                                <span style={{ color: "rgba(240,234,214,0.25)" }}>IP:{r.ip}</span>{" "}
-                                {!r.verificado && <span style={{ color: "#e8a84c" }}>NO✓</span>}
-                              </div>
-                            ))}
+                          <div style={{ marginTop: 6, maxHeight: 300, overflowY: "auto" }}>
+                            {(() => {
+                              const ipsDup: string[] = investigacion.analisis.ipsDuplicadas ?? [];
+                              const ipPart: string = investigacion.analisis.ipParticipante ?? "";
+                              return investigacion.referidos.map((r: { nombre: string; email: string; ip: string; verificado: boolean; createdAt: string; estado: string }, ri: number) => {
+                                const ipRepetida = ipsDup.includes(r.ip);
+                                const mismaIPPart = r.ip && r.ip === ipPart;
+                                const fecha = new Date(r.createdAt);
+                                const fechaStr = fecha.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit" }) + " " + fecha.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+                                return (
+                                  <div key={ri} style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+                                      <span style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.7)", fontWeight: 600 }}>{r.nombre}</span>
+                                      {!r.verificado && <span style={{ color: "#e8a84c", fontSize: "0.65rem" }}>⏳</span>}
+                                      {r.estado === "descalificado" && <span style={{ fontSize: "0.62rem", padding: "1px 5px", borderRadius: 4, background: "rgba(255,80,80,0.15)", color: "#ff6b6b" }}>DESC</span>}
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 2, flexWrap: "wrap" }}>
+                                      <span style={{ color: "rgba(240,234,214,0.3)" }}>{r.email}</span>
+                                      <span style={{ color: mismaIPPart ? "#ff6b6b" : ipRepetida ? "#e8a84c" : "rgba(240,234,214,0.2)", fontWeight: ipRepetida || mismaIPPart ? 700 : 400 }}>
+                                        {mismaIPPart ? "🔴" : ipRepetida ? "🟡" : ""} {r.ip}
+                                      </span>
+                                      <span style={{ color: "rgba(240,234,214,0.25)" }}>{fechaStr}</span>
+                                    </div>
+                                  </div>
+                                );
+                              });
+                            })()}
                           </div>
                         </details>
                         {investigacion.participante.estado !== "descalificado" && (
