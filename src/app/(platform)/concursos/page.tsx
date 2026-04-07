@@ -347,17 +347,33 @@ export default function ConcursosPage() {
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 10 }}>⚡ +2 pts bonus primeros 10</span>
                     )}
 
-                    {/* Programado info */}
+                    {/* Programado countdown */}
                     {c.estado === "programado" && (() => {
-                      const actMs = c.fechaActivacion ? new Date(c.fechaActivacion).getTime() - Date.now() : 0;
+                      const actMs = c.fechaActivacion ? Math.max(0, new Date(c.fechaActivacion).getTime() - Date.now()) : 0;
                       const actDias = Math.floor(actMs / 86400000);
                       const actHoras = Math.floor((actMs % 86400000) / 3600000);
-                      const actTexto = actDias > 0 ? `${actDias} día${actDias > 1 ? "s" : ""} ${actHoras}h` : `${actHoras}h`;
-                      const wc = c.listaEsperaCount ?? 0;
+                      const actMin = Math.floor((actMs % 3600000) / 60000);
                       return (
-                        <div style={{ marginBottom: 10 }}>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 4 }}>Se activa en {actTexto}</p>
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", marginBottom: 4, whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
+                        <div style={{ marginBottom: 12 }}>
+                          <div style={{ background: "rgba(167,139,250,0.06)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 10, padding: "10px 8px", marginBottom: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, justifyContent: "center" }}>
+                              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#a78bfa", animation: "dc-pd 1.8s ease-in-out infinite" }} />
+                              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#a78bfa" }}>Se activa en</span>
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                              {[
+                                ...(actDias > 0 ? [{ v: actDias, l: "días" }] : []),
+                                { v: actHoras, l: "hrs" },
+                                { v: actMin, l: "min" },
+                              ].map(({ v, l }) => (
+                                <div key={l} style={{ textAlign: "center", minWidth: 40 }}>
+                                  <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 20, fontWeight: 700, color: "#a78bfa", lineHeight: 1 }}>{String(v).padStart(2, "0")}</div>
+                                  <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(167,139,250,0.5)", marginTop: 2 }}>{l}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
                         </div>
                       );
                     })()}
