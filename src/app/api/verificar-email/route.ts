@@ -5,8 +5,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
-    const refCodeParam = searchParams.get("ref");
-    const concursoParam = searchParams.get("concurso");
+    let refCodeParam = searchParams.get("ref");
+    let concursoParam = searchParams.get("concurso");
     if (!token) return NextResponse.json({ error: "Token inválido" }, { status: 400 });
 
     const usuario = await prisma.usuario.findFirst({ where: { tokenVerificacion: token } });
@@ -15,6 +15,10 @@ export async function GET(req: NextRequest) {
     // Reject tokens older than 48 hours (use updatedAt since token is regenerated on resend)
     const tokenAge = Date.now() - new Date(usuario.updatedAt).getTime();
     if (tokenAge > 48 * 60 * 60 * 1000) return NextResponse.json({ error: "Este enlace ha expirado. Solicita uno nuevo." }, { status: 400 });
+
+    // Fallback: use ref data saved at registration if not in URL
+    if (!refCodeParam && usuario.registroRefCode) refCodeParam = usuario.registroRefCode;
+    if (!concursoParam && usuario.registroRefConcursoId) concursoParam = usuario.registroRefConcursoId;
 
     await prisma.usuario.update({ where: { id: usuario.id }, data: { emailVerificado: true, emailVerificadoAt: new Date(), tokenVerificacion: null } });
 

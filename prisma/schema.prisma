@@ -34,6 +34,8 @@ model Usuario {
   resetTokenExpira    DateTime?
   ipRegistro          String    @default("")
   codigoRef                     String   @default("")
+  registroRefCode               String?
+  registroRefConcursoId         String?
   totalPuntosHistoricos         Int      @default(0)
   totalConcursosParticipados    Int      @default(0)
   totalConcursosGanados         Int      @default(0)

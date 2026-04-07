@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
     const codigoRef = await generarCodigoRef(nombre);
 
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip, codigoRef, ...(estiloAlimentario && { estiloAlimentario }), ...(comidasFavoritas?.length && { comidasFavoritas }) },
+      data: { nombre, email, password: hash, telefono, ciudad, cumpleDia, cumpleMes, cumpleAnio, emailVerificado: false, tokenVerificacion, ipRegistro: ip, codigoRef, ...(estiloAlimentario && { estiloAlimentario }), ...(comidasFavoritas?.length && { comidasFavoritas }), ...(refCode && { registroRefCode: refCode }), ...(refConcursoId && { registroRefConcursoId: refConcursoId }) },
     });
 
     const { password: _, ...usuarioSinPassword } = usuario;
