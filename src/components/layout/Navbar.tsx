@@ -180,7 +180,7 @@ export default function Navbar() {
           )}
           {isAuthenticated && user && (
             <div ref={notifRef2} style={{ position: "relative" }}>
-              <button onClick={() => { if (showNotifs) { setShowNotifs(false); } else { setShowNotifs(true); if (user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
+              <button onClick={() => { if (showNotifs) { setShowNotifs(false); } else { setShowNotifs(true); if (user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px", WebkitTapHighlightColor: "transparent", touchAction: "manipulation" as any }}>
                 <span style={{ fontSize: "1.1rem" }}>🔔</span>
                 {notifCount > 0 && (
                   <span style={{ position: "absolute", top: -2, right: -2, background: "#ff6b6b", color: "#fff", fontSize: "0.6rem", fontWeight: 700, borderRadius: "50%", width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>{notifCount > 9 ? "9+" : notifCount}</span>
@@ -405,6 +405,9 @@ export default function Navbar() {
           align-items: center; justify-content: center;
           color: var(--accent); font-size: 1.25rem; line-height: 1;
           flex-shrink: 0;
+          position: relative; z-index: 10;
+          -webkit-tap-highlight-color: rgba(232,168,76,0.15);
+          touch-action: manipulation;
         }
 
         @keyframes dc-drawer-in {
@@ -415,9 +418,9 @@ export default function Navbar() {
         .dc-nav-spacer { height: 68px; }
         .dc-nav-mobile-right { display: none; }
         @media (max-width: 767px) {
-          .dc-nav { padding: 14px 20px; }
+          .dc-nav { padding: 14px 16px; }
           .dc-nav-links { display: none; }
-          .dc-nav-mobile-right { display: flex; align-items: center; gap: 8px; }
+          .dc-nav-mobile-right { display: flex; align-items: center; gap: 6px; }
           .dc-hamburger { display: flex; }
           .dc-nav-spacer { height: 56px; }
         }
