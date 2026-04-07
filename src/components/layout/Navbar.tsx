@@ -112,7 +112,7 @@ export default function Navbar() {
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
       <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
-        <Link href="/" className="dc-nav-logo" onClick={(e) => { if (pathname === "/") { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); } }}>🏮 DeseoComer</Link>
+        <a href="/" className="dc-nav-logo">🏮 DeseoComer</a>
 
         {/* Desktop links */}
         <div className="dc-nav-links">
