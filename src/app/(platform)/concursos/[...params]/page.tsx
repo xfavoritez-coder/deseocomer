@@ -176,21 +176,25 @@ function ConcursoDetallePage() {
 
   const handleDismissRefBanner = () => { setRefBannerDismissed(true); if (refUserId || refCodeRaw) savePendingRef(refUserId || refCodeRaw!, concursoId); };
 
-  const [justEnded, setJustEnded] = useState(false);
+  const wasActiveOnLoad = useRef<boolean | null>(null);
   useEffect(() => {
     if (!concursoData) return;
+    // Check if contest was still active when page loaded
+    if (wasActiveOnLoad.current === null) {
+      wasActiveOnLoad.current = !getTimeLeft(concursoData.endsAt).ended;
+    }
     const tick = () => {
       const t = getTimeLeft(concursoData.endsAt);
       setTimer(t);
-      // When countdown reaches 0, reload data to show finalized state
-      if (t.ended && !justEnded) {
-        setJustEnded(true);
+      // Only reload if countdown ended DURING this visit (was active on load)
+      if (t.ended && wasActiveOnLoad.current) {
+        wasActiveOnLoad.current = false;
         setTimeout(() => window.location.reload(), 2000);
       }
     };
     const iid = setInterval(tick, 1000);
     return () => clearInterval(iid);
-  }, [concursoData?.endsAt, justEnded]);
+  }, [concursoData?.endsAt]);
 
   useEffect(() => {
     if (!refUserId || refProcessed.current) return;
