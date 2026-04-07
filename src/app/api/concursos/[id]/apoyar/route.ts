@@ -33,33 +33,32 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: { puntos: { increment: 1 }, puntosApoyos: { increment: 1 } },
     });
 
+    // Get supporter name (used for notification and email)
+    const supporterUser = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { nombre: true } });
+    const supporterNombre = supporterUser?.nombre?.split(" ")[0] ?? "Alguien";
+
     // Email primer apoyo recibido (una sola vez por usuario, fire-and-forget)
-    // Set flag FIRST to prevent duplicate sends from rapid clicks,
-    // then send email without awaiting to avoid blocking the response.
     prisma.usuario.findUnique({ where: { id: targetUsuarioId }, select: { nombre: true, email: true, primerApoyoNotificado: true } })
       .then(async (targetUser) => {
         if (!targetUser || targetUser.primerApoyoNotificado) return;
-        // Set flag immediately to prevent race conditions from rapid clicks
         await prisma.usuario.update({ where: { id: targetUsuarioId }, data: { primerApoyoNotificado: true } });
         await resend.emails.send({
           from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
           to: targetUser.email,
-          subject: `💛 ¡Alguien te apoya en tu concurso! — ${concurso.premio}`,
+          subject: `💛 ${supporterNombre} cree en ti — tu primer apoyo en "${concurso.premio}"`,
           html: primerApoyoHtml({
             nombreUsuario: targetUser.nombre,
             premioConcurso: concurso.premio,
             nombreLocal: concurso.local?.nombre ?? "un local",
+            nombreApoyo: supporterUser?.nombre,
           }),
         });
       })
       .catch((emailErr: unknown) => {
         console.error("[Email primer apoyo]", emailErr);
       });
-
-    // Notification: apoyo recibido
-    const supporterUser = await prisma.usuario.findUnique({ where: { id: supporterId }, select: { nombre: true } });
     const premioCorto = concurso.premio.length > 25 ? concurso.premio.substring(0, 25) + "..." : concurso.premio;
-    const msgApoyo = `${supporterUser?.nombre?.split(" ")[0] ?? "Alguien"} te apoyó en "${premioCorto}". +1 pt 💛`;
+    const msgApoyo = `${supporterNombre} te apoyó en "${premioCorto}". +1 pt 💛`;
     const yaNotifApoyo = await prisma.notificacion.findFirst({ where: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", createdAt: { gte: new Date(Date.now() - 60000) } } });
     if (!yaNotifApoyo) prisma.notificacion.create({ data: { usuarioId: targetUsuarioId, tipo: "apoyo_recibido", mensaje: msgApoyo, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
 

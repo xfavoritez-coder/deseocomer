@@ -1,5 +1,6 @@
-export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: { nombreUsuario: string; premioConcurso: string; nombreLocal: string }) {
+export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal, nombreApoyo }: { nombreUsuario: string; premioConcurso: string; nombreLocal: string; nombreApoyo?: string }) {
   const primerNombre = nombreUsuario.split(/\s+/)[0];
+  const apoyoNombre = nombreApoyo?.split(/\s+/)[0] ?? "Alguien";
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
 <body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
@@ -13,23 +14,23 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: 
   <div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
     <div style="text-align:center;margin-bottom:24px">
       <p style="font-size:40px;margin:0 0 12px">💛</p>
-      <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:8px;line-height:1.3">¡${primerNombre}, alguien te apoya!</h2>
-      <p style="color:#8a7040;font-size:14px;margin:0;font-style:italic">Has recibido tu primer punto de apoyo</p>
+      <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:8px;line-height:1.3">¡${primerNombre}, ${apoyoNombre} cree en ti!</h2>
+      <p style="color:#8a7040;font-size:14px;margin:0;font-style:italic">Tu primer punto de apoyo en el concurso</p>
     </div>
 
     <div style="background-color:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.15);border-radius:12px;padding:20px;margin-bottom:24px">
       <p style="color:#c0a060;font-size:15px;line-height:1.7;margin:0">
-        Otro participante te ha dado <strong style="color:#e8a84c">+1 punto</strong> en el concurso
+        <strong style="color:#e8a84c">${apoyoNombre}</strong> te ha dado <strong style="color:#e8a84c">+1 punto</strong> en el concurso
         <strong style="color:#f5d080">&ldquo;${premioConcurso}&rdquo;</strong> de <strong style="color:#e8a84c">${nombreLocal}</strong>.
       </p>
     </div>
 
     <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">
-      Esto significa que otros participantes creen en ti y quieren que ganes. ¡Sigue sumando puntos compartiendo tu link y subiendo en el ranking!
+      Esto significa que ${apoyoNombre} quiere que ganes. ¡Sigue sumando puntos compartiendo tu link y subiendo en el ranking!
     </p>
 
     <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:28px">
-      Recuerda: por cada persona que se registre con tu link, tú ganas <strong style="color:#e8a84c">hasta +3 puntos</strong>. Compártelo y acércate al premio.
+      Recuerda: por cada persona que se registre con tu link, tú ganas <strong style="color:#e8a84c">+3 puntos</strong>. Compártelo y acércate al premio.
     </p>
 
     <div style="text-align:center;margin-bottom:8px">
@@ -38,7 +39,7 @@ export function primerApoyoHtml({ nombreUsuario, premioConcurso, nombreLocal }: 
   </div>
 
   <div style="text-align:center;margin-top:32px">
-    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con 💛 y mucha hambre · DeseoComer.com<br/>Santiago de Chile</p>
+    <p style="color:#5a4028;font-size:12px;line-height:1.6">Hecho con 💛 y mucha hambre · DeseoComer.com</p>
   </div>
 
 </div>
