@@ -83,9 +83,13 @@ export default function EstadisticasPage() {
   const [tab, setTab] = useState<"busquedas" | "usuarios" | "registros">("busquedas");
 
   useEffect(() => {
+    // Load search stats (lightweight)
     adminFetch("/api/stats").then(r => r.json()).then(setStats).catch(() => setError(true));
-    adminFetch("/api/admin/stats-usuarios").then(r => r.json()).then(d => { if (!d.error) setUserStats(d); }).catch(() => {});
-    adminFetch("/api/admin/stats-registros").then(r => r.json()).then(d => { if (!d.error) setRegStats(d); }).catch(() => {});
+    // Load precalculated admin stats from cache
+    adminFetch("/api/admin/stats-cache").then(r => r.json()).then(d => {
+      if (d.usuarios) setUserStats(d.usuarios);
+      if (d.registros) setRegStats(d.registros);
+    }).catch(() => {});
   }, []);
 
   if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ color: "#ff6b6b", fontFamily: "Georgia" }}>Error al cargar estadísticas</p></div>;

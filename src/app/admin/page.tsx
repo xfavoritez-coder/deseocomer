@@ -12,7 +12,8 @@ export default function AdminDashboard() {
   const [error, setError] = useState(false);
   useEffect(() => {
     adminFetch("/api/admin/stats").then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(setStats).catch(() => setError(true));
-    adminFetch("/api/admin/sospechosos").then(r => r.json()).then(d => { if (d.sospechosos) setSospechosos(d.sospechosos); }).catch(() => {});
+    // Load precalculated sospechosos from cache (no heavy queries)
+    adminFetch("/api/admin/stats-cache").then(r => r.json()).then(d => { if (d.sospechosos) setSospechosos(d.sospechosos); }).catch(() => {});
   }, []);
 
   if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ fontSize: "2rem", marginBottom: "12px" }}>⚠️</p><p style={{ color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.9rem" }}>Error al cargar datos. Vuelve a iniciar sesión.</p><a href="/admin/login" style={{ color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.8rem" }}>Ir al login →</a></div>;
