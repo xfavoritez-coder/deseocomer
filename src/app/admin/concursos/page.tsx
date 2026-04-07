@@ -5,7 +5,7 @@ import SubirFoto from "@/components/SubirFoto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type C = any;
-type Participante = { id: string; usuarioId: string; nombre: string; email: string; puntos: number; puntosPendientes: number; referidos: number; estado: string; createdAt: string; flags: string[]; sospechoso: boolean };
+type Participante = { id: string; usuarioId: string; nombre: string; email: string; puntos: number; puntosPendientes: number; referidos: number; clicksWhatsapp: number; clicksInstagram: number; estado: string; createdAt: string; flags: string[]; sospechoso: boolean };
 
 export default function AdminConcursos() {
   const [concursos, setConcursos] = useState<C[]>([]);
@@ -372,6 +372,7 @@ export default function AdminConcursos() {
                       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                         <span style={{ fontFamily: "Georgia", fontSize: "0.8rem", color: "#e8a84c" }}>{p.puntos} pts</span>
                         <span style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)" }}>{p.referidos} refs</span>
+                        {(p.clicksWhatsapp > 0 || p.clicksInstagram > 0) && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)" }}>{p.clicksWhatsapp > 0 ? `WA:${p.clicksWhatsapp}` : ""}{p.clicksWhatsapp > 0 && p.clicksInstagram > 0 ? " · " : ""}{p.clicksInstagram > 0 ? `IG:${p.clicksInstagram}` : ""}</span>}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: "6px", marginTop: "6px", alignItems: "center", flexWrap: "wrap" }}>

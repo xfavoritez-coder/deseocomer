@@ -79,11 +79,13 @@ export default function EstadisticasPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [userStats, setUserStats] = useState<UserStatsData | null>(null);
   const [error, setError] = useState(false);
-  const [tab, setTab] = useState<"busquedas" | "usuarios">("busquedas");
+  const [regStats, setRegStats] = useState<{ total: number; porDia: { dia: string; registros: number }[] } | null>(null);
+  const [tab, setTab] = useState<"busquedas" | "usuarios" | "registros">("busquedas");
 
   useEffect(() => {
     adminFetch("/api/stats").then(r => r.json()).then(setStats).catch(() => setError(true));
     adminFetch("/api/admin/stats-usuarios").then(r => r.json()).then(d => { if (!d.error) setUserStats(d); }).catch(() => {});
+    adminFetch("/api/admin/stats-registros").then(r => r.json()).then(d => { if (!d.error) setRegStats(d); }).catch(() => {});
   }, []);
 
   if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ color: "#ff6b6b", fontFamily: "Georgia" }}>Error al cargar estadísticas</p></div>;
@@ -99,6 +101,7 @@ export default function EstadisticasPage() {
       <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(232,168,76,0.15)", marginBottom: 24 }}>
         <button onClick={() => setTab("busquedas")} style={tabS(tab === "busquedas")}>Búsquedas</button>
         <button onClick={() => setTab("usuarios")} style={tabS(tab === "usuarios")}>Gustos de usuarios</button>
+        <button onClick={() => setTab("registros")} style={tabS(tab === "registros")}>Registros</button>
       </div>
 
       {tab === "busquedas" && stats && (
@@ -192,6 +195,61 @@ export default function EstadisticasPage() {
                 <div style={sectionS}>
                   <h3 style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#3db89e", marginBottom: 14 }}>Estilos alimentarios</h3>
                   <BarChart data={userStats.estilos} color="#3db89e" max={10} />
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {tab === "registros" && (
+        <>
+          {!regStats ? (
+            <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: 40 }}>Cargando...</p>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+                <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 10, padding: "14px 20px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "Georgia", fontSize: "1.8rem", color: "#3db89e", fontWeight: 700 }}>{regStats.total}</div>
+                  <div style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Últimos 30 días</div>
+                </div>
+                <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 10, padding: "14px 20px", textAlign: "center" }}>
+                  <div style={{ fontFamily: "Georgia", fontSize: "1.8rem", color: "#e8a84c", fontWeight: 700 }}>{regStats.porDia.length > 0 ? Math.round(regStats.total / regStats.porDia.length) : 0}</div>
+                  <div style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Promedio/día</div>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <div style={sectionS}>
+                <h3 style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#3db89e", marginBottom: 16 }}>Registros por día</h3>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 160 }}>
+                  {(() => {
+                    const maxVal = Math.max(...regStats.porDia.map(d => d.registros), 1);
+                    return regStats.porDia.map((d, i) => {
+                      const height = (d.registros / maxVal) * 140;
+                      const isToday = d.dia === new Date().toISOString().split("T")[0];
+                      return (
+                        <div key={d.dia} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, minWidth: 0 }} title={`${d.dia}: ${d.registros} registros`}>
+                          <span style={{ fontFamily: "Georgia", fontSize: "0.6rem", color: d.registros > 0 ? "rgba(240,234,214,0.5)" : "transparent" }}>{d.registros}</span>
+                          <div style={{ width: "100%", maxWidth: 20, height: Math.max(height, 2), background: isToday ? "#e8a84c" : d.registros > 0 ? "#3db89e" : "rgba(255,255,255,0.04)", borderRadius: "3px 3px 0 0", transition: "height 0.3s" }} />
+                          {i % 5 === 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.55rem", color: "rgba(240,234,214,0.25)", marginTop: 2, whiteSpace: "nowrap" }}>{d.dia.slice(5)}</span>}
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+              </div>
+
+              {/* Table */}
+              <div style={{ ...sectionS, marginTop: 16 }}>
+                <h3 style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#e8a84c", marginBottom: 12 }}>Detalle por día</h3>
+                <div style={{ maxHeight: 300, overflowY: "auto" }}>
+                  {[...regStats.porDia].reverse().map(d => (
+                    <div key={d.dia} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)" }}>{new Date(d.dia + "T12:00:00").toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "short" })}</span>
+                      <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: d.registros > 0 ? "#3db89e" : "rgba(240,234,214,0.2)", fontWeight: 700 }}>{d.registros}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </>

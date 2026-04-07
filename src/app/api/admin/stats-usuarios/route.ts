@@ -7,11 +7,6 @@ export async function GET(req: NextRequest) {
   if (authErr) return authErr;
 
   try {
-    const usuarios = await prisma.usuario.findMany({
-      where: { geniePerfil: { not: undefined } },
-      select: { geniePerfil: true },
-    });
-
     const categorias: Record<string, number> = {};
     const comunas: Record<string, number> = {};
     const horarios: Record<string, number> = {};
@@ -20,49 +15,55 @@ export async function GET(req: NextRequest) {
     const estilos: Record<string, number> = {};
     let totalPerfiles = 0;
 
-    for (const u of usuarios) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const gp = u.geniePerfil as any;
-      if (!gp?.gustos) continue;
-      totalPerfiles++;
+    // Process in batches of 100 to avoid memory/connection issues
+    let cursor: string | undefined;
+    while (true) {
+      const batch = await prisma.usuario.findMany({
+        take: 100,
+        ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+        where: { geniePerfil: { not: undefined } },
+        select: { id: true, geniePerfil: true },
+        orderBy: { id: "asc" },
+      });
 
-      // Categorías preferidas
-      if (gp.gustos.categorias) {
-        for (const [cat, score] of Object.entries(gp.gustos.categorias)) {
-          categorias[cat] = (categorias[cat] ?? 0) + (score as number);
+      if (batch.length === 0) break;
+      cursor = batch[batch.length - 1].id;
+
+      for (const u of batch) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const gp = u.geniePerfil as any;
+        if (!gp?.gustos) continue;
+        totalPerfiles++;
+
+        if (gp.gustos.categorias) {
+          for (const [cat, score] of Object.entries(gp.gustos.categorias)) {
+            categorias[cat] = (categorias[cat] ?? 0) + (score as number);
+          }
         }
-      }
-
-      // Comunas preferidas
-      if (gp.gustos.comunas) {
-        for (const [com, score] of Object.entries(gp.gustos.comunas)) {
-          comunas[com] = (comunas[com] ?? 0) + (score as number);
+        if (gp.gustos.comunas) {
+          for (const [com, score] of Object.entries(gp.gustos.comunas)) {
+            comunas[com] = (comunas[com] ?? 0) + (score as number);
+          }
         }
-      }
-
-      // Horarios (momentos del día)
-      if (gp.gustos.horario) {
-        for (const [h, score] of Object.entries(gp.gustos.horario)) {
-          horarios[h] = (horarios[h] ?? 0) + (score as number);
+        if (gp.gustos.horario) {
+          for (const [h, score] of Object.entries(gp.gustos.horario)) {
+            horarios[h] = (horarios[h] ?? 0) + (score as number);
+          }
         }
-      }
-
-      // Ocasiones
-      if (gp.gustos.ocasiones) {
-        for (const [oc, score] of Object.entries(gp.gustos.ocasiones)) {
-          ocasiones[oc] = (ocasiones[oc] ?? 0) + (score as number);
+        if (gp.gustos.ocasiones) {
+          for (const [oc, score] of Object.entries(gp.gustos.ocasiones)) {
+            ocasiones[oc] = (ocasiones[oc] ?? 0) + (score as number);
+          }
         }
-      }
-
-      // Locales más visitados
-      if (gp.comportamiento?.localesVisitados) {
-        for (const lv of gp.comportamiento.localesVisitados) {
-          if (lv.nombre) localesTop[lv.nombre] = (localesTop[lv.nombre] ?? 0) + 1;
+        if (gp.comportamiento?.localesVisitados) {
+          for (const lv of gp.comportamiento.localesVisitados) {
+            if (lv.nombre) localesTop[lv.nombre] = (localesTop[lv.nombre] ?? 0) + 1;
+          }
         }
       }
     }
 
-    // Estilos alimentarios (campo directo del usuario)
+    // Estilos alimentarios
     const estilosRaw = await prisma.usuario.groupBy({
       by: ["estiloAlimentario"],
       where: { estiloAlimentario: { notIn: ["", "no_especificado"] } },
@@ -72,7 +73,6 @@ export async function GET(req: NextRequest) {
       if (e.estiloAlimentario) estilos[e.estiloAlimentario] = e._count;
     }
 
-    // Top 30 de cada cosa
     const top = (obj: Record<string, number>, n = 30) =>
       Object.fromEntries(Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n));
 
@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
       localesTop: top(localesTop),
       estilos: top(estilos),
     }, {
-      headers: { "Cache-Control": "private, max-age=60" },
+      headers: { "Cache-Control": "private, max-age=120" },
     });
   } catch (error) {
     console.error("[Admin stats-usuarios]", error);

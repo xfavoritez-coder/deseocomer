@@ -226,6 +226,8 @@ model ParticipanteConcurso {
   codigoInvitacion          String?
   bonusRef         Int      @default(0)
   puntosApoyos     Int      @default(0)
+  clicksWhatsapp   Int      @default(0)
+  clicksInstagram  Int      @default(0)
   puntos           Int      @default(1)
   puntosPendientes Int      @default(0)
   estado           String   @default("activo")

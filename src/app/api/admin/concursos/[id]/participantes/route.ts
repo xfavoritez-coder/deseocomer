@@ -60,6 +60,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         puntos: p.puntos,
         puntosPendientes: p.puntosPendientes,
         referidos: referidos.length,
+        clicksWhatsapp: p.clicksWhatsapp ?? 0,
+        clicksInstagram: p.clicksInstagram ?? 0,
         estado: p.estado,
         createdAt: p.createdAt,
         flags,
