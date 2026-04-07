@@ -428,12 +428,12 @@ export default function GeniePanel() {
                 </div>
               )}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(10,8,18,0) 30%, rgba(10,8,18,0.82) 100%)" }} />
-              <div style={{ position: "absolute", bottom: "10px", left: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <Link href={`/locales/${r.slug || r.id}`} onClick={() => setIsOpen(false)} style={{ position: "absolute", bottom: "10px", left: "12px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}>
                 <div style={{ width: "24px", height: "24px", borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: r.logoUrl ? "transparent" : "rgba(20,12,35,0.9)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", fontSize: "11px", fontWeight: 700, color: "#e8a84c" }}>
                   {r.logoUrl ? <img src={r.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : getInitials(r.nombre)}
                 </div>
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "13px", color: "rgba(245,238,220,0.95)", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.05em", textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}>{r.nombre}</span>
-              </div>
+              </Link>
             </div>
 
             {/* Body */}
@@ -443,8 +443,9 @@ export default function GeniePanel() {
                 <span style={{ color: "rgba(240,234,214,0.18)" }}>·</span>
                 <span style={{ color: "#3db89e" }}>{CATEGORIA_EMOJI[r.categorias?.[0] ?? ""] ?? "🍽️"} {r.categorias?.[0] ?? r.categoria}</span>
                 {(() => {
-                  const ratingMostrar = r.rating > 0 ? r.rating : (r as any).googleRating;
-                  const esGoogle = r.rating === 0 && (r as any).googleRating;
+                  const esImportado = !(r as any).activo;
+                  const ratingMostrar = r.rating > 0 ? r.rating : (esImportado ? (r as any).googleRating : null);
+                  const esGoogle = r.rating === 0 && esImportado && (r as any).googleRating;
                   if (!ratingMostrar) return null;
                   return (<><span style={{ color: "rgba(240,234,214,0.18)" }}>·</span><span style={{ color: "#e8a84c", fontWeight: 600 }}>★ {ratingMostrar.toFixed ? ratingMostrar.toFixed(1) : ratingMostrar}{esGoogle && <span style={{ fontSize: "10px", opacity: 0.5, marginLeft: "2px" }}>G</span>}</span></>);
                 })()}

@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       } : undefined,
       ...(!paginated && {
         select: {
-          id: true, slug: true, nombre: true, categorias: true, comuna: true,
+          id: true, slug: true, nombre: true, categorias: true, comuna: true, activo: true,
           googleRating: true, estadoLocal: true, portadaUrl: true, logoUrl: true,
           tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,
           horarioGoogle: true, horarios: true,
