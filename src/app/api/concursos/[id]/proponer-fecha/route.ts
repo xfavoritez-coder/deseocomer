@@ -18,8 +18,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
     if (!concurso.ganadorActual) return NextResponse.json({ error: "No hay ganador" }, { status: 400 });
 
+    // Save to DB
+    await prisma.concurso.update({
+      where: { id: concurso.id },
+      data: { fechaPropuestaAt: new Date(), fechaPropuesta: fecha },
+    });
+
     const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
     const ganadorNombre = concurso.ganadorActual.nombre.split(" ")[0];
+    const tel = concurso.local.telefono;
+
+    // Build contact section
+    let contactoHtml = "";
+    if (tel) {
+      contactoHtml += `<p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0 0 4px"><strong style="color:#e8a84c">Teléfono:</strong> <a href="tel:${tel.replace(/\s/g, "")}" style="color:#f5d080;text-decoration:none">${tel}</a></p>`;
+    }
+    if (tel) {
+      const wspNum = tel.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+      contactoHtml += `<p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0 0 4px"><strong style="color:#e8a84c">WhatsApp:</strong> <a href="https://wa.me/${wspNum}" style="color:#25d366;text-decoration:none;font-weight:bold">Enviar mensaje →</a></p>`;
+    }
 
     await resend.emails.send({
       from,
@@ -31,18 +48,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 <div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
 <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">📅 Coordinar entrega de tu premio</h2>
 <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Hola ${ganadorNombre},</p>
-<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px"><strong style="color:#f5d080">${concurso.local.nombre}</strong> te propone la siguiente fecha para que retires tu premio <strong style="color:#f5d080">"${concurso.premio}"</strong>:</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px"><strong style="color:#f5d080">${concurso.local.nombre}</strong> te envía el siguiente mensaje sobre la entrega de tu premio <strong style="color:#f5d080">"${concurso.premio}"</strong>:</p>
 <div style="background-color:rgba(232,168,76,0.1);border:1px solid rgba(232,168,76,0.25);border-radius:12px;padding:20px;margin-bottom:20px;text-align:center">
-<p style="color:#e8a84c;font-size:20px;font-weight:bold;margin:0">${fecha}</p>
+<p style="color:#e8a84c;font-size:18px;font-weight:bold;margin:0;line-height:1.6">${fecha}</p>
 </div>
 <div style="background-color:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-bottom:20px">
-<p style="color:#e8a84c;font-size:14px;font-weight:bold;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.1em">Dónde ir</p>
+<p style="color:#e8a84c;font-size:14px;font-weight:bold;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.1em">Datos del local</p>
 <p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0 0 4px"><strong style="color:#e8a84c">Local:</strong> ${concurso.local.nombre}</p>
 ${concurso.local.direccion ? `<p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0 0 4px"><strong style="color:#e8a84c">Dirección:</strong> ${concurso.local.direccion}${concurso.local.comuna ? `, ${concurso.local.comuna}` : ""}</p>` : ""}
-${concurso.local.telefono ? `<p style="color:#c0a060;font-size:14px;line-height:1.7;margin:0"><strong style="color:#e8a84c">Teléfono:</strong> ${concurso.local.telefono}</p>` : ""}
+${contactoHtml}
 </div>
 <p style="color:#c0a060;font-size:14px;line-height:1.7;margin-bottom:16px">Recuerda llevar tu código de verificación: <strong style="color:#f5d080;letter-spacing:0.1em">${concurso.codigoEntrega}</strong></p>
-<p style="color:#c0a060;font-size:14px;line-height:1.7;margin-bottom:0">Si la fecha no te acomoda, responde a este correo o contacta al local directamente.</p>
+<p style="color:#c0a060;font-size:14px;line-height:1.7;margin-bottom:0">Si tienes alguna duda, contacta al local directamente.</p>
 </div>
 <div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,

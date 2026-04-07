@@ -287,6 +287,7 @@ export default function PanelConcursos() {
             </div>
           );
           // finalizado — coordinar entrega
+          const yaEnvioFecha = !!(detalle.fechaPropuestaAt || detalle.fechaEnviada);
           return (
             <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "20px", marginBottom: "20px" }}>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", fontWeight: 700, marginBottom: "12px" }}>🏆 Coordinar entrega del premio</p>
@@ -301,8 +302,8 @@ export default function PanelConcursos() {
                 {[
                   { done: true, label: "Concurso finalizado" },
                   { done: !!detalle.ganadorNotificadoAt, label: "Ganador notificado" },
-                  { done: false, active: true, label: "Coordinar entrega" },
-                  { done: false, label: "Foto + confirmar entrega" },
+                  { done: yaEnvioFecha, active: !yaEnvioFecha, label: "Coordinar entrega" },
+                  { done: false, active: yaEnvioFecha, label: "Foto + confirmar entrega" },
                 ].map((st, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "#e8a84c" : "rgba(240,234,214,0.25)" }}>{st.done ? "✓" : st.active ? "⏳" : "○"}</span>
@@ -310,27 +311,37 @@ export default function PanelConcursos() {
                   </div>
                 ))}
               </div>
-              {/* Proponer fecha */}
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Proponer fecha al ganador</label>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <input id={`fecha-top-${detalle.id}`} type="text" placeholder="Ej: Miércoles 10 abril, 18:00" style={{ flex: 1, padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
-                  <button onClick={async () => {
-                    const input = document.getElementById(`fecha-top-${detalle.id}`) as HTMLInputElement;
-                    const f = input?.value?.trim();
-                    if (!f) { setActionToast("Escribe una fecha"); setTimeout(() => setActionToast(""), 3000); return; }
-                    const s = getSession();
-                    try {
-                      const res = await fetch(`/api/concursos/${detalle.id}/proponer-fecha`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fecha: f }) });
-                      if (res.ok) { setActionToast("✓ Fecha enviada al ganador"); input.value = ""; setDetalle({ ...detalle, fechaEnviada: true }); }
-                      else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
-                    } catch { setActionToast("Error de conexión"); }
-                    setTimeout(() => setActionToast(""), 4000);
-                  }} style={{ padding: "10px 16px", background: "#e8a84c", border: "none", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#0a0812", cursor: "pointer", whiteSpace: "nowrap" }}>Enviar</button>
+
+              {/* Enviar mensaje al ganador — solo si aún no se ha enviado */}
+              {!yaEnvioFecha ? (
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Indicar cómo coordinar la entrega</label>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", marginBottom: 8, lineHeight: 1.5 }}>Escribe una fecha, horario, o instrucciones para que el ganador retire su premio. Le enviaremos un email con tu mensaje.</p>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input id={`fecha-top-${detalle.id}`} type="text" placeholder="Ej: Miércoles 10 abril, 14:00 a 20:00" style={{ flex: 1, padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
+                    <button onClick={async () => {
+                      const input = document.getElementById(`fecha-top-${detalle.id}`) as HTMLInputElement;
+                      const f = input?.value?.trim();
+                      if (!f) { setActionToast("Escribe un mensaje"); setTimeout(() => setActionToast(""), 3000); return; }
+                      const s = getSession();
+                      try {
+                        const res = await fetch(`/api/concursos/${detalle.id}/proponer-fecha`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fecha: f }) });
+                        if (res.ok) { setActionToast("✓ Mensaje enviado al ganador"); input.value = ""; setDetalle({ ...detalle, fechaPropuestaAt: new Date().toISOString(), fechaEnviada: true }); }
+                        else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
+                      } catch { setActionToast("Error de conexión"); }
+                      setTimeout(() => setActionToast(""), 4000);
+                    }} style={{ padding: "10px 16px", background: "#e8a84c", border: "none", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#0a0812", cursor: "pointer", whiteSpace: "nowrap" }}>Enviar</button>
+                  </div>
                 </div>
-              </div>
-              {/* Foto + confirmar solo después de enviar fecha */}
-              {detalle.fechaEnviada && (
+              ) : (
+                <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#3db89e", margin: 0 }}>✓ Mensaje de coordinación enviado al ganador</p>
+                  {detalle.fechaPropuesta && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "4px 0 0", fontStyle: "italic" }}>&quot;{detalle.fechaPropuesta}&quot;</p>}
+                </div>
+              )}
+
+              {/* Foto + confirmar — visible después de enviar mensaje */}
+              {yaEnvioFecha && (
                 <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", paddingTop: 14 }}>
                   <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 8 }}>Subir foto del ganador (opcional)</label>
                   <SubirFoto folder="concursos" preview={detalle.fotoGanador ?? ""} onUpload={(url: string) => setDetalle({ ...detalle, fotoGanador: url })} label="Foto del ganador con su premio" height="160px" />

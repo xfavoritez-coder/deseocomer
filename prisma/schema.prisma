@@ -202,6 +202,8 @@ model Concurso {
   modalidadConcurso   String   @default("meritos")
   requiereTelefono  Boolean  @default(false)
   fechaActivacion   DateTime?
+  fechaPropuestaAt  DateTime?
+  fechaPropuesta    String?
 
   createdAt         DateTime @default(now())
 
