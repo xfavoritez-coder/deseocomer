@@ -110,7 +110,7 @@ function ConcursoDetallePage() {
             localCategorias: data.local?.categorias ?? [],
             imagen: "🏆", imagenUrl: data.imagenUrl ?? data.local?.portadaUrl ?? "",
             premio: data.premio ?? "", descripcionPremio: data.descripcion ?? "",
-            condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0,
+            condiciones: data.condiciones ?? "", participantes: data._count?.participantes ?? 0, totalParticipantes: data._count?.participantes ?? 0,
             endsAt: new Date(data.fechaFin).getTime(),
             ranking: (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { id?: string; nombre?: string; fotoUrl?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, fotoUrl: p.usuario?.fotoUrl || "", usuarioId: p.usuarioId ?? p.usuario?.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" })),
             reglas: ["Debes estar registrado en DeseoComer para entrar.", "El ganador es quien más puntos tenga al cierre del concurso."],
@@ -156,6 +156,7 @@ function ConcursoDetallePage() {
   }, [hasRefLink, isAuthenticated, concursoId]);
   const [tooltipActivo, setTooltipActivo] = useState<string | null>(null);
   const [showAllRanking, setShowAllRanking] = useState(false);
+  const [allRankingData, setAllRankingData] = useState<any[]>([]);
   const [infoTooltip, setInfoTooltip] = useState<string | null>(null);
   useEffect(() => {
     if (!infoTooltip) return;
@@ -590,13 +591,13 @@ function ConcursoDetallePage() {
                 <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
               </div>
             )}
-            {ocultos.length > 0 && !showAllRanking && (
+            {!showAllRanking && (concursoData as any)?.totalParticipantes > visibles.length && (
               <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
-                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {ocultos.length} participante{ocultos.length !== 1 ? "s" : ""} más con 1 punto</span>
-                <button onClick={() => setShowAllRanking(true)} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
+                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {(concursoData as any).totalParticipantes - visibles.length} participante{(concursoData as any).totalParticipantes - visibles.length !== 1 ? "s" : ""} más</span>
+                <button onClick={async () => { try { const res = await fetch(`/api/concursos/${slug}/ranking`); const d = await res.json(); if (d.participantes) { const full = d.participantes.map((p: any) => ({ nombre: p.usuario.nombre, referidos: p.puntos, fotoUrl: p.usuario.fotoUrl, usuarioId: p.usuarioId, codigoRef: p.usuario.codigoRef })); setAllRankingData(full); } } catch {} setShowAllRanking(true); }} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
               </div>
             )}
-            {showAllRanking && ocultos.map((r, i) => renderRow(r, visibles.length + i))}
+            {showAllRanking && (allRankingData.length > 0 ? allRankingData : ocultos).slice(visibles.length).map((r, i) => renderRow(r, visibles.length + i))}
           </>
         );
       })()}

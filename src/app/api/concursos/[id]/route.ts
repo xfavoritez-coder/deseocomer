@@ -8,20 +8,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { OR: [{ id }, { slug: id }] },
       include: {
         local: { select: { id: true, nombre: true, slug: true, logoUrl: true, portadaUrl: true, comuna: true, direccion: true, telefono: true, email: true, categorias: true } },
-        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true, email: true, telefono: true, codigoRef: true } } }, orderBy: { puntos: "desc" } },
+        participantes: { where: { estado: { not: "descalificado" } }, include: { usuario: { select: { id: true, nombre: true, fotoUrl: true, codigoRef: true } } }, orderBy: { puntos: "desc" }, take: 6 },
         ganadorActual: { select: { id: true, nombre: true } },
         _count: { select: { participantes: { where: { estado: { not: "descalificado" } } }, listaEspera: true } },
       },
     });
     if (!concurso) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
-    // Count disqualified participants for public transparency
-    const descalificados = await prisma.participanteConcurso.count({
-      where: { concursoId: concurso.id, estado: "descalificado" },
-    });
-
-    // Increment view count (raw query to avoid idle transactions in pooler)
+    // Fire-and-forget view count — don't block response
     prisma.$executeRawUnsafe('UPDATE "Concurso" SET "vistas" = "vistas" + 1 WHERE "id" = $1', concurso.id).catch(() => {});
+    const descalificados = 0; // removed extra query — use _count if needed
 
     // Lazy close: if contest ended but still "activo", close it now and send emails
     if (concurso.estado === "activo" && new Date(concurso.fechaFin) <= new Date() && concurso.participantes.length > 0) {
@@ -78,7 +74,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           concursoId: concurso.id, titulo: concurso.premio, premio: concurso.premio, codigoEntrega: codigo,
           local: { nombre: concurso.local.nombre, direccion: concurso.local.direccion, comuna: concurso.local.comuna, telefono: concurso.local.telefono },
         };
-        const ganador = { nombre: ganadorPart.usuario.nombre, email: ganadorPart.usuario.email!, telefono: ganadorPart.usuario.telefono };
+        const ganadorUser = await prisma.usuario.findUnique({ where: { id: ganadorPart.usuario.id }, select: { nombre: true, email: true, telefono: true } });
+        const ganador = { nombre: ganadorUser!.nombre, email: ganadorUser!.email!, telefono: ganadorUser!.telefono };
         const urls = {
           confirm: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=si`,
           disputa: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=no`,
