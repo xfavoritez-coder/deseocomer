@@ -32,6 +32,7 @@ import {
   unsupportUser,
 } from "@/lib/referrals";
 import { useGenie } from "@/contexts/GenieContext";
+import VerificarTelefono from "@/components/VerificarTelefono";
 
 export default function ConcursoDetalleWrapper() {
   return <Suspense><ConcursoDetallePage /></Suspense>;
@@ -396,6 +397,8 @@ function ConcursoDetallePage() {
         const errData = await res.json().catch(() => ({}));
         if (errData.codigo === "EMAIL_NO_VERIFICADO") {
           setJoinError("Debes verificar tu email para participar. Revisa tu bandeja de entrada.");
+        } else if (errData.codigo === "TELEFONO_NO_VERIFICADO") {
+          setShowPhoneModal(true);
         } else {
           setJoinError(errData.error ?? "Error al unirse al concurso.");
         }
@@ -1063,28 +1066,18 @@ function ConcursoDetallePage() {
       </>)}
 
       {/* Modal de teléfono */}
-      {showPhoneModal && (<>
-        <div onClick={() => setShowPhoneModal(false)} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,0.7)" }} />
-        <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: "90%", maxWidth: 400, zIndex: 1000, background: "rgba(13,7,3,0.98)", border: "1px solid rgba(232,168,76,0.4)", borderRadius: 20, padding: "32px 24px", textAlign: "center" }}>
-          <button onClick={() => setShowPhoneModal(false)} style={{ position: "absolute", top: 12, right: 12, background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: "1rem", cursor: "pointer" }}>✕</button>
-          <p style={{ fontSize: "2rem", marginBottom: 8 }}>📱</p>
-          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", marginBottom: 10 }}>Necesitamos tu teléfono</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 20 }}>Para entrar a concursos necesitamos tu número de teléfono. Si ganas, el local lo usará para coordinar la entrega del premio.</p>
-          {phoneError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8080", marginBottom: 10 }}>⚠️ {phoneError}</p>}
-          <input
-            type="tel"
-            value={phoneInput}
-            onChange={e => setPhoneInput(e.target.value)}
-            placeholder="+56 9 1234 5678"
-            style={{ width: "100%", padding: "14px 16px", background: "#1a1008", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 10, color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box", marginBottom: 16, textAlign: "center", letterSpacing: "0.05em" }}
-          />
-          <button
-            onClick={handleSavePhone}
-            disabled={phoneSaving || phoneInput.trim().length < 8}
-            style={{ width: "100%", padding: 14, background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", borderRadius: 10, border: "none", cursor: phoneSaving ? "wait" : "pointer", opacity: phoneInput.trim().length >= 8 ? 1 : 0.5, letterSpacing: "0.06em" }}
-          >{phoneSaving ? "Guardando..." : "Guardar y entrar"}</button>
-        </div>
-      </>)}
+      {showPhoneModal && user && (
+        <VerificarTelefono
+          userId={user.id}
+          telefonoActual={user.telefono}
+          onVerificado={() => {
+            setShowPhoneModal(false);
+            // Retry participation after phone verification
+            doJoin();
+          }}
+          onCerrar={() => setShowPhoneModal(false)}
+        />
+      )}
 
       {/* Animación sorteo */}
       {mostrarSorteo && (concursoData as any)?.ganadorActualNombre && (

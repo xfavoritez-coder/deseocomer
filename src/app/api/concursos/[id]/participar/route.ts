@@ -10,7 +10,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!usuarioId) return NextResponse.json({ error: "Falta usuarioId" }, { status: 400 });
 
     // Verify user has confirmed email and is not blocked
-    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { emailVerificado: true, tipo: true } });
+    const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId }, select: { emailVerificado: true, telefonoVerificado: true, tipo: true } });
     if (usuario?.tipo === "bloqueado") {
       return NextResponse.json({ error: "Tu cuenta ha sido suspendida por actividad fraudulenta. No puedes participar en concursos.", codigo: "CUENTA_BLOQUEADA" }, { status: 403 });
     }
@@ -23,6 +23,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
     if (!concurso) return NextResponse.json({ error: "Concurso no encontrado o inactivo" }, { status: 404 });
     if (new Date(concurso.fechaFin) <= new Date()) return NextResponse.json({ error: "Concurso finalizado" }, { status: 400 });
+
+    // Check phone verification for contests that require it
+    if (concurso.requiereTelefono && !usuario.telefonoVerificado) {
+      return NextResponse.json({ error: "Debes verificar tu número de celular para participar en este concurso.", codigo: "TELEFONO_NO_VERIFICADO" }, { status: 403 });
+    }
 
     // Check if already participating
     const existing = await prisma.participanteConcurso.findUnique({

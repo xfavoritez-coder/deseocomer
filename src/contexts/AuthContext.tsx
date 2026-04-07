@@ -11,6 +11,7 @@ export interface AuthUser {
   email: string;
   fotoUrl?: string;
   telefono?: string | null;
+  telefonoVerificado?: boolean;
   type: UserType;
   nombreLocal?: string;
   comuna?: string;
@@ -124,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: data.data.email,
         fotoUrl: data.data.fotoUrl || "",
         telefono: data.data.telefono || null,
+        telefonoVerificado: data.data.telefonoVerificado ?? false,
         type: "user",
         cumpleDia: data.data.cumpleDia ?? null,
         cumpleMes: data.data.cumpleMes ?? null,

@@ -13,7 +13,11 @@ model Usuario {
   nombre      String
   email       String   @unique
   password    String
-  telefono    String?
+  telefono              String?
+  telefonoVerificado    Boolean   @default(false)
+  telefonoVerificadoAt  DateTime?
+  codigoSMS             String?
+  codigoSMSExpira       DateTime?
   ciudad      String?  @default("santiago")
   cumpleDia   Int?
   cumpleMes   Int?
@@ -195,6 +199,7 @@ model Concurso {
   ganadorDescartadoRazon String?
   modalidadPremio     String[] @default([])
   modalidadConcurso   String   @default("meritos")
+  requiereTelefono  Boolean  @default(false)
   fechaActivacion   DateTime?
 
   createdAt         DateTime @default(now())
