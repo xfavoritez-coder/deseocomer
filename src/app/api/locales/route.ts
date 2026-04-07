@@ -28,13 +28,15 @@ export async function GET(req: NextRequest) {
           ...(categoria ? [{ categorias: { has: categoria } }] : []),
           // Comuna filter
           ...(comuna ? [{ comuna }] : []),
-          // Search query
+          // Search query — split words for better matching
           ...(q ? [{
             OR: [
               { nombre: { contains: q, mode: "insensitive" as const } },
               { comuna: { contains: q, mode: "insensitive" as const } },
               { categorias: { hasSome: q.split(/\s+/).filter(w => w.length > 2) } },
               { descripcion: { contains: q, mode: "insensitive" as const } },
+              // Also match each word individually in nombre
+              ...q.split(/\s+/).filter(w => w.length > 2).map(w => ({ nombre: { contains: w, mode: "insensitive" as const } })),
             ],
           }] : []),
         ],

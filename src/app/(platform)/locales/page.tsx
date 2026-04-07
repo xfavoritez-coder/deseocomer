@@ -261,18 +261,8 @@ export default function LocalesPage() {
           })}
         </div>
 
-        {/* Fila 2 — Estado + Ordenamiento */}
+        {/* Fila 2 — Comuna + Estado + Ordenamiento */}
         <div className="dc-filtros-fila">
-          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloAbiertos ? "1px solid #3db89e" : "1px solid rgba(232,168,76,0.2)", background: soloAbiertos ? "rgba(61,184,158,0.12)" : "transparent", color: soloAbiertos ? "#3db89e" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
-            {soloAbiertos && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#3db89e", display: "inline-block" }} />}
-            Abierto ahora
-          </button>
-          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConConcursos ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConConcursos ? "rgba(232,168,76,0.12)" : "transparent", color: soloConConcursos ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
-            🏆 Con concursos
-          </button>
-          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
-            ⚡ Con promociones
-          </button>
           <select value={comunaActiva} onChange={e => setComunaActiva(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: comunaActiva ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.2)", background: comunaActiva ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.04)", color: comunaActiva ? "#e8a84c" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="" style={{ background: "#0a0812", color: "#f0ead6" }}>📍 Todas las comunas</option>
             {(() => {
@@ -290,6 +280,16 @@ export default function LocalesPage() {
               </>);
             })()}
           </select>
+          <button onClick={() => setSoloAbiertos(!soloAbiertos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloAbiertos ? "1px solid #3db89e" : "1px solid rgba(232,168,76,0.2)", background: soloAbiertos ? "rgba(61,184,158,0.12)" : "transparent", color: soloAbiertos ? "#3db89e" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+            {soloAbiertos && <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#3db89e", display: "inline-block" }} />}
+            Abierto ahora
+          </button>
+          <button onClick={() => setSoloConConcursos(!soloConConcursos)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConConcursos ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConConcursos ? "rgba(232,168,76,0.12)" : "transparent", color: soloConConcursos ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+            🏆 Con concursos
+          </button>
+          <button onClick={() => setSoloConPromociones(!soloConPromociones)} style={{ padding: "8px 16px", borderRadius: "20px", border: soloConPromociones ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.2)", background: soloConPromociones ? "rgba(232,168,76,0.12)" : "transparent", color: soloConPromociones ? "var(--accent)" : "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", display: "flex", alignItems: "center", gap: "6px" }}>
+            ⚡ Con promociones
+          </button>
           <select value={ordenamiento} onChange={e => setOrdenamiento(e.target.value)} style={{ padding: "8px 32px 8px 16px", borderRadius: "20px", border: "1px solid rgba(232,168,76,0.2)", background: "rgba(255,255,255,0.04)", color: "var(--text-muted)", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.08em", textTransform: "uppercase" as const, cursor: "pointer", outline: "none", appearance: "none" as const, WebkitAppearance: "none" as const, whiteSpace: "nowrap", flexShrink: 0, minHeight: "36px", backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e8a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}>
             <option value="para_ti" style={{ background: "#0a0812", color: "#f0ead6" }}>✨ Para ti</option>
             <option value="rating" style={{ background: "#0a0812", color: "#f0ead6" }}>⭐ Mejor valorados</option>
