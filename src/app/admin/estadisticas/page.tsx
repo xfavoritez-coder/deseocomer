@@ -134,9 +134,6 @@ export default function EstadisticasPage() {
 
       {tab === "busquedas" && stats && (
         <>
-          <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", marginBottom: 24 }}>
-            Datos de la sección /locales — actualizado {stats.updatedAt ? new Date(stats.updatedAt).toLocaleString("es-CL") : "nunca"}
-          </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 24 }}>
             {[
