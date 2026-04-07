@@ -30,6 +30,11 @@ export async function GET(req: NextRequest) {
             where: { OR: [{ id: concursoParam }, { slug: concursoParam }], activo: true },
           });
           if (concurso && new Date(concurso.fechaFin) > new Date()) {
+            // Skip auto-participation if contest requires phone and user hasn't verified
+            if (concurso.requiereTelefono && !usuario.telefonoVerificado) {
+              autoConcursoSlug = concursoParam;
+              // Don't auto-participate — user will see SMS modal on contest page
+            } else {
             const yaParticipa = await prisma.participanteConcurso.findUnique({
               where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: usuario.id } },
             });
@@ -97,6 +102,7 @@ export async function GET(req: NextRequest) {
 
               prisma.usuario.update({ where: { id: usuario.id }, data: { totalConcursosParticipados: { increment: 1 } } }).catch(() => {});
             }
+          } // end else (no phone required)
           }
         }
         // Set concursoSlug and referidorNombre for the response

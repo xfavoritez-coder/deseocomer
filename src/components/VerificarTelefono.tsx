@@ -63,7 +63,7 @@ export default function VerificarTelefono({ userId, telefonoActual, onVerificado
         </h3>
         <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, marginBottom: 20 }}>
           {paso === "telefono"
-            ? "Para que tu participación sea válida, necesitamos verificar que eres una persona real. Solo te tomará unos segundos."
+            ? "Para participar necesitamos verificar tu número de teléfono, así el local te podrá contactar y verificamos que eres una persona real."
             : `Enviamos un código de 6 dígitos al ${telefonoEnviado}`}
         </p>
 
@@ -84,7 +84,7 @@ export default function VerificarTelefono({ userId, telefonoActual, onVerificado
             <button onClick={enviarCodigo} disabled={loading} style={{ width: "100%", padding: 14, background: loading ? "rgba(232,168,76,0.3)" : "#e8a84c", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#0a0812", cursor: loading ? "default" : "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               {loading ? "Enviando..." : "Enviar código SMS"}
             </button>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)", marginTop: 12, lineHeight: 1.5 }}>Solo usamos tu número para verificación y entrega de premios. Jamás enviaremos publicidad por SMS.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", marginTop: 14, lineHeight: 1.5 }}>Solo usamos tu número para verificación y entrega de premios. Jamás enviaremos publicidad por SMS.</p>
           </>
         ) : (
           <>
