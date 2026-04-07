@@ -212,7 +212,7 @@ export default function PanelConcursos() {
         <button onClick={() => { setDetalle(null); setEditando(false); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
 
         {/* Header */}
-        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", overflow: "hidden", marginBottom: "20px" }}>
+        <a href={terminado ? `/concursos/${detalle.slug || detalle.id}` : undefined} target={terminado ? "_blank" : undefined} rel={terminado ? "noopener" : undefined} style={{ display: "block", background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", overflow: "hidden", marginBottom: "20px", textDecoration: "none", cursor: terminado ? "pointer" : "default" }}>
           {detalle.imagenUrl && <img src={detalle.imagenUrl} alt="" style={{ width: "100%", height: "160px", objectFit: "cover" }} />}
           <div style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
@@ -228,10 +228,10 @@ export default function PanelConcursos() {
               {detalle.modalidadConcurso !== "sorteo" && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", fontWeight: 700, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "2px 10px" }}>🏆 Méritos</span>}
             </div>
           </div>
-        </div>
+        </a>
 
-        {/* Link para compartir */}
-        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
+        {/* Link para compartir — solo en concursos activos */}
+        {!terminado && <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "10px" }}>Link del concurso</p>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "var(--text-muted)", flex: 1, wordBreak: "break-all" }}>{link}</p>
@@ -239,7 +239,7 @@ export default function PanelConcursos() {
               {copied ? "✓" : "Copiar"}
             </button>
           </div>
-        </div>
+        </div>}
 
         {/* Share prompt after creating */}
         {sharePrompt && (

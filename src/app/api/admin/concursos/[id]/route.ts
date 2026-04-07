@@ -30,10 +30,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       if (c.ganadorActual) {
         const emailData = { concursoId: c.id, titulo: c.premio, premio: c.premio, codigoEntrega: c.codigoEntrega!, local: c.local };
         const ganador = { nombre: c.ganadorActual.nombre, email: c.ganadorActual.email, telefono: c.ganadorActual.telefono };
+        const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
         const urls = { confirm: `${BASE_URL}/concursos/confirmar?id=${c.id}&token=${token}&respuesta=si`, disputa: `${BASE_URL}/concursos/confirmar?id=${c.id}&token=${token}&respuesta=no` };
         try {
           await emailGanador(emailData, ganador, urls.confirm, urls.disputa);
-          await emailLocal(emailData, c.local.email, ganador);
+          await emailLocal({ ...emailData, coordinarUrl }, c.local.email, ganador);
         } catch {}
       }
       return NextResponse.json({ ok: true, estado: "finalizado" });
@@ -62,10 +63,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         const nuevoGanador = await prisma.usuario.findUnique({ where: { id: siguienteId }, select: { nombre: true, email: true, telefono: true } });
         if (nuevoGanador) {
           const emailData = { concursoId: c.id, titulo: c.premio, premio: c.premio, codigoEntrega: c.codigoEntrega!, local: c.local };
+          const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
           const urls = { confirm: `${BASE_URL}/concursos/confirmar?id=${c.id}&token=${token}&respuesta=si`, disputa: `${BASE_URL}/concursos/confirmar?id=${c.id}&token=${token}&respuesta=no` };
           try {
             await emailNuevoGanador(emailData, nuevoGanador, orden, orden === 2 ? 5 : 3, urls.confirm, urls.disputa);
-            await emailLocal(emailData, c.local.email, nuevoGanador);
+            await emailLocal({ ...emailData, coordinarUrl }, c.local.email, nuevoGanador);
           } catch {}
         }
         return NextResponse.json({ ok: true, estado: "finalizado", nuevoGanador: siguienteId });

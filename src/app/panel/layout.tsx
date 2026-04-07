@@ -28,6 +28,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   const [mobileMenu, setMobileMenu] = useState(false);
   const [localComuna, setLocalComuna] = useState("");
   const [faltantes, setFaltantes] = useState<string[]>([]);
+  const [concursosPendientes, setConcursosPendientes] = useState(0);
 
   useEffect(() => {
     setMontado(true);
@@ -60,6 +61,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
                 const tieneHorario = hrs && Array.isArray(hrs) && hrs.length > 0 && (hrs.some((h: any) => h.activo) || hrs.some((h: any) => h.abre));
                 if (!tieneHorario && !info.horarioGoogle) missing.push("Horario");
                 setFaltantes(missing);
+                if (typeof info.concursosPendientes === "number") setConcursosPendientes(info.concursosPendientes);
                 if (info.slug && !data.slug) {
                   data.slug = info.slug;
                   setLocalSlug(info.slug);
@@ -105,8 +107,11 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         <div onClick={() => setMobileMenu(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 998 }} />
         <div className="dc-panel-mobilemenu">
           {NAV.map(n => (
-            <Link key={n.href} href={n.href} onClick={() => setMobileMenu(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", textDecoration: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: isActive(n.href) ? "var(--accent)" : "var(--text-muted)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderBottom: "1px solid rgba(232,168,76,0.06)" }}>
+            <Link key={n.href} href={n.href} onClick={() => setMobileMenu(false)} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", textDecoration: "none", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: isActive(n.href) ? "var(--accent)" : "var(--text-muted)", background: isActive(n.href) ? "rgba(232,168,76,0.1)" : "transparent", borderBottom: "1px solid rgba(232,168,76,0.06)", position: "relative" }}>
               <span>{n.icon}</span> {n.label}
+              {n.href === "/panel/concursos" && concursosPendientes > 0 && (
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff4444", display: "inline-block", marginLeft: 4, flexShrink: 0 }} />
+              )}
             </Link>
           ))}
           <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px", width: "100%", textAlign: "left", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#ff8080", background: "none", border: "none", cursor: "pointer" }}>
@@ -164,6 +169,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
               transition: "all 0.15s",
             }}>
               <span style={{ fontSize: "1rem" }}>{n.icon}</span> {n.label}
+              {n.href === "/panel/concursos" && concursosPendientes > 0 && (
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff4444", display: "inline-block", marginLeft: 4, flexShrink: 0 }} />
+              )}
             </Link>
           ))}
         </nav>

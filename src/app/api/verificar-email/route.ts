@@ -30,21 +30,14 @@ export async function GET(req: NextRequest) {
             where: { OR: [{ id: concursoParam }, { slug: concursoParam }], activo: true },
           });
           if (concurso && new Date(concurso.fechaFin) > new Date()) {
-            // Skip auto-participation if contest requires phone and user hasn't verified
-            if (concurso.requiereTelefono && !usuario.telefonoVerificado) {
-              autoConcursoSlug = concursoParam;
-              // Don't auto-participate — user will see SMS modal on contest page
-            } else {
             const yaParticipa = await prisma.participanteConcurso.findUnique({
               where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: usuario.id } },
             });
             if (!yaParticipa) {
-              // Create participation via internal API call logic
               const refParticipante = await prisma.participanteConcurso.findUnique({
                 where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidor.id } },
               });
 
-              // Build referral chain — check if referrer has their own referrer (nivel 2)
               let referidorNivel2Id: string | null = null;
               if (refParticipante?.referidorDirectoId) {
                 referidorNivel2Id = refParticipante.referidorDirectoId;
@@ -56,53 +49,79 @@ export async function GET(req: NextRequest) {
               const puntosRefBonus = 3;
               const puntosMadrugador = esMadrugador ? 2 : 0;
 
+              // Referral points stay PENDING until phone is verified
+              const telVerificado = usuario.telefonoVerificado;
+              const puntosReales = puntosBase + puntosMadrugador + (telVerificado ? puntosRefBonus : 0);
+              const puntosPend = telVerificado ? 0 : puntosRefBonus;
+
               await prisma.participanteConcurso.create({
                 data: {
                   concursoId: concurso.id, usuarioId: usuario.id, referidoPor: referidor.id,
-                  puntos: puntosBase + puntosRefBonus + puntosMadrugador,
+                  puntos: puntosReales, puntosPendientes: puntosPend,
                   referidorDirectoId: referidor.id, referidorNivel2Id, esMadrugador, puntosMadrugador,
                 },
               });
 
-              // Give referrer +3 points
+              // Give referrer +3 points (pending if new user hasn't verified phone)
               if (refParticipante) {
-                await prisma.participanteConcurso.update({
-                  where: { id: refParticipante.id },
-                  data: { puntos: { increment: 3 }, puntosReferidosNuevos: { increment: 3 } },
-                });
+                if (telVerificado) {
+                  await prisma.participanteConcurso.update({
+                    where: { id: refParticipante.id },
+                    data: { puntos: { increment: 3 }, puntosReferidosNuevos: { increment: 3 } },
+                  });
+                } else {
+                  await prisma.participanteConcurso.update({
+                    where: { id: refParticipante.id },
+                    data: { puntosPendientes: { increment: 3 } },
+                  });
+                }
               }
 
               const premioCorto = concurso.premio && concurso.premio.length > 30 ? concurso.premio.substring(0, 30) + "..." : (concurso.premio || "un concurso");
               const cSlug = concurso.slug || concurso.id;
 
-              // Give nivel 2 referrer +1 point
+              // Nivel 2 referrer — also pending if phone not verified
               if (referidorNivel2Id) {
                 const nivel2Part = await prisma.participanteConcurso.findUnique({
                   where: { concursoId_usuarioId: { concursoId: concurso.id, usuarioId: referidorNivel2Id } },
                 });
                 if (nivel2Part && (nivel2Part.puntosNivel2 ?? 0) < 10) {
-                  await prisma.participanteConcurso.update({
-                    where: { id: nivel2Part.id },
-                    data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } },
-                  });
-                  const refDirectoNombre = refParticipante ? (await prisma.usuario.findUnique({ where: { id: referidor.id }, select: { nombre: true } }))?.nombre?.split(" ")[0] : "tu referido";
-                  prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: `La red de ${refDirectoNombre ?? "tu referido"} te sumó +1 punto en "${premioCorto}" 🧞`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                  if (telVerificado) {
+                    await prisma.participanteConcurso.update({
+                      where: { id: nivel2Part.id },
+                      data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } },
+                    });
+                    const refDirectoNombre = refParticipante ? (await prisma.usuario.findUnique({ where: { id: referidor.id }, select: { nombre: true } }))?.nombre?.split(" ")[0] : "tu referido";
+                    prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: `La red de ${refDirectoNombre ?? "tu referido"} te sumó +1 punto en "${premioCorto}" 🧞`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                  } else {
+                    await prisma.participanteConcurso.update({
+                      where: { id: nivel2Part.id },
+                      data: { puntosNivel2Pendientes: { increment: 1 } },
+                    });
+                  }
                 }
               }
 
               // Notificación al nuevo participante
-              const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
-              prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+              if (telVerificado) {
+                const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
+                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+              } else {
+                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}"! Verifica tu celular para activar tus +3 puntos de referido 📱`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+              }
 
               // Notificación al referidor
               if (refParticipante) {
                 const nombreRef = usuario.nombre?.split(" ")[0] ?? "Alguien";
-                prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} activó su cuenta con tu link en "${premioCorto}". +3 pts para ti 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                if (telVerificado) {
+                  prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} se unió con tu link en "${premioCorto}". +3 pts para ti 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                } else {
+                  prisma.notificacion.create({ data: { usuarioId: referidor.id, tipo: "referido_nuevo", mensaje: `${nombreRef} activó su cuenta con tu link en "${premioCorto}". Sus +3 pts se acreditarán cuando verifique su celular 📱`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                }
               }
 
               prisma.usuario.update({ where: { id: usuario.id }, data: { totalConcursosParticipados: { increment: 1 } } }).catch(() => {});
             }
-          } // end else (no phone required)
           }
         }
         // Set concursoSlug and referidorNombre for the response
@@ -242,7 +261,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email, referidorNombre: referidorNombre || autoReferidorNombre, concursoSlug: concursoSlug || autoConcursoSlug });
+    return NextResponse.json({ ok: true, id: usuario.id, nombre: usuario.nombre, email: usuario.email, referidorNombre: referidorNombre || autoReferidorNombre, concursoSlug: concursoSlug || autoConcursoSlug, telefonoVerificado: usuario.telefonoVerificado });
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }

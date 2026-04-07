@@ -83,9 +83,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           confirm: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=si`,
           disputa: `${BASE_URL}/concursos/confirmar?id=${concurso.id}&token=${token}&respuesta=no`,
         };
+        const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${concurso.id}&token=${token}`;
         try {
           await emailGanador(emailData, ganador, urls.confirm, urls.disputa);
-          await emailLocal(emailData, concurso.local.email!, ganador);
+          await emailLocal({ ...emailData, coordinarUrl }, concurso.local.email!, ganador);
         } catch (e) { console.error("[Lazy close email]", e); }
       }
 

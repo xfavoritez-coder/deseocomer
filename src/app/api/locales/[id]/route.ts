@@ -22,6 +22,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     prisma.$executeRawUnsafe('UPDATE "Local" SET "vistas" = "vistas" + 1 WHERE "id" = $1', local.id).catch(() => {});
     const { password: _, ...safe } = local as Record<string, unknown>;
 
+    // Count contests pending delivery coordination
+    safe.concursosPendientes = (local.concursos ?? []).filter(
+      (c: any) => c.estado === "finalizado" && !c.premioEntregado
+    ).length;
+
     // Limpiar datos de locales importados
     if (local.origenImportacion === 'GOOGLE_PLACES') {
       const comunaLimpia = (local.comuna ?? '')

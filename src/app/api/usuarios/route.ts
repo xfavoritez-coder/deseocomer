@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     resend.emails.send({
       from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
       to: email,
-      subject: refNombre ? `Confirma tu email y gana 3 puntos, ${nombre.split(" ")[0]} 🎉` : "Activa tu cuenta en DeseoComer",
+      subject: refNombre ? `${nombre.split(" ")[0]}, ${refNombre} te invitó a un concurso 🏆` : "Activa tu cuenta en DeseoComer",
       html: buildVerificationHtml(nombre, verificationUrl, refNombre),
     }).catch(err => console.error("[Registro] Error enviando email:", err));
 
@@ -188,8 +188,34 @@ export async function POST(req: NextRequest) {
 }
 
 function buildVerificationHtml(nombre: string, url: string, refNombre?: string | null): string {
+  const header = `<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>`;
+  const footer = `<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div>`;
+  const spam = `<p style="color:#5a4028;font-size:12px;line-height:1.5;margin-top:12px;font-style:italic">¿No ves el botón? Revisa tu carpeta de spam o correo no deseado.</p>`;
+  const wrap = (c: string) => `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0"><div style="max-width:560px;margin:0 auto;padding:40px 24px">${header}<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">${c}</div>${footer}</div></body></html>`;
+  const btn = (href: string, label: string) => `<div style="text-align:center;margin-bottom:24px"><a href="${href}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">${label}</a></div>`;
+  const firstName = nombre.split(" ")[0];
+
   if (refNombre) {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0"><div style="max-width:560px;margin:0 auto;padding:40px 24px"><div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px"><h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡${refNombre} te está esperando!</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Hola ${nombre.split(" ")[0]}, al confirmar tu email:</p><div style="margin-bottom:24px"><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">✅ Le sumas <strong style="color:#e8a84c">3 puntos</strong> a ${refNombre} en su concurso</p><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">✅ <strong style="color:#e8a84c">Tú también ganas 3 puntos</strong> automáticamente</p><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">✅ Empiezas a participar por <strong style="color:#e8a84c">comida gratis</strong></p></div><div style="text-align:center;margin-bottom:24px"><a href="${url}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Confirmar email y ganar mis 3 puntos →</a></div><p style="color:#5a4028;font-size:13px;line-height:1.6">Si no confirmas, los puntos no se acreditan para ninguno de los dos.</p><p style="color:#5a4028;font-size:12px;line-height:1.5;margin-top:12px;font-style:italic">¿No ves el email? Revisa tu carpeta de spam o correo no deseado.</p></div><div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div></div></body></html>`;
+    return wrap([
+      `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡${refNombre} te invitó a un concurso!</h2>`,
+      `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px">Hola ${firstName}, activa tu cuenta para entrar al concurso y competir por comida gratis.</p>`,
+      `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
+      `<p style="color:#f5d080;font-size:14px;font-weight:bold;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.08em">Así funciona:</p>`,
+      `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">① Activa tu cuenta con el botón de abajo</p>`,
+      `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">② Verifica tu celular en el concurso (30 seg)</p>`,
+      `<p style="color:#3db89e;font-size:15px;line-height:2;margin:0">③ <strong>Ambos ganan +3 puntos</strong> automáticamente</p>`,
+      `</div>`,
+      btn(url, `Activar mi cuenta →`),
+      `<p style="color:#5a4028;font-size:13px;line-height:1.6">Los puntos de referido se acreditan al verificar tu celular. Es rápido y solo necesitas hacerlo una vez.</p>`,
+      spam,
+    ].join(""));
   }
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0"><div style="max-width:560px;margin:0 auto;padding:40px 24px"><div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px"><h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">Confirma tu email, ${nombre}</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:32px">Para activar tu cuenta y participar en concursos, confirma tu dirección de email:</p><div style="text-align:center;margin-bottom:32px"><a href="${url}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Activar mi cuenta →</a></div><p style="color:#5a4028;font-size:13px;line-height:1.6">El link expira en 24 horas. Si no creaste esta cuenta, ignora este email.</p><p style="color:#5a4028;font-size:12px;line-height:1.5;margin-top:12px;font-style:italic">¿No ves el email? Revisa tu carpeta de spam o correo no deseado.</p></div><div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div></div></body></html>`;
+
+  return wrap([
+    `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">Hola ${firstName}, activa tu cuenta</h2>`,
+    `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:32px">Para participar en concursos y descubrir los mejores locales de comida, activa tu cuenta:</p>`,
+    btn(url, "Activar mi cuenta →"),
+    `<p style="color:#5a4028;font-size:13px;line-height:1.6">El link expira en 48 horas. Si no creaste esta cuenta, ignora este email.</p>`,
+    spam,
+  ].join(""));
 }
