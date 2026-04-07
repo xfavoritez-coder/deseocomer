@@ -20,8 +20,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { concursoId: concurso.id, estado: "descalificado" },
     });
 
-    // Increment view count (fire and forget)
-    prisma.concurso.update({ where: { id: concurso.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
+    // Increment view count (raw query to avoid idle transactions in pooler)
+    prisma.$executeRawUnsafe('UPDATE "Concurso" SET "vistas" = "vistas" + 1 WHERE "id" = $1', concurso.id).catch(() => {});
 
     // Lazy close: if contest ended but still "activo", close it now and send emails
     if (concurso.estado === "activo" && new Date(concurso.fechaFin) <= new Date() && concurso.participantes.length > 0) {

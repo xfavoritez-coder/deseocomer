@@ -18,8 +18,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
     if (!local) return NextResponse.json({ error: "Local no encontrado" }, { status: 404 });
-    // Increment view count (fire and forget)
-    prisma.local.update({ where: { id: local.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
+    // Increment view count (raw query to avoid idle transactions in pooler)
+    prisma.$executeRawUnsafe('UPDATE "Local" SET "vistas" = "vistas" + 1 WHERE "id" = $1', local.id).catch(() => {});
     const { password: _, ...safe } = local as Record<string, unknown>;
 
     // Limpiar datos de locales importados

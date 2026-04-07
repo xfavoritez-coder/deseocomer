@@ -11,8 +11,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
     if (!promocion) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
-    // Increment view count (fire and forget)
-    prisma.promocion.update({ where: { id: promocion.id }, data: { vistas: { increment: 1 } } }).catch(() => {});
+    // Increment view count (raw query to avoid idle transactions in pooler)
+    prisma.$executeRawUnsafe('UPDATE "Promocion" SET "vistas" = "vistas" + 1 WHERE "id" = $1', promocion.id).catch(() => {});
     return NextResponse.json(promocion);
   } catch {
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
