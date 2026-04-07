@@ -38,9 +38,19 @@ export async function GET(req: NextRequest) {
         ganadorActual: { select: { nombre: true } },
         _count: { select: { participantes: true, listaEspera: true } },
       },
-      orderBy: { fechaFin: "asc" },
+      orderBy: { fechaFin: "desc" },
       take: limit,
       skip: offset,
+    });
+
+    // Sort: activos first (by fechaFin asc), then programados, then finalizados/completados
+    const order: Record<string, number> = { activo: 0, programado: 1, finalizado: 2, en_revision: 2, completado: 3, expirado: 4 };
+    concursos.sort((a, b) => {
+      const oa = order[a.estado] ?? 5;
+      const ob = order[b.estado] ?? 5;
+      if (oa !== ob) return oa - ob;
+      if (oa === 0) return new Date(a.fechaFin).getTime() - new Date(b.fechaFin).getTime(); // activos: el que termina antes primero
+      return new Date(b.fechaFin).getTime() - new Date(a.fechaFin).getTime(); // rest: más reciente primero
     });
 
     const json = JSON.stringify(concursos);

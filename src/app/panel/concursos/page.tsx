@@ -257,6 +257,101 @@ export default function PanelConcursos() {
           </div>
         )}
 
+        {/* Estado de entrega — ANTES del ranking en concursos finalizados */}
+        {terminado && participantes > 0 && (() => {
+          const ganador = (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0];
+          const ganadorNombre = ganador?.usuario?.nombre ?? "Sin participantes";
+          const estadoC = detalle.estado ?? (detalle.premioEntregado ? "completado" : "finalizado");
+          const _fnE = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
+          const ganadorActualNombreE = detalle.ganadorActual?.nombre ? _fnE(detalle.ganadorActual.nombre) : _fnE(ganadorNombre);
+          const codigoE = detalle.codigoEntrega;
+          const ganadorTelE = detalle.ganadorActual?.telefono || ganador?.usuario?.telefono || "";
+          const ganadorEmailE = detalle.ganadorActual?.email || ganador?.usuario?.email || "";
+
+          if (estadoC === "completado") return (
+            <div style={{ background: "rgba(61,184,158,0.06)", border: "1px solid rgba(61,184,158,0.25)", borderRadius: 14, padding: "20px", marginBottom: "20px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#3db89e", fontWeight: 700, marginBottom: "4px" }}>Premio entregado ✓</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "var(--text-primary)" }}>{ganadorActualNombreE}</p>
+            </div>
+          );
+          if (estadoC === "en_disputa") return (
+            <div style={{ background: "rgba(255,80,80,0.06)", border: "1px solid rgba(255,80,80,0.2)", borderRadius: 14, padding: "20px", marginBottom: "20px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#ff6b6b", fontWeight: 700, marginBottom: "8px" }}>Disputa activa</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>El ganador reportó no haber recibido el premio. Nuestro equipo está investigando.</p>
+            </div>
+          );
+          if (estadoC === "en_revision") return (
+            <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, padding: "20px", marginBottom: "20px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", fontWeight: 700, marginBottom: "8px" }}>Verificando resultados</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Estamos verificando los resultados del concurso.</p>
+            </div>
+          );
+          // finalizado — coordinar entrega
+          return (
+            <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 14, padding: "20px", marginBottom: "20px" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", fontWeight: 700, marginBottom: "12px" }}>🏆 Coordinar entrega del premio</p>
+              <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "4px" }}>Ganador: <strong style={{ color: "#e8a84c" }}>{ganadorActualNombreE}</strong></p>
+                {ganadorEmailE && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Email: {ganadorEmailE}</p>}
+                {ganadorTelE && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Teléfono: {ganadorTelE}</p>}
+                {codigoE && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>Código: <strong style={{ color: "var(--accent)" }}>{codigoE}</strong></p>}
+              </div>
+              {/* Timeline */}
+              <div style={{ textAlign: "left", marginBottom: 14 }}>
+                {[
+                  { done: true, label: "Concurso finalizado" },
+                  { done: !!detalle.ganadorNotificadoAt, label: "Ganador notificado" },
+                  { done: false, active: true, label: "Coordinar entrega" },
+                  { done: false, label: "Foto + confirmar entrega" },
+                ].map((st, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "3px 0" }}>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "#e8a84c" : "rgba(240,234,214,0.25)" }}>{st.done ? "✓" : st.active ? "⏳" : "○"}</span>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "var(--text-primary)" : "rgba(240,234,214,0.3)" }}>{st.label}</span>
+                  </div>
+                ))}
+              </div>
+              {/* Proponer fecha */}
+              <div style={{ marginBottom: 14 }}>
+                <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Proponer fecha al ganador</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input id={`fecha-top-${detalle.id}`} type="text" placeholder="Ej: Miércoles 10 abril, 18:00" style={{ flex: 1, padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
+                  <button onClick={async () => {
+                    const input = document.getElementById(`fecha-top-${detalle.id}`) as HTMLInputElement;
+                    const f = input?.value?.trim();
+                    if (!f) { setActionToast("Escribe una fecha"); setTimeout(() => setActionToast(""), 3000); return; }
+                    const s = getSession();
+                    try {
+                      const res = await fetch(`/api/concursos/${detalle.id}/proponer-fecha`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fecha: f }) });
+                      if (res.ok) { setActionToast("✓ Fecha enviada al ganador"); input.value = ""; setDetalle({ ...detalle, fechaEnviada: true }); }
+                      else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
+                    } catch { setActionToast("Error de conexión"); }
+                    setTimeout(() => setActionToast(""), 4000);
+                  }} style={{ padding: "10px 16px", background: "#e8a84c", border: "none", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "#0a0812", cursor: "pointer", whiteSpace: "nowrap" }}>Enviar</button>
+                </div>
+              </div>
+              {/* Foto + confirmar solo después de enviar fecha */}
+              {detalle.fechaEnviada && (
+                <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", paddingTop: 14 }}>
+                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 8 }}>Subir foto del ganador (opcional)</label>
+                  <SubirFoto folder="concursos" preview={detalle.fotoGanador ?? ""} onUpload={(url: string) => setDetalle({ ...detalle, fotoGanador: url })} label="Foto del ganador con su premio" height="160px" />
+                  <button onClick={async () => {
+                    const s = getSession();
+                    try {
+                      const res = await fetch(`/api/concursos/${detalle.id}/confirmar-entrega`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fotoGanador: detalle.fotoGanador || null }) });
+                      if (res.ok) {
+                        setDetalle({ ...detalle, estado: "completado", premioEntregado: true });
+                        setConcursos(prev => prev.map(cc => cc.id === detalle.id ? { ...cc, estado: "completado", premioEntregado: true } : cc));
+                        setActionToast("✓ Premio entregado confirmado");
+                      } else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
+                    } catch { setActionToast("Error de conexión"); }
+                    setTimeout(() => setActionToast(""), 3000);
+                  }} style={{ width: "100%", marginTop: 12, padding: 14, background: "#3db89e", color: "#fff", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.04em" }}>Confirmar entrega del premio</button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {/* Ranking / Participantes */}
         <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
@@ -280,136 +375,11 @@ export default function PanelConcursos() {
                   <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)" }}>
                     {p.puntos ?? 0} pts
                   </span>
-                  {!reportedIds.has(p.id) && (
-                    <button onClick={() => setReportModal({ id: p.id, nombre: p.usuario?.nombre ?? "Participante" })} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", fontSize: "0.85rem", opacity: 0.5 }} title="Reportar sospechoso">⚠️</button>
-                  )}
                 </div>
               ))}
             </div>
           )}
 
-          {terminado && participantes > 0 && (() => {
-            const ganador = (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0];
-            const ganadorNombre = ganador?.usuario?.nombre ?? "Sin participantes";
-            const estado = detalle.estado ?? (detalle.premioEntregado ? "completado" : "finalizado");
-            const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
-            const ganadorActualNombre = detalle.ganadorActual?.nombre ? _fn(detalle.ganadorActual.nombre) : _fn(ganadorNombre);
-            const codigo = detalle.codigoEntrega;
-
-            if (estado === "completado") {
-              return (
-                <div style={{ marginTop: "16px", padding: "20px", background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.3)", borderRadius: "12px", textAlign: "center" }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#3db89e", fontWeight: 700, marginBottom: "4px" }}>Premio entregado ✓</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", color: "var(--text-primary)", marginBottom: "0" }}>{ganadorActualNombre}</p>
-                  {(detalle.premioConfirmadoAt || detalle.premioEntregadoAt) && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginTop: "4px" }}>Confirmado el {new Date(detalle.premioConfirmadoAt || detalle.premioEntregadoAt).toLocaleDateString("es-CL")}</p>}
-                </div>
-              );
-            }
-            if (estado === "en_disputa") {
-              return (
-                <div style={{ marginTop: "16px", padding: "20px", background: "rgba(255,80,80,0.08)", border: "1px solid rgba(255,80,80,0.25)", borderRadius: "14px", textAlign: "center" }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "#ff6b6b", fontWeight: 700, marginBottom: "8px" }}>Disputa activa</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6 }}>El ganador reportó no haber recibido el premio. Nuestro equipo está investigando el caso.</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.35)", marginTop: "8px" }}>Contáctanos: deseocomer.com/contacto</p>
-                </div>
-              );
-            }
-            if (estado === "expirado") {
-              return (
-                <div style={{ marginTop: "16px", padding: "20px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", textAlign: "center" }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "8px" }}>Premio no reclamado</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.4)", lineHeight: 1.6 }}>Ningún participante reclamó el premio dentro del plazo establecido.</p>
-                </div>
-              );
-            }
-            if (estado === "en_revision") {
-              return (
-                <div style={{ marginTop: "16px", padding: "20px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px", textAlign: "center" }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700, marginBottom: "8px" }}>Verificando resultados</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6 }}>Estamos verificando los resultados para anunciar al ganador oficial.</p>
-                </div>
-              );
-            }
-            // estado === "finalizado" — coordinar y entregar
-            const ganadorTel = detalle.ganadorActual?.telefono || (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0]?.usuario?.telefono || "";
-            const ganadorEmail = detalle.ganadorActual?.email || (detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0))[0]?.usuario?.email || "";
-            return (
-              <div style={{ marginTop: "16px", padding: "20px", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: "14px" }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f5d080", fontWeight: 700, marginBottom: "12px" }}>🏆 Concurso finalizado — Coordinar entrega</p>
-
-                <div style={{ marginBottom: "16px", background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 14 }}>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-primary)", marginBottom: "4px" }}>Ganador: <strong style={{ color: "#e8a84c" }}>{ganadorActualNombre}</strong></p>
-                  {ganadorEmail && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Email: {ganadorEmail}</p>}
-                  {ganadorTel && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: 2 }}>Teléfono: {ganadorTel}</p>}
-                  {codigo && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)" }}>Código verificación: <strong style={{ color: "var(--accent)", letterSpacing: "0.05em" }}>{codigo}</strong></p>}
-                </div>
-
-                {/* Timeline */}
-                <div style={{ textAlign: "left", marginBottom: "16px" }}>
-                  {[
-                    { done: true, label: "Concurso finalizado" },
-                    { done: !!detalle.ganadorNotificadoAt, label: "Ganador notificado por email" },
-                    { done: false, active: true, label: "Coordinar entrega del premio" },
-                    { done: false, label: "Foto + confirmar entrega" },
-                  ].map((st, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0" }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "#e8a84c" : "rgba(240,234,214,0.25)" }}>
-                        {st.done ? "✓" : st.active ? "⏳" : "○"}
-                      </span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: st.done ? "#3db89e" : st.active ? "var(--text-primary)" : "rgba(240,234,214,0.3)" }}>{st.label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.6, marginBottom: "16px" }}>
-                  Contacta al ganador para coordinar la entrega. Cuando entregues el premio, sube una foto y confirma la entrega.
-                </p>
-
-                {/* Proponer fecha al ganador por email */}
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 6 }}>Proponer fecha y hora al ganador</label>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <input id={`fecha-${detalle.id}`} type="text" placeholder="Ej: Miércoles 10 abril, 18:00 hrs" style={{ flex: 1, padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "var(--font-lato)", fontSize: "0.85rem", outline: "none" }} />
-                    <button onClick={async () => {
-                      const input = document.getElementById(`fecha-${detalle.id}`) as HTMLInputElement;
-                      const fecha = input?.value?.trim();
-                      if (!fecha) { setActionToast("Escribe una fecha"); setTimeout(() => setActionToast(""), 3000); return; }
-                      const s = getSession();
-                      try {
-                        const res = await fetch(`/api/concursos/${detalle.id}/proponer-fecha`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fecha }) });
-                        if (res.ok) { setActionToast("✓ Propuesta enviada al ganador por email"); input.value = ""; }
-                        else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
-                      } catch { setActionToast("Error de conexión"); }
-                      setTimeout(() => setActionToast(""), 4000);
-                    }} style={{ padding: "10px 16px", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", color: "#e8a84c", cursor: "pointer", whiteSpace: "nowrap" }}>
-                      Enviar
-                    </button>
-                  </div>
-                </div>
-
-                {/* Subir foto y confirmar */}
-                <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", paddingTop: 16 }}>
-                  <label style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "rgba(240,234,214,0.4)", display: "block", marginBottom: 8 }}>Subir foto del ganador (opcional)</label>
-                  <SubirFoto folder="concursos" preview={detalle.fotoGanador ?? ""} onUpload={(url: string) => setDetalle({ ...detalle, fotoGanador: url })} label="Foto del ganador con su premio" height="160px" />
-
-                  <button onClick={async () => {
-                    const s = getSession();
-                    try {
-                      const res = await fetch(`/api/concursos/${detalle.id}/confirmar-entrega`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ localId: s.id, fotoGanador: detalle.fotoGanador || null }) });
-                      if (res.ok) {
-                        setDetalle({ ...detalle, estado: "completado", premioEntregado: true, premioEntregadoAt: new Date().toISOString(), premioConfirmadoAt: new Date().toISOString() });
-                        setConcursos(prev => prev.map(c => c.id === detalle.id ? { ...c, estado: "completado", premioEntregado: true } : c));
-                        setActionToast("✓ Premio entregado confirmado");
-                      } else { const d = await res.json(); setActionToast(d.error ?? "Error"); }
-                    } catch { setActionToast("Error de conexión"); }
-                    setTimeout(() => setActionToast(""), 3000);
-                  }} style={{ width: "100%", marginTop: 12, padding: "14px 28px", background: "#3db89e", color: "#fff", border: "none", borderRadius: "10px", fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                    Confirmar entrega del premio
-                  </button>
-                </div>
-              </div>
-            );
-          })()}
         </div>
 
         {/* Formulario de edición (solo sin participantes) */}
@@ -668,12 +638,22 @@ export default function PanelConcursos() {
     if (filtroPanel === "entregados") return c.estado === "completado" || c.premioEntregado;
     return true;
   }).sort((a, b) => {
+    // Pendientes (finalizados sin entregar) go first
+    const isPendA = new Date(a.fechaFin).getTime() <= Date.now() && a.estado !== "completado" && a.estado !== "expirado" && a.estado !== "cancelado";
+    const isPendB = new Date(b.fechaFin).getTime() <= Date.now() && b.estado !== "completado" && b.estado !== "expirado" && b.estado !== "cancelado";
+    if (isPendA && !isPendB) return -1;
+    if (!isPendA && isPendB) return 1;
     const endedA = new Date(a.fechaFin).getTime() <= Date.now();
     const endedB = new Date(b.fechaFin).getTime() <= Date.now();
     if (!endedA && endedB) return -1;
     if (endedA && !endedB) return 1;
     return new Date(b.fechaFin).getTime() - new Date(a.fechaFin).getTime();
   });
+
+  const pendientesCount = concursos.filter(c => {
+    const ended = new Date(c.fechaFin).getTime() <= Date.now();
+    return ended && c.estado !== "completado" && c.estado !== "expirado" && c.estado !== "cancelado";
+  }).length;
 
   const chipFiltro = (key: typeof filtroPanel, label: string) => (
     <button onClick={() => setFiltroPanel(key)} style={{ padding: "6px 14px", borderRadius: "20px", cursor: "pointer", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.06em", background: filtroPanel === key ? "rgba(232,168,76,0.15)" : "transparent", border: filtroPanel === key ? "1px solid var(--accent)" : "1px solid var(--border-color)", color: filtroPanel === key ? "var(--accent)" : "var(--text-muted)" }}>{label}</button>
@@ -690,12 +670,20 @@ export default function PanelConcursos() {
       </div>
     </div>
 
+    {/* Alerta pendientes */}
+    {pendientesCount > 0 && (
+      <div style={{ background: "rgba(255,100,100,0.06)", border: "1px solid rgba(255,100,100,0.2)", borderRadius: 12, padding: "12px 16px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ fontSize: "1.2rem" }}>🔔</span>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "#ff8080", margin: 0, flex: 1 }}>Tienes <strong>{pendientesCount} {pendientesCount === 1 ? "concurso" : "concursos"}</strong> pendiente{pendientesCount > 1 ? "s" : ""} de entrega de premio</p>
+      </div>
+    )}
+
     {/* Filtros */}
     {concursos.length > 0 && (
       <div style={{ display: "flex", gap: "6px", marginBottom: "16px", overflowX: "auto", scrollbarWidth: "none", paddingBottom: "4px", width: "100%", boxSizing: "border-box" }}>
         {chipFiltro("todos", "Todos")}
         {chipFiltro("activos", "Activos")}
-        {chipFiltro("pendientes", "Pendientes")}
+        {chipFiltro("pendientes", pendientesCount > 0 ? `Pendientes (${pendientesCount})` : "Pendientes")}
         {chipFiltro("entregados", "Entregados")}
       </div>
     )}
@@ -737,7 +725,7 @@ export default function PanelConcursos() {
           const tiempoStr = dias > 0 ? `${dias}d ${hrs}h` : hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
           const parts = c._count?.participantes ?? 0;
           return (
-            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", maxWidth: 800, boxSizing: "border-box", minWidth: 0 }}>
+            <div key={c.id} style={{ background: "rgba(45,26,8,0.85)", border: (ended && c.estado !== "completado" && c.estado !== "expirado" && c.estado !== "cancelado") ? "1px solid rgba(255,100,100,0.3)" : "1px solid rgba(232,168,76,0.12)", borderRadius: 14, overflow: "hidden", width: "100%", maxWidth: 800, boxSizing: "border-box", minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "stretch" }}>
               <a href={`/concursos/${c.slug || c.id}`} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, display: "block" }}>
                 {c.imagenUrl ? (
@@ -778,7 +766,7 @@ export default function PanelConcursos() {
                   <button onClick={e => { e.stopPropagation(); window.open(`/story/${c.slug || c.id}`, "_blank"); }} style={{ flex: 1, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.45)", cursor: "pointer" }}>📸 Compartir</button>
                 )}
                 <button onClick={e => { e.stopPropagation(); setDetalle(c); setAbrirEditando(true); }} style={{ flex: 1, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "#e8a84c", cursor: "pointer" }}>Editar</button>
-                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>Detalle</button>
+                <button onClick={e => { e.stopPropagation(); setDetalle(c); }} style={{ flex: ended && c.estado !== "completado" && c.estado !== "expirado" ? 2 : 1, background: ended && c.estado !== "completado" && c.estado !== "expirado" ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.04)", border: ended && c.estado !== "completado" && c.estado !== "expirado" ? "1px solid rgba(232,168,76,0.4)" : "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: ended && c.estado !== "completado" && c.estado !== "expirado" ? 11 : 10, fontWeight: ended && c.estado !== "completado" && c.estado !== "expirado" ? 700 : 400, color: ended && c.estado !== "completado" && c.estado !== "expirado" ? "#e8a84c" : "rgba(240,234,214,0.4)", cursor: "pointer" }}>{ended && c.estado !== "completado" && c.estado !== "expirado" ? "Coordinar entrega →" : "Detalle"}</button>
               </div>
             </div>
           );
