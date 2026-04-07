@@ -6,7 +6,10 @@ const DC_PREFIXES = ["51.158.", "51.159.", "51.81.", "62.210.", "15.204.", "15.2
 
 export async function GET(req: NextRequest) {
   const secret = req.headers.get("authorization")?.replace("Bearer ", "");
-  if (secret !== process.env.CRON_SECRET && process.env.CRON_SECRET) {
+  const adminToken = req.headers.get("x-admin-token");
+  const isCron = secret === process.env.CRON_SECRET;
+  const isAdmin = adminToken === process.env.ADMIN_PASSWORD;
+  if (!isCron && !isAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
