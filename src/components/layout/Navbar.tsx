@@ -223,10 +223,15 @@ export default function Navbar() {
           <button
             className="dc-hamburger"
             onClick={() => setMenuOpen(o => !o)}
+            onTouchEnd={(e) => { e.preventDefault(); setMenuOpen(o => !o); }}
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={menuOpen}
           >
-            {menuOpen ? "✕" : "☰"}
+            {menuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            )}
           </button>
         </div>
       </nav>
@@ -317,20 +322,20 @@ export default function Navbar() {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 20px 60px;
           display: flex; justify-content: space-between; align-items: center;
-          background: color-mix(in srgb, var(--bg-primary) 97%, black);
-          backdrop-filter: blur(10px);
+          background: rgba(10,8,18,0.97);
+          backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
           border-bottom: 1px solid var(--border-color);
           transition: background 0.3s ease, border-color 0.3s ease;
         }
         .dc-nav--transparent {
           background: transparent !important;
-          backdrop-filter: none !important;
+          backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
           border-bottom: none !important;
           box-shadow: none !important;
         }
         .dc-nav--solid {
-          background: color-mix(in srgb, var(--bg-primary) 97%, black);
-          backdrop-filter: blur(10px);
+          background: rgba(10,8,18,0.97);
+          backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
           border-bottom: 1px solid var(--border-color);
         }
         .dc-nav-logo {
@@ -428,7 +433,7 @@ export default function Navbar() {
         .dc-nav-mobile-right { display: none; }
         @media (max-width: 767px) {
           .dc-nav { padding: 14px 16px; }
-          .dc-nav-links { display: none; }
+          .dc-nav-links { display: none !important; visibility: hidden; pointer-events: none; position: absolute; }
           .dc-nav-mobile-right { display: flex; align-items: center; gap: 6px; }
           .dc-hamburger { display: flex; }
           .dc-nav-spacer { height: 56px; }

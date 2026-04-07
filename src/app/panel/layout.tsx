@@ -222,7 +222,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         }
         .dc-panel-mobilebar {
           display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-          padding: 14px 20px; background: color-mix(in srgb, var(--bg-primary) 97%, black);
+          padding: 14px 20px; background: rgba(10,8,18,0.97);
           border-bottom: 1px solid var(--border-color);
           justify-content: space-between; align-items: center;
         }
