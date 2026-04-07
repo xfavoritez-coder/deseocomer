@@ -9,10 +9,13 @@ type Ganador = {
   slug: string | null;
   premio: string;
   imagenUrl: string | null;
+  fotoGanador: string | null;
   local: string;
+  localLogo: string | null;
   categoria: string | null;
   ganador: string;
   ganadorId: string | null;
+  estado: string;
   fechaFin: string;
   participantes: number;
 };
@@ -126,22 +129,37 @@ export default function GanadoresPage() {
             </div>
 
             {/* Lista historial */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               {ganadores.map((c) => (
                 <Link key={c.id} href={`/concursos/${c.slug || c.id}`} style={{ textDecoration: "none" }}>
-                  <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: "14px", overflow: "hidden", display: "flex", transition: "border-color 0.2s" }}
+                  <div style={{ background: "rgba(255,255,255,0.03)", border: `1px solid ${c.estado === "completado" ? "rgba(61,184,158,0.15)" : "rgba(232,168,76,0.1)"}`, borderRadius: "16px", overflow: "hidden", transition: "border-color 0.2s" }}
                     onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.3)"; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(232,168,76,0.1)"; }}>
-                    <div style={{ width: "70px", flexShrink: 0, background: "rgba(45,26,8,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", position: "relative", overflow: "hidden" }}>
-                      {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} /> : emojiPorCategoria(c.premio + " " + c.local)}
-                    </div>
-                    <div style={{ padding: "10px 12px", flex: 1, minWidth: 0 }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#3db89e", marginBottom: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.local}</p>
-                      <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.78rem", color: "#f5d080", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.charAt(0)}</div>
-                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</span>
-                        {c.fechaFin && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", flexShrink: 0 }}>{c.fechaFin}</span>}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.borderColor = c.estado === "completado" ? "rgba(61,184,158,0.15)" : "rgba(232,168,76,0.1)"; }}>
+                    {/* Foto del ganador si existe */}
+                    {c.fotoGanador && (
+                      <div style={{ position: "relative", height: 180, overflow: "hidden" }}>
+                        <img src={c.fotoGanador} alt={`${c.ganador} recibiendo ${c.premio}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 60, background: "linear-gradient(transparent, rgba(10,8,18,0.9))" }} />
+                        <span style={{ position: "absolute", top: 10, right: 10, fontSize: 10, padding: "3px 8px", borderRadius: 8, background: "rgba(61,184,158,0.9)", color: "#fff", fontFamily: "var(--font-cinzel)", fontWeight: 700, letterSpacing: "0.06em" }}>ENTREGADO</span>
+                      </div>
+                    )}
+                    <div style={{ display: "flex", padding: c.fotoGanador ? "10px 14px 14px" : "0", overflow: "hidden" }}>
+                      {!c.fotoGanador && (
+                        <div style={{ width: "70px", flexShrink: 0, background: "rgba(45,26,8,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.6rem", position: "relative", overflow: "hidden", minHeight: 70 }}>
+                          {c.imagenUrl ? <img src={c.imagenUrl} alt={c.premio} style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} /> : emojiPorCategoria(c.premio + " " + c.local)}
+                        </div>
+                      )}
+                      <div style={{ padding: c.fotoGanador ? "0" : "10px 12px", flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.65rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#3db89e", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{c.local}</p>
+                          {c.estado !== "completado" && <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: "rgba(232,168,76,0.12)", color: "#e8a84c", fontFamily: "var(--font-lato)", whiteSpace: "nowrap" }}>verificando</span>}
+                        </div>
+                        <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.78rem", color: "#f5d080", marginBottom: "6px", lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{c.premio}</p>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{c.ganador.charAt(0)}</div>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.8)", fontWeight: 600, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.ganador}</span>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)", flexShrink: 0 }}>{c.participantes} participantes</span>
+                        </div>
                       </div>
                     </div>
                   </div>

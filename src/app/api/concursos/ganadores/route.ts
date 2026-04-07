@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const ganadores = await prisma.concurso.findMany({
-      where: { estado: "completado" },
+      where: { estado: { in: ["completado", "finalizado", "en_revision"] }, ganadorActualId: { not: null } },
       include: {
-        local: { select: { nombre: true, categorias: true } },
+        local: { select: { nombre: true, categorias: true, logoUrl: true } },
         ganadorActual: { select: { id: true, nombre: true } },
+        _count: { select: { participantes: true } },
       },
-      orderBy: { premioConfirmadoAt: "desc" },
+      orderBy: { fechaFin: "desc" },
     });
 
     return NextResponse.json(
@@ -18,12 +19,15 @@ export async function GET() {
         slug: g.slug,
         premio: g.premio,
         imagenUrl: g.imagenUrl,
+        fotoGanador: g.fotoGanador,
         local: g.local.nombre,
+        localLogo: g.local.logoUrl,
         categoria: g.local.categorias?.[0] ?? "",
         ganador: (() => { const n = g.ganadorActual?.nombre ?? "Ganador"; const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; })(),
         ganadorId: g.ganadorActualId,
-        fechaFin: g.premioConfirmadoAt?.toLocaleDateString("es-CL") ?? "",
-        participantes: 0,
+        estado: g.estado,
+        fechaFin: g.premioConfirmadoAt?.toLocaleDateString("es-CL") ?? g.fechaFin?.toLocaleDateString("es-CL") ?? "",
+        participantes: g._count.participantes,
       })),
     );
   } catch (error) {
