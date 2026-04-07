@@ -173,9 +173,18 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile: avatar + bell + hamburger grouped together */}
+        {/* Mobile: avatar/logo + bell + hamburger grouped together */}
         <div className="dc-nav-mobile-right">
-          {isAuthenticated && user && (
+          {mounted && isLocalLoggedIn && (
+            <Link href="/panel" style={{ textDecoration: "none", width: 30, height: 30, borderRadius: "50%", border: "1px solid rgba(61,184,158,0.4)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)" }}>
+              {localSession?.logoUrl ? (
+                <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+              ) : (
+                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 700, color: "#fff" }}>{localInitials}</span>
+              )}
+            </Link>
+          )}
+          {!isLocalLoggedIn && isAuthenticated && user && (
             <Link href="/perfil" className="dc-nav-avatar dc-nav-avatar--mobile" style={{ textDecoration: "none", width: 30, height: 30, fontSize: "0.65rem" }}>{user.nombre?.charAt(0).toUpperCase() ?? "U"}</Link>
           )}
           {isAuthenticated && user && (
