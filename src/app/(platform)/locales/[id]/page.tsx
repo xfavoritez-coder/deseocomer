@@ -406,8 +406,8 @@ export default function LocalDetailPage() {
             {tab === "Información" && (
               <div className={tieneSidebar ? "dc-local-layout" : "dc-local-single"}>
                 <div className="dc-local-main-content" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  {/* Descripción — ocultar si importado sin contenido — order 1 mobile */}
-                  {(local.descripcion || local.historia || (!esImportado && (local as any).categorias?.length > 1)) && (
+                  {/* Descripción — ocultar si no hay contenido real */}
+                  {(local.descripcion || local.historia) && (
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Sobre el local</p>
                     {local.descripcion && <p style={bodyStyle}>{local.descripcion}</p>}
@@ -492,7 +492,7 @@ export default function LocalDetailPage() {
 
                 </div>
                 {/* Encuéntranos — extracted for ordering */}
-                {tieneSidebar && tieneUbicacion && (
+                {tieneUbicacion && (
                 <div className="dc-local-encuentranos" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Encuéntranos</p>
@@ -530,6 +530,26 @@ export default function LocalDetailPage() {
                 </div>
                 )}
 
+                {/* Horarios — inline en móvil, sidebar en desktop */}
+                {tieneHorarios && (
+                <div className="dc-local-horarios-section" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  <div className="dc-horarios-box" style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "18px 20px" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "12px" }}>Horarios</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                    {local.horarios.map(h => {
+                      const esHoy = h.dia === todayName;
+                      return (
+                        <div key={h.dia} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: esHoy ? "7px 10px" : "7px 4px", background: esHoy ? "rgba(61,184,158,0.06)" : "transparent", borderRadius: esHoy ? "8px" : 0 }}>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: esHoy ? "#3db89e" : "rgba(240,234,214,0.5)", fontWeight: esHoy ? 700 : 400 }}>{h.dia}{esHoy ? " · hoy" : ""}</span>
+                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: h.cerrado ? "rgba(255,100,100,0.6)" : (esHoy ? "#3db89e" : "rgba(240,234,214,0.8)"), fontWeight: esHoy ? 700 : 400 }}>{h.cerrado ? "Cerrado" : `${h.abre} – ${h.cierra}`}</span>
+                        </div>
+                      );
+                    })}
+                    </div>
+                  </div>
+                </div>
+                )}
+
                 <div className="dc-local-resenas-section" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   {/* Reseñas preview */}
                   {local.resenas.length === 0 ? (
@@ -546,7 +566,7 @@ export default function LocalDetailPage() {
                   ) : (
                     <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Reseñas</p>
-                      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
+                      <div className="dc-resenas-rating" style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "16px" }}>
                         <div style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "3rem", fontWeight: 700, color: "#e8a84c", lineHeight: 1 }}>{local.rating?.toFixed(1) ?? "—"}</div>
                         <div>
                           <div style={{ color: "#e8a84c", fontSize: "1rem", marginBottom: "4px", letterSpacing: "2px" }}>{"★".repeat(Math.round(local.rating ?? 0))}</div>
@@ -568,23 +588,6 @@ export default function LocalDetailPage() {
                   )}
                 </div>
 
-                {/* Sidebar: solo horarios — sticky a la derecha en desktop */}
-                {tieneSidebar && tieneHorarios && (
-                <div className="dc-local-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div className="dc-horarios-box" style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
-                    {local.horarios.map(h => {
-                      const esHoy = h.dia === todayName;
-                      return (
-                        <div key={h.dia} className="dc-horario-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: esHoy ? "8px 10px" : "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", background: esHoy ? "rgba(61,184,158,0.04)" : "transparent", borderRadius: esHoy ? "6px" : 0, gap: "12px" }}>
-                          <span className="dc-horario-dia" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: esHoy ? "#3db89e" : "rgba(240,234,214,0.55)", fontWeight: esHoy ? 700 : 400, whiteSpace: "nowrap" }}>{h.dia}{esHoy ? " · hoy" : ""}</span>
-                          <span className="dc-horario-hora" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: h.cerrado ? "rgba(255,100,100,0.6)" : (esHoy ? "#3db89e" : "#f0ead6"), fontWeight: esHoy ? 700 : 400, whiteSpace: "nowrap", textAlign: "right" }}>{h.cerrado ? "Cerrado" : `${h.abre} - ${h.cierra}`}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                )}
 
               </div>
             )}
@@ -727,24 +730,29 @@ export default function LocalDetailPage() {
       <style>{`
         .dc-ld-layout { display: block; }
         .dc-ld-main { min-width: 0; }
-        .dc-local-layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
+        .dc-local-layout { display: flex; flex-direction: column; gap: 20px; max-width: 680px; }
         .dc-local-single { max-width: 680px; }
-        .dc-local-main-content { grid-column: 1; }
-        .dc-local-concursos-promos { grid-column: 1; }
-        .dc-local-encuentranos { grid-column: 1; }
-        .dc-local-resenas-section { grid-column: 1; }
-        .dc-local-sidebar { grid-column: 2; grid-row: 1 / -1; position: sticky; top: 100px; }
+        .dc-local-main-content { }
+        .dc-local-concursos-promos { }
+        .dc-local-encuentranos { }
+        .dc-local-horarios-section { }
+        .dc-local-resenas-section { }
         .dc-ld-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .dc-ld-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
         @media (max-width: 1023px) {
-          .dc-local-layout { grid-template-columns: 1fr; display: flex; flex-direction: column; }
           .dc-local-main-content { order: 0; }
           .dc-local-concursos-promos { order: 1; }
           .dc-local-encuentranos { order: 2; }
-          .dc-local-sidebar { position: static; order: 3; }
+          .dc-local-horarios-section { order: 3; }
           .dc-local-resenas-section { order: 4; }
         }
         @media (min-width: 1024px) {
+          .dc-local-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; max-width: none; align-items: start; }
+          .dc-local-main-content { grid-column: 1; }
+          .dc-local-concursos-promos { grid-column: 1; }
+          .dc-local-encuentranos { grid-column: 1; }
+          .dc-local-horarios-section { grid-column: 2; grid-row: 1 / -1; position: sticky; top: 100px; }
+          .dc-local-resenas-section { grid-column: 1; }
           .dc-hero-inner { max-width: 1100px; margin: 0 auto; }
           .dc-tabs-inner { max-width: 1100px; margin: 0 auto; }
         }
@@ -755,10 +763,9 @@ export default function LocalDetailPage() {
           .dc-hero-nombre-row { flex-wrap: wrap; }
           .dc-hero-nombre-row h1 { flex-basis: 70%; flex-shrink: 1; }
           .dc-hero-acciones { flex-basis: 100%; justify-content: flex-start; }
-          .dc-horarios-box { padding: 14px 14px !important; }
-          .dc-horario-row { padding-left: 6px !important; padding-right: 6px !important; }
-          .dc-horario-dia { font-size: 0.8rem !important; }
-          .dc-horario-hora { font-size: 0.8rem !important; }
+          .dc-horarios-box { padding: 14px 16px !important; }
+          .dc-resenas-rating { justify-content: center !important; }
+          .dc-resenas-empty { text-align: center; }
         }
       `}</style>
     </main>
