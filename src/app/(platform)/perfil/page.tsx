@@ -14,8 +14,8 @@ import { CONCURSOS, CONCURSOS_FINALIZADOS, getRefCode } from "@/lib/mockConcurso
 // ─── Types & helpers ─────────────────────────────────────────────────────────
 
 const TABS = [
-  { key: "favoritos", icon: "💛", label: "Favoritos" },
   { key: "concursos", icon: "🏆", label: "Concursos" },
+  { key: "favoritos", icon: "💛", label: "Favoritos" },
   { key: "historial", icon: "🕐", label: "Historial" },
   { key: "genio",     icon: "🏮", label: "Mi Genio" },
   { key: "perfil",    icon: "⚙️", label: "Mi Perfil" },
@@ -50,7 +50,7 @@ function timeAgo(ts: number): string {
 export default function PerfilPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<TabKey>("favoritos");
+  const [tab, setTab] = useState<TabKey>("concursos");
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/login?next=/perfil");
