@@ -88,6 +88,7 @@ export async function GET(req: NextRequest) {
     const horarios: Record<string, number> = {};
     const ocasiones: Record<string, number> = {};
     const localesTop: Record<string, number> = {};
+    const comidasRanked: Record<string, number> = {}; // weighted by selection order
     let totalPerfiles = 0;
 
     let cursor: string | undefined;
@@ -96,7 +97,7 @@ export async function GET(req: NextRequest) {
         take: 100,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
         where: { geniePerfil: { not: undefined } },
-        select: { id: true, geniePerfil: true },
+        select: { id: true, geniePerfil: true, comidasFavoritas: true },
         orderBy: { id: "asc" },
       });
       if (batch.length === 0) break;
@@ -112,6 +113,13 @@ export async function GET(req: NextRequest) {
         if (gp.gustos.horario) for (const [k, v] of Object.entries(gp.gustos.horario)) horarios[k] = (horarios[k] ?? 0) + (v as number);
         if (gp.gustos.ocasiones) for (const [k, v] of Object.entries(gp.gustos.ocasiones)) ocasiones[k] = (ocasiones[k] ?? 0) + (v as number);
         if (gp.comportamiento?.localesVisitados) for (const lv of gp.comportamiento.localesVisitados) { if (lv.nombre) localesTop[lv.nombre] = (localesTop[lv.nombre] ?? 0) + 1; }
+        // Comidas favoritas weighted by selection order (1st=5pts, 2nd=4pts, etc)
+        if (u.comidasFavoritas?.length) {
+          u.comidasFavoritas.forEach((c: string, i: number) => {
+            const peso = Math.max(1, 6 - i); // 1st=5, 2nd=4, 3rd=3, 4th=2, 5th=1
+            comidasRanked[c.toLowerCase()] = (comidasRanked[c.toLowerCase()] ?? 0) + peso;
+          });
+        }
       }
     }
 
@@ -135,7 +143,7 @@ export async function GET(req: NextRequest) {
     // ═══ SAVE CACHE ═══
     const cache = {
       sospechosos,
-      usuarios: { totalPerfiles, categorias: top(categorias), comunas: top(comunas), horarios: top(horarios), ocasiones: top(ocasiones), localesTop: top(localesTop), estilos: top(estilos) },
+      usuarios: { totalPerfiles, categorias: top(categorias), comunas: top(comunas), horarios: top(horarios), ocasiones: top(ocasiones), localesTop: top(localesTop), estilos: top(estilos), comidasRanked: top(comidasRanked) },
       registros: { total: regs.length, porDia: regResult },
       calculadoAt: new Date().toISOString(),
     };

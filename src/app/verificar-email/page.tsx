@@ -102,8 +102,8 @@ function VerificarContent() {
                     </div>
                   </div>
                 </div>
-                <a href="/concursos" style={{ display: "block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none", textAlign: "center", marginBottom: "8px" }}>
-                  Ver concursos activos →
+                <a href="/" style={{ display: "block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, padding: "14px 32px", borderRadius: "12px", textDecoration: "none", textAlign: "center", marginBottom: "8px" }}>
+                  Explorar DeseoComer →
                 </a>
                 <a href="/locales" style={{ display: "block", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", textDecoration: "none", textAlign: "center", marginTop: "4px" }}>
                   Explorar locales →

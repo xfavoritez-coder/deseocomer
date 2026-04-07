@@ -55,6 +55,7 @@ interface UserStatsData {
   ocasiones: Record<string, number>;
   localesTop: Record<string, number>;
   estilos: Record<string, number>;
+  comidasRanked?: Record<string, number>;
 }
 
 function BarChart({ data, color = "#e8a84c", max = 15 }: { data: Record<string, number>; color?: string; max?: number }) {
@@ -201,6 +202,14 @@ export default function EstadisticasPage() {
                   <BarChart data={userStats.estilos} color="#3db89e" max={10} />
                 </div>
               </div>
+
+              {userStats.comidasRanked && Object.keys(userStats.comidasRanked).length > 0 && (
+                <div style={{ ...sectionS, marginBottom: 16 }}>
+                  <h3 style={{ fontFamily: "Georgia", fontSize: "0.9rem", color: "#e05090", marginBottom: 6 }}>Comidas favoritas (ranking ponderado)</h3>
+                  <p style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.3)", marginBottom: 14 }}>1ra selección = 5pts, 2da = 4pts, 3ra = 3pts, etc.</p>
+                  <BarChart data={userStats.comidasRanked} color="#e05090" max={20} />
+                </div>
+              )}
             </>
           )}
         </>

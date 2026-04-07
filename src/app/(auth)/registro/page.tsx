@@ -206,7 +206,7 @@ function RegistroContent() {
               </div>
               <div style={{ fontSize: "2rem", marginBottom: "12px" }}>😋</div>
               <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", color: "var(--accent)", marginBottom: "8px" }}>¿Qué te encanta comer?</h2>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Elige entre 2 y 5 favoritos</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Selecciona hasta 5 favoritos</p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "12px" }}>
                 {(() => {
                   const usarDB = categoriasDB.length > 0;
@@ -218,14 +218,15 @@ function RegistroContent() {
                   return opciones.map(c => {
                     const sel = comidasSel.includes(c);
                     const maxed = totalSel >= 5 && !sel;
+                    const orden = sel ? comidasSel.indexOf(c) + 1 : 0;
                     return (
                       <button key={c} disabled={maxed} onClick={() => setComidasSel(prev => sel ? prev.filter(x => x !== c) : [...prev, c])} style={{
                         padding: "8px 16px", borderRadius: "20px", cursor: maxed ? "default" : "pointer",
                         background: sel ? "rgba(232,168,76,0.15)" : "transparent",
                         border: sel ? "1px solid var(--accent)" : "1px solid rgba(232,168,76,0.15)",
                         color: sel ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.55)",
-                        fontFamily: "var(--font-lato)", fontSize: "0.85rem",
-                      }}>{c}</button>
+                        fontFamily: "var(--font-lato)", fontSize: "0.85rem", position: "relative",
+                      }}>{sel && <span style={{ position: "absolute", top: -6, right: -4, width: 18, height: 18, borderRadius: "50%", background: "#e8a84c", color: "#0a0812", fontSize: "0.65rem", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{orden}</span>}{c}</button>
                     );
                   });
                 })()}

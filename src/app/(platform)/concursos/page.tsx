@@ -117,18 +117,18 @@ export default function ConcursosPage() {
     const soon = isSoonEnding(c.endsAt, sa);
     if (filter === "activos") return !ended && !soon && c.estado !== "programado";
     if (filter === "por_terminar") return !ended && soon && c.estado !== "programado";
-    if (filter === "finalizados") return false;
+    if (filter === "finalizados") return ended || ["finalizado", "completado", "en_revision"].includes(c.estado);
     return true;
   }).sort((a, b) => {
-    const endedA = getTimeLeft(a.endsAt).ended;
-    const endedB = getTimeLeft(b.endsAt).ended;
-    // Programados siempre al final (después de activos, antes de finalizados)
-    if (a.estado === "programado" && b.estado !== "programado") return 1;
-    if (b.estado === "programado" && a.estado !== "programado") return -1;
-    // Finalizados siempre al final
+    const endedA = getTimeLeft(a.endsAt).ended || ["finalizado", "completado", "en_revision"].includes(a.estado);
+    const endedB = getTimeLeft(b.endsAt).ended || ["finalizado", "completado", "en_revision"].includes(b.estado);
+    // Finalizados always last
     if (endedA && !endedB) return 1;
     if (!endedA && endedB) return -1;
     if (endedA && endedB) return b.endsAt - a.endsAt;
+    // Programados after active
+    if (a.estado === "programado" && b.estado !== "programado") return 1;
+    if (b.estado === "programado" && a.estado !== "programado") return -1;
     return scoreConcurso(b) - scoreConcurso(a);
   });
 
