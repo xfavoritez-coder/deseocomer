@@ -6,7 +6,7 @@ import SubirFoto from "@/components/SubirFoto";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type P = any;
 
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Combo", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { promo: "Promoción", "Promoción": "Promoción", happy_hour: "Promoción", descuento: "Promoción", "Descuento %": "Promoción", "2x1": "Promoción", combo: "Promoción", Combo: "Promoción", cupon: "Promoción", precio_especial: "Promoción", Regalo: "Promoción", cumpleanos: "Cumpleaños", "Cumpleaños": "Cumpleaños" };
 const DIAS_NOMBRE = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
 export default function AdminPromociones() {
@@ -26,7 +26,7 @@ export default function AdminPromociones() {
   const [toast, setToast] = useState("");
   const [filtro, setFiltro] = useState<"todas" | "activas" | "inactivas">("todas");
   const [creando, setCreando] = useState(false);
-  const [crearForm, setCrearForm] = useState({ localId: "", tipo: "happy_hour", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false] as boolean[], porcentajeDescuento: "", imagenUrl: "" });
+  const [crearForm, setCrearForm] = useState({ localId: "", tipo: "Promoción", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false] as boolean[], porcentajeDescuento: "", imagenUrl: "" });
   const [localesList, setLocalesList] = useState<{ id: string; nombre: string }[]>([]);
   const [crearError, setCrearError] = useState("");
 
@@ -59,7 +59,7 @@ export default function AdminPromociones() {
       const nuevo = await res.json();
       setPromos(prev => [nuevo, ...prev]);
       setCreando(false);
-      setCrearForm({ localId: "", tipo: "happy_hour", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false], porcentajeDescuento: "", imagenUrl: "" });
+      setCrearForm({ localId: "", tipo: "Promoción", titulo: "", descripcion: "", condiciones: "", horaInicio: "", horaFin: "", diasSemana: [false, false, false, false, false, false, false], porcentajeDescuento: "", imagenUrl: "" });
       setToast("Promocion creada");
       setTimeout(() => setToast(""), 3000);
     } catch { setCrearError("Error de conexion"); }
@@ -196,7 +196,7 @@ export default function AdminPromociones() {
             <div>
               <label style={LBL}>Tipo</label>
               <select style={INP} value={crearForm.tipo} onChange={e => setCrearForm(f => ({ ...f, tipo: e.target.value }))}>
-                {Object.entries(TIPO_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                {[["Promoción", "Promoción"], ["Cumpleaños", "Cumpleaños"]].map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </div>
             <div>
@@ -306,7 +306,7 @@ export default function AdminPromociones() {
                 <div>
                   <label style={LBL}>Tipo</label>
                   <select style={INP} value={editTipo} onChange={e => setEditTipo(e.target.value)}>
-                    {Object.entries(TIPO_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    {[["Promoción", "Promoción"], ["Cumpleaños", "Cumpleaños"]].map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>
                 </div>
                 <div>

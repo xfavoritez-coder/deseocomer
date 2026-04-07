@@ -66,7 +66,7 @@ function getColor(name: string): string {
 }
 
 type Tab = "Información" | "Reseñas" | "Concursos" | "Promociones";
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", promo: "Combo", combo: "Combo", Combo: "Combo", cumpleanos: "Cumpleaños", "Descuento %": "Descuento", "Happy Hour": "Happy Hour", "Cumpleaños": "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { happy_hour: "Promoción", descuento: "Promoción", "2x1": "Promoción", promo: "Promoción", combo: "Promoción", Combo: "Promoción", "Descuento %": "Promoción", "Happy Hour": "Promoción", Regalo: "Promoción", cumpleanos: "Cumpleaños", "Cumpleaños": "Cumpleaños", "Promoción": "Promoción" };
 
 const DAY_NAMES = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 

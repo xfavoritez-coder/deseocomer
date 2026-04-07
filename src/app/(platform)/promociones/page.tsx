@@ -9,7 +9,7 @@ import { useGenie } from "@/contexts/GenieContext";
 import { PROMOCIONES, TIPO_LABELS, isPromocionActivaAhora, normalizeTipo, type Promocion } from "@/lib/mockPromociones";
 import { trackStat } from "@/lib/stats-client";
 
-const TIPOS = ["happy_hour", "descuento", "2x1", "cupon", "precio_especial", "cumpleanos"] as const;
+const TIPOS = ["promo", "cumpleanos"] as const;
 const DIAS_NOMBRE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 function formatDias(dias: number[]): string {
@@ -23,19 +23,16 @@ function formatDias(dias: number[]): string {
   if (sorted.length === 2 && sorted.includes(0) && sorted.includes(6)) return "Sáb y Dom";
   return sorted.map(d => DIAS_NOMBRE[d]).join(", ");
 }
-const TIPO_LABEL: Record<string, string> = { happy_hour: "Happy Hour", descuento: "Descuento", "2x1": "2×1", combo: "Combo", promo: "Combo", cumpleanos: "Cumpleaños" };
+const TIPO_LABEL: Record<string, string> = { promo: "Promoción", cumpleanos: "Cumpleaños", happy_hour: "Promoción", descuento: "Promoción", "2x1": "Promoción", combo: "Promoción", cupon: "Promoción", precio_especial: "Promoción" };
+
+function isCumple(tipo: string | undefined): boolean {
+  const t = (tipo ?? "").toLowerCase();
+  return t === "cumpleanos" || t === "cumpleaños";
+}
 
 function getSello(promo: Promocion): { text: string; color: string } | null {
-  const t = promo.tipo?.toLowerCase() ?? "";
-  if (t === "happy_hour" || t === "happy hour") return { text: "HAPPY HOUR", color: "#d4a017" };
-  if (t === "cumpleanos" || t === "cumpleaños") return { text: "CUMPLEAÑOS", color: "#e05090" };
-  if (t === "2x1") return { text: "2×1", color: "#3db89e" };
-  if (t === "descuento" || t === "descuento %") return { text: promo.porcentajeDescuento ? `-${promo.porcentajeDescuento}%` : "DESCUENTO", color: "#ff6644" };
-  if (t === "cupon" || t === "cupón") return { text: "COMBO", color: "#e8a84c" };
-  if (t === "precio_especial" || t === "especial") return { text: "COMBO", color: "#e8a84c" };
-  if (t === "combo" || t === "promo") return { text: "COMBO", color: "#e8a84c" };
-  if (t === "regalo") return { text: "REGALO", color: "#e8a84c" };
-  return { text: promo.tipo?.toUpperCase() ?? "PROMO", color: "#e8a84c" };
+  if (isCumple(promo.tipo)) return { text: "🎂 CUMPLEAÑOS", color: "#e05090" };
+  return null;
 }
 
 export default function PromocionesPage() {
@@ -111,7 +108,7 @@ export default function PromocionesPage() {
   const filtered = promos.filter(p => {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
-    if (filtrosTipo.length > 0 && !filtrosTipo.some(f => f.toLowerCase() === (p.tipo ?? "").toLowerCase() || (f === "cumpleanos" && (p.tipo as string) === "Cumpleaños") || (f === "descuento" && (p.tipo ?? "").startsWith("Descuento")))) return false;
+    if (filtrosTipo.length > 0 && !filtrosTipo.some(f => f === "cumpleanos" ? isCumple(p.tipo) : !isCumple(p.tipo))) return false;
     if (filtroComuna && p.comuna?.toLowerCase() !== filtroComuna.toLowerCase()) return false;
     if (filtroCategoria) {
       const catLower = filtroCategoria.toLowerCase();
@@ -165,11 +162,7 @@ export default function PromocionesPage() {
           {[
             { key: "todas", label: "Todas", color: "var(--accent)" },
             { key: "activas", label: "Activas ahora", color: "var(--oasis-bright)" },
-            { key: "happy_hour", label: "Happy Hour", color: "#d4a017" },
-            { key: "descuento", label: "Descuento", color: "#ff6644" },
-            { key: "2x1", label: "2\u00d71", color: "#3db89e" },
-            { key: "combo", label: "Combo", color: "#e8a84c" },
-            { key: "cumpleanos", label: "Cumpleaños", color: "#e05090" },
+            { key: "cumpleanos", label: "🎂 Cumpleaños", color: "#e05090" },
           ].map(({ key, label, color }) => {
             const isActive = key === "todas" ? (filtrosTipo.length === 0 && !filtroActivas) : key === "activas" ? filtroActivas : filtrosTipo.includes(key);
             return (
@@ -274,21 +267,20 @@ export default function PromocionesPage() {
             {promosNormales.map(promo => {
               const activa = isPromocionActivaAhora(promo);
               const sello = getSello(promo);
-              const isHH = promo.tipo === "happy_hour";
-              const accentColor = isHH ? "#d4a017" : "var(--accent)";
+              const isCumplePromo = isCumple(promo.tipo);
+              const accentColor = "var(--accent)";
               const logoUrl = (promo as unknown as Record<string, unknown>).logoUrl as string | undefined;
               const cumpleBorder = esCumple ? "1px solid rgba(224,80,144,0.35)" : "";
               return (
                 <a key={promo.id} href={`/promociones/${(promo as any).slug || promo.id}`} style={{
                   backgroundColor: "rgba(45,26,8,0.85)",
-                  border: cumpleBorder || (isHH ? "1px solid rgba(212,160,23,0.25)" : "1px solid var(--border-color)"),
+                  border: cumpleBorder || "1px solid var(--border-color)",
                   borderRadius: "20px", cursor: "pointer", position: "relative", overflow: "hidden",
                   textDecoration: "none", display: "block", color: "inherit",
                   transition: "border-color 0.2s",
                   boxShadow: esCumple ? "0 0 16px rgba(224,80,144,0.1)" : "none",
                 }}>
-                  {isHH && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: "linear-gradient(90deg, #c8850a, #d4a017, #f0c040, #d4a017, #c8850a)", zIndex: 1 }} />}
-
+                  
                   {promo.imagenUrl && (
                     <div style={{ position: "relative", height: "160px", overflow: "hidden" }}>
                       <img src={promo.imagenUrl} alt={promo.titulo} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
@@ -308,7 +300,7 @@ export default function PromocionesPage() {
                       <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg, rgba(232,168,76,0.25), rgba(232,168,76,0.08))", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", fontWeight: 700, color: "var(--accent)", border: "1px solid rgba(232,168,76,0.2)", flexShrink: 0 }}>{(promo.local ?? "L").charAt(0).toUpperCase()}</div>
                     )}
                     <div>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: isHH ? "#d4a017" : "var(--text-primary)", fontWeight: 600 }}>{promo.local}</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--text-primary)", fontWeight: 600 }}>{promo.local}</p>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--text-muted)" }}>{promo.comuna}</p>
                     </div>
                   </div>
@@ -349,7 +341,7 @@ export default function PromocionesPage() {
                       )}
                     </div>
 
-                    <div style={{ width: "100%", background: isHH ? "linear-gradient(135deg, #c8850a, #d4a017)" : "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", borderRadius: "16px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#07040f", fontWeight: 700, minHeight: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "100%", background: "linear-gradient(135deg, var(--oasis-teal), var(--oasis-bright))", borderRadius: "16px", fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#07040f", fontWeight: 700, minHeight: "46px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       Ver promoción
                     </div>
                   </div>

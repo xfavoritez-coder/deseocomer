@@ -1,6 +1,6 @@
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour" | "cumpleanos" | "combo";
+export type TipoPromocion = "descuento" | "2x1" | "cupon" | "precio_especial" | "happy_hour" | "cumpleanos" | "combo" | "promo";
 export type CategoriaPromocion = "almuerzo" | "cena" | "desayuno" | "bebidas" | "postres";
 
 export interface Promocion {
@@ -345,23 +345,25 @@ export function pad2(n: number) {
 }
 
 export const TIPO_LABELS: Record<TipoPromocion, string> = {
-  descuento: "Descuento",
-  "2x1": "2x1",
-  cupon: "Cupón",
-  precio_especial: "Precio Especial",
-  happy_hour: "Happy Hour",
+  descuento: "Promoción",
+  "2x1": "Promoción",
+  cupon: "Promoción",
+  precio_especial: "Promoción",
+  happy_hour: "Promoción",
   cumpleanos: "Cumpleaños",
-  combo: "Combo",
+  combo: "Promoción",
+  promo: "Promoción",
 };
 
 export const TIPO_ICONS: Record<TipoPromocion, string> = {
-  descuento: "🏷️",
-  "2x1": "🔁",
-  cupon: "🎟️",
-  precio_especial: "⭐",
+  descuento: "⚡",
+  "2x1": "⚡",
+  cupon: "⚡",
+  precio_especial: "⚡",
   happy_hour: "⚡",
   cumpleanos: "🎂",
-  combo: "🍱",
+  combo: "⚡",
+  promo: "⚡",
 };
 
 export const CATEGORIA_LABELS: Record<CategoriaPromocion, string> = {
