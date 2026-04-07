@@ -111,7 +111,7 @@ export default function PromocionesPage() {
   const filtered = promos.filter(p => {
     if (busqueda) { const q = busqueda.toLowerCase(); if (!p.titulo?.toLowerCase().includes(q) && !p.local?.toLowerCase().includes(q) && !p.comuna?.toLowerCase().includes(q) && !p.tipo?.toLowerCase().includes(q)) return false; }
     if (filtroActivas && !isPromocionActivaAhora(p)) return false;
-    if (filtrosTipo.length > 0 && !filtrosTipo.some(f => f.toLowerCase() === p.tipo?.toLowerCase() || (f === "cumpleanos" && p.tipo === "Cumpleaños") || (f === "descuento" && p.tipo?.startsWith("Descuento")))) return false;
+    if (filtrosTipo.length > 0 && !filtrosTipo.some(f => f.toLowerCase() === (p.tipo ?? "").toLowerCase() || (f === "cumpleanos" && (p.tipo as string) === "Cumpleaños") || (f === "descuento" && (p.tipo ?? "").startsWith("Descuento")))) return false;
     if (filtroComuna && p.comuna?.toLowerCase() !== filtroComuna.toLowerCase()) return false;
     if (filtroCategoria) {
       const catLower = filtroCategoria.toLowerCase();
