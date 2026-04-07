@@ -52,6 +52,7 @@ export default function LocalesPage() {
   const [loading, setLoading] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [busqueda, setBusqueda] = useState("");
+  const [busquedaActiva, setBusquedaActiva] = useState("");
   const [categoriaActiva, setCategoriaActiva] = useState("Todos");
   const [soloAbiertos, setSoloAbiertos] = useState(false);
   const [soloConConcursos, setSoloConConcursos] = useState(false);
@@ -89,11 +90,11 @@ export default function LocalesPage() {
   const buildUrl = useCallback((cursor?: string | null) => {
     const params = new URLSearchParams({ paginated: "1", limit: "24" });
     if (categoriaActiva !== "Todos") params.set("categoria", categoriaActiva);
-    if (busqueda.trim().length >= 2) params.set("q", busqueda.trim());
+    if (busquedaActiva.trim().length >= 2) params.set("q", busquedaActiva.trim());
     if (comunaActiva) params.set("comuna", comunaActiva);
     if (cursor) params.set("cursor", cursor);
     return `/api/locales?${params}`;
-  }, [categoriaActiva, busqueda, comunaActiva]);
+  }, [categoriaActiva, busquedaActiva, comunaActiva]);
 
   const fetchLocales = useCallback(async (reset = false) => {
     if (reset) { setLoading(true); setLocales([]); setNextCursor(null); setHasMore(true); setFilteredCount(null); }
@@ -121,13 +122,10 @@ export default function LocalesPage() {
     fetchLocales(true);
   }, [categoriaActiva, comunaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Debounced search
+  // Search on enter/submit
   useEffect(() => {
-    if (busqueda.length === 0 || busqueda.length >= 2) {
-      const timer = setTimeout(() => fetchLocales(true), busqueda.length === 0 ? 0 : 400);
-      return () => clearTimeout(timer);
-    }
-  }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchLocales(true);
+  }, [busquedaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = useCallback(async () => {
     if (!hasMore || loadingMore || !nextCursor) return;
@@ -157,11 +155,8 @@ export default function LocalesPage() {
 
   useEffect(() => { trackStat("pagina", "locales"); }, []);
   useEffect(() => {
-    if (busqueda.length >= 3) {
-      const t = setTimeout(() => { addInteraccion("busqueda", { query: busqueda }); trackStat("busqueda", busqueda); }, 1500);
-      return () => clearTimeout(t);
-    }
-  }, [busqueda]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (busquedaActiva.length >= 3) { addInteraccion("busqueda", { query: busquedaActiva }); trackStat("busqueda", busquedaActiva); }
+  }, [busquedaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { if (comunaActiva) trackStat("comuna", comunaActiva); }, [comunaActiva]);
   useEffect(() => { if (categoriaActiva !== "Todos") trackStat("categoria", categoriaActiva); }, [categoriaActiva]);
@@ -213,6 +208,7 @@ export default function LocalesPage() {
 
   const limpiarFiltros = () => {
     setBusqueda("");
+    setBusquedaActiva("");
     setCategoriaActiva("Todos");
     setSoloAbiertos(false);
     setSoloConConcursos(false);
@@ -220,7 +216,7 @@ export default function LocalesPage() {
     setComunaActiva("");
   };
 
-  const hayFiltros = busqueda || categoriaActiva !== "Todos" || soloAbiertos || soloConConcursos || soloConPromociones || comunaActiva;
+  const hayFiltros = busquedaActiva || categoriaActiva !== "Todos" || soloAbiertos || soloConConcursos || soloConPromociones || comunaActiva;
 
   return (
     <main style={{ background: "var(--bg-primary)", minHeight: "100vh" }}>
@@ -239,16 +235,26 @@ export default function LocalesPage() {
       {/* Search + Filters */}
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 32px" }}>
         {/* Search */}
-        <div style={{ position: "relative", marginBottom: "16px" }}>
-          <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
-          <input
-            type="text"
-            placeholder="Buscar local o categoría..."
-            value={busqueda}
-            onChange={e => setBusqueda(e.target.value)}
-            style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
-          />
+        <div style={{ position: "relative", marginBottom: "16px", display: "flex", gap: 8 }}>
+          <div style={{ position: "relative", flex: 1 }}>
+            <span style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)", fontSize: "1rem", pointerEvents: "none" }}>🔍</span>
+            <input
+              type="text"
+              placeholder="Buscar local o categoría..."
+              value={busqueda}
+              onChange={e => setBusqueda(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") { setBusquedaActiva(busqueda.trim()); } }}
+              style={{ width: "100%", padding: "14px 16px 14px 44px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "12px", color: "var(--text-primary)", fontFamily: "var(--font-lato)", fontSize: "1rem", outline: "none", boxSizing: "border-box" }}
+            />
+          </div>
+          <button onClick={() => setBusquedaActiva(busqueda.trim())} style={{ padding: "14px 20px", background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#e8a84c", cursor: "pointer", flexShrink: 0, fontWeight: 700 }}>Buscar</button>
         </div>
+        {busquedaActiva && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+            <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)" }}>Buscando: <strong style={{ color: "#e8a84c" }}>{busquedaActiva}</strong></span>
+            <button onClick={() => { setBusqueda(""); setBusquedaActiva(""); }} style={{ background: "none", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 8px", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>✕ Limpiar</button>
+          </div>
+        )}
 
         {/* Fila 1 — Categorías */}
         <div className="dc-filtros-fila" style={{ marginBottom: "10px" }}>

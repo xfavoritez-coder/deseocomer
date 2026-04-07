@@ -128,7 +128,8 @@ export async function GET(req: NextRequest) {
 
     const estilos: Record<string, number> = {};
     const estilosRaw = await prisma.usuario.groupBy({ by: ["estiloAlimentario"], where: { estiloAlimentario: { notIn: ["", "no_especificado"] } }, _count: true });
-    for (const e of estilosRaw) { if (e.estiloAlimentario) estilos[e.estiloAlimentario] = e._count; }
+    const ESTILO_LABELS: Record<string, string> = { carnivoro: "Carnívoro", vegetariano: "Vegetariano", vegano: "Vegano", omnivoro: "Como de todo" };
+    for (const e of estilosRaw) { if (e.estiloAlimentario) estilos[ESTILO_LABELS[e.estiloAlimentario] ?? e.estiloAlimentario] = e._count; }
 
     const top = (obj: Record<string, number>, n = 30) => Object.fromEntries(Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n));
 

@@ -33,7 +33,8 @@ export async function GET(req: NextRequest) {
             OR: [
               { nombre: { contains: q, mode: "insensitive" as const } },
               { comuna: { contains: q, mode: "insensitive" as const } },
-              { categorias: { hasSome: q.split(/\s+/).filter(w => w.length > 2) } },
+              // Match categories case-insensitive (capitalize first letter of each word)
+              { categorias: { hasSome: q.split(/\s+/).filter(w => w.length > 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) } },
               { descripcion: { contains: q, mode: "insensitive" as const } },
               // Also match each word individually in nombre
               ...q.split(/\s+/).filter(w => w.length > 2).map(w => ({ nombre: { contains: w, mode: "insensitive" as const } })),
