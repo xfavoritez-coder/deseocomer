@@ -571,14 +571,14 @@ export default function LocalDetailPage() {
                 {/* Sidebar: solo horarios — sticky a la derecha en desktop */}
                 {tieneSidebar && tieneHorarios && (
                 <div className="dc-local-sidebar" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
+                  <div className="dc-horarios-box" style={{ background: "rgba(255,255,255,0.03)", border: "0.5px solid rgba(232,168,76,0.1)", borderRadius: "14px", padding: "20px 24px" }}>
                     <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: "14px" }}>Horarios</p>
                     {local.horarios.map(h => {
                       const esHoy = h.dia === todayName;
                       return (
-                        <div key={h.dia} style={{ display: "flex", justifyContent: "space-between", padding: esHoy ? "9px 8px" : "9px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", background: esHoy ? "rgba(61,184,158,0.04)" : "transparent", borderRadius: esHoy ? "6px" : 0 }}>
-                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: esHoy ? "#3db89e" : "rgba(240,234,214,0.55)", fontWeight: esHoy ? 700 : 400 }}>{h.dia}{esHoy ? " · hoy" : ""}</span>
-                          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: h.cerrado ? "rgba(255,100,100,0.6)" : (esHoy ? "#3db89e" : "#f0ead6"), fontWeight: esHoy ? 700 : 400 }}>{h.cerrado ? "Cerrado" : `${h.abre} - ${h.cierra}`}</span>
+                        <div key={h.dia} className="dc-horario-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: esHoy ? "8px 10px" : "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)", background: esHoy ? "rgba(61,184,158,0.04)" : "transparent", borderRadius: esHoy ? "6px" : 0, gap: "12px" }}>
+                          <span className="dc-horario-dia" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: esHoy ? "#3db89e" : "rgba(240,234,214,0.55)", fontWeight: esHoy ? 700 : 400, whiteSpace: "nowrap" }}>{h.dia}{esHoy ? " · hoy" : ""}</span>
+                          <span className="dc-horario-hora" style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: h.cerrado ? "rgba(255,100,100,0.6)" : (esHoy ? "#3db89e" : "#f0ead6"), fontWeight: esHoy ? 700 : 400, whiteSpace: "nowrap", textAlign: "right" }}>{h.cerrado ? "Cerrado" : `${h.abre} - ${h.cierra}`}</span>
                         </div>
                       );
                     })}
@@ -755,6 +755,10 @@ export default function LocalDetailPage() {
           .dc-hero-nombre-row { flex-wrap: wrap; }
           .dc-hero-nombre-row h1 { flex-basis: 70%; flex-shrink: 1; }
           .dc-hero-acciones { flex-basis: 100%; justify-content: flex-start; }
+          .dc-horarios-box { padding: 14px 14px !important; }
+          .dc-horario-row { padding-left: 6px !important; padding-right: 6px !important; }
+          .dc-horario-dia { font-size: 0.8rem !important; }
+          .dc-horario-hora { font-size: 0.8rem !important; }
         }
       `}</style>
     </main>

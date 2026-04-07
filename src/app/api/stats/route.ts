@@ -20,17 +20,18 @@ function emptyStats(): StatsData {
   return { busquedas: {}, comunas: {}, categorias: {}, paginas: {}, promocionesVistas: {}, totalBusquedas: 0, totalFiltrosComunas: 0, totalFiltrosCategorias: 0, totalPromocionesVistas: 0, updatedAt: new Date().toISOString() };
 }
 
-// ── In-memory buffer: absorbs all incoming events, writes to DB max every 30s ──
-let pendingEvents: { tipo: string; valor: string }[] = [];
-let flushTimer: ReturnType<typeof setTimeout> | null = null;
-let flushing = false;
-
-async function flushToDB() {
-  if (flushing || pendingEvents.length === 0) return;
-  flushing = true;
-  const batch = pendingEvents.splice(0, 500);
-
+// POST: receive events and merge into stats (atomic upsert)
+export async function POST(req: NextRequest) {
   try {
+    const body = await req.json();
+    const eventos: { tipo: string; valor: string }[] = body.eventos;
+    if (!Array.isArray(eventos) || eventos.length === 0) {
+      return NextResponse.json({ ok: true });
+    }
+
+    const batch = eventos.slice(0, 50);
+
+    // Atomic read-modify-write using Prisma transaction
     await prisma.$transaction(async (tx) => {
       const row = await tx.configSite.findUnique({ where: { clave: CLAVE } });
       const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
@@ -62,6 +63,7 @@ async function flushToDB() {
         }
       }
 
+      // Keep only top 200 per category
       for (const key of ["busquedas", "comunas", "categorias", "paginas", "promocionesVistas"] as const) {
         const entries = Object.entries(stats[key]);
         if (entries.length > 200) {
@@ -78,47 +80,6 @@ async function flushToDB() {
         create: { id: CLAVE, clave: CLAVE, valor: JSON.stringify(stats) },
       });
     });
-  } catch (err) {
-    // Put events back if flush failed so they aren't lost
-    pendingEvents.unshift(...batch);
-    console.error("[Stats flush]", err);
-  } finally {
-    flushing = false;
-  }
-}
-
-function scheduleFlush() {
-  if (flushTimer) return;
-  flushTimer = setTimeout(() => {
-    flushTimer = null;
-    flushToDB();
-  }, 30000); // Write to DB max every 30 seconds
-}
-
-// POST: accept events instantly, buffer in memory, write to DB periodically
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const eventos: { tipo: string; valor: string }[] = body.eventos;
-    if (!Array.isArray(eventos) || eventos.length === 0) {
-      return NextResponse.json({ ok: true });
-    }
-
-    // Add to in-memory buffer (instant, no DB hit)
-    pendingEvents.push(...eventos.slice(0, 50));
-
-    // Cap buffer to prevent memory issues
-    if (pendingEvents.length > 5000) {
-      pendingEvents = pendingEvents.slice(-2000);
-    }
-
-    // Schedule a DB write if not already scheduled
-    scheduleFlush();
-
-    // If buffer is getting large, flush now
-    if (pendingEvents.length >= 200) {
-      flushToDB();
-    }
 
     return NextResponse.json({ ok: true });
   } catch {
@@ -126,12 +87,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: flush pending events first, then return fresh stats
+// GET: return stats for admin
 export async function GET() {
   try {
-    // Flush any pending events so admin sees up-to-date data
-    if (pendingEvents.length > 0) await flushToDB();
-
     const row = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
     const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
     return NextResponse.json(stats, {
