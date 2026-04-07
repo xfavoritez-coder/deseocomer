@@ -33,7 +33,19 @@ export async function POST(req: NextRequest) {
 
     // Simple read + write (no transaction needed for stats counters)
     const row = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
-    const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
+    const raw = row?.valor ? JSON.parse(row.valor) : {};
+    const stats: StatsData = {
+      busquedas: raw.busquedas ?? {},
+      comunas: raw.comunas ?? {},
+      categorias: raw.categorias ?? {},
+      paginas: raw.paginas ?? {},
+      promocionesVistas: raw.promocionesVistas ?? {},
+      totalBusquedas: raw.totalBusquedas ?? 0,
+      totalFiltrosComunas: raw.totalFiltrosComunas ?? 0,
+      totalFiltrosCategorias: raw.totalFiltrosCategorias ?? 0,
+      totalPromocionesVistas: raw.totalPromocionesVistas ?? 0,
+      updatedAt: raw.updatedAt ?? new Date().toISOString(),
+    };
 
     for (const e of batch) {
       const val = (e.valor ?? "").toLowerCase().trim();
@@ -90,7 +102,19 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const row = await prisma.configSite.findUnique({ where: { clave: CLAVE } });
-    const stats: StatsData = row?.valor ? JSON.parse(row.valor) : emptyStats();
+    const raw = row?.valor ? JSON.parse(row.valor) : {};
+    const stats: StatsData = {
+      busquedas: raw.busquedas ?? {},
+      comunas: raw.comunas ?? {},
+      categorias: raw.categorias ?? {},
+      paginas: raw.paginas ?? {},
+      promocionesVistas: raw.promocionesVistas ?? {},
+      totalBusquedas: raw.totalBusquedas ?? 0,
+      totalFiltrosComunas: raw.totalFiltrosComunas ?? 0,
+      totalFiltrosCategorias: raw.totalFiltrosCategorias ?? 0,
+      totalPromocionesVistas: raw.totalPromocionesVistas ?? 0,
+      updatedAt: raw.updatedAt ?? new Date().toISOString(),
+    };
     return NextResponse.json(stats, {
       headers: { "Cache-Control": "private, max-age=30" },
     });
