@@ -100,7 +100,7 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg-primary)" }}>
       {/* Mobile top bar */}
       <div className="dc-panel-mobilebar">
-        <Link href="/panel" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>🏮 DeseoComer</Link>
+        <Link href="/" style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.9rem", color: "var(--accent)", textDecoration: "none" }}>🏮 DeseoComer</Link>
         <button onClick={() => setMobileMenu(o => !o)} style={{ background: "none", border: "1px solid var(--border-color)", borderRadius: "8px", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent)", fontSize: "1.1rem", cursor: "pointer" }}>{mobileMenu ? "✕" : "☰"}</button>
       </div>
       {mobileMenu && (<>
@@ -229,7 +229,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
         .dc-panel-mobilemenu {
           position: fixed; top: 68px; right: 0; width: min(300px, 80vw); bottom: 0;
           background: rgba(13,7,3,0.98); border-left: 1px solid rgba(232,168,76,0.15);
-          z-index: 999; overflow-y: auto; animation: dcDrawerIn 0.2s ease;
+          z-index: 999; overflow-y: auto; -webkit-overflow-scrolling: touch;
+          padding-bottom: env(safe-area-inset-bottom, 20px);
+          animation: dcDrawerIn 0.2s ease;
         }
         @keyframes dcDrawerIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         @media (max-width: 767px) {

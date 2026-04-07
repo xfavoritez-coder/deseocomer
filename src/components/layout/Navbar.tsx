@@ -173,8 +173,11 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile: bell + hamburger grouped together */}
+        {/* Mobile: avatar + bell + hamburger grouped together */}
         <div className="dc-nav-mobile-right">
+          {isAuthenticated && user && (
+            <Link href="/perfil" className="dc-nav-avatar dc-nav-avatar--mobile" style={{ textDecoration: "none", width: 30, height: 30, fontSize: "0.65rem" }}>{user.nombre?.charAt(0).toUpperCase() ?? "U"}</Link>
+          )}
           {isAuthenticated && user && (
             <div ref={notifRef2} style={{ position: "relative" }}>
               <button onClick={() => { if (showNotifs) { setShowNotifs(false); } else { setShowNotifs(true); if (user?.id) { fetch(`/api/notificaciones?userId=${user.id}`).then(r => r.json()).then(d => { const nots = d.notificaciones ?? []; processNotifs(nots, 0); if ((d.noLeidas ?? 0) > 0) { fetch("/api/notificaciones", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ marcarTodas: true, userId: user?.id }) }).catch(() => {}); } }).catch(() => {}); } } }} style={{ background: "none", border: "none", cursor: "pointer", position: "relative", padding: "4px" }}>
@@ -223,7 +226,7 @@ export default function Navbar() {
       {menuOpen && (
         <>
           <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 1000, backdropFilter: "blur(2px)" }} />
-          <div style={{ position: "fixed", top: 0, right: 0, width: "min(320px, 80vw)", height: "100vh", background: "rgba(13,7,3,0.98)", borderLeft: "1px solid rgba(232,168,76,0.15)", zIndex: 1001, display: "flex", flexDirection: "column", animation: "dc-drawer-in 0.25s ease both", overflowY: "auto" }}>
+          <div style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "min(320px, 80vw)", background: "rgba(13,7,3,0.98)", borderLeft: "1px solid rgba(232,168,76,0.15)", zIndex: 1001, display: "flex", flexDirection: "column", animation: "dc-drawer-in 0.25s ease both", overflowY: "auto", WebkitOverflowScrolling: "touch" as any }}>
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", borderBottom: "1px solid rgba(232,168,76,0.08)" }}>
               <Link href="/" onClick={() => setMenuOpen(false)} style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "var(--accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: "8px" }}>🏮 DeseoComer</Link>
@@ -231,7 +234,7 @@ export default function Navbar() {
             </div>
 
             {/* Nav links */}
-            <nav style={{ padding: "8px 0", flex: 1 }}>
+            <nav style={{ padding: "8px 0" }}>
               {[
                 { href: "/concursos", label: "Concursos", icon: "🏆" },
                 { href: "/promociones", label: "Promociones", icon: "⚡" },
@@ -246,13 +249,14 @@ export default function Navbar() {
               })}
             </nav>
 
-            {/* User section */}
-            <div style={{ padding: "20px 24px", borderTop: "1px solid rgba(232,168,76,0.08)" }}>
+            {/* Separator + User section — right after nav links */}
+            <div style={{ height: 1, background: "rgba(232,168,76,0.12)", margin: "4px 24px" }} />
+            <div style={{ padding: "16px 24px" }}>
               {mounted && isLocalLoggedIn ? (
                 <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</div>
-                    <div><p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#3db89e", margin: 0 }}>{localName}</p><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", margin: 0 }}>Local asociado</p></div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: localSession?.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden" }}>{localSession?.logoUrl ? <img src={localSession.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : localInitials}</div>
+                    <div><p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#3db89e", margin: 0 }}>{localName}</p><p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", margin: 0 }}>Local asociado</p></div>
                   </div>
                   {[
                     { href: "/panel", label: "Mi Panel", color: "#3db89e" },
@@ -266,13 +270,13 @@ export default function Navbar() {
                 </div>
               ) : mounted && isAuthenticated && user ? (
                 <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
+                    <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>
                       {user.nombre?.charAt(0).toUpperCase() ?? "U"}
                     </div>
                     <div>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "var(--accent)", margin: 0 }}>{displayName}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", margin: 0 }}>Miembro de DeseoComer</p>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "var(--accent)", margin: 0 }}>{displayName}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "var(--text-muted)", margin: 0 }}>Miembro de DeseoComer</p>
                     </div>
                   </div>
                   {[
@@ -291,7 +295,7 @@ export default function Navbar() {
               ) : mounted ? (
                 <div>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "12px", textAlign: "center" }}>Únete gratis o inicia sesión</p>
-                  <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700, marginBottom: "12px" }}>Entrar</Link>
+                  <Link href="/login" onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "14px 20px", background: "var(--accent)", borderRadius: "12px", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--bg-primary)", textDecoration: "none", textAlign: "center", fontWeight: 700 }}>Entrar</Link>
                 </div>
               ) : null}
             </div>
