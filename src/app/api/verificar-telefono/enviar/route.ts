@@ -4,6 +4,15 @@ import { enviarCodigoSMS } from "@/lib/twilio";
 
 export async function POST(req: NextRequest) {
   try {
+    // Debug: log env var availability
+    const envCheck = {
+      hasSid: !!process.env.TWILIO_ACCOUNT_SID,
+      hasToken: !!process.env.TWILIO_AUTH_TOKEN,
+      hasVerify: !!process.env.TWILIO_VERIFY_SERVICE_SID,
+      verifyPrefix: process.env.TWILIO_VERIFY_SERVICE_SID?.substring(0, 4) ?? "NONE",
+    };
+    console.log("[SMS enviar] env check:", JSON.stringify(envCheck));
+
     const { userId, telefono } = await req.json();
     if (!userId || !telefono) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
 
@@ -50,6 +59,7 @@ export async function POST(req: NextRequest) {
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);
     console.error("[SMS enviar]", msg, error);
-    return NextResponse.json({ error: `Error al enviar SMS: ${msg}` }, { status: 500 });
+    const debug = `SID:${!!process.env.TWILIO_ACCOUNT_SID} TOKEN:${!!process.env.TWILIO_AUTH_TOKEN} VERIFY:${!!process.env.TWILIO_VERIFY_SERVICE_SID}`;
+    return NextResponse.json({ error: `Error al enviar SMS: ${msg} [${debug}]` }, { status: 500 });
   }
 }
