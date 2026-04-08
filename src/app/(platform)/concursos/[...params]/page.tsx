@@ -767,7 +767,7 @@ function ConcursoDetallePage() {
                   <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>Sorteo</span>
                 </div>
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>Más boletos = más chances. Invita amigos para aumentar tu probabilidad.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>🎯 Más boletos = más chances. Invita amigos para aumentar tu probabilidad.</p>
             </div>
           )}
 
