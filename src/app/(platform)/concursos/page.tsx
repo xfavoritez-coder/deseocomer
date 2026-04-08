@@ -311,7 +311,7 @@ export default function ConcursosPage() {
                       <div className="dc-sorteo-badge" style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: 20, padding: "4px 10px 4px 8px", display: "flex", alignItems: "center", gap: 5, cursor: "default" }}>
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
                         <div className="dc-sorteo-tip" style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, width: 220, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 12, padding: "10px 12px", zIndex: 10, display: "none", pointerEvents: "none" }}>
-                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. <strong style={{ color: "#ec4899" }}>Más puntos, más chances</strong> de ganar.</p>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y <strong style={{ color: "#e8a84c" }}>cualquiera puede ganar</strong>.</p>
                         </div>
                       </div>
                     )}
@@ -412,8 +412,8 @@ export default function ConcursosPage() {
 
                     {/* Participantes / En espera */}
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.estado === "programado" ? "En espera" : c.modalidadConcurso === "sorteo" ? "Boletos en juego" : "Participantes"}</span>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : c.modalidadConcurso === "sorteo" ? "#ec4899" : "rgba(240,234,214,0.5)", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>{c.estado === "programado" ? `${c.listaEsperaCount ?? 0} personas` : c.modalidadConcurso === "sorteo" ? <>{c.participantes} 🎟️</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(240,234,214,0.35)" style={{ flexShrink: 0 }}><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>{c.participantes}</>}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.3)" }}>{c.estado === "programado" ? "En espera" : "Participantes"}</span>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.estado === "programado" ? "#a78bfa" : "rgba(240,234,214,0.5)", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>{c.estado === "programado" ? `${c.listaEsperaCount ?? 0} personas` : <><svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(240,234,214,0.35)" style={{ flexShrink: 0 }}><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>{c.participantes}</>}</span>
                     </div>
 
                     {/* Top 3 */}
@@ -429,7 +429,7 @@ export default function ConcursosPage() {
                             <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 0", borderBottom: i < c.ranking.length - 1 ? "1px solid rgba(232,168,76,0.05)" : "none" }}>
                               <div style={{ width: 18, height: 18, borderRadius: "50%", background: posC.bg, border: `1px solid ${posC.bd}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 700, color: posC.c, flexShrink: 0 }}>{i + 1}</div>
                               <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.6)", textTransform: "capitalize" }}>{(() => { const parts = (r.nombre as string).trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
-                              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: c.modalidadConcurso === "sorteo" ? "rgba(236,72,153,0.5)" : "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} {c.modalidadConcurso === "sorteo" ? "🎟️" : "refs"}</span>
+                              {c.modalidadConcurso !== "sorteo" && <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.28)", letterSpacing: "0.04em" }}>{r.refs} refs</span>}
                             </div>
                           );
                         })}

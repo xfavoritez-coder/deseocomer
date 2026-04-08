@@ -516,9 +516,9 @@ function ConcursoDetallePage() {
   const rankingBlock = (
     <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden", position: "relative" }}>
       {supportError && <div style={{ padding: "10px 14px", background: "rgba(255,80,80,0.1)", borderBottom: "1px solid rgba(255,80,80,0.2)", fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", textAlign: "center" }}>{supportError} <a href="/verificar-email" style={{ color: "#e8a84c", fontWeight: 700 }}>Reenviar verificación →</a></div>}
-      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
+      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>{esSorteo ? "🎲 participantes del sorteo" : "🏆 tabla de posiciones"}</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
-        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "rgba(120,140,220,0.8)" }}>Ranking en tiempo real</span>
+        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "rgba(120,140,220,0.8)" }}>{esSorteo ? `${ranking.length} participando` : "Ranking en tiempo real"}</span>
         <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>↻ cada 30 seg</span>
       </div>
       {ranking.length === 0 ? (
@@ -563,7 +563,11 @@ function ConcursoDetallePage() {
           const alreadySupported = supportedMap[supportKey];
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderBottom: "1px solid rgba(61,100,210,0.1)", background: isMe ? "rgba(100,140,255,0.1)" : "transparent", border: isMe ? "1px solid rgba(100,140,255,0.2)" : undefined, borderRadius: isMe ? 8 : 0, position: "relative" }}>
-              <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
+              {!esSorteo ? (
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: posColors.bg, border: `1px solid ${posColors.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: posColors.color, flexShrink: 0 }}>{i + 1}</div>
+              ) : (
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>🎲</div>
+              )}
               {r.fotoUrl ? (
                 <img src={r.fotoUrl} alt="" style={{ width: 26, height: 26, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(232,168,76,0.2)" }} />
               ) : (
@@ -575,31 +579,8 @@ function ConcursoDetallePage() {
                 <Link href={`/usuario/${(r as any).codigoRef || (r as any).usuarioId}`} style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize", textDecoration: "none" }}>{r.nombre}</Link>
               )}
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
-              {esSorteo && probPct > 0 && (() => {
-                const nombre1 = r.nombre.trim().split(/\s+/)[0];
-                const ttKey = `sorteo_${supportKey}`;
-                return (
-                  <div style={{ position: "relative" }}>
-                    <button onClick={(e) => { e.stopPropagation(); if (tooltipActivo === ttKey) { setTooltipActivo(null); return; } const rect = e.currentTarget.getBoundingClientRect(); const el = document.getElementById(ttKey); if (el) { el.style.top = `${rect.top - 8}px`; el.style.right = `${window.innerWidth - rect.right}px`; } setTooltipActivo(ttKey); setTimeout(() => setTooltipActivo(v => v === ttKey ? null : v), 6000); }} style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 52, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                      <div style={{ flex: 1, height: 4, background: "rgba(236,72,153,0.1)", borderRadius: 4, overflow: "hidden", minWidth: 28 }}>
-                        <div style={{ width: `${Math.max(8, probPct)}%`, height: "100%", background: isMe ? "linear-gradient(to right, #ec4899, #f472b6)" : "rgba(236,72,153,0.4)", borderRadius: 4, transition: "width 0.3s" }} />
-                      </div>
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: isMe ? "#ec4899" : "rgba(236,72,153,0.5)", whiteSpace: "nowrap" }}>{probPct}%</span>
-                    </button>
-                    {tooltipActivo === ttKey && <>
-                      <div onClick={() => setTooltipActivo(null)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
-                      <div id={ttKey} style={{ position: "fixed", transform: "translateY(-100%)", width: 240, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.55, margin: 0 }}>
-                          {isMe ? "Tienes" : `${nombre1} tiene`} <strong style={{ color: "#ec4899" }}>{r.referidos}</strong> de los <strong style={{ color: "#f5d080" }}>{totalBoletosRanking}</strong> boletos totales. {isMe ? "Tendrías" : "Tendría"} un <strong style={{ color: "#ec4899" }}>{probPct}%</strong> de chances de ganar este sorteo.
-                          {isMe && <><br/><span style={{ color: "rgba(232,168,76,0.7)" }}>Invita amigos para sumar más boletos y aumentar tu %.</span></>}
-                          {" "}<span style={{ color: "rgba(240,234,214,0.4)" }}>Cualquiera dentro puede ganar.</span>
-                        </p>
-                      </div>
-                    </>}
-                  </div>
-                );
-              })()}
+              {!esSorteo && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>}
+              {esSorteo && <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)" }}>participando</span>}
               {!isMe && (
                 <button onClick={() => { if (!isAuthenticated) { setTooltipActivo("nologin_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } if (!isParticipating) { setTooltipActivo("noparticipa_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } handleSupport(r.nombre, supportKey, rAny.usuarioId || ""); }} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
@@ -732,8 +713,8 @@ function ConcursoDetallePage() {
               <div onClick={() => setSorteoInfoOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 3 }} />
               <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 260, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 14, padding: "14px 16px", zIndex: 4, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
                 <div style={{ position: "absolute", top: -6, right: 20, width: 12, height: 12, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRight: "none", borderBottom: "none", transform: "rotate(45deg)" }} />
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#ec4899", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>🎲 Modalidad sorteo</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto que acumulas es un boleto — <strong style={{ color: "#ec4899" }}>más puntos = más chances</strong> de ganar.</p>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>🎲 Modalidad sorteo</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y cualquiera dentro puede ganar.</p>
               </div>
             </>}
           </div>
@@ -767,24 +748,24 @@ function ConcursoDetallePage() {
                 <span style={{ fontSize: 16 }}>🎲</span>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Modalidad sorteo</p>
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.65)", lineHeight: 1.7, marginBottom: 12 }}>En este concurso <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong>. Cada punto que acumulas se convierte en un boleto. Al cierre, el sistema sortea un boleto al azar entre todos.</p>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(10,8,18,0.4)", borderRadius: 12, padding: "12px 16px" }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  <span style={{ fontSize: 18 }}>🎟️</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>1 punto</span>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.65)", lineHeight: 1.7, marginBottom: 12 }}>En este concurso <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong> entre todos los participantes. Es completamente gratis — solo entra y ya estás participando.</p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, background: "rgba(10,8,18,0.4)", borderRadius: 12, padding: "14px 16px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 20 }}>✅</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Entra gratis</span>
                 </div>
-                <span style={{ color: "rgba(232,168,76,0.3)", fontSize: 14 }}>=</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  <span style={{ fontSize: 18 }}>🎟️</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>1 boleto</span>
+                <span style={{ color: "rgba(232,168,76,0.25)", fontSize: 16 }}>→</span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 20 }}>📲</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Invita amigos</span>
                 </div>
-                <span style={{ color: "rgba(232,168,76,0.25)", fontSize: 16, margin: "0 2px" }}>→</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  <span style={{ fontSize: 22 }}>🎲</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>Sorteo</span>
+                <span style={{ color: "rgba(232,168,76,0.25)", fontSize: 16 }}>→</span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 20 }}>🎲</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>Se sortea</span>
                 </div>
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>🎯 Más boletos = más chances. Invita amigos para aumentar tu probabilidad.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>Cualquiera dentro puede ganar. Invita amigos para que ellos también participen.</p>
             </div>
           )}
 
@@ -977,10 +958,9 @@ function ConcursoDetallePage() {
                 </div>
               ) : isAuthenticated && !isParticipating ? (
                 <div style={{ marginTop: 16 }}>
-                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: esSorteo ? "#ec4899" : "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : esSorteo ? "🎲 Entrar al sorteo" : "🎉 Unirme al concurso"}</button>
+                  <button onClick={handleJoin} disabled={joinLoading} style={{ display: "block", width: "100%", background: "#e8a84c", color: "#0a0812", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", padding: 14, borderRadius: 10, border: "none", cursor: joinLoading ? "wait" : "pointer", textAlign: "center", letterSpacing: "0.06em" }}>{joinLoading ? "Uniéndote..." : esSorteo ? "Entrar gratis al sorteo" : "🎉 Unirme al concurso"}</button>
                   {joinError && <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "#ff8c00", textAlign: "center", marginTop: 8 }}>{joinError}</p>}
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>{esSorteo ? "Solo por entrar ya tienes tu primer boleto 🎟️" : "Entra gratis y sube en el ranking para ganar"}</p>
-                  {esSorteo && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(236,72,153,0.5)", textAlign: "center", marginTop: 4 }}>🎲 Cualquier participante puede ganar — no necesitas ser el #1</p>}
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 8 }}>{esSorteo ? "Es gratis. Al cierre se elige un ganador al azar entre todos" : "Entra gratis y sube en el ranking para ganar"}</p>
                 </div>
               ) : !isAuthenticated ? (
                 <div style={{ marginTop: 16 }}>
@@ -1017,10 +997,30 @@ function ConcursoDetallePage() {
             );
           })()}
 
-          {/* 6. Cómo se gana */}
-          {!isEnded && (
+          {/* 6. Cómo se gana / Cómo funciona el sorteo */}
+          {!isEnded && esSorteo && (
             <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>{esSorteo ? "Tus boletos en el sorteo" : "Cómo se gana"}</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo funciona</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                {[
+                  { num: "1", icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
+                  { num: "2", icon: "📲", title: "Invita amigos", desc: "Comparte tu link para que tus amigos también participen." },
+                  { num: "3", icon: "🎲", title: "Se sortea el ganador", desc: "Al cierre, se elige un ganador al azar entre todos. Cualquiera puede ganar." },
+                ].map((paso, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 0", borderBottom: i < 2 ? "1px solid rgba(232,168,76,0.06)" : "none" }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: i === 2 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === 2 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{paso.icon}</div>
+                    <div>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", margin: "0 0 3px" }}>{paso.title}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>{paso.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {!isEnded && !esSorteo && (
+            <div>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
                 {[
   { icon: "🎟️", pts: "+1", label: "Al entrar", id: "tt1", ttTitle: "Al entrar al concurso", ttText: "Por unirte ganas 1 punto base. Si entraste por el link de un amigo, ambos ganan 3 puntos adicionales automáticamente.", ttPts: "+1 punto (o +4 si entraste por un link)" },
@@ -1090,7 +1090,7 @@ function ConcursoDetallePage() {
                   <span style={{ fontSize: 14 }}>🎲</span>
                   <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Modalidad sorteo</span>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. Más puntos, más chances de ganar. Cualquier participante puede llevarse el premio.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y cualquiera dentro puede ganar.</p>
               </div>
             ) : (
               <button onClick={() => setSorteoReminderOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
@@ -1101,29 +1101,13 @@ function ConcursoDetallePage() {
             )
           )}
 
-          {/* Contador de boletos del usuario */}
-          {esSorteo && isParticipating && !isEnded && (() => {
-            const misPuntos = ranking.find(r => {
-              const myName = user?.nombre?.split(" ")[0] ?? "";
-              return r.nombre.startsWith(myName);
-            })?.referidos ?? 1;
-            const totalBoletos = ranking.reduce((acc, r) => acc + Math.max(1, r.referidos), 0);
-            const prob = totalBoletos > 0 ? Math.round((Math.max(1, misPuntos) / totalBoletos) * 100) : 0;
-            return (
-              <div className="dc-boletos-card" style={{ background: "linear-gradient(135deg, rgba(236,72,153,0.1), rgba(168,85,247,0.06))", border: "1px solid rgba(236,72,153,0.3)", borderRadius: 16, padding: "18px 20px", marginTop: 12, textAlign: "center", position: "relative", overflow: "hidden" }}>
-                <div className="dc-boletos-shimmer" />
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 26, color: "#ec4899", fontWeight: 700, margin: "0 0 6px", position: "relative", zIndex: 1 }}>{misPuntos} boleto{misPuntos !== 1 ? "s" : ""} 🎟️</p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 8, position: "relative", zIndex: 1 }}>
-                  <div style={{ flex: 1, maxWidth: 160, height: 6, background: "rgba(236,72,153,0.1)", borderRadius: 6, overflow: "hidden" }}>
-                    <div style={{ width: `${Math.max(5, prob)}%`, height: "100%", background: "linear-gradient(to right, #ec4899, #f472b6)", borderRadius: 6, transition: "width 0.5s" }} />
-                  </div>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#ec4899", fontWeight: 700 }}>~{prob}%</span>
-                </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", margin: "0 0 10px", position: "relative", zIndex: 1 }}>de probabilidad de ganar</p>
-                <button onClick={() => { const el = document.querySelector('.dc-cd-cta-btn, [style*="WhatsApp"]') as HTMLElement; if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); else copyLink(); }} style={{ background: "rgba(236,72,153,0.15)", border: "1px solid rgba(236,72,153,0.3)", borderRadius: 10, padding: "8px 18px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#f472b6", cursor: "pointer", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", position: "relative", zIndex: 1 }}>Sumar más boletos →</button>
-              </div>
-            );
-          })()}
+          {/* Sorteo — mensaje de confirmación */}
+          {esSorteo && isParticipating && !isEnded && (
+            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: "16px 20px", marginTop: 12, textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", fontWeight: 700, margin: "0 0 6px" }}>✅ Ya estás dentro del sorteo</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>Invita amigos para que ellos también tengan la oportunidad de ganar</p>
+            </div>
+          )}
 
           {/* 6.6 Descripción completa del premio (si fue truncada en hero) */}
           {c.descripcionPremio && c.descripcionPremio.length > 120 && (

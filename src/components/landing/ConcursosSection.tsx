@@ -157,7 +157,7 @@ export default function ConcursosSection() {
                     <div className="dc-sorteo-badge" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 5, background: "rgba(236,72,153,0.9)", borderRadius: "20px", padding: "4px 10px 4px 8px", display: "flex", alignItems: "center", gap: "5px", cursor: "default" }}>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
                       <div className="dc-sorteo-tip" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 220, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 12, padding: "10px 12px", zIndex: 10, display: "none", pointerEvents: "none" }}>
-                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. <strong style={{ color: "#ec4899" }}>Más puntos, más chances</strong> de ganar.</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y <strong style={{ color: "#e8a84c" }}>cualquiera puede ganar</strong>.</p>
                       </div>
                     </div>
                   )}
@@ -239,7 +239,7 @@ export default function ConcursosSection() {
                   {/* Footer */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "5px" }}>
-                      {esProgramado ? <>{c.listaEspera ?? 0} en espera</> : c.modalidadConcurso === "sorteo" ? <>🎟️ {c.participantes} boleto{c.participantes !== 1 ? "s" : ""}</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
+                      {esProgramado ? <>{c.listaEspera ?? 0} en espera</> : <>👥 {c.participantes} participante{c.participantes !== 1 ? "s" : ""}</>}
                     </span>
                     {!ended && (
                       <span className={esProgramado ? "dc-cst-btn dc-cst-btn-prog" : esUrgente ? "dc-cst-btn dc-cst-btn-urgent" : c.modalidadConcurso === "sorteo" ? "dc-cst-btn dc-cst-btn-sorteo" : "dc-cst-btn"} style={{
