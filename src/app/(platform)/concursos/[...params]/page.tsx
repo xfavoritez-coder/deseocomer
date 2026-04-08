@@ -119,6 +119,13 @@ function ConcursoDetallePage() {
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
           setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fotoGanador: data.fotoGanador ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0, descalificados: data.descalificados ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.slug || data.id);
+          // Mark participation checked from initial load data
+          if (user && data.participantes) {
+            const me = (data.participantes as { usuarioId?: string; puntos?: number }[]).find(p => p.usuarioId === user.id);
+            setIsParticipating(!!me);
+            if (me) setMyRefs(me.puntos ?? 0);
+            setParticipationChecked(true);
+          }
           // Redirect from ID to slug if needed
           if (data.slug && slug !== data.slug && slug === data.id) {
             window.history.replaceState(null, "", `/concursos/${data.slug}`);
@@ -167,6 +174,10 @@ function ConcursoDetallePage() {
   const [supportedMap, setSupportedMap] = useState<Record<string, boolean>>({});
   const [isParticipating, setIsParticipating] = useState(false);
   const [participationChecked, setParticipationChecked] = useState(false);
+  // If not authenticated, no need to check participation — mark as checked immediately
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) setParticipationChecked(true);
+  }, [authLoading, isAuthenticated]);
   const [esLocal, setEsLocal] = useState(false);
   const [localId, setLocalId] = useState<string | null>(null);
   useEffect(() => {
@@ -240,8 +251,8 @@ function ConcursoDetallePage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usuarioId: user.id, referidoPor: refUserId }),
     }).then(() => {
-      // Reload ranking from DB
-      fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
+      // Reload ranking from lightweight endpoint
+      fetch(`/api/concursos/${encodeURIComponent(slug)}/ranking`).then(r => r.ok ? r.json() : null).then(data => {
         if (data) {
           const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" }));
           setRanking(newRanking);
@@ -251,9 +262,10 @@ function ConcursoDetallePage() {
     setRefToast(true); setTimeout(() => setRefToast(false), 4000);
   }, [authLoading, isAuthenticated, user, concursoId, refUserId]);
 
+  const initialLoadDone = useRef(false);
   const refreshRanking = useCallback(() => {
     if (!slug) return;
-    fetch(`/api/concursos/${encodeURIComponent(slug)}`).then(r => r.ok ? r.json() : null).then(data => {
+    fetch(`/api/concursos/${encodeURIComponent(slug)}/ranking`).then(r => r.ok ? r.json() : null).then(data => {
       if (data) {
         const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
         setRanking(newRanking);
@@ -282,7 +294,13 @@ function ConcursoDetallePage() {
     }).catch(() => {});
   }, [slug, user, isAuthenticated]);
 
-  useEffect(() => { refreshRanking(); const iid = setInterval(refreshRanking, 30_000); return () => clearInterval(iid); }, [refreshRanking]);
+  useEffect(() => {
+    // Skip first call — initial data already comes from the main fetch
+    if (!initialLoadDone.current) { initialLoadDone.current = true; }
+    else { refreshRanking(); }
+    const iid = setInterval(refreshRanking, 30_000);
+    return () => clearInterval(iid);
+  }, [refreshRanking]);
   useEffect(() => { if (user) setMyRefs(getRefCount(concursoId, user.id)); }, [user, concursoId]);
 
   useEffect(() => {

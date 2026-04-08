@@ -18,7 +18,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     // Fire-and-forget view count
     prisma.$executeRawUnsafe('UPDATE "Concurso" SET "vistas" = "vistas" + 1 WHERE "id" = $1', concurso.id).catch(() => {});
 
-    return NextResponse.json(concurso);
+    return NextResponse.json(concurso, {
+      headers: {
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=30",
+      },
+    });
   } catch (error) {
     console.error("[API /concursos/[id]] Error:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
