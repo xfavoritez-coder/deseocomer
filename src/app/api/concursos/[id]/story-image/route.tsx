@@ -176,7 +176,10 @@ export async function GET(
             {theme.headerText}
           </span>
           {/* Prize title */}
-          <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.03em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9), 1px 0 0 currentColor, -1px 0 0 currentColor" }}>{"\u{1F3C6}"} {concurso.premio}</span>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", textAlign: "center" }}>
+            <span style={{ fontSize: `${Math.round(titleSize * 0.7)}px`, lineHeight: 1, flexShrink: 0 }}>{"\u{1F3C6}"}</span>
+            <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", lineHeight: "1.15", letterSpacing: "0.03em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9), 1px 0 0 currentColor, -1px 0 0 currentColor" }}>{concurso.premio}</span>
+          </div>
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Description text */}
