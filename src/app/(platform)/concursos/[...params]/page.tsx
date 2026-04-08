@@ -576,14 +576,29 @@ function ConcursoDetallePage() {
               )}
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
               <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
-              {esSorteo && probPct > 0 && (
-                <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 52 }}>
-                  <div style={{ flex: 1, height: 4, background: "rgba(236,72,153,0.1)", borderRadius: 4, overflow: "hidden", minWidth: 28 }}>
-                    <div style={{ width: `${Math.max(8, probPct)}%`, height: "100%", background: isMe ? "linear-gradient(to right, #ec4899, #f472b6)" : "rgba(236,72,153,0.4)", borderRadius: 4, transition: "width 0.3s" }} />
+              {esSorteo && probPct > 0 && (() => {
+                const nombre1 = r.nombre.trim().split(/\s+/)[0];
+                const ttKey = `sorteo_${supportKey}`;
+                return (
+                  <div style={{ position: "relative" }}>
+                    <button onClick={(e) => { e.stopPropagation(); setTooltipActivo(tooltipActivo === ttKey ? null : ttKey); setTimeout(() => setTooltipActivo(v => v === ttKey ? null : v), 5000); }} style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 52, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                      <div style={{ flex: 1, height: 4, background: "rgba(236,72,153,0.1)", borderRadius: 4, overflow: "hidden", minWidth: 28 }}>
+                        <div style={{ width: `${Math.max(8, probPct)}%`, height: "100%", background: isMe ? "linear-gradient(to right, #ec4899, #f472b6)" : "rgba(236,72,153,0.4)", borderRadius: 4, transition: "width 0.3s" }} />
+                      </div>
+                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: isMe ? "#ec4899" : "rgba(236,72,153,0.5)", whiteSpace: "nowrap" }}>{probPct}%</span>
+                    </button>
+                    {tooltipActivo === ttKey && (
+                      <div style={{ position: "absolute", bottom: "calc(100% + 8px)", right: 0, width: 230, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.55, margin: 0 }}>
+                          {isMe ? "Tienes" : `${nombre1} tiene`} <strong style={{ color: "#ec4899" }}>{r.referidos}</strong> de los <strong style={{ color: "#f5d080" }}>{totalBoletosRanking}</strong> boletos totales. {isMe ? "Tendrías" : "Tendría"} un <strong style={{ color: "#ec4899" }}>{probPct}%</strong> de chances de ganar este sorteo.
+                          {isMe && <><br/><span style={{ color: "rgba(232,168,76,0.7)" }}>Invita amigos para sumar más boletos y aumentar tu %.</span></>}
+                          {" "}<span style={{ color: "rgba(240,234,214,0.4)" }}>Cualquiera dentro puede ganar.</span>
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <span title="Probabilidad de ganar" style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: isMe ? "#ec4899" : "rgba(236,72,153,0.5)", cursor: "help", whiteSpace: "nowrap" }}>{probPct}%</span>
-                </div>
-              )}
+                );
+              })()}
               {!isMe && (
                 <button onClick={() => { if (!isAuthenticated) { setTooltipActivo("nologin_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } if (!isParticipating) { setTooltipActivo("noparticipa_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } handleSupport(r.nombre, supportKey, rAny.usuarioId || ""); }} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
