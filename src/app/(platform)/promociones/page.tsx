@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
@@ -39,7 +39,11 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
   return null;
 }
 
-export default function PromocionesPage() {
+export default function PromocionesWrapper() {
+  return <Suspense><PromocionesPage /></Suspense>;
+}
+
+function PromocionesPage() {
   const searchParams = useSearchParams();
   const { addInteraccion } = useGenie();
   const { isAuthenticated } = useAuth();

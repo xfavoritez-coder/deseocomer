@@ -307,9 +307,12 @@ export default function ConcursosPage() {
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#e05555", textTransform: "uppercase" }}>¡Termina hoy!</span>
                       </div>
                     )}
-                    {esNuevo && (
-                      <div style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(61,184,158,0.5)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: "#3db89e", textTransform: "uppercase" }}>Nuevo</span>
+                    {c.modalidadConcurso === "sorteo" && !esTerminaHoy && !ended && c.estado !== "programado" && (
+                      <div className="dc-sorteo-badge" style={{ position: "absolute", top: 12, left: 12, zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: 20, padding: "4px 10px 4px 8px", display: "flex", alignItems: "center", gap: 5, cursor: "default" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
+                        <div className="dc-sorteo-tip" style={{ position: "absolute", top: "calc(100% + 8px)", left: 0, width: 220, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 12, padding: "10px 12px", zIndex: 10, display: "none", pointerEvents: "none" }}>
+                          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. <strong style={{ color: "#ec4899" }}>Más puntos, más chances</strong> de ganar.</p>
+                        </div>
                       </div>
                     )}
                     {ended && c.estado !== "programado" && (
@@ -322,11 +325,7 @@ export default function ConcursosPage() {
                         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 10, fontWeight: 800, letterSpacing: "0.08em", color: "#0a0812", textTransform: "uppercase" }}>🔮 Próximamente</span>
                       </div>
                     )}
-                    {c.modalidadConcurso === "sorteo" && (
-                      <div style={{ position: "absolute", bottom: 12, left: 12, zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center" }}>
-                        <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, fontWeight: 800, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
-                      </div>
-                    )}
+                    {/* Sorteo badge moved to top-left */}
 
                   </div>
 
@@ -499,8 +498,9 @@ export default function ConcursosPage() {
           .dc-cp-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
         }
         @media (min-width: 1024px) {
-          .dc-cp-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+          .dc-cp-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
         }
+        .dc-sorteo-badge:hover .dc-sorteo-tip { display: block !important; }
       `}</style>
     </main>
   );

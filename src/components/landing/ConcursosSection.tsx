@@ -153,9 +153,12 @@ export default function ConcursosSection() {
                     <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: badgeDot, animation: ended ? "none" : `dc-pulse-dot ${esUrgente ? "0.8s" : "1.8s"} ease-in-out infinite` }} />
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.08em", color: badgeColor, textTransform: "uppercase" }}>{badgeText}</span>
                   </div>
-                  {c.modalidadConcurso === "sorteo" && (
-                    <div style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 3, background: "rgba(236,72,153,0.9)", borderRadius: "20px", padding: "4px 10px" }}>
+                  {c.modalidadConcurso === "sorteo" && !ended && c.estado !== "programado" && (
+                    <div className="dc-sorteo-badge" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 5, background: "rgba(236,72,153,0.9)", borderRadius: "20px", padding: "4px 10px 4px 8px", display: "flex", alignItems: "center", gap: "5px", cursor: "default" }}>
                       <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.08em", color: "#fff", textTransform: "uppercase" }}>🎲 Sorteo</span>
+                      <div className="dc-sorteo-tip" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 220, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 12, padding: "10px 12px", zIndex: 10, display: "none", pointerEvents: "none" }}>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.5, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. <strong style={{ color: "#ec4899" }}>Más puntos, más chances</strong> de ganar.</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -290,9 +293,10 @@ export default function ConcursosSection() {
           .dc-cst-btn-urgent { background: #e05555 !important; color: #fff !important; border-color: #e05555 !important; }
           .dc-cst-btn-prog { background: rgba(167,139,250,0.15) !important; color: #a78bfa !important; border-color: rgba(167,139,250,0.4) !important; }
           .dc-cst-btn-sorteo { background: rgba(236,72,153,0.15) !important; color: #ec4899 !important; border-color: rgba(236,72,153,0.4) !important; }
+          .dc-sorteo-badge:hover .dc-sorteo-tip { display: block !important; }
         }
         @media (min-width: 1024px) {
-          .dc-cst-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+          .dc-cst-grid { grid-template-columns: repeat(3, 1fr); }
           .dc-cst-premio { font-size: 24px; }
         }
         @media (max-width: 767px) {
