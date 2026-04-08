@@ -1034,7 +1034,7 @@ function ConcursoDetallePage() {
               <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 16, padding: 20, marginTop: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
                   <div style={{ flex: 1, height: 1, background: "rgba(232,168,76,0.2)" }} />
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.14em", textTransform: "uppercase" }}>Cadena de referidos</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", letterSpacing: "0.14em", textTransform: "uppercase" }}>Red de referidos</span>
                   <div style={{ flex: 1, height: 1, background: "rgba(232,168,76,0.2)" }} />
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
