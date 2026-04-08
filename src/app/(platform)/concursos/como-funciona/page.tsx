@@ -77,7 +77,7 @@ export default async function ComoFuncionaPage() {
             <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 16, padding: 24 }}>
               <p style={{ fontSize: 36, marginBottom: 8 }}>🎲</p>
               <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#ec4899", marginBottom: 8 }}>Concurso de sorteo</h3>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Se sortea entre todos los participantes. Cada punto que acumulas es un boleto — más boletos, más chances de ganar.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>El ganador se elige al azar entre todos los participantes. Entra gratis y ya estás participando — cualquiera dentro puede ganar.</p>
             </div>
           </div>
         </section>
@@ -106,10 +106,11 @@ export default async function ComoFuncionaPage() {
           </div>
         </section>
 
-        {/* Sistema de puntos */}
+        {/* Concurso de méritos */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>El sistema</p>
-          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>¿Cómo se ganan puntos?</h2>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>🏆 Modalidad méritos</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "12px", lineHeight: 1.3 }}>¿Cómo se gana en méritos?</h2>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem,1.5vw,1rem)", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto clamp(28px,4vw,48px)" }}>Gana quien más puntos acumule al cierre. Invita amigos, sube en el ranking y llévate el premio.</p>
 
           <div className="cf-puntos">
             {[
@@ -145,12 +146,7 @@ export default async function ComoFuncionaPage() {
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Bonus madrugador ⚡</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Los primeros 10 participantes de cada concurso reciben +2 puntos extra automáticamente. ¡Entra rápido cuando se publique un concurso nuevo!</p>
-          </div>
-
-          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
-            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Trae amigos que ya están en DeseoComer</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Si tienes amigos que ya están registrados, puedes invitarlos a participar en cada concurso. Comparte tu link o código personal y gana +1 punto por cada uno que participe. Tu código aparece en la página de cada concurso cuando estás participando.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Los primeros 10 participantes de cada concurso de méritos reciben +2 puntos extra automáticamente. ¡Entra rápido cuando se publique un concurso nuevo!</p>
           </div>
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
@@ -169,7 +165,36 @@ export default async function ComoFuncionaPage() {
               </div>
             </div>
           </div>
+        </section>
 
+        {/* Concurso de sorteo */}
+        <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>🎲 Modalidad sorteo</p>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>¿Cómo funciona un sorteo?</h2>
+
+          <div style={{ maxWidth: 560, margin: "0 auto" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 0, marginBottom: 32 }}>
+              {[
+                { icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
+                { icon: "🎲", title: "Se sortea", desc: "Al cierre se elige un ganador al azar entre todos." },
+              ].map((paso, i, arr) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", width: 180 }}>
+                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: i === arr.length - 1 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === arr.length - 1 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 12 }}>{paso.icon}</div>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", fontWeight: 700, color: "#f5d080", margin: "0 0 6px" }}>{paso.title}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.55, margin: 0 }}>{paso.desc}</p>
+                  </div>
+                  {i < arr.length - 1 && <div style={{ display: "flex", alignItems: "center", height: 56, padding: "0 8px" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: 20, color: "rgba(232,168,76,0.3)" }}>→</span></div>}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: 24, textAlign: "center" }}>
+              <p style={{ fontSize: 32, marginBottom: 12 }}>🎲</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, marginBottom: 12 }}>En un concurso de sorteo, <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong> entre todos los participantes. Es gratis y <strong style={{ color: "#e8a84c" }}>cualquiera dentro puede ganar</strong>.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.4)", lineHeight: 1.6 }}>Opcional: invita amigos para que ellos también tengan la oportunidad de participar.</p>
+            </div>
+          </div>
         </section>
 
         {/* Premios reales */}

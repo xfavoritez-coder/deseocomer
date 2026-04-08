@@ -748,24 +748,19 @@ function ConcursoDetallePage() {
                 <span style={{ fontSize: 16 }}>🎲</span>
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Modalidad sorteo</p>
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.65)", lineHeight: 1.7, marginBottom: 12 }}>En este concurso <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong> entre todos los participantes. Es completamente gratis — solo entra y ya estás participando.</p>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, background: "rgba(10,8,18,0.4)", borderRadius: 12, padding: "14px 16px" }}>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 20 }}>✅</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Entra gratis</span>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.65)", lineHeight: 1.7, marginBottom: 14 }}>En este concurso <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong> entre todos los participantes. Es completamente gratis — solo entra y ya estás participando.</p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, background: "rgba(10,8,18,0.4)", borderRadius: 12, padding: "16px 12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", flex: 1 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 6 }}>✅</div>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#f5d080", fontWeight: 700 }}>Entra gratis</span>
                 </div>
-                <span style={{ color: "rgba(232,168,76,0.25)", fontSize: 16 }}>→</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 20 }}>📲</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(240,234,214,0.4)", textTransform: "uppercase" }}>Invita amigos</span>
-                </div>
-                <span style={{ color: "rgba(232,168,76,0.25)", fontSize: 16 }}>→</span>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 20 }}>🎲</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700 }}>Se sortea</span>
+                <span style={{ color: "rgba(232,168,76,0.3)", fontSize: 18, padding: "0 2px", marginBottom: 12 }}>→</span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", flex: 1 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, marginBottom: 6 }}>🎲</div>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#f5d080", fontWeight: 700 }}>Se sortea</span>
                 </div>
               </div>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>Cualquiera dentro puede ganar. Invita amigos para que ellos también participen.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)", lineHeight: 1.5, margin: "10px 0 0", textAlign: "center" }}>Opcional: invita amigos para que ellos también participen</p>
             </div>
           )}
 
@@ -998,24 +993,7 @@ function ConcursoDetallePage() {
           })()}
 
           {/* 6. Cómo se gana / Cómo funciona el sorteo */}
-          {!isEnded && esSorteo && (
-            <div>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo funciona</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 0, maxWidth: 360, margin: "0 auto" }}>
-                {[
-                  { icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
-                  { icon: "📲", title: "Invita amigos", desc: "Comparte tu link para que ellos también participen." },
-                  { icon: "🎲", title: "Se sortea el ganador", desc: "Al cierre, se elige un ganador al azar. Cualquiera puede ganar." },
-                ].map((paso, i) => (
-                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "16px 0", borderBottom: i < 2 ? "1px solid rgba(232,168,76,0.06)" : "none" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: i === 2 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === 2 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 8 }}>{paso.icon}</div>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", margin: "0 0 4px" }}>{paso.title}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>{paso.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Cómo funciona sorteo: solo se explica en el banner dismissible arriba, no duplicar aquí */}
           {!isEnded && !esSorteo && (
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo se gana</p>
