@@ -176,7 +176,7 @@ export async function GET(
             {theme.headerText}
           </span>
           {/* Prize title */}
-          <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.02em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)" }}>{concurso.premio}</span>
+          <span style={{ fontFamily: "Cinzel", fontSize: `${titleSize}px`, fontWeight: 700, color: theme.titleColor, textTransform: "uppercase", textAlign: "center", lineHeight: "1.15", letterSpacing: "0.03em", textShadow: "0 3px 12px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9), 1px 0 0 currentColor, -1px 0 0 currentColor" }}>{"\u{1F3C6}"} {concurso.premio}</span>
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Description text */}
@@ -195,7 +195,7 @@ export async function GET(
               <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
             </div>
             {"ctaSubtext" in theme && (
-              <span style={{ fontFamily: "Lato", fontSize: "32px", color: "rgba(240,234,214,0.4)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{(theme as {ctaSubtext: string}).ctaSubtext}</span>
+              <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 700, color: "rgba(240,234,214,0.65)", textAlign: "center", letterSpacing: "0.06em", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{(theme as {ctaSubtext: string}).ctaSubtext}</span>
             )}
           </div>
           {/* Closing time for termina hoy */}
