@@ -298,8 +298,7 @@ function ConcursoDetallePage() {
     // Skip first call — initial data already comes from the main fetch
     if (!initialLoadDone.current) { initialLoadDone.current = true; }
     else { refreshRanking(); }
-    const iid = setInterval(refreshRanking, 30_000);
-    return () => clearInterval(iid);
+    return undefined;
   }, [refreshRanking]);
   useEffect(() => { if (user) setMyRefs(getRefCount(concursoId, user.id)); }, [user, concursoId]);
 
@@ -537,7 +536,7 @@ function ConcursoDetallePage() {
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>{esSorteo ? "🎲 participantes del sorteo" : "🏆 tabla de posiciones"}</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
         <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "rgba(120,140,220,0.8)" }}>{esSorteo ? `${ranking.length} participando` : "Ranking en tiempo real"}</span>
-        <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>↻ cada 30 seg</span>
+        <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.3)" }}>↻ en tiempo real</span>
       </div>
       {ranking.length === 0 ? (
         <div style={{ padding: "20px 14px" }}>
@@ -598,7 +597,8 @@ function ConcursoDetallePage() {
               )}
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
               {!esSorteo && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>}
-              {esSorteo && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#ec4899", whiteSpace: "nowrap" }}>{Math.max(1, r.referidos)} 🎟️ <span style={{ fontSize: 11, color: "rgba(240,234,214,0.3)" }}>~{probPct}%</span></span>}
+              {esSorteo && isAuthenticated && isParticipating && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, color: "#ec4899", whiteSpace: "nowrap" }}>{Math.max(1, r.referidos)} 🎟️ <span style={{ fontSize: 11, color: "rgba(240,234,214,0.3)" }}>~{probPct}%</span></span>}
+              {esSorteo && !(isAuthenticated && isParticipating) && <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.35)", fontStyle: "italic" }}>Participando</span>}
               {!isMe && !esSorteo && (
                 <button onClick={() => { if (!isAuthenticated) { setTooltipActivo("nologin_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } if (!isParticipating) { setTooltipActivo("noparticipa_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } handleSupport(r.nombre, supportKey, rAny.usuarioId || ""); }} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
@@ -624,7 +624,12 @@ function ConcursoDetallePage() {
                 )}
                 <span style={{ flex: 1, fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", textTransform: "capitalize" }}>{(() => { const parts = myEntry.nombre.trim().split(/\s+/); return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0]; })()}</span>
                 <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>
-                <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: esSorteo ? "#ec4899" : "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>{esSorteo ? "🎟️" : "pts"}</span></span>
+                {esSorteo
+                  ? (isAuthenticated && isParticipating
+                    ? <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#ec4899", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>🎟️</span></span>
+                    : <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.35)", fontStyle: "italic" }}>Participando</span>)
+                  : <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{myEntry.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>
+                }
               </div>
             )}
             {!showAllRanking && (concursoData as any)?.totalParticipantes > visibles.length && (
