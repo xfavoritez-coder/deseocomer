@@ -514,7 +514,7 @@ function ConcursoDetallePage() {
 
   // Ranking block (shared between mobile + desktop sidebar)
   const rankingBlock = (
-    <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden" }}>
+    <div style={{ background: "rgba(13,27,62,0.85)", border: "1px solid rgba(61,100,210,0.25)", borderRadius: 12, overflow: "hidden", position: "relative" }}>
       {supportError && <div style={{ padding: "10px 14px", background: "rgba(255,80,80,0.1)", borderBottom: "1px solid rgba(255,80,80,0.2)", fontFamily: "var(--font-lato)", fontSize: 12, color: "#ff8080", textAlign: "center" }}>{supportError} <a href="/verificar-email" style={{ color: "#e8a84c", fontWeight: 700 }}>Reenviar verificación →</a></div>}
       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.12em", textAlign: "center", padding: "14px 14px 0" }}>🏆 tabla de posiciones</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px 10px" }}>
@@ -581,21 +581,22 @@ function ConcursoDetallePage() {
                 const ttKey = `sorteo_${supportKey}`;
                 return (
                   <div style={{ position: "relative" }}>
-                    <button onClick={(e) => { e.stopPropagation(); setTooltipActivo(tooltipActivo === ttKey ? null : ttKey); setTimeout(() => setTooltipActivo(v => v === ttKey ? null : v), 5000); }} style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 52, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                    <button onClick={(e) => { e.stopPropagation(); if (tooltipActivo === ttKey) { setTooltipActivo(null); return; } const rect = e.currentTarget.getBoundingClientRect(); const el = document.getElementById(ttKey); if (el) { el.style.top = `${rect.top - 8}px`; el.style.right = `${window.innerWidth - rect.right}px`; } setTooltipActivo(ttKey); setTimeout(() => setTooltipActivo(v => v === ttKey ? null : v), 6000); }} style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 52, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
                       <div style={{ flex: 1, height: 4, background: "rgba(236,72,153,0.1)", borderRadius: 4, overflow: "hidden", minWidth: 28 }}>
                         <div style={{ width: `${Math.max(8, probPct)}%`, height: "100%", background: isMe ? "linear-gradient(to right, #ec4899, #f472b6)" : "rgba(236,72,153,0.4)", borderRadius: 4, transition: "width 0.3s" }} />
                       </div>
                       <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: isMe ? "#ec4899" : "rgba(236,72,153,0.5)", whiteSpace: "nowrap" }}>{probPct}%</span>
                     </button>
-                    {tooltipActivo === ttKey && (
-                      <div style={{ position: "absolute", bottom: "calc(100% + 8px)", right: 0, width: 230, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 20, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+                    {tooltipActivo === ttKey && <>
+                      <div onClick={() => setTooltipActivo(null)} style={{ position: "fixed", inset: 0, zIndex: 99 }} />
+                      <div id={ttKey} style={{ position: "fixed", transform: "translateY(-100%)", width: 240, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, padding: "10px 12px", zIndex: 100, boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
                         <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.7)", lineHeight: 1.55, margin: 0 }}>
                           {isMe ? "Tienes" : `${nombre1} tiene`} <strong style={{ color: "#ec4899" }}>{r.referidos}</strong> de los <strong style={{ color: "#f5d080" }}>{totalBoletosRanking}</strong> boletos totales. {isMe ? "Tendrías" : "Tendría"} un <strong style={{ color: "#ec4899" }}>{probPct}%</strong> de chances de ganar este sorteo.
                           {isMe && <><br/><span style={{ color: "rgba(232,168,76,0.7)" }}>Invita amigos para sumar más boletos y aumentar tu %.</span></>}
                           {" "}<span style={{ color: "rgba(240,234,214,0.4)" }}>Cualquiera dentro puede ganar.</span>
                         </p>
                       </div>
-                    )}
+                    </>}
                   </div>
                 );
               })()}
@@ -935,8 +936,8 @@ function ConcursoDetallePage() {
           ) : (
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.22)", borderRadius: 14, overflow: "hidden" }}>
             <div style={{ padding: 20 }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : "🏆 Participa en este concurso"}</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>{isAuthenticated && isParticipating ? "Comparte este link y suma puntos para ganar" : "Invita amigos y sube en el ranking para ganar"}</p>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", textAlign: "center", fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>{isAuthenticated && isParticipating ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e8a84c" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Tu link de participación</> : esSorteo ? "🎲 Entra a este sorteo gratis" : "🏆 Participa en este concurso"}</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.45)", textAlign: "center", marginTop: 6 }}>{isAuthenticated && isParticipating ? "Comparte este link y suma puntos para ganar" : esSorteo ? "Solo por entrar ya tienes un boleto. Cualquiera dentro puede ganar" : "Invita amigos y sube en el ranking para ganar"}</p>
 
               {isAuthenticated && isParticipating && refLink ? (
                 <div style={{ marginTop: 14 }}>
@@ -1094,7 +1095,7 @@ function ConcursoDetallePage() {
             ) : (
               <button onClick={() => setSorteoReminderOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
                 <span style={{ fontSize: 14 }}>🎲</span>
-                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona el sorteo?</span>
+                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona la modalidad sorteo?</span>
                 <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(232,168,76,0.3)" }}>→</span>
               </button>
             )
