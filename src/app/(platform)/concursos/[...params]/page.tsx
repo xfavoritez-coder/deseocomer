@@ -617,6 +617,28 @@ function ConcursoDetallePage() {
           </span>
         </div>
       )}
+      {/* Bonus madrugador integrado en ranking */}
+      {!isEnded && !isProgramado && (() => {
+        const totalParts = c.participantes ?? 0;
+        if (totalParts >= 10) return null;
+        const spots = 10 - totalParts;
+        return (
+          <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", padding: "12px 14px", background: "rgba(232,168,76,0.03)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 14 }}>⚡</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em" }}>Bonus madrugador</span>
+              <span style={{ marginLeft: "auto", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c" }}>+2 pts</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ flex: 1, height: 5, background: "rgba(232,168,76,0.1)", borderRadius: 5, overflow: "hidden" }}>
+                <div style={{ width: `${(totalParts / 10) * 100}%`, height: "100%", background: "linear-gradient(to right, #e8a84c, #f5d080)", borderRadius: 5, transition: "width 0.3s" }} />
+              </div>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(232,168,76,0.6)", whiteSpace: "nowrap" }}>{spots} de 10</span>
+            </div>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.35)", margin: "6px 0 0", lineHeight: 1.4 }}>Los primeros 10 en entrar reciben +2 puntos extra</p>
+          </div>
+        );
+      })()}
     </div>
   );
 
@@ -860,26 +882,6 @@ function ConcursoDetallePage() {
           <div className="dc-cd-ranking-mobile">
             {rankingBlock}
           </div>
-
-          {/* Bonus madrugador — below ranking */}
-          {!isEnded && !isProgramado && (() => {
-            const totalParts = c.participantes ?? 0;
-            if (totalParts >= 10) return null;
-            const madrugadoresRestantes = Math.max(0, 10 - totalParts);
-            return (
-              <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(232,168,76,0.06))", border: "1px solid rgba(232,168,76,0.35)", borderRadius: 14, padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 24, flexShrink: 0 }}>⚡</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", margin: 0 }}>Bonus madrugador</p>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.5)", margin: "3px 0" }}>Los primeros 10 en entrar reciben +2 puntos extra</p>
-                  <div style={{ background: "rgba(10,8,18,0.5)", borderRadius: 20, height: 6, overflow: "hidden", marginTop: 6 }}>
-                    <div style={{ background: "linear-gradient(to right, #e8a84c, #f5d080)", width: `${(totalParts / 10) * 100}%`, height: "100%", borderRadius: 20, transition: "width 0.3s" }} />
-                  </div>
-                  <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", marginTop: 4 }}>{madrugadoresRestantes} lugares restantes con bonus</p>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* 4. Link de participación (solo activos) / CTA concursos (finalizados) */}
           {esLocal && !isEnded ? (
