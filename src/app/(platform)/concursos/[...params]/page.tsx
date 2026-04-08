@@ -581,7 +581,7 @@ function ConcursoDetallePage() {
               {isMe && <span style={{ background: "rgba(61,184,158,0.15)", color: "#3db89e", border: "1px solid rgba(61,184,158,0.3)", borderRadius: 4, padding: "1px 6px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700 }}>tú</span>}
               {!esSorteo && <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", whiteSpace: "nowrap" }}>{r.referidos} <span style={{ fontSize: 11, color: "rgba(240,234,214,0.35)" }}>pts</span></span>}
               {esSorteo && <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.25)" }}>participando</span>}
-              {!isMe && (
+              {!isMe && !esSorteo && (
                 <button onClick={() => { if (!isAuthenticated) { setTooltipActivo("nologin_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } if (!isParticipating) { setTooltipActivo("noparticipa_" + supportKey); setTimeout(() => setTooltipActivo(null), 3000); return; } handleSupport(r.nombre, supportKey, rAny.usuarioId || ""); }} disabled={!!alreadySupported} style={{ background: "none", border: "none", cursor: alreadySupported ? "default" : "pointer", opacity: alreadySupported ? 0.3 : 1, padding: 0, lineHeight: 1 }}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill={alreadySupported ? "rgba(232,168,76,0.3)" : "#e8a84c"}><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
                 </button>
@@ -627,8 +627,8 @@ function ConcursoDetallePage() {
           </span>
         </div>
       )}
-      {/* Bonus madrugador integrado en ranking */}
-      {!isEnded && !isProgramado && (() => {
+      {/* Bonus madrugador integrado en ranking — solo méritos */}
+      {!isEnded && !isProgramado && !esSorteo && (() => {
         const totalParts = c.participantes ?? 0;
         if (totalParts >= 10) return null;
         const spots = 10 - totalParts;
@@ -1001,18 +1001,16 @@ function ConcursoDetallePage() {
           {!isEnded && esSorteo && (
             <div>
               <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "center", marginBottom: 12 }}>Cómo funciona</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 0, maxWidth: 360, margin: "0 auto" }}>
                 {[
-                  { num: "1", icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
-                  { num: "2", icon: "📲", title: "Invita amigos", desc: "Comparte tu link para que tus amigos también participen." },
-                  { num: "3", icon: "🎲", title: "Se sortea el ganador", desc: "Al cierre, se elige un ganador al azar entre todos. Cualquiera puede ganar." },
+                  { icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
+                  { icon: "📲", title: "Invita amigos", desc: "Comparte tu link para que ellos también participen." },
+                  { icon: "🎲", title: "Se sortea el ganador", desc: "Al cierre, se elige un ganador al azar. Cualquiera puede ganar." },
                 ].map((paso, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "14px 0", borderBottom: i < 2 ? "1px solid rgba(232,168,76,0.06)" : "none" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: i === 2 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === 2 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{paso.icon}</div>
-                    <div>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", margin: "0 0 3px" }}>{paso.title}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>{paso.desc}</p>
-                    </div>
+                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", padding: "16px 0", borderBottom: i < 2 ? "1px solid rgba(232,168,76,0.06)" : "none" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: i === 2 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === 2 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 8 }}>{paso.icon}</div>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, color: "#f5d080", margin: "0 0 4px" }}>{paso.title}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>{paso.desc}</p>
                   </div>
                 ))}
               </div>
@@ -1101,13 +1099,33 @@ function ConcursoDetallePage() {
             )
           )}
 
-          {/* Sorteo — mensaje de confirmación */}
-          {esSorteo && isParticipating && !isEnded && (
-            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: "16px 20px", marginTop: 12, textAlign: "center" }}>
-              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", fontWeight: 700, margin: "0 0 6px" }}>✅ Ya estás dentro del sorteo</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.5, margin: 0 }}>Invita amigos para que ellos también tengan la oportunidad de ganar</p>
-            </div>
-          )}
+          {/* Sorteo — mecánica detallada (solo visible después de participar) */}
+          {esSorteo && isParticipating && !isEnded && (() => {
+            const misPuntos = ranking.find(r => {
+              const myName = user?.nombre?.split(" ")[0] ?? "";
+              return r.nombre.startsWith(myName);
+            })?.referidos ?? 1;
+            const totalBoletos = ranking.reduce((acc, r) => acc + Math.max(1, r.referidos), 0);
+            const prob = totalBoletos > 0 ? Math.round((Math.max(1, misPuntos) / totalBoletos) * 100) : 0;
+            return (
+              <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 16, padding: "18px 20px", marginTop: 12 }}>
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 14, color: "#e8a84c", fontWeight: 700, textAlign: "center", margin: "0 0 6px" }}>✅ Ya estás en el sorteo</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", textAlign: "center", lineHeight: 1.5, margin: "0 0 14px" }}>Pero puedes <strong style={{ color: "#f5d080" }}>aumentar tus chances</strong> invitando amigos</p>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 12 }}>
+                  <div style={{ textAlign: "center" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 22, color: "#e8a84c", fontWeight: 700, margin: 0 }}>{misPuntos}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>tus boletos</p>
+                  </div>
+                  <div style={{ width: 1, height: 30, background: "rgba(232,168,76,0.15)" }} />
+                  <div style={{ textAlign: "center" }}>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 22, color: "#e8a84c", fontWeight: 700, margin: 0 }}>~{prob}%</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>chances de ganar</p>
+                  </div>
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.4)", textAlign: "center", lineHeight: 1.5, margin: 0 }}>Cada amigo que entre por tu link te da más boletos. Más boletos = más chances en el sorteo.</p>
+              </div>
+            );
+          })()}
 
           {/* 6.6 Descripción completa del premio (si fue truncada en hero) */}
           {c.descripcionPremio && c.descripcionPremio.length > 120 && (
@@ -1238,8 +1256,14 @@ function ConcursoDetallePage() {
         <div onClick={() => setRecienUnido(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 499, backdropFilter: "blur(4px)" }} />
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 500, width: "90%", maxWidth: 420, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 20, padding: "32px 24px", textAlign: "center", boxShadow: "0 0 60px rgba(0,0,0,0.8)", animation: "dc-slideUp 0.4s ease" }}>
           <button onClick={() => setRecienUnido(false)} style={{ position: "absolute", top: 12, right: 16, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
-          <p style={{ fontSize: 36, marginBottom: 12 }}>🎉</p>
-          {refNameFromUrl || refNameRaw ? (
+          <p style={{ fontSize: 36, marginBottom: 12 }}>{esSorteo ? "🎲" : "🎉"}</p>
+          {esSorteo ? (
+            <>
+              <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, fontWeight: 700, color: "#f5d080", textTransform: "uppercase", marginBottom: 10, letterSpacing: "0.04em" }}>¡Ya estás en el sorteo!</h3>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, marginBottom: 8 }}>Al cierre se elige un ganador al azar. <strong style={{ color: "#e8a84c" }}>Cualquiera dentro puede ganar</strong>.</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, marginBottom: 20 }}>Comparte tu link para que tus amigos también tengan la oportunidad. <strong style={{ color: "#e8a84c" }}>Mientras más personas entren por tu link, más chances tienes de ganar</strong>.</p>
+            </>
+          ) : refNameFromUrl || refNameRaw ? (
             <>
               <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: 18, fontWeight: 700, color: "#3db89e", textTransform: "uppercase", marginBottom: 10, letterSpacing: "0.04em" }}>¡Entraste al concurso!</h3>
               <div style={{ background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
@@ -1255,7 +1279,7 @@ function ConcursoDetallePage() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, marginBottom: 20 }}>Para ganar necesitas subir en el ranking invitando amigos. Cada amigo que entre por tu link te da <strong style={{ color: "#e8a84c" }}>+3 puntos</strong> — y él también gana <strong style={{ color: "#e8a84c" }}>+3 puntos</strong>.</p>
             </>
           )}
-          <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); window.open(`https://wa.me/?text=${encodeURIComponent(`Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Entra por este link y ambos ganamos 3 puntos — es gratis y toma 1 minuto 👉 ${refLink}`)}`, "_blank"); }} style={{ width: "100%", padding: 16, background: "#25d366", border: "none", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          <button onClick={() => { fetch(`/api/concursos/${concursoId}/track-share`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId: user?.id, tipo: "whatsapp" }), keepalive: true }).catch(() => {}); const msg = esSorteo ? `Oye, están sorteando ${c?.premio ?? "un premio"} gratis en ${c?.local ?? "DeseoComer"}. Entra por este link — cualquiera puede ganar 👉 ${refLink}` : `Oye, estoy participando para ganar ${c?.premio ?? "un premio"} en ${c?.local ?? "DeseoComer"}. Entra por este link y ambos ganamos 3 puntos — es gratis y toma 1 minuto 👉 ${refLink}`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank"); }} style={{ width: "100%", padding: 16, background: "#25d366", border: "none", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: 15, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" /><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492l4.63-1.476A11.93 11.93 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75c-2.15 0-4.136-.683-5.762-1.843l-.413-.265-2.748.877.87-2.686-.287-.438A9.71 9.71 0 0 1 2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" /></svg>
             Compartir por WhatsApp
           </button>
