@@ -191,6 +191,7 @@ function ConcursoDetallePage() {
   const [mostrarSorteo, setMostrarSorteo] = useState(false);
   const [sorteoInfoOpen, setSorteoInfoOpen] = useState(false);
   const [sorteobannerVisible, setSorteoBannerVisible] = useState(false);
+  const [sorteoReminderOpen, setSorteoReminderOpen] = useState(false);
   useEffect(() => {
     if (!concursoId) return;
     try {
@@ -1064,13 +1065,24 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* Sorteo reminder link — visible when banner is dismissed */}
+          {/* Sorteo reminder link — visible when top banner is dismissed */}
           {esSorteo && !isEnded && !sorteobannerVisible && (
-            <button onClick={() => setSorteoBannerVisible(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
-              <span style={{ fontSize: 14 }}>🎲</span>
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona el sorteo?</span>
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(232,168,76,0.3)" }}>→</span>
-            </button>
+            sorteoReminderOpen ? (
+              <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, padding: "16px 18px", marginTop: 4, position: "relative" }}>
+                <button onClick={() => setSorteoReminderOpen(false)} style={{ position: "absolute", top: 8, right: 10, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 14, cursor: "pointer", padding: 4 }}>✕</button>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                  <span style={{ fontSize: 14 }}>🎲</span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Modalidad sorteo</span>
+                </div>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong>. Cada punto = 1 boleto. Más puntos, más chances de ganar. Cualquier participante puede llevarse el premio.</p>
+              </div>
+            ) : (
+              <button onClick={() => setSorteoReminderOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
+                <span style={{ fontSize: 14 }}>🎲</span>
+                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona el sorteo?</span>
+                <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(232,168,76,0.3)" }}>→</span>
+              </button>
+            )
           )}
 
           {/* Contador de boletos del usuario */}

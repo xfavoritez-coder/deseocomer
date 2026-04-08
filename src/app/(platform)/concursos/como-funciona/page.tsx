@@ -53,7 +53,7 @@ export default async function ComoFuncionaPage() {
             Gana Comida<br />Gratis 🏆
           </h1>
           <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(1rem,2vw,1.15rem)", color: "rgba(240,234,214,0.65)", lineHeight: 1.8, maxWidth: "480px", margin: "0 auto 36px" }}>
-            Comparte tu link con amigos, sube en el ranking y gana premios reales de los mejores restaurantes de Chile.
+            Comparte tu link, suma puntos y gana premios reales de los mejores restaurantes de Chile.
           </p>
           <Link href="/concursos" style={{ display: "inline-block", background: "var(--accent)", color: "var(--bg-primary)", fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.75rem,1.5vw,0.85rem)", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", padding: "14px 36px", borderRadius: "30px", textDecoration: "none" }}>
             Ver concursos activos →
@@ -92,7 +92,7 @@ export default async function ComoFuncionaPage() {
               { num: "1", title: "Regístrate gratis", desc: "Crea tu cuenta gratis. Sin tarjeta de crédito ni letra chica." },
               { num: "2", title: "Elige un concurso", desc: "Hay premios de distintos restaurantes. Únete al que más te guste." },
               { num: "3", title: "Comparte tu link", desc: "Recibes un link único. Compártelo por WhatsApp, Instagram o donde quieras." },
-              { num: "4", title: "Sube en el ranking", desc: "Cada amigo que se registra con tu link o persona que te apoya suma puntos. El que más tenga, gana." },
+              { num: "4", title: "Suma puntos", desc: "Cada amigo que se registra con tu link suma puntos. En méritos gana el #1, en sorteo cada punto es un boleto al azar." },
               { num: "🏆", title: "¡Ganas el premio!", desc: "Te contactamos en 24 horas para coordinar cómo retirar tu premio." },
             ].map((paso, i) => (
               <div key={i} className="cf-paso-item">
@@ -130,17 +130,17 @@ export default async function ComoFuncionaPage() {
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
             <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>El poder de tu red</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros a participar, tú ganas +1 punto por cada uno que traigan. Así tu red trabaja para ti. Máximo 10 puntos acumulables por esta vía.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 16 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros a participar, tú ganas +2 puntos por cada uno que traigan. Así tu red trabaja para ti. Máximo 20 puntos acumulables por esta vía.</p>
             <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "14px 16px", marginBottom: 16 }}>
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
                 Invitas a María (nueva en DC) → <strong style={{ color: "#3db89e" }}>+3 puntos</strong> para ti<br/>
                 Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+1 punto</strong> para ti<br/>
-                María invita a Juan → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong><br/>
-                María invita a Ana → +3 para María, <strong style={{ color: "#3db89e" }}>+1 para ti</strong>
+                María invita a Juan → +3 para María, <strong style={{ color: "#3db89e" }}>+2 para ti</strong><br/>
+                María invita a Ana → +3 para María, <strong style={{ color: "#3db89e" }}>+2 para ti</strong>
               </p>
             </div>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>Límite: puedes acumular hasta 10 puntos extra por los referidos de tus referidos en cada concurso.</p>
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>Límite: puedes acumular hasta 20 puntos extra por los referidos de tus referidos en cada concurso.</p>
           </div>
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
@@ -191,7 +191,7 @@ export default async function ComoFuncionaPage() {
                   <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "0.88rem", color: "#f5d080", marginBottom: "8px", lineHeight: 1.3 }}>{c.premio}</p>
                   <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "var(--font-lato)", fontSize: "0.8rem", color: "rgba(240,234,214,0.35)" }}>
                     <span>Ganó: {c.ganador.nombre}</span>
-                    <span>{c.ganador.referidos} refs</span>
+                    <span>{c.ganador.referidos} pts</span>
                   </div>
                 </div>
               </div>
@@ -223,6 +223,7 @@ export default async function ComoFuncionaPage() {
               { q: "¿Cómo sé que el concurso es real?", a: "Todos los locales en DeseoComer están verificados. Puedes ver el historial completo de ganadores anteriores con nombre y fecha." },
               { q: "¿Puedo participar en más de un concurso?", a: "Sí, puedes participar en todos los concursos activos al mismo tiempo con la misma cuenta." },
               { q: "¿Qué pasa si gano?", a: "Te contactamos por email dentro de las 24 horas siguientes al cierre del concurso para coordinar cómo retirar tu premio." },
+              { q: "¿Cómo funciona un concurso de sorteo?", a: "El ganador se elige al azar. Cada punto que acumulas es un boleto — más puntos, más chances de ganar. Cualquier participante puede llevarse el premio." },
               { q: "¿Los referidos deben ser cuentas nuevas?", a: "No necesariamente. Si traes a alguien nuevo a DeseoComer ganas +3 puntos, y si invitas a un amigo que ya tiene cuenta ganas +1 punto. En ambos casos deben usar tu link o código." },
               { q: "¿Cada cuánto puedo apoyar a un participante?", a: "Puedes darle +1 punto a cada participante una vez al día. Al día siguiente puedes volver a apoyarlo." },
               { q: "¿El premio es canjeable por efectivo?", a: "No. El premio es el producto o servicio indicado en el concurso, no es canjeable por dinero." },
