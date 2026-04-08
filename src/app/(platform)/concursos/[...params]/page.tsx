@@ -1064,7 +1064,14 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* Sorteo explanation moved to banner below hero */}
+          {/* Sorteo reminder link — visible when banner is dismissed */}
+          {esSorteo && !isEnded && !sorteobannerVisible && (
+            <button onClick={() => setSorteoBannerVisible(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
+              <span style={{ fontSize: 14 }}>🎲</span>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona el sorteo?</span>
+              <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(232,168,76,0.3)" }}>→</span>
+            </button>
+          )}
 
           {/* Contador de boletos del usuario */}
           {esSorteo && isParticipating && !isEnded && (() => {
