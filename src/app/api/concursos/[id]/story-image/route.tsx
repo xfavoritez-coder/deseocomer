@@ -11,7 +11,7 @@ export async function GET(
 
   const concurso = await prisma.concurso.findFirst({
     where: { OR: [{ id }, { slug: id }] },
-    include: { local: { select: { nombre: true } } },
+    include: { local: { select: { nombre: true, logoUrl: true } } },
   });
 
   if (!concurso) {
@@ -110,12 +110,13 @@ export async function GET(
         badgeColor: "#ec4899",
         badgeText: "SORTEO",
         overlayColor: "rgba(10,8,18,0.5)",
-        gradientTop: "rgba(40,10,30,0.75)",
-        accentColor: "#f472b6",
-        titleColor: "#fce7f3",
+        gradientTop: "rgba(10,8,18,0.8)",
+        accentColor: "#e8a84c",
+        titleColor: "#f5d080",
         emoji: "\u{1F3B2}",
         headerText: "Sorteo de premio",
-        subtitulo: "Cada punto es un boleto \u2014 m\u00e1s boletos, m\u00e1s chances",
+        subtitulo: "Cada punto es un boleto",
+        subtitulo2: "M\u00e1s boletos, m\u00e1s chances de ganar",
         cta: "Entra al sorteo",
         ctaIcon: "\u{1F3B0}",
         ctaBg: "rgba(236,72,153,0.15)",
@@ -123,6 +124,7 @@ export async function GET(
         ctaIconBg: "rgba(236,72,153,0.15)",
         ctaIconBorder: "rgba(236,72,153,0.3)",
         dividerColor: "rgba(236,72,153,0.25)",
+        ctaSubtext: "Cualquiera dentro puede ganar",
       }
     : {
         badgeColor: "#3db89e",
@@ -158,12 +160,17 @@ export async function GET(
         {/* Badge ribbon */}
         <div style={{ position: "absolute", top: "88px", right: "-112px", width: terminaHoy ? "620px" : "560px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", transform: "rotate(45deg)" }}>
           <span style={{ fontSize: "32px" }}>{theme.emoji}</span>
-          <span style={{ fontFamily: "Cinzel", fontSize: terminaHoy ? "30px" : "36px", fontWeight: 700, color: "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
+          <span style={{ fontFamily: "Cinzel", fontSize: terminaHoy ? "30px" : "36px", fontWeight: 700, color: esSorteo ? "#ffffff" : "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
-          {/* Local name */}
-          <span style={{ fontFamily: "Lato", fontSize: "44px", color: "rgba(240,234,214,0.8)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
+          {/* Local name with logo */}
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", justifyContent: "center" }}>
+            {concurso.local.logoUrl && (
+              <img src={concurso.local.logoUrl} style={{ width: "56px", height: "56px", borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.4)" }} />
+            )}
+            <span style={{ fontFamily: "Lato", fontSize: "44px", color: "rgba(240,234,214,0.8)", letterSpacing: "0.1em", textTransform: "uppercase", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{concurso.local.nombre}</span>
+          </div>
           {/* Header text */}
           <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 800, color: theme.accentColor, letterSpacing: "0.16em", textTransform: "uppercase", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>
             {theme.headerText}
@@ -173,11 +180,23 @@ export async function GET(
           {/* Divider */}
           <div style={{ height: "2px", width: "70%", background: theme.dividerColor, display: "flex" }} />
           {/* Description text */}
-          <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
+          {"subtitulo2" in theme ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontFamily: "Lato", fontSize: "48px", fontWeight: 700, color: "rgba(240,234,214,0.9)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
+              <span style={{ fontFamily: "Lato", fontSize: "42px", color: "rgba(240,234,214,0.6)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{(theme as {subtitulo2: string}).subtitulo2}</span>
+            </div>
+          ) : (
+            <span style={{ fontFamily: "Lato", fontSize: "38px", color: "rgba(240,234,214,0.8)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{theme.subtitulo}</span>
+          )}
           {/* CTA button */}
-          <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
-            <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
-            <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "32px", background: theme.ctaBg, border: `2px solid ${theme.ctaBorder}`, borderRadius: "56px", padding: "36px 56px" }}>
+              <div style={{ width: "112px", height: "112px", borderRadius: "50%", background: theme.ctaIconBg, border: `2px solid ${theme.ctaIconBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "52px" }}>{theme.ctaIcon}</div>
+              <span style={{ fontFamily: "Lato", fontSize: "52px", fontWeight: 700, color: "rgba(240,234,214,0.9)" }}>{theme.cta}</span>
+            </div>
+            {"ctaSubtext" in theme && (
+              <span style={{ fontFamily: "Lato", fontSize: "32px", color: "rgba(240,234,214,0.4)", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{(theme as {ctaSubtext: string}).ctaSubtext}</span>
+            )}
           </div>
           {/* Closing time for termina hoy */}
           {terminaHoy && (

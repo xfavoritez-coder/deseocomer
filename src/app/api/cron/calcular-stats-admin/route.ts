@@ -145,18 +145,17 @@ export async function GET(req: NextRequest) {
     while (cur <= hoy) { const d = cur.toISOString().split("T")[0]; regResult.push({ dia: d, registros: porDia[d] ?? 0 }); cur.setDate(cur.getDate() + 1); }
 
     // ═══ 4. SHARE STATS ═══
-    const topSharers = await prisma.participanteConcurso.findMany({
+    const allSharers = await prisma.participanteConcurso.findMany({
       where: { OR: [{ clicksWhatsapp: { gt: 0 } }, { clicksInstagram: { gt: 0 } }] },
       select: { clicksWhatsapp: true, clicksInstagram: true, usuario: { select: { nombre: true } }, concurso: { select: { premio: true } } },
       orderBy: [{ clicksWhatsapp: "desc" }, { clicksInstagram: "desc" }],
-      take: 10,
     });
-    const totalWA = topSharers.reduce((a, s) => a + s.clicksWhatsapp, 0);
-    const totalIG = topSharers.reduce((a, s) => a + s.clicksInstagram, 0);
+    const totalWA = allSharers.reduce((a, s) => a + s.clicksWhatsapp, 0);
+    const totalIG = allSharers.reduce((a, s) => a + s.clicksInstagram, 0);
     const shareStats = {
       totalWA,
       totalIG,
-      top: topSharers.map(s => {
+      top: allSharers.map(s => {
         const parts = s.usuario.nombre.trim().split(/\s+/);
         const nombre = parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0];
         return { nombre, concurso: s.concurso.premio, wa: s.clicksWhatsapp, ig: s.clicksInstagram, total: s.clicksWhatsapp + s.clicksInstagram };

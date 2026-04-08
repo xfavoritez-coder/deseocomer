@@ -3,7 +3,104 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { makeLocalSlug } from "@/lib/slugify";
 import { CATEGORIAS } from "@/lib/categorias";
+import { COMUNAS_MAESTRAS } from "@/lib/comunas";
 import { enriquecerLocalConGoogle } from "@/lib/enriquecer-local-google";
+
+// Aliases for categories that users might type differently
+const CATEGORIA_ALIASES: Record<string, string> = {
+  "mexicana": "Mexicano", "mexicano": "Mexicano", "tacos": "Mexicano",
+  "sushi": "Sushi", "japonesa": "Sushi", "japones": "Sushi",
+  "pizza": "Pizza", "pizzas": "Pizza",
+  "hamburguesa": "Hamburguesa", "hamburguesas": "Hamburguesa", "burger": "Hamburguesa",
+  "vegano": "Vegano", "vegana": "Vegano",
+  "vegetariano": "Vegetariano", "vegetariana": "Vegetariano",
+  "saludable": "Saludable",
+  "pastas": "Pastas", "pasta": "Pastas", "italiana": "Pastas",
+  "pollo": "Pollo", "pollos": "Pollo",
+  "mariscos": "Mariscos", "pescado": "Mariscos",
+  "carnes": "Carnes / Parrilla", "parrilla": "Carnes / Parrilla", "asado": "Carnes / Parrilla",
+  "arabe": "Árabe", "árabe": "Árabe",
+  "peruano": "Peruano", "peruana": "Peruano", "ceviche": "Peruano",
+  "india": "India", "hindu": "India",
+  "coreano": "Coreano", "coreana": "Coreano", "korean": "Coreano",
+  "thai": "Thai", "tailandesa": "Thai",
+  "ramen": "Ramen",
+  "fusion": "Fusión", "fusión": "Fusión",
+  "cafe": "Café", "café": "Café", "cafeteria": "Café",
+  "postres": "Postres", "postre": "Postres",
+  "brunch": "Brunch",
+  "chifa": "Chifa",
+  "empanadas": "Empanadas", "empanada": "Empanadas",
+  "poke": "Poke Bowl", "poke bowl": "Poke Bowl",
+  "sandwich": "Sandwich", "sandwiches": "Sandwich",
+  "jugos": "Jugos y Smoothies", "smoothies": "Jugos y Smoothies",
+  "mediterraneo": "Mediterráneo", "mediterráneo": "Mediterráneo",
+  "sin gluten": "Sin gluten",
+};
+
+/**
+ * Parse a free-text search query to extract comuna, category, and remaining text.
+ * Handles patterns like "sushi en quinta normal", "comida mexicana en la florida", etc.
+ */
+function parseSearchQuery(q: string): { comunaDetected: string | null; categoriaDetected: string | null; remainingText: string } {
+  let text = q.toLowerCase().trim();
+  let comunaDetected: string | null = null;
+  let categoriaDetected: string | null = null;
+
+  // Try to extract comuna — check longest names first to match "Quinta Normal" before "Normal"
+  const comunasSorted = [...COMUNAS_MAESTRAS].sort((a, b) => b.length - a.length);
+  for (const comuna of comunasSorted) {
+    const idx = text.indexOf(comuna.toLowerCase());
+    if (idx !== -1) {
+      comunaDetected = comuna;
+      // Remove the comuna and any preceding "en", "de", "en la", etc.
+      let start = idx;
+      const before = text.slice(0, idx).trimEnd();
+      if (before.endsWith(" en") || before.endsWith(" de")) {
+        start = before.lastIndexOf(" ") === -1 ? 0 : before.lastIndexOf(" ");
+      }
+      text = (text.slice(0, start) + " " + text.slice(idx + comuna.length)).trim();
+      break;
+    }
+  }
+
+  // Try to extract category from remaining text
+  const words = text.split(/\s+/).filter(w => w.length > 0);
+  // Check multi-word aliases first (e.g., "poke bowl", "sin gluten")
+  for (const [alias, cat] of Object.entries(CATEGORIA_ALIASES)) {
+    if (alias.includes(" ") && text.includes(alias)) {
+      categoriaDetected = cat;
+      text = text.replace(alias, "").trim();
+      break;
+    }
+  }
+  // Check single-word aliases
+  if (!categoriaDetected) {
+    for (const word of words) {
+      const cat = CATEGORIA_ALIASES[word];
+      if (cat) {
+        categoriaDetected = cat;
+        text = text.replace(new RegExp(`\\b${word}\\b`, "i"), "").trim();
+        break;
+      }
+    }
+  }
+  // Also check exact category names
+  if (!categoriaDetected) {
+    for (const cat of CATEGORIAS) {
+      if (text.includes(cat.toLowerCase())) {
+        categoriaDetected = cat;
+        text = text.replace(new RegExp(cat, "i"), "").trim();
+        break;
+      }
+    }
+  }
+
+  // Clean up remaining text — remove filler words
+  const remaining = text.replace(/\b(en|de|la|el|los|las|por|para|con|comida|restaurante|restaurant|local)\b/gi, "").replace(/\s+/g, " ").trim();
+
+  return { comunaDetected, categoriaDetected, remainingText: remaining };
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,6 +112,12 @@ export async function GET(req: NextRequest) {
     const paginated = searchParams.get("paginated") === "1" || !!cursor;
     const limit = paginated ? Math.min(Number(searchParams.get("limit")) || 24, 60) : 500;
 
+    // Parse free-text query to extract structured filters
+    const parsed = q ? parseSearchQuery(q) : null;
+    const efectiveComuna = comuna || parsed?.comunaDetected || null;
+    const efectiveCategoria = categoria || parsed?.categoriaDetected || null;
+    const remainingQ = parsed?.remainingText || null;
+
     const hayFiltros = !!(categoria || comuna || q);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const whereClause: any = {
@@ -24,20 +127,25 @@ export async function GET(req: NextRequest) {
           { nombre: { not: "" } },
           { categorias: { isEmpty: false } },
           { NOT: { estadoLocal: "RECHAZADO" } },
-          // Category filter
-          ...(categoria ? [{ categorias: { has: categoria } }] : []),
-          // Comuna filter
-          ...(comuna ? [{ comuna }] : []),
-          // Search query — split words for better matching
-          ...(q ? [{
+          // Category filter (from dropdown OR parsed from query)
+          ...(efectiveCategoria ? [{ categorias: { has: efectiveCategoria } }] : []),
+          // Comuna filter (from dropdown OR parsed from query)
+          ...(efectiveComuna ? [{ comuna: efectiveComuna }] : []),
+          // Remaining search text after extracting comuna/category
+          ...(remainingQ ? [{
+            OR: [
+              { nombre: { contains: remainingQ, mode: "insensitive" as const } },
+              { descripcion: { contains: remainingQ, mode: "insensitive" as const } },
+              ...remainingQ.split(/\s+/).filter(w => w.length > 2).map(w => ({ nombre: { contains: w, mode: "insensitive" as const } })),
+            ],
+          }] : []),
+          // If query had no structured parts detected, fall back to broad text search
+          ...(q && !efectiveComuna && !efectiveCategoria && !remainingQ ? [{
             OR: [
               { nombre: { contains: q, mode: "insensitive" as const } },
               { comuna: { contains: q, mode: "insensitive" as const } },
-              // Match categories case-insensitive (capitalize first letter of each word)
               { categorias: { hasSome: q.split(/\s+/).filter(w => w.length > 2).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()) } },
               { descripcion: { contains: q, mode: "insensitive" as const } },
-              // Also match each word individually in nombre
-              ...q.split(/\s+/).filter(w => w.length > 2).map(w => ({ nombre: { contains: w, mode: "insensitive" as const } })),
             ],
           }] : []),
         ],

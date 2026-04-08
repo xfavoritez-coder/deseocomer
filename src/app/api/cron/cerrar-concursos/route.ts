@@ -114,6 +114,9 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
+      // Marcar ANTES de enviar para evitar duplicados si la función se reintenta
+      await prisma.concurso.update({ where: { id: c.id }, data: { recordatorio24h: true } });
+
       const lider = c.participantes[0];
       const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
       let enviados = 0;
@@ -151,7 +154,6 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         }
       }
 
-      await prisma.concurso.update({ where: { id: c.id }, data: { recordatorio24h: true } });
       log.push(`[24H_OK] ${c.id} "${c.premio}" - ${enviados}/${c.participantes.length} emails enviados`);
     }
 
