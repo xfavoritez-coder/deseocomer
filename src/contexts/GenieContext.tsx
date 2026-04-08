@@ -406,6 +406,8 @@ export function GenieProvider({ children }: { children: ReactNode }) {
       let score = (ratingBase ?? 4) * 10;
       if (l.tieneConcurso) score += 20;
       const primaryCat = l.categorias?.[0]?.toLowerCase() ?? l.categoria;
+      // Boost locals whose primary category matches the search
+      if (categoria && primaryCat === categoria.toLowerCase()) score += 30;
       const catScore = perfil.gustos.categorias[primaryCat] ?? 0;
       const secScore = (l.categorias ?? []).slice(1).reduce((acc, c) => acc + (perfil.gustos.categorias[c.toLowerCase()] ?? 0), 0);
       const comScore = perfil.gustos.comunas[l.comuna.toLowerCase()] ?? 0;

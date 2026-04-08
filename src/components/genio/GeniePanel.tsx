@@ -181,9 +181,12 @@ export default function GeniePanel() {
       const res = await fetch(`/api/locales/recomendar?${params}`);
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
-        // Pick random from top rated
-        const pool = data.filter((l: any) => (l.googleRating ?? 0) >= 4.0);
-        const candidates = pool.length >= 3 ? pool : data;
+        // Prefer locals whose primary category matches the search
+        const catLower = c.toLowerCase();
+        const primary = data.filter((l: any) => (l.categorias?.[0] ?? "").toLowerCase() === catLower);
+        const base = primary.length >= 3 ? primary : data;
+        const pool = base.filter((l: any) => (l.googleRating ?? 0) >= 4.0);
+        const candidates = pool.length >= 3 ? pool : base;
         const pick = candidates[Math.floor(Math.random() * Math.min(5, candidates.length))];
         if (pick) {
           shownIds.current.push(pick.id);

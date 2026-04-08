@@ -453,7 +453,7 @@ export default function ConcursosPage() {
                       letterSpacing: "0.05em", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                       background: misConcursos.has(c.id) ? "rgba(61,184,158,0.15)" : soon ? urg : c.modalidadConcurso === "sorteo" ? "#ec4899" : "#e8a84c",
                       border: misConcursos.has(c.id) ? "1px solid rgba(61,184,158,0.4)" : "none",
-                      color: misConcursos.has(c.id) ? "#3db89e" : soon ? "#fff" : "#0a0812",
+                      color: misConcursos.has(c.id) ? "#3db89e" : "#fff",
                     }}>
                       {misConcursos.has(c.id) ? "Ver concurso" : "Participar"}
                     </button>
