@@ -157,16 +157,21 @@ export async function POST(req: NextRequest) {
 
     // Resolve referrer name if refCode provided
     let refNombre: string | null = null;
+    let concursoInfo: { premio: string; local: string } | null = null;
     if (refCode) {
       const referidor = await prisma.usuario.findFirst({ where: { OR: [{ codigoRef: refCode.toUpperCase() }, { id: refCode }] }, select: { nombre: true } });
       refNombre = referidor?.nombre?.split(" ")[0] ?? null;
+    }
+    if (refConcursoId) {
+      const conc = await prisma.concurso.findFirst({ where: { OR: [{ id: refConcursoId }, { slug: refConcursoId }] }, select: { premio: true, local: { select: { nombre: true } } } });
+      if (conc) concursoInfo = { premio: conc.premio, local: conc.local.nombre };
     }
 
     resend.emails.send({
       from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
       to: email,
       subject: refNombre ? `${nombre.split(" ")[0]}, ${refNombre} te invitó a un concurso 🏆` : "Activa tu cuenta en DeseoComer",
-      html: buildVerificationHtml(nombre, verificationUrl, refNombre),
+      html: buildVerificationHtml(nombre, verificationUrl, refNombre, concursoInfo),
     }).catch(err => console.error("[Registro] Error enviando email:", err));
 
     // Link to lista espera comunas if exists
@@ -187,7 +192,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function buildVerificationHtml(nombre: string, url: string, refNombre?: string | null): string {
+function buildVerificationHtml(nombre: string, url: string, refNombre?: string | null, concursoInfo?: { premio: string; local: string } | null): string {
   const header = `<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>`;
   const footer = `<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div>`;
   const spam = `<p style="color:#c0a060;font-size:14px;line-height:1.5;margin-top:16px;text-align:center">¿No ves el botón? Revisa tu carpeta de <strong>spam</strong> o correo no deseado.</p>`;
@@ -198,7 +203,9 @@ function buildVerificationHtml(nombre: string, url: string, refNombre?: string |
   if (refNombre) {
     return wrap([
       `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡${refNombre} te invitó a un concurso!</h2>`,
-      `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px">Hola ${firstName}, activa tu cuenta para entrar al concurso y ganar comida gratis.</p>`,
+      concursoInfo
+        ? `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:12px">Hola ${firstName}, activa tu cuenta para entrar al concurso y ganar:</p><div style="background:rgba(232,168,76,0.06);border:1px solid rgba(232,168,76,0.15);border-radius:12px;padding:14px 18px;margin-bottom:20px;text-align:center"><p style="color:#f5d080;font-size:20px;font-weight:bold;margin:0 0 4px">🏆 ${concursoInfo.premio}</p><p style="color:rgba(240,234,214,0.5);font-size:13px;margin:0">en ${concursoInfo.local}</p></div>`
+        : `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px">Hola ${firstName}, activa tu cuenta para entrar al concurso y ganar comida gratis.</p>`,
       `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
       `<p style="color:#f5d080;font-size:14px;font-weight:bold;margin:0 0 10px;text-transform:uppercase;letter-spacing:0.08em">Así funciona:</p>`,
       `<p style="color:#f5d080;font-size:15px;line-height:2;margin:0">① Activa tu cuenta con el botón de abajo</p>`,
