@@ -594,7 +594,7 @@ function ConcursoDetallePage() {
             {!showAllRanking && (concursoData as any)?.totalParticipantes > visibles.length && (
               <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
                 <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {(concursoData as any).totalParticipantes - visibles.length} participante{(concursoData as any).totalParticipantes - visibles.length !== 1 ? "s" : ""} más</span>
-                <button onClick={async () => { try { const res = await fetch(`/api/concursos/${slug}/ranking`); const d = await res.json(); if (d.participantes) { const full = d.participantes.map((p: any) => ({ nombre: p.usuario.nombre, referidos: p.puntos, fotoUrl: p.usuario.fotoUrl, usuarioId: p.usuarioId, codigoRef: p.usuario.codigoRef })); setAllRankingData(full); } } catch {} setShowAllRanking(true); }} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
+                <button onClick={async (e) => { const btn = e.currentTarget; btn.disabled = true; btn.textContent = "Cargando..."; try { const res = await fetch(`/api/concursos/${slug}/ranking`); const d = await res.json(); if (d.participantes) { const full = d.participantes.map((p: any) => ({ nombre: p.usuario.nombre, referidos: p.puntos, fotoUrl: p.usuario.fotoUrl, usuarioId: p.usuarioId, codigoRef: p.usuario.codigoRef })); setAllRankingData(full); } } catch {} setShowAllRanking(true); }} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
               </div>
             )}
             {showAllRanking && (allRankingData.length > 0 ? allRankingData : ocultos).slice(visibles.length).map((r, i) => renderRow(r, visibles.length + i))}
@@ -671,11 +671,11 @@ function ConcursoDetallePage() {
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2, padding: "0 clamp(14px,4vw,32px) clamp(14px,3vw,20px)", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(10,8,18,0.6)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 14px 6px 6px", border: "1px solid rgba(232,168,76,0.2)" }}>
+          <Link href={`/locales/${c.localSlug || c.localId}`} style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 10, background: "rgba(10,8,18,0.6)", backdropFilter: "blur(6px)", borderRadius: 24, padding: "6px 14px 6px 6px", border: "1px solid rgba(232,168,76,0.2)", textDecoration: "none" }}>
             {c.localLogoUrl ? <img src={c.localLogoUrl} alt="" style={{ width: 30, height: 30, borderRadius: "50%", objectFit: "cover", border: "1.5px solid rgba(232,168,76,0.4)" }} />
               : <div style={{ width: 30, height: 30, borderRadius: "50%", border: "1.5px solid rgba(232,168,76,0.4)", background: "rgba(232,168,76,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c" }}>{localInitials[0]}</div>}
             <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 13, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#f0ead6" }}>{c.local}</span>
-          </div>
+          </Link>
           <h1 className="dc-cd-title" style={{ fontFamily: "var(--font-cinzel)", fontSize: 28, fontWeight: 700, color: "#f5d080", lineHeight: 1.15, margin: 0, textTransform: "uppercase", letterSpacing: "0.03em", textAlign: "center" }}>🏆 {c.premio}</h1>
           {c.descripcionPremio && <>
             <div style={{ width: '40px', height: '1px', background: 'rgba(232,168,76,0.4)', margin: '10px auto' }} />
@@ -946,7 +946,7 @@ function ConcursoDetallePage() {
   { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ambos ganan 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos para cada uno" },
   { icon: "👥", pts: "+1", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 1 punto por cada uno.", ttPts: "+1 punto" },
   { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
-  { icon: "🔗", pts: "+1", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +1 punto por cada uno que traigan. Máximo 10 puntos por esta vía.", ttPts: "+1 punto por cada uno" },
+  { icon: "🔗", pts: "+2", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +2 puntos por cada uno que traigan. Máximo 20 puntos por esta vía.", ttPts: "+2 puntos por cada uno" },
   { icon: "💛", pts: "+1", label: "Al recibir apoyo", id: "tt6", ttTitle: "Al recibir apoyo", ttText: "Cuando otro participante toca el corazón en tu perfil del ranking, tú ganas +1 punto. Solo puedes recibir un apoyo por persona cada 24 horas.", ttPts: "+1 punto para ti" },
 ].map((s, idx) => {
                   const col = idx % 3;
@@ -986,7 +986,7 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Tu referido</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: 20, padding: "2px 8px" }}>+1 pt para ti</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#3db89e", background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", borderRadius: 20, padding: "2px 8px" }}>+2 pts para ti</span>
                     <span style={{ color: "rgba(61,184,158,0.4)", fontSize: 16 }}>→</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
@@ -994,8 +994,8 @@ function ConcursoDetallePage() {
                     <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 9, color: "rgba(61,184,158,0.4)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Su referido</span>
                   </div>
                 </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros, tú ganas <strong style={{ color: "#e8a84c" }}>+1 punto</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.32)", fontStyle: "italic" }}>Máximo 10 puntos acumulables por referidos de segundo nivel.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.55, marginBottom: 10 }}>Cuando invitas a alguien a un concurso y esa persona también invita a otros, tú ganas <strong style={{ color: "#e8a84c" }}>+2 puntos</strong> por cada uno que traigan. Así tu red trabaja para ti.</p>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.32)", fontStyle: "italic" }}>Máximo 20 puntos acumulables por referidos de segundo nivel.</p>
               </div>
             </div>
           )}

@@ -128,7 +128,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
           </p>
 
           {mounted && activasAhora > 0 && (
-            <div style={{
+            <Link href="/promociones?filtro=activas" style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "8px",
@@ -141,6 +141,8 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
               background: "rgba(212,160,23,0.1)",
               border: "1px solid rgba(212,160,23,0.35)",
               color: "#d4a017",
+              textDecoration: "none",
+              cursor: "pointer",
             }}>
               <span style={{
                 width: "7px", height: "7px", borderRadius: "50%",
@@ -148,7 +150,7 @@ export default function PromocionesSection({ initialData = [] }: { initialData?:
                 animation: "dc-ps-blink 1.5s ease-in-out infinite",
               }} />
               {activasAhora} activa{activasAhora !== 1 ? "s" : ""} ahora mismo
-            </div>
+            </Link>
           )}
         </div>
 

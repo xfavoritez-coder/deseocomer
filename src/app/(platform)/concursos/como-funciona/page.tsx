@@ -116,7 +116,7 @@ export default async function ComoFuncionaPage() {
               { icon: "🆕", pts: "+3", color: "#e8a84c", label: "Traes a alguien nuevo a DeseoComer", highlight: true },
               { icon: "👥", pts: "+1", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
               { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
-              { icon: "🔗", pts: "+1", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
+              { icon: "🔗", pts: "+2", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
               { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
               { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Al recibir apoyo de otro participante", highlight: false },
             ].map((p, i) => (

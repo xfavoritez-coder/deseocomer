@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -39,12 +40,13 @@ function getSello(promo: Promocion): { text: string; color: string } | null {
 }
 
 export default function PromocionesPage() {
+  const searchParams = useSearchParams();
   const { addInteraccion } = useGenie();
   const { isAuthenticated } = useAuth();
   const [promos, setPromos] = useState<Promocion[]>(PROMOCIONES.filter(p => p.activa));
   const [promosLoading, setPromosLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-  const [filtroActivas, setFiltroActivas] = useState(false);
+  const [filtroActivas, setFiltroActivas] = useState(searchParams.get("filtro") === "activas");
   const [filtrosTipo, setFiltrosTipo] = useState<string[]>([]);
   const [diaSeleccionado, setDiaSeleccionado] = useState<string>("Todos");
   const [esCumple, setEsCumple] = useState(false);

@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
           });
           if (nivel2Part && (nivel2Part.puntosNivel2Pendientes ?? 0) > 0) {
             const n2pend = nivel2Part.puntosNivel2Pendientes ?? 0;
-            if ((nivel2Part.puntosNivel2 ?? 0) + n2pend <= 10) {
+            if ((nivel2Part.puntosNivel2 ?? 0) + n2pend <= 20) {
               await prisma.participanteConcurso.update({
                 where: { id: nivel2Part.id },
                 data: { puntos: { increment: n2pend }, puntosNivel2: { increment: n2pend }, puntosNivel2Pendientes: 0 },

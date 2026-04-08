@@ -104,11 +104,11 @@ export async function GET() {
       log(`IP check: misma=${mismaIP}, <1h=${menosDeUnaHora}, n2actual=${n2Part.puntosNivel2}`);
 
       if (mismaIP || menosDeUnaHora) {
-        await prisma.participanteConcurso.update({ where: { id: n2Part.id }, data: { puntosNivel2Pendientes: { increment: 1 } } });
+        await prisma.participanteConcurso.update({ where: { id: n2Part.id }, data: { puntosNivel2Pendientes: { increment: 2 } } });
         log(`⚠️ Pendiente (antifraude) para ${refN2?.nombre}`);
-      } else if ((n2Part.puntosNivel2 ?? 0) < 10) {
-        await prisma.participanteConcurso.update({ where: { id: n2Part.id }, data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } } });
-        log(`✅ +1 nivel2 a ${refN2?.nombre}`);
+      } else if ((n2Part.puntosNivel2 ?? 0) < 20) {
+        await prisma.participanteConcurso.update({ where: { id: n2Part.id }, data: { puntos: { increment: 2 }, puntosNivel2: { increment: 2 } } });
+        log(`✅ +2 nivel2 a ${refN2?.nombre}`);
       }
     }
 

@@ -192,17 +192,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         if (mismaIP || menosDeUnaHora) {
           await prisma.participanteConcurso.update({
             where: { id: nivel2Part.id },
-            data: { puntosNivel2Pendientes: { increment: 1 } },
+            data: { puntosNivel2Pendientes: { increment: 2 } },
           });
-        } else if ((nivel2Part.puntosNivel2 ?? 0) < 10) {
+        } else if ((nivel2Part.puntosNivel2 ?? 0) < 20) {
           await prisma.participanteConcurso.update({
             where: { id: nivel2Part.id },
-            data: { puntos: { increment: 1 }, puntosNivel2: { increment: 1 } },
+            data: { puntos: { increment: 2 }, puntosNivel2: { increment: 2 } },
           });
           const refDirectoNombre = referidorDirectoId
             ? await prisma.usuario.findUnique({ where: { id: referidorDirectoId }, select: { nombre: true } })
             : null;
-          const msgN2 = `+1 punto — ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} trajo a alguien a tu red 🧞`;
+          const msgN2 = `+2 puntos — ${refDirectoNombre?.nombre?.split(" ")[0] ?? "tu referido"} trajo a alguien a tu red 🧞`;
           const yaNotifN2 = await prisma.notificacion.findFirst({ where: { usuarioId: referidorNivel2Id, mensaje: msgN2, createdAt: { gte: new Date(Date.now() - 60000) } } });
           if (!yaNotifN2) prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: msgN2 } }).catch(() => {});
         }
