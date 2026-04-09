@@ -736,7 +736,7 @@ function ConcursoDetallePage() {
         {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
         {/* Badge cinta diagonal modalidad — solo móvil */}
         {!isProgramado && (
-          <div className="dc-cd-modalidad-badge" style={{ position: "absolute", top: -10, right: -40, zIndex: 3, width: 160, overflow: "visible", transform: "rotate(45deg)" }}>
+          <div className="dc-cd-modalidad-badge" style={{ position: "absolute", top: 18, right: -34, zIndex: 3, width: 150, transform: "rotate(45deg)" }}>
             <div style={{
               background: esSorteo
                 ? "#ec4899"
@@ -747,7 +747,7 @@ function ConcursoDetallePage() {
               fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: "0.12em",
-              padding: "6px 0",
+              padding: "5px 0",
               textAlign: "center",
               boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
               display: "flex",
