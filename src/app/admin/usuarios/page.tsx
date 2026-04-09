@@ -583,7 +583,7 @@ export default function AdminUsuarios() {
           <div key={u.id} onClick={() => selectUser(u)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", cursor: "pointer" }}>
             <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{u.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <a href={`/admin/usuarios/${u.id}/actividad`} onClick={e => e.stopPropagation()} style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block", textDecoration: "none" }} onMouseEnter={e => (e.currentTarget.style.textDecoration = "underline")} onMouseLeave={e => (e.currentTarget.style.textDecoration = "none")}>{u.nombre}</a>
+              <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>
               <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "rgba(240,234,214,0.45)", margin: "3px 0 0" }}>{u.email}</p>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "3px" }}>
