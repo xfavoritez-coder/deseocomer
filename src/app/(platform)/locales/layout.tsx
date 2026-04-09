@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Locales — Descubre dónde comer | DeseoComer",
   description: "Los mejores restaurantes, cafeterías y locales de comida de Santiago. Encuentra dónde comer hoy.",

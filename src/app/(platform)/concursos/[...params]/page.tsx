@@ -273,6 +273,7 @@ function ConcursoDetallePage() {
       if (data) {
         const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
         setRanking(newRanking);
+        setConcursoData((prev: any) => prev ? { ...prev, totalParticipantes: newRanking.length } : prev);
         if (user) {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
@@ -639,7 +640,7 @@ function ConcursoDetallePage() {
             {!showAllRanking && (concursoData as any)?.totalParticipantes > visibles.length && (
               <div style={{ padding: "12px 14px", textAlign: "center", borderBottom: "1px solid rgba(61,100,210,0.1)" }}>
                 <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)" }}>Y {(concursoData as any).totalParticipantes - visibles.length} participante{(concursoData as any).totalParticipantes - visibles.length !== 1 ? "s" : ""} más</span>
-                <button onClick={async (e) => { const btn = e.currentTarget; btn.disabled = true; btn.textContent = "Cargando..."; try { const res = await fetch(`/api/concursos/${slug}/ranking`); const d = await res.json(); if (d.participantes) { const full = d.participantes.map((p: any) => ({ nombre: p.usuario.nombre, referidos: p.puntos, fotoUrl: p.usuario.fotoUrl, usuarioId: p.usuarioId, codigoRef: p.usuario.codigoRef })); setAllRankingData(full); } } catch {} setShowAllRanking(true); }} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
+                <button onClick={async (e) => { const btn = e.currentTarget; btn.disabled = true; btn.textContent = "Cargando..."; try { const res = await fetch(`/api/concursos/${slug}/ranking`); const d = await res.json(); if (d.participantes) { const full = d.participantes.map((p: any) => ({ nombre: p.usuario.nombre, referidos: p.puntos, fotoUrl: p.usuario.fotoUrl, usuarioId: p.usuarioId, codigoRef: p.usuario.codigoRef })); setAllRankingData(full); setConcursoData((prev: any) => ({ ...prev, totalParticipantes: full.length })); } } catch {} setShowAllRanking(true); }} style={{ display: "block", margin: "8px auto 0", background: "none", border: "1px solid rgba(61,100,210,0.2)", borderRadius: 8, padding: "6px 16px", fontFamily: "var(--font-cinzel)", fontSize: 12, color: "rgba(120,140,220,0.7)", cursor: "pointer", letterSpacing: "0.06em" }}>Ver todos →</button>
               </div>
             )}
             {showAllRanking && (allRankingData.length > 0 ? allRankingData : ocultos).slice(visibles.length).map((r, i) => renderRow(r, visibles.length + i))}
@@ -733,7 +734,33 @@ function ConcursoDetallePage() {
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
         <div style={{ position: "absolute", inset: 0, background: isProgramado ? "linear-gradient(to bottom, rgba(10,8,18,0.2) 0%, rgba(10,8,18,0.96) 100%)" : "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
         {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
-        {/* Badge sorteo removido del hero — la info de sorteo se muestra en el banner debajo */}
+        {/* Badge modalidad — solo móvil */}
+        {!isProgramado && (
+          <div className="dc-cd-modalidad-badge" style={{ position: "absolute", top: 16, right: 14, zIndex: 3, overflow: "hidden" }}>
+            <div style={{
+              background: esSorteo
+                ? "linear-gradient(135deg, rgba(232,168,76,0.95), rgba(245,208,128,0.95))"
+                : "linear-gradient(135deg, rgba(61,100,210,0.95), rgba(120,160,255,0.95))",
+              color: esSorteo ? "#1a0e05" : "#fff",
+              fontFamily: "var(--font-cinzel)",
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              padding: "5px 14px 5px 10px",
+              borderRadius: "4px 4px 0 12px",
+              boxShadow: esSorteo
+                ? "0 2px 12px rgba(232,168,76,0.4)"
+                : "0 2px 12px rgba(61,100,210,0.4)",
+              display: "flex",
+              alignItems: "center",
+              gap: 5,
+            }}>
+              <span style={{ fontSize: 12 }}>{esSorteo ? "🎲" : "🏆"}</span>
+              {esSorteo ? "Sorteo" : "Mérito"}
+            </div>
+          </div>
+        )}
         {/* Back */}
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}
@@ -755,7 +782,7 @@ function ConcursoDetallePage() {
       <div className="dc-cd-body">
         <div className="dc-cd-main" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-          {/* Sorteo info banner — dismissible, auto-hides after 3 visits */}
+          {/* Sorteo info banner — only on first visit (auto-hides after 2 visits) */}
           {esSorteo && !isEnded && !isProgramado && sorteobannerVisible && (
             <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 16, padding: "18px 20px 16px", marginTop: 20, position: "relative" }}>
               <button onClick={() => { setSorteoBannerVisible(false); try { localStorage.setItem(`dc_sorteo_seen_${concursoId}`, "1"); } catch {} }} style={{ position: "absolute", top: 10, right: 12, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 16, cursor: "pointer", lineHeight: 1, padding: 4 }}>✕</button>
@@ -1100,25 +1127,7 @@ function ConcursoDetallePage() {
             </div>
           )}
 
-          {/* Sorteo reminder link — visible when top banner is dismissed */}
-          {esSorteo && !isEnded && !sorteobannerVisible && (
-            sorteoReminderOpen ? (
-              <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, padding: "16px 18px", marginTop: 4, position: "relative" }}>
-                <button onClick={() => setSorteoReminderOpen(false)} style={{ position: "absolute", top: 8, right: 10, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 14, cursor: "pointer", padding: 4 }}>✕</button>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                  <span style={{ fontSize: 14 }}>🎲</span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Modalidad sorteo</span>
-                </div>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.6)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y cualquiera dentro puede ganar.</p>
-              </div>
-            ) : (
-              <button onClick={() => setSorteoReminderOpen(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.12)", borderRadius: 10, padding: "10px 16px", cursor: "pointer", marginTop: 4 }}>
-                <span style={{ fontSize: 14 }}>🎲</span>
-                <span style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.5)" }}>¿Cómo funciona la modalidad sorteo?</span>
-                <span style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(232,168,76,0.3)" }}>→</span>
-              </button>
-            )
-          )}
+          {/* Sorteo reminder removed — info only shown on first visits via banner above */}
 
           {/* Sorteo stats box moved above ranking (after countdown) */}
 
@@ -1166,11 +1175,13 @@ function ConcursoDetallePage() {
 
           {/* 8. Ficha del local */}
           <div style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(232,168,76,0.1)", borderRadius: 12, padding: "12px 14px", display: "flex", gap: 12, alignItems: "center" }}>
-            {c.localLogoUrl ? <img src={c.localLogoUrl} alt={c.local} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.3)", flexShrink: 0 }} />
-              : <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "2px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#e8a84c", flexShrink: 0 }}>{localInitials}</div>}
+            <Link href={`/locales/${c.localSlug || c.localId}`} style={{ flexShrink: 0 }}>
+              {c.localLogoUrl ? <img src={c.localLogoUrl} alt={c.local} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", border: "2px solid rgba(232,168,76,0.3)", display: "block" }} />
+                : <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(232,168,76,0.15)", border: "2px solid rgba(232,168,76,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-cinzel)", fontSize: 14, fontWeight: 700, color: "#e8a84c" }}>{localInitials}</div>}
+            </Link>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700, margin: 0 }}>{c.local}</p>
+                <Link href={`/locales/${c.localSlug || c.localId}`} style={{ fontFamily: "var(--font-cinzel)", fontSize: 15, color: "#e8a84c", textTransform: "uppercase", fontWeight: 700, margin: 0, textDecoration: "none" }}>{c.local}</Link>
                 {((c as any).localCategorias ?? []).some((cat: string) => /vegan[oa]?/i.test(cat)) && <span style={{ fontSize: 10, color: "rgba(76,175,80,0.7)", fontFamily: "var(--font-lato)" }}>🌱</span>}
               </div>
               {(c as any).localCategoria && <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.45)", margin: "0 0 4px", textTransform: "capitalize" }}>{(c as any).localCategoria}</p>}
@@ -1295,6 +1306,7 @@ function ConcursoDetallePage() {
         .dc-cd-sidebar { display: none; }
         .dc-cd-ranking-mobile { display: block; }
         @media (min-width: 1024px) {
+          .dc-cd-modalidad-badge { display: none !important; }
           .dc-cd-hero { height: 340px !important; }
           .dc-cd-title { font-size: 36px !important; }
           .dc-cd-body { display: grid; grid-template-columns: 58% 42%; gap: 28px; max-width: 1100px; margin: 0 auto; padding: 32px 32px; align-items: start; }

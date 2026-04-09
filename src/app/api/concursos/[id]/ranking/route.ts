@@ -14,7 +14,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         usuario: { select: { id: true, nombre: true, fotoUrl: true, codigoRef: true } },
       },
       orderBy: { puntos: "desc" },
-      take: 20,
     });
     // If the requesting user isn't in the top 20, check if they're participating
     let meParticipating = false;
