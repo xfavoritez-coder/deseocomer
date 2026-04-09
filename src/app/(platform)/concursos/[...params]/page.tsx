@@ -125,9 +125,8 @@ function ConcursoDetallePage() {
             if (me) {
               setIsParticipating(true);
               setMyRefs(me.puntos ?? 0);
-              setParticipationChecked(true);
             }
-            // If not found in top 6, don't mark as checked — refreshRanking will verify
+            setParticipationChecked(true);
           }
           // Redirect from ID to slug if needed
           if (data.slug && slug !== data.slug && slug === data.id) {

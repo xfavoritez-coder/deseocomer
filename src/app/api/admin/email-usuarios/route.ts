@@ -221,10 +221,6 @@ function wrapEmail(content: string) {
 
 function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; imagenUrl: string | null; esSorteo: boolean; slug: string }) {
   const url = `https://deseocomer.com/concursos/${slug}`;
-  const modalidadBadge = esSorteo
-    ? `<span style="display:inline-block;background:#ec4899;color:#fff;font-size:12px;font-weight:bold;padding:4px 14px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px">🎲 SORTEO</span>`
-    : `<span style="display:inline-block;background:#3db89e;color:#fff;font-size:12px;font-weight:bold;padding:4px 14px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px">🏆 MÉRITO</span>`;
-
   const modalidadMsg = esSorteo
     ? `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Es modalidad <strong>sorteo</strong> — solo entra y ya estás participando. <strong style="color:#e8a84c">Cualquiera dentro puede ganar</strong>. Es gratis.</p>`
     : `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Invita amigos, suma puntos y <strong style="color:#e8a84c">gana el premio</strong>. Cada amigo que entre por tu link te da +3 puntos.</p>`;
@@ -238,9 +234,6 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, s
     : "";
 
   return wrapEmail(`
-    <div style="text-align:center;margin-bottom:16px">
-      ${modalidadBadge}
-    </div>
     <a href="${url}" style="text-decoration:none"><h2 style="color:#e8a84c;font-size:24px;margin-top:0;margin-bottom:8px;text-align:center">{{nombre}}, ¡nuevo concurso!</h2></a>
     <div style="text-align:center;margin-bottom:16px">
       ${logoHtml}<span style="color:#f0ead6;font-size:16px;font-weight:bold;vertical-align:middle">${local}</span>
