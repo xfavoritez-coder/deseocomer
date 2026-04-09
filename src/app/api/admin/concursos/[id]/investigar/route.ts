@@ -111,6 +111,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
       totalReferidos: referidos.length,
       referidos: referidos.map(r => ({
+        usuarioId: r.usuarioId,
         nombre: r.usuario.nombre,
         email: r.usuario.email,
         ip: r.usuario.ipRegistro,

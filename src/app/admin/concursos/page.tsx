@@ -365,7 +365,7 @@ export default function AdminConcursos() {
                       <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
                         <span style={{ fontSize: "0.85rem", width: "24px" }}>{i < 3 ? ["🥇", "🥈", "🥉"][i] : `${i + 1}.`}</span>
                         <div>
-                          <span style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6" }}>{p.nombre}</span>
+                          <a href={`/admin/usuarios/${p.usuarioId}/actividad`} style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", textDecoration: "none" }} onMouseEnter={e => (e.currentTarget.style.textDecoration = "underline")} onMouseLeave={e => (e.currentTarget.style.textDecoration = "none")}>{p.nombre}</a>
                           <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.3)", margin: 0 }}>{p.email}</p>
                         </div>
                       </div>
@@ -424,7 +424,7 @@ export default function AdminConcursos() {
                             {(() => {
                               const ipsDup: string[] = investigacion.analisis.ipsDuplicadas ?? [];
                               const ipPart: string = investigacion.analisis.ipParticipante ?? "";
-                              return investigacion.referidos.map((r: { nombre: string; email: string; ip: string; verificado: boolean; createdAt: string; estado: string }, ri: number) => {
+                              return investigacion.referidos.map((r: { usuarioId?: string; nombre: string; email: string; ip: string; verificado: boolean; createdAt: string; estado: string }, ri: number) => {
                                 const ipRepetida = ipsDup.includes(r.ip);
                                 const mismaIPPart = r.ip && r.ip === ipPart;
                                 const fecha = new Date(r.createdAt);
@@ -432,7 +432,7 @@ export default function AdminConcursos() {
                                 return (
                                   <div key={ri} style={{ fontFamily: "Georgia", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
                                     <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-                                      <span style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.7)", fontWeight: 600 }}>{r.nombre}</span>
+                                      {r.usuarioId ? <a href={`/admin/usuarios/${r.usuarioId}/actividad`} style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.7)", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => (e.currentTarget.style.textDecoration = "underline")} onMouseLeave={e => (e.currentTarget.style.textDecoration = "none")}>{r.nombre}</a> : <span style={{ color: r.estado === "descalificado" ? "#ff6b6b" : "rgba(240,234,214,0.7)", fontWeight: 600 }}>{r.nombre}</span>}
                                       {!r.verificado && <span style={{ color: "#e8a84c", fontSize: "0.65rem" }}>⏳</span>}
                                       {r.estado === "descalificado" && <span style={{ fontSize: "0.62rem", padding: "1px 5px", borderRadius: 4, background: "rgba(255,80,80,0.15)", color: "#ff6b6b" }}>DESC</span>}
                                     </div>
