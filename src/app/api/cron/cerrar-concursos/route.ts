@@ -121,11 +121,14 @@ export async function GET(req: NextRequest) {
       const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
       let enviados = 0;
 
-      for (const p of c.participantes) {
-        const pos = c.participantes.findIndex(x => x.id === p.id) + 1;
-        const esLider = pos === 1;
-        try {
-          await resend.emails.send({
+      // Send emails in batches of 10 for performance
+      const BATCH_SIZE = 10;
+      for (let b = 0; b < c.participantes.length; b += BATCH_SIZE) {
+        const batch = c.participantes.slice(b, b + BATCH_SIZE);
+        const results = await Promise.allSettled(batch.map(p => {
+          const pos = c.participantes.findIndex(x => x.id === p.id) + 1;
+          const esLider = pos === 1;
+          return resend.emails.send({
             from,
             to: p.usuario.email,
             subject: `⏰ ¡Última oportunidad! "${c.premio}" cierra hoy`,
@@ -148,10 +151,9 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
 <div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,
           });
-          enviados++;
-        } catch (emailErr) {
-          log.push(`[24H_ERR] ${c.id} - ${p.usuario.email}: ${emailErr}`);
-        }
+        }));
+        enviados += results.filter(r => r.status === "fulfilled").length;
+        results.forEach((r, i) => { if (r.status === "rejected") log.push(`[24H_ERR] ${c.id} - ${batch[i].usuario.email}: ${r.reason}`); });
       }
 
       log.push(`[24H_OK] ${c.id} "${c.premio}" - ${enviados}/${c.participantes.length} emails enviados`);
@@ -247,25 +249,31 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         data: { totalConcursosGanados: { increment: 1 } }
       }).catch(() => {});
 
-      // Update stats for top 20 participants
+      // Update stats for top 20 participants (batched to reduce queries)
       const allParticipants = await prisma.participanteConcurso.findMany({
         where: { concursoId: c.id, estado: { not: "descalificado" } },
         orderBy: { puntos: "desc" },
         select: { usuarioId: true, puntos: true },
+        take: 20,
       });
-      for (let i = 0; i < Math.min(allParticipants.length, 20); i++) {
-        const p = allParticipants[i];
-        const posicion = i + 1;
-        try {
-          const usr = await prisma.usuario.findUnique({ where: { id: p.usuarioId }, select: { mejorPosicion: true } });
-          await prisma.usuario.update({
+      if (allParticipants.length > 0) {
+        const userIds = allParticipants.map(p => p.usuarioId);
+        const existingUsers = await prisma.usuario.findMany({
+          where: { id: { in: userIds } },
+          select: { id: true, mejorPosicion: true },
+        });
+        const posMap = new Map(existingUsers.map(u => [u.id, u.mejorPosicion]));
+        await Promise.all(allParticipants.map((p, i) => {
+          const posicion = i + 1;
+          const mejorActual = posMap.get(p.usuarioId);
+          return prisma.usuario.update({
             where: { id: p.usuarioId },
             data: {
               totalPuntosHistoricos: { increment: p.puntos },
-              ...(!usr?.mejorPosicion || posicion < usr.mejorPosicion ? { mejorPosicion: posicion } : {}),
+              ...(!mejorActual || posicion < mejorActual ? { mejorPosicion: posicion } : {}),
             },
-          });
-        } catch {}
+          }).catch(() => {});
+        }));
       }
 
       // Fetch winner data

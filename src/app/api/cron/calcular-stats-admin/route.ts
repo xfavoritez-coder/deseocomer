@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
     let cursor: string | undefined;
     while (true) {
       const batch = await prisma.usuario.findMany({
-        take: 100,
+        take: 500,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
         where: { geniePerfil: { not: undefined } },
         select: { id: true, geniePerfil: true, comidasFavoritas: true },

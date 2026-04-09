@@ -55,6 +55,9 @@ model Usuario {
   toastsDismissed ToastDismissed[]
   notificaciones  Notificacion[]
   comidasCustom   ComidaCustom[]
+
+  @@index([emailVerificado, createdAt])
+  @@index([createdAt])
 }
 
 enum OrigenLocal {
@@ -134,6 +137,10 @@ model Local {
   resenas       Resena[]
   alertasEspera LocalAlertaEspera[]
   captador      Captador? @relation("CaptadorLocales", fields: [captadorId], references: [id])
+
+  @@index([activo, estadoLocal])
+  @@index([comuna])
+  @@index([createdAt])
 }
 
 model MenuItem {
@@ -250,6 +257,8 @@ model ParticipanteConcurso {
   @@index([usuarioId])
   @@index([referidorDirectoId])
   @@index([referidorNivel2Id])
+  @@index([concursoId, estado, puntos])
+  @@index([createdAt])
 }
 
 model Promocion {
@@ -401,6 +410,9 @@ model Notificacion {
   leida       Boolean  @default(false)
   createdAt   DateTime @default(now())
   usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+
+  @@index([usuarioId, tipo, createdAt])
+  @@index([usuarioId, leida])
 }
 
 model CategoriaComida {

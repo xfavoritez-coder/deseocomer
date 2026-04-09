@@ -7,22 +7,27 @@ import { ultimoRecordatorioHtml } from "@/emails/ultimoRecordatorioHtml";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-async function prepararUsuario(u: { id: string; nombre: string; email: string; tokenVerificacion: string | null; updatedAt: Date }) {
-  // Buscar referidor
-  const participacion = await prisma.participanteConcurso.findFirst({
-    where: { usuarioId: u.id, referidorDirectoId: { not: null } },
-    select: { referidorDirectoId: true },
+// Pre-load referrer names for a batch of users (avoids N+1 queries)
+async function cargarReferidores(userIds: string[]): Promise<Map<string, string>> {
+  const participaciones = await prisma.participanteConcurso.findMany({
+    where: { usuarioId: { in: userIds }, referidorDirectoId: { not: null } },
+    select: { usuarioId: true, referidorDirectoId: true },
+    distinct: ["usuarioId"],
   });
-  let referidorNombre: string | null = null;
-  if (participacion?.referidorDirectoId) {
-    const referidor = await prisma.usuario.findUnique({
-      where: { id: participacion.referidorDirectoId },
-      select: { nombre: true },
-    });
-    referidorNombre = referidor?.nombre?.split(/\s+/)[0] ?? null;
+  const refIds = [...new Set(participaciones.map(p => p.referidorDirectoId!))];
+  const referidores = refIds.length > 0
+    ? await prisma.usuario.findMany({ where: { id: { in: refIds } }, select: { id: true, nombre: true } })
+    : [];
+  const refMap = new Map(referidores.map(r => [r.id, r.nombre?.split(/\s+/)[0] ?? null]));
+  const result = new Map<string, string>();
+  for (const p of participaciones) {
+    const nombre = refMap.get(p.referidorDirectoId!);
+    if (nombre) result.set(p.usuarioId, nombre);
   }
+  return result;
+}
 
-  // Regenerar token si no tiene o si expiró (>48h)
+async function prepararToken(u: { id: string; tokenVerificacion: string | null; updatedAt: Date }): Promise<string> {
   let token = u.tokenVerificacion;
   const tokenEdad = Date.now() - new Date(u.updatedAt).getTime();
   if (!token || tokenEdad > 48 * 3600000) {
@@ -32,8 +37,7 @@ async function prepararUsuario(u: { id: string; nombre: string; email: string; t
       data: { tokenVerificacion: token },
     });
   }
-
-  return { referidorNombre, token };
+  return token;
 }
 
 export async function GET(req: NextRequest) {
@@ -68,9 +72,11 @@ export async function GET(req: NextRequest) {
       select: { id: true, nombre: true, email: true, tokenVerificacion: true, updatedAt: true },
     });
 
+    const refsPrimer = await cargarReferidores(usuariosPrimer.map(u => u.id));
     for (const u of usuariosPrimer) {
       try {
-        const { referidorNombre, token } = await prepararUsuario(u);
+        const referidorNombre = refsPrimer.get(u.id) ?? null;
+        const token = await prepararToken(u);
         const html = recordatorioActivacionHtml({
           nombre: u.nombre,
           concursosActivos,
@@ -106,7 +112,7 @@ export async function GET(req: NextRequest) {
     let enviadosSegundo = 0;
     for (const u of usuariosSegundo) {
       try {
-        const { token } = await prepararUsuario(u);
+        const token = await prepararToken(u);
         const nombre = u.nombre.split(/\s+/)[0];
         const activarUrl = `https://deseocomer.com/verificar-email?token=${token}`;
         const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0"><div style="max-width:560px;margin:0 auto;padding:40px 24px"><div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div><div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px"><h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">¡Ya casi estás dentro, ${nombre}!</h2><p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Te registraste en DeseoComer pero tu cuenta aún no está activa. Quizás no viste el correo o pensaste que ya estaba listo — solo falta un click.</p><p style="color:#f5d080;font-size:17px;font-weight:bold;margin-bottom:12px">¿Qué te estás perdiendo?</p><div style="margin-bottom:24px"><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">🏆 <strong style="color:#e8a84c">${concursosActivos} concursos activos</strong> donde puedes ganar comida gratis</p><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">🎯 <strong style="color:#e8a84c">3 puntos gratis</strong> — cada amigo que invites te da +3 y él también gana +3</p><p style="color:#f5d080;font-size:15px;line-height:2;margin:0">📈 <strong style="color:#e8a84c">Sube en el ranking</strong> — comparte tu link, suma puntos y gana el premio</p></div><div style="text-align:center;margin-bottom:24px"><a href="${activarUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Activar mi cuenta →</a></div><p style="color:#5a4028;font-size:13px;line-height:1.6">Muchas personas ya están participando. No te quedes fuera.</p></div><div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div></div></body></html>`;
@@ -136,9 +142,11 @@ export async function GET(req: NextRequest) {
       select: { id: true, nombre: true, email: true, tokenVerificacion: true, updatedAt: true },
     });
 
+    const refsUltimo = await cargarReferidores(usuariosUltimo.map(u => u.id));
     for (const u of usuariosUltimo) {
       try {
-        const { referidorNombre, token } = await prepararUsuario(u);
+        const referidorNombre = refsUltimo.get(u.id) ?? null;
+        const token = await prepararToken(u);
         const html = ultimoRecordatorioHtml({
           nombre: u.nombre,
           concursosActivos,

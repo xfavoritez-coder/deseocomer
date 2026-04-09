@@ -25,6 +25,14 @@ export async function GET(req: NextRequest) {
       select: { id: true, slug: true, premio: true },
     });
 
+    // Pre-fetch all recent ranking alerts to avoid N+1 queries
+    const hace48h = new Date(Date.now() - 48 * 3600000);
+    const alertasRecientes = await prisma.notificacion.findMany({
+      where: { tipo: "alerta_ranking", createdAt: { gte: hace48h } },
+      select: { usuarioId: true },
+    });
+    const alertadosSet = new Set(alertasRecientes.map(a => a.usuarioId));
+
     for (const c of concursos) {
       const top = await prisma.participanteConcurso.findMany({
         where: { concursoId: c.id, estado: { not: "descalificado" } },
@@ -45,11 +53,7 @@ export async function GET(req: NextRequest) {
       if (diff > 15) continue;
 
       // ── Alert to 2nd place: "El 1° te lleva X puntos" ──
-      const already2nd = await prisma.notificacion.findFirst({
-        where: { usuarioId: segundo.usuarioId, tipo: "alerta_ranking", createdAt: { gte: new Date(Date.now() - 48 * 3600000) } },
-      });
-
-      if (!already2nd && segundo.puntos >= 3) {
+      if (!alertadosSet.has(segundo.usuarioId) && segundo.puntos >= 3) {
         const nombre2 = segundo.usuario.nombre.split(" ")[0];
         const nombre1 = primero.usuario.nombre.split(" ")[0];
         const amigosNecesarios = Math.ceil(diff / 3);
@@ -76,6 +80,7 @@ export async function GET(req: NextRequest) {
             ].join("")),
           });
           enviados++;
+          alertadosSet.add(segundo.usuarioId);
           log.push(`[2do] ${nombre2} en "${premioCorto}" (diff: ${diff})`);
         } catch (err) {
           log.push(`[ERROR] email 2do ${segundo.usuario.email}: ${err}`);
@@ -84,11 +89,7 @@ export async function GET(req: NextRequest) {
 
       // ── Alert to 1st place: "El 2° se está acercando" (only if diff <= 6 pts) ──
       if (diff <= 6 && primero.puntos >= 3) {
-        const already1st = await prisma.notificacion.findFirst({
-          where: { usuarioId: primero.usuarioId, tipo: "alerta_ranking", createdAt: { gte: new Date(Date.now() - 48 * 3600000) } },
-        });
-
-        if (!already1st) {
+        if (!alertadosSet.has(primero.usuarioId)) {
           const nombre1 = primero.usuario.nombre.split(" ")[0];
           const nombre2 = segundo.usuario.nombre.split(" ")[0];
 
@@ -113,6 +114,7 @@ export async function GET(req: NextRequest) {
               ].join("")),
             });
             enviados++;
+            alertadosSet.add(primero.usuarioId);
             log.push(`[1ro] ${nombre1} en "${premioCorto}" (diff: ${diff})`);
           } catch (err) {
             log.push(`[ERROR] email 1ro ${primero.usuario.email}: ${err}`);

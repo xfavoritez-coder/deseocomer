@@ -18,15 +18,15 @@
     },
     {
       "path": "/api/cron/alerta-ranking",
-      "schedule": "0 9 * * *"
+      "schedule": "0 */4 * * *"
     },
     {
       "path": "/api/cron/contar-comunas",
-      "schedule": "0 4 * * *"
+      "schedule": "0 */4 * * *"
     },
     {
       "path": "/api/cron/calcular-stats-admin",
-      "schedule": "0 5 * * *"
+      "schedule": "0 */6 * * *"
     }
   ]
 }

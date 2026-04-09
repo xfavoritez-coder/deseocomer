@@ -54,6 +54,7 @@ export default function LiveActivityToast() {
 
     const poll = async () => {
       if (!active) return;
+      if (document.hidden) return;
       try {
         const res = await fetch("/api/participaciones-recientes");
         const data: Participacion[] = await res.json();

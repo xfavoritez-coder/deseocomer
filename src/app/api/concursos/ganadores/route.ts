@@ -13,8 +13,7 @@ export async function GET() {
       orderBy: { fechaFin: "desc" },
     });
 
-    return NextResponse.json(
-      ganadores.map(g => ({
+    return NextResponse.json(ganadores.map(g => ({
         id: g.id,
         slug: g.slug,
         premio: g.premio,
@@ -28,8 +27,9 @@ export async function GET() {
         estado: g.estado,
         fechaFin: g.premioConfirmadoAt?.toLocaleDateString("es-CL") ?? g.fechaFin?.toLocaleDateString("es-CL") ?? "",
         participantes: g._count.participantes,
-      })),
-    );
+      })), {
+      headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
+    });
   } catch (error) {
     console.error("[API ganadores]", error);
     return NextResponse.json([]);
