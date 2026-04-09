@@ -306,11 +306,11 @@ function ConcursoDetallePage() {
   }, [slug, user, isAuthenticated]);
 
   useEffect(() => {
-    // Skip first call — initial data already comes from the main fetch
-    if (!initialLoadDone.current) { initialLoadDone.current = true; }
-    else { refreshRanking(); }
-    return undefined;
-  }, [refreshRanking]);
+    // Refresh ranking once after auth loads (skip initial — data comes from main fetch)
+    if (!initialLoadDone.current) { initialLoadDone.current = true; return; }
+    if (isAuthenticated && user && slug) refreshRanking();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id, slug]);
   useEffect(() => { if (user) setMyRefs(getRefCount(concursoId, user.id)); }, [user, concursoId]);
 
   useEffect(() => {
@@ -1206,13 +1206,13 @@ function ConcursoDetallePage() {
         <div onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 9998 }} />
         <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 20, padding: 24, maxWidth: 340, width: "90vw" }}>
           <button onClick={() => { setShowCodigoModal(false); setShowCodigoInput(false); setCodigoInput(""); setCodigoValidacion(null); }} style={{ position: "absolute", top: 12, right: 16, background: "none", border: "none", color: "rgba(240,234,214,0.3)", fontSize: 20, cursor: "pointer", lineHeight: 1 }}>×</button>
-          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>🏆 Entra a este concurso</h3>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 8, textAlign: "center" }}>Únete gratis, invita amigos y gana</p>
-          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(61,184,158,0.7)", lineHeight: 1.4, marginBottom: 16, textAlign: "center" }}>🎟️ Ganas 1 punto al entrar · Invita amigos y ambos ganan +3</p>
+          <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1rem", color: "#f5d080", textTransform: "uppercase", marginBottom: 8, textAlign: "center" }}>{esSorteo ? "🎲 Entra al sorteo" : "🏆 Entra a este concurso"}</h3>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.45)", lineHeight: 1.5, marginBottom: 8, textAlign: "center" }}>{esSorteo ? "Es gratis — solo entra y ya estás participando" : "Únete gratis, invita amigos y gana"}</p>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(61,184,158,0.7)", lineHeight: 1.4, marginBottom: 16, textAlign: "center" }}>{esSorteo ? "✅ Cualquiera dentro puede ganar" : "🎟️ Ganas 1 punto al entrar · Invita amigos y ambos ganan +3"}</p>
 
           {!showCodigoInput ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <button onClick={() => doJoinWithCode()} style={{ padding: 14, background: "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "var(--bg-primary)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>Entrar al concurso</button>
+              <button onClick={() => doJoinWithCode()} style={{ padding: 14, background: esSorteo ? "#ec4899" : "var(--accent)", border: "none", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, color: "#fff", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.08em" }}>{esSorteo ? "Entrar al sorteo" : "Entrar al concurso"}</button>
               <button onClick={() => setShowCodigoInput(true)} style={{ padding: 0, background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(232,168,76,0.6)", cursor: "pointer", textAlign: "center", lineHeight: 1.5 }}>¿Un amigo te invitó? <span style={{ textDecoration: "underline" }}>Ingresa su código y súmale puntos</span></button>
             </div>
           ) : (
