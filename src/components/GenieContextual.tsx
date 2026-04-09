@@ -63,35 +63,6 @@ function getMensajeContextual(
         opciones: ["Ver ofertas", "Explorar todo"],
       };
     }
-    if (!isLoggedIn) {
-      return {
-        texto: "🏮 Guarda tus locales favoritos para que te recomiende mejor",
-        opciones: ["Registrarme", "Ahora no"],
-      };
-    }
-  }
-
-  if (pathname === "/concursos" || pathname.startsWith("/concursos/")) {
-    try { if (localStorage.getItem("genio_concursos_ya_sabe")) return null; } catch {}
-    return {
-      texto: "🏆 ¿Sabías que puedes ganar comida gratis invitando amigos?",
-      opciones: ["¿Cómo funciona?", "Ya lo sé"],
-    };
-  }
-
-  if (pathname === "/promociones" || pathname.startsWith("/promociones/")) {
-    if (esCumple && isLoggedIn) {
-      return {
-        texto: `🎂 Hay promociones especiales de cumpleaños para ti${nombre}`,
-        opciones: ["Ver mis ofertas", "Ver todas"],
-      };
-    }
-    if (favCat && isLoggedIn) {
-      return {
-        texto: `🏮 Hay promociones de ${favCat} que podrían interesarte`,
-        opciones: ["Ver ahora", "Explorar todo"],
-      };
-    }
   }
 
   return null;

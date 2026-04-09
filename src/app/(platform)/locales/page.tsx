@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { boostScore } from "@/lib/personalizacion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -47,19 +48,34 @@ const localesMock: any[] = [];
 
 export default function LocalesPage() {
   const { addInteraccion, comunasConLocales, totalLocales } = useGenie();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [locales, setLocales] = useState<any[]>(localesMock);
   const [loading, setLoading] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
-  const [busqueda, setBusqueda] = useState("");
-  const [busquedaActiva, setBusquedaActiva] = useState("");
-  const [categoriaActiva, setCategoriaActiva] = useState("Todos");
+  const [busqueda, setBusqueda] = useState(searchParams.get("q") ?? "");
+  const [busquedaActiva, setBusquedaActiva] = useState(searchParams.get("q") ?? "");
+  const [categoriaActiva, setCategoriaActiva] = useState(searchParams.get("categoria") ?? "Todos");
   const [soloAbiertos, setSoloAbiertos] = useState(false);
   const [soloConConcursos, setSoloConConcursos] = useState(false);
   const [soloConPromociones, setSoloConPromociones] = useState(false);
   const [ordenamiento, setOrdenamiento] = useState("para_ti");
-  const [comunaActiva, setComunaActiva] = useState("");
+  const [comunaActiva, setComunaActiva] = useState(searchParams.get("comuna") ?? "");
   const CATEGORIAS = ["Todos", ...CATEGORIAS_MASTER];
+
+  // Sync filters to URL query params
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (categoriaActiva && categoriaActiva !== "Todos") params.set("categoria", categoriaActiva);
+    if (comunaActiva) params.set("comuna", comunaActiva);
+    if (busquedaActiva) params.set("q", busquedaActiva);
+    const qs = params.toString();
+    const newUrl = qs ? `/locales?${qs}` : "/locales";
+    if (newUrl !== window.location.pathname + window.location.search) {
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [categoriaActiva, comunaActiva, busquedaActiva]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -475,6 +491,9 @@ export default function LocalesPage() {
           padding-bottom: 4px;
         }
         .dc-filtros-fila::-webkit-scrollbar { display: none; }
+        @media (min-width: 768px) {
+          .dc-filtros-fila { flex-wrap: wrap; overflow-x: visible; }
+        }
         @keyframes dcPulseD { 0%,100% { opacity:0.3; transform:scale(1); } 50% { opacity:1; transform:scale(1.3); } }
         .dc-comuna { font-family: var(--font-lato); font-size: 12px; color: rgba(240,234,214,0.4); font-weight: 400; }
         .dc-sep { font-size: 11px; color: rgba(240,234,214,0.2); }
