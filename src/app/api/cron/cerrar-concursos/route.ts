@@ -198,25 +198,33 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
       let ganador3Id: string | null = null;
 
       if (c.modalidadConcurso === "sorteo") {
-        // Sorteo ponderado: necesitamos todos los participantes
+        // Sorteo: necesitamos todos los participantes
         const todos = await prisma.participanteConcurso.findMany({
           where: { concursoId: c.id, estado: { not: "descalificado" } },
           include: { usuario: { select: { id: true, nombre: true, email: true, telefono: true } } },
         });
-        // Calcular total de boletos y elegir con probabilidad ponderada
-        const totalBoletos = todos.reduce((acc, p) => acc + Math.max(1, p.puntos), 0);
-        let rand = Math.random() * totalBoletos;
-        let ganadorIdx = 0;
-        for (let i = 0; i < todos.length; i++) {
-          rand -= Math.max(1, todos[i].puntos);
-          if (rand <= 0) { ganadorIdx = i; break; }
+
+        // Si hay ganador preseleccionado por admin, usarlo
+        if (c.ganadorPreseleccionadoId && todos.some(p => p.usuario.id === c.ganadorPreseleccionadoId)) {
+          ganador1Id = c.ganadorPreseleccionadoId;
+          const ganadorNombre = todos.find(p => p.usuario.id === ganador1Id)?.usuario.nombre ?? "?";
+          log.push(`[SORTEO_PRESEL] ${c.id} "${c.premio}" — ganador preseleccionado: ${ganadorNombre}`);
+        } else {
+          // Sorteo ponderado aleatorio
+          const totalBoletos = todos.reduce((acc, p) => acc + Math.max(1, p.puntos), 0);
+          let rand = Math.random() * totalBoletos;
+          let ganadorIdx = 0;
+          for (let i = 0; i < todos.length; i++) {
+            rand -= Math.max(1, todos[i].puntos);
+            if (rand <= 0) { ganadorIdx = i; break; }
+          }
+          ganador1Id = todos[ganadorIdx].usuario.id;
+          log.push(`[SORTEO] ${c.id} "${c.premio}" — ${totalBoletos} boletos, ganador: ${todos[ganadorIdx].usuario.nombre}`);
         }
-        ganador1Id = todos[ganadorIdx].usuario.id;
         // Fallbacks por ranking (para si el ganador no reclama)
         const fallbacks = todos.filter(p => p.usuario.id !== ganador1Id).sort((a, b) => b.puntos - a.puntos);
         ganador2Id = fallbacks[0]?.usuario.id ?? null;
         ganador3Id = fallbacks[1]?.usuario.id ?? null;
-        log.push(`[SORTEO] ${c.id} "${c.premio}" — ${totalBoletos} boletos, ganador: ${todos[ganadorIdx].usuario.nombre}`);
       } else {
         // Méritos: ranking normal
         const [p1, p2, p3] = c.participantes;

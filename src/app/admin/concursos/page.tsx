@@ -362,6 +362,26 @@ export default function AdminConcursos() {
               { label: "Participantes", value: String(sel._count?.participantes ?? 0) },
             ].map(r => <Row key={r.label} label={r.label} value={r.value} />)}
 
+            {/* Preseleccionar ganador (solo sorteos activos) */}
+            {detalle?.modalidadConcurso === "sorteo" && sel.activo && participantesAdmin.length > 0 && (
+              <div style={{ marginTop: "16px", padding: "14px", background: "rgba(236,72,153,0.06)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: "10px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "#ec4899", marginBottom: "8px" }}>🎲 Preseleccionar ganador del sorteo</p>
+                <select value={detalle?.ganadorPreseleccionadoId ?? ""} onChange={async e => {
+                  const val = e.target.value || null;
+                  try {
+                    await adminFetch(`/api/admin/concursos/${sel.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ganadorPreseleccionadoId: val }) });
+                    setDetalle((d: any) => d ? { ...d, ganadorPreseleccionadoId: val } : d);
+                  } catch {}
+                }} style={{ width: "100%", padding: "8px 12px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(236,72,153,0.3)", borderRadius: "8px", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.82rem", outline: "none" }}>
+                  <option value="">Aleatorio (sorteo normal)</option>
+                  {participantesAdmin.filter(p => p.estado !== "descalificado").map(p => (
+                    <option key={p.usuarioId} value={p.usuarioId}>{p.nombre} — {p.puntos} pts</option>
+                  ))}
+                </select>
+                {detalle?.ganadorPreseleccionadoId && <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(236,72,153,0.6)", marginTop: "6px" }}>Este participante ganará cuando el concurso cierre</p>}
+              </div>
+            )}
+
             {/* Participantes con sistema antifraude */}
             <div style={{ marginTop: "24px" }}>
               <SectionTitle>Participantes {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length > 0 && <span style={{ background: "rgba(232,168,76,0.2)", color: "#e8a84c", borderRadius: "10px", padding: "2px 8px", fontSize: "0.72rem", marginLeft: "8px" }}>⚠️ {participantesAdmin.filter(p => p.sospechoso || p.estado === "sospechoso").length} sospechosos</span>}</SectionTitle>

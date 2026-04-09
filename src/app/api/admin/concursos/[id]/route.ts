@@ -108,6 +108,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.condiciones !== undefined && { condiciones: body.condiciones }),
         ...(body.activo !== undefined && { activo: body.activo }),
         ...(body.modalidadConcurso !== undefined && { modalidadConcurso: body.modalidadConcurso }),
+        ...(body.ganadorPreseleccionadoId !== undefined && { ganadorPreseleccionadoId: body.ganadorPreseleccionadoId || null }),
       },
     });
     return NextResponse.json(concurso);

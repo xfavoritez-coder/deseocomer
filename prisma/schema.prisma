@@ -193,6 +193,7 @@ model Concurso {
 
   // New estado-based fields
   estado              EstadoConcurso @default(activo)
+  ganadorPreseleccionadoId String?
   ganador1Id          String?
   ganador2Id          String?
   ganador3Id          String?
