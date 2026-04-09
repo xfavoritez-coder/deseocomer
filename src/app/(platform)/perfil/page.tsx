@@ -739,8 +739,7 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
           <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)", display: "block", marginBottom: "8px" }}>Estilo alimentario</span>
           <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             {[
-              { value: "omnivoro", emoji: "🍽️", label: "Como de todo" },
-              { value: "carnivoro", emoji: "🥩", label: "Carnívoro" },
+              { value: "", emoji: "🍽️", label: "Como de todo" },
               { value: "vegetariano", emoji: "🌱", label: "Vegetariano" },
               { value: "vegano", emoji: "🌿", label: "Vegano" },
             ].map(opt => (

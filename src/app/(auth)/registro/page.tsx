@@ -180,10 +180,9 @@ function RegistroContent() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "20px" }}>Así te mostramos lo que más te gusta</p>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "20px" }}>
                 {[
-                  { value: "carnivoro", label: "Carnívoro", emoji: "🥩" },
+                  { value: "", label: "Como de todo", emoji: "🍽️" },
                   { value: "vegetariano", label: "Vegetariano", emoji: "🌱" },
                   { value: "vegano", label: "Vegano", emoji: "🌿" },
-                  { value: "omnivoro", label: "Como de todo", emoji: "🍽️" },
                 ].map(e => (
                   <button key={e.value} onClick={() => { setEstilo(e.value); setOnboardingStep(2); }} style={{
                     display: "flex", alignItems: "center", gap: "12px", padding: "14px 20px",
@@ -321,7 +320,7 @@ function RegistroContent() {
                 }
                 setOnboardingStep(3);
               }} style={btnS}>¡Listo, vamos!</button>
-              <button onClick={() => setOnboardingStep(3)} style={{ display: "block", margin: "12px auto 0", background: "none", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>Saltar →</button>
+              {/* Saltar removido — comidas favoritas es obligatorio para personalización */}
             </div>
           ) : onboardingStep === 3 ? (
             // Step 3: Verification reminder

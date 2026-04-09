@@ -10,7 +10,41 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { action, filtros, plantilla, concursoId, asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl } = body;
+    const { action, filtros, plantilla, concursoId, asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl, emailPrueba } = body;
+
+    // Test mode — send single email to a test address
+    if (action === "test") {
+      if (!emailPrueba) return NextResponse.json({ error: "Falta email de prueba" }, { status: 400 });
+      const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
+      let asunto = "";
+      let htmlBody = "";
+
+      if (plantilla === "nuevo_concurso" && concursoId) {
+        const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true, logoUrl: true } } } });
+        if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
+        const esSorteo = concurso.modalidadConcurso === "sorteo";
+        asunto = `[PRUEBA] ${esSorteo ? "🎲 ¡Sorteo: " + concurso.premio + " gratis!" : "🏆 Nuevo concurso: gana " + concurso.premio}`;
+        htmlBody = buildNuevoConcursoHtml({ premio: concurso.premio, local: concurso.local.nombre, logoUrl: concurso.local.logoUrl, esSorteo, slug: concurso.slug || concurso.id, descripcion: concurso.descripcion });
+      } else if (plantilla === "concurso_por_terminar" && concursoId) {
+        const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true } }, _count: { select: { participantes: true } } } });
+        if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
+        const esSorteo = concurso.modalidadConcurso === "sorteo";
+        asunto = `[PRUEBA] ⏰ ¡Último día para ${esSorteo ? "entrar al sorteo" : "ganar"}: ${concurso.premio}!`;
+        htmlBody = buildPorTerminarHtml({ premio: concurso.premio, local: concurso.local.nombre, participantes: concurso._count.participantes, esSorteo, slug: concurso.slug || concurso.id });
+      } else if (plantilla === "personalizado") {
+        asunto = `[PRUEBA] ${asuntoCustom || "Novedades de DeseoComer"}`;
+        htmlBody = buildPersonalizadoHtml({ titulo: tituloCustom || "", cuerpo: cuerpoCustom || "", ctaTexto: ctaTexto || "", ctaUrl: ctaUrl || "https://deseocomer.com" });
+      } else {
+        return NextResponse.json({ error: "Selecciona una plantilla y concurso" }, { status: 400 });
+      }
+
+      try {
+        await resend.emails.send({ from, to: emailPrueba, subject: asunto, html: htmlBody.replace(/\{\{nombre\}\}/g, "Prueba") });
+        return NextResponse.json({ ok: true });
+      } catch (e) {
+        return NextResponse.json({ error: e instanceof Error ? e.message : "Error al enviar" }, { status: 500 });
+      }
+    }
 
     // Build where clause from filters
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

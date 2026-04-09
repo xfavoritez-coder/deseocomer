@@ -97,6 +97,25 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showNotifs]);
 
+  const [needsComidas, setNeedsComidas] = useState(false);
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (s.comidasFavoritas && s.comidasFavoritas.length > 0) { setNeedsComidas(false); return; }
+      // Check DB
+      fetch(`/api/usuarios/${s.id || user.id}/perfil`).then(r => r.ok ? r.json() : null).then(d => {
+        if (d?.comidasFavoritas?.length > 0) {
+          s.comidasFavoritas = d.comidasFavoritas;
+          localStorage.setItem("deseocomer_session", JSON.stringify(s));
+          setNeedsComidas(false);
+        } else {
+          setNeedsComidas(true);
+        }
+      }).catch(() => {});
+    } catch {}
+  }, [isAuthenticated, user]);
+
   const initials = user?.nombre
     ? user.nombre.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
     : "?";
@@ -111,6 +130,15 @@ export default function Navbar() {
     <>
       {/* Spacer to push content below fixed navbar (not on home) */}
       {!isHome && <div className="dc-nav-spacer" />}
+
+      {/* Banner completar perfil */}
+      {needsComidas && !isHome && pathname !== "/perfil" && (
+        <div style={{ background: "linear-gradient(135deg, rgba(232,168,76,0.12), rgba(232,168,76,0.06))", borderBottom: "1px solid rgba(232,168,76,0.2)", padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <span style={{ fontSize: 14 }}>🍽️</span>
+          <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.7)" }}>Completa tu perfil para recomendarte mejor</span>
+          <a href="/perfil" style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "#e8a84c", textDecoration: "none", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 8, padding: "4px 12px", whiteSpace: "nowrap" }}>Completar →</a>
+        </div>
+      )}
       <nav className={`dc-nav${isHome ? (scrolled ? " dc-nav--solid" : " dc-nav--transparent") : ""}`}>
         <a href="/" className="dc-nav-logo">🏮 DeseoComer</a>
 

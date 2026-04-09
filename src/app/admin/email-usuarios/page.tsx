@@ -40,6 +40,8 @@ export default function AdminEmailUsuarios() {
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [resultado, setResultado] = useState<{ enviados: number; errores: number; total: number; log: string[] } | null>(null);
+  const [pruebaEmail, setPruebaEmail] = useState("");
+  const [pruebaEnviando, setPruebaEnviando] = useState(false);
 
   const show = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 4000); };
 
@@ -117,7 +119,6 @@ export default function AdminEmailUsuarios() {
             <select value={estiloAlimentario} onChange={e => setEstiloAlimentario(e.target.value)} style={selectS}>
               <option value="todos">Todos</option>
               <option value="como_de_todo">🍽️ Come de todo</option>
-              <option value="carnivoro">🥩 Carnívoro</option>
               <option value="vegetariano">🌱 Vegetariano</option>
               <option value="vegano">🌿 Vegano</option>
             </select>
@@ -223,6 +224,31 @@ export default function AdminEmailUsuarios() {
       {/* 3. ENVIAR */}
       <div style={cardS}>
         <p style={titleS}>3. Enviar</p>
+
+        {/* Email de prueba */}
+        <div style={{ marginBottom: 20, padding: 16, background: "rgba(61,184,158,0.04)", border: "1px solid rgba(61,184,158,0.15)", borderRadius: 12 }}>
+          <label style={{ ...labelS, color: "#3db89e" }}>Enviar email de prueba</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <input value={pruebaEmail} onChange={e => setPruebaEmail(e.target.value)} placeholder="tu@email.com" style={{ ...inputS, flex: 1 }} />
+            <button onClick={async () => {
+              if (!pruebaEmail.includes("@")) { show("Email inválido"); return; }
+              setPruebaEnviando(true);
+              try {
+                const res = await adminFetch("/api/admin/email-usuarios", {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    action: "test", emailPrueba: pruebaEmail, plantilla, concursoId,
+                    asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl,
+                  }),
+                });
+                const d = await res.json();
+                if (d.ok) show("✓ Email de prueba enviado a " + pruebaEmail);
+                else show("Error: " + (d.error || "desconocido"));
+              } catch { show("Error de conexión"); }
+              setPruebaEnviando(false);
+            }} disabled={pruebaEnviando} style={{ ...btnSecS, whiteSpace: "nowrap" }}>{pruebaEnviando ? "Enviando..." : "Enviar prueba"}</button>
+          </div>
+        </div>
 
         {preview !== null && preview > 0 && (
           <p style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "rgba(240,234,214,0.6)", marginBottom: 16 }}>
