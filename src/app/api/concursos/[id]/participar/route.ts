@@ -207,9 +207,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           const msgN2 = `+2 puntos — ${rdNombre} trajo a alguien a tu red 🧞`;
           prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: msgN2, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
 
-          // Email nivel 2 — una sola vez en la vida del usuario
+          // Email + notificación red — una sola vez en la vida del usuario
           const nivel2Usuario = await prisma.usuario.findUnique({ where: { id: referidorNivel2Id }, select: { email: true, nombre: true, emailNivel2Enviado: true } });
           if (nivel2Usuario && !nivel2Usuario.emailNivel2Enviado) {
+            // Notificación que lleva a ver la red en el perfil
+            prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id!, tipo: "red_crecio", mensaje: `🌐 ¡Formaste tu red! ${rdNombre} trajo a alguien y tú ganaste +2 pts. Mira tu red en tu perfil`, datos: { link: "/perfil?tab=concursos" } } }).catch(() => {});
             const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <noreply@deseocomer.com>";
             resend.emails.send({
               from,
