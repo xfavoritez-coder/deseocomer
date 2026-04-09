@@ -4,6 +4,8 @@ import { adminFetch } from "@/lib/adminFetch";
 import SubirFoto from "@/components/SubirFoto";
 import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
 
+const COMUNAS = ["Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura", "San Miguel", "Maipú", "La Florida", "Pudahuel", "Peñalolén", "Macul", "La Reina", "Lo Barnechea", "Huechuraba", "Recoleta", "Independencia", "Estación Central", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "La Cisterna", "La Granja", "La Pintana", "Lo Espejo", "Lo Prado", "Quilicura", "Quinta Normal", "Renca", "San Bernardo", "San Joaquín", "San Ramón", "Padre Hurtado", "Puente Alto", "Pirque", "Colina", "Lampa", "Melipilla", "Talagante", "Pedro Aguirre Cerda", "Buin"];
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
 
@@ -22,6 +24,9 @@ export default function AdminLocales() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectMotivo, setRejectMotivo] = useState("");
+  const [crearMode, setCrearMode] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [crearData, setCrearData] = useState<Record<string, any>>({ nombre: "", email: "", password: "", comuna: "", direccion: "", categorias: [], descripcion: "" });
   const CATEGORIAS = [...CATEGORIAS_MASTER];
 
   useEffect(() => { adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
@@ -118,12 +123,19 @@ export default function AdminLocales() {
       {editMode && (
         <div style={cardS}>
           <p style={cardTitleS}>Editar datos</p>
-          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["comuna", "Comuna"], ["direccion", "Dirección"], ["telefono", "Teléfono"], ["instagram", "Instagram"], ["sitioWeb", "Sitio web"]].map(([key, label]) => (
+          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["direccion", "Dirección"], ["telefono", "Teléfono"], ["instagram", "Instagram"], ["sitioWeb", "Sitio web"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
             </div>
           ))}
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Comuna</label>
+            <select style={inputS} value={editData.comuna ?? ""} onChange={e => setEditData(d => ({ ...d, comuna: e.target.value }))}>
+              <option value="">Seleccionar...</option>
+              {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
           <div style={{ marginBottom: "10px" }}>
             <label style={labelS}>Categorías (máx. 3)</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
@@ -242,6 +254,61 @@ export default function AdminLocales() {
           <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.78rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? "#e8a84c" : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f}</button>
         ))}
       </div>
+
+      {/* Create local */}
+      {!crearMode ? (
+        <button onClick={() => setCrearMode(true)} style={{ ...btnOutlineS, marginBottom: "16px", textAlign: "center", color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>+ Crear local</button>
+      ) : (
+        <div style={{ ...cardS, marginBottom: "16px" }}>
+          <p style={cardTitleS}>Crear nuevo local</p>
+          {[["nombre", "Nombre del local"], ["email", "Email"], ["password", "Contraseña"], ["direccion", "Dirección"]].map(([key, label]) => (
+            <div key={key} style={{ marginBottom: "10px" }}>
+              <label style={labelS}>{label}</label>
+              <input style={inputS} type={key === "password" ? "password" : "text"} value={crearData[key] ?? ""} onChange={e => setCrearData(d => ({ ...d, [key]: e.target.value }))} />
+            </div>
+          ))}
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Comuna</label>
+            <select style={inputS} value={crearData.comuna ?? ""} onChange={e => setCrearData(d => ({ ...d, comuna: e.target.value }))}>
+              <option value="">Seleccionar...</option>
+              {COMUNAS.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Categorías (máx. 3)</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+              {CATEGORIAS.map(cat => {
+                const cats: string[] = crearData.categorias ?? [];
+                const sel2 = cats.includes(cat);
+                const maxed = cats.length >= 3 && !sel2;
+                return <button key={cat} type="button" disabled={maxed} onClick={() => {
+                  setCrearData(d => ({ ...d, categorias: sel2 ? cats.filter((c: string) => c !== cat) : [...cats, cat] }));
+                }} style={{ padding: "5px 12px", borderRadius: "16px", border: sel2 ? "1px solid #e8a84c" : "1px solid rgba(232,168,76,0.15)", background: sel2 ? "rgba(232,168,76,0.15)" : "transparent", color: sel2 ? "#e8a84c" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: maxed ? "default" : "pointer", opacity: maxed ? 0.3 : 1 }}>{CATEGORIA_EMOJI[cat] ?? "🍽️"} {cat}</button>;
+              })}
+            </div>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Descripción (opcional)</label>
+            <textarea style={{ ...inputS, minHeight: "60px", resize: "vertical" }} value={crearData.descripcion ?? ""} onChange={e => setCrearData(d => ({ ...d, descripcion: e.target.value }))} />
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button onClick={async () => {
+              if (!crearData.nombre?.trim() || !crearData.email?.trim() || !crearData.password?.trim()) { show("Nombre, email y contraseña son obligatorios"); return; }
+              setLoading(true);
+              try {
+                const res = await adminFetch("/api/admin/locales", {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(crearData),
+                });
+                const d = await res.json();
+                if (d.error) { show("Error: " + d.error); } else { setLocales(p => [d, ...p]); setCrearMode(false); setCrearData({ nombre: "", email: "", password: "", comuna: "", direccion: "", categorias: [], descripcion: "" }); show("✓ Local creado"); }
+              } catch { show("Error de conexión"); }
+              setLoading(false);
+            }} disabled={loading} style={btnPrimaryS}>{loading ? "..." : "Crear"}</button>
+            <button onClick={() => setCrearMode(false)} style={btnSecS}>Cancelar</button>
+          </div>
+        </div>
+      )}
 
       {/* Card list (mobile-friendly) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
