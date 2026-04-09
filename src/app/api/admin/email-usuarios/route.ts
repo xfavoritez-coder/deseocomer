@@ -230,7 +230,7 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, s
     : `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Invita amigos, suma puntos y <strong style="color:#e8a84c">gana el premio</strong>. Cada amigo que entre por tu link te da +3 puntos.</p>`;
 
   const logoHtml = logoUrl
-    ? `<img src="${logoUrl}" alt="${local}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(232,168,76,0.3);margin-right:12px;vertical-align:middle" />`
+    ? `<img src="${logoUrl}" alt="${local}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(232,168,76,0.3);margin-right:8px;vertical-align:middle" />`
     : "";
 
   const fotoHtml = imagenUrl
