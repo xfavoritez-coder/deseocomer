@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
           });
           const premioCorto = conc.premio && conc.premio.length > 30 ? conc.premio.substring(0, 30) + "..." : (conc.premio || "un concurso");
           const nombreRef = user.telefono ? (await prisma.usuario.findUnique({ where: { id: userId }, select: { nombre: true } }))?.nombre?.split(" ")[0] ?? "Alguien" : "Alguien";
-          prisma.notificacion.create({ data: { usuarioId: mr.referidorDirectoId, tipo: "referido_nuevo", mensaje: `${nombreRef} verificó su cuenta. ¡+${refPart.puntosPendientes} puntos para ti en "${premioCorto}"! 🎉` } }).catch(() => {});
+          prisma.notificacion.create({ data: { usuarioId: mr.referidorDirectoId, tipo: "referido_nuevo", mensaje: `${nombreRef} verificó su cuenta. ¡+${refPart.puntosPendientes} puntos para ti en "${premioCorto}"! 🎉`, datos: { concursoSlug: conc.slug || mr.concursoId } } }).catch(() => {});
         }
 
         // Credit nivel 2 pending points
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
 
       // Notify user about credited points
       if (puntosAcreditados > 0) {
-        prisma.notificacion.create({ data: { usuarioId: userId, tipo: "verificacion", mensaje: `¡Celular verificado! Se acreditaron +${puntosAcreditados} puntos de referido en tus concursos 🎉` } }).catch(() => {});
+        prisma.notificacion.create({ data: { usuarioId: userId, tipo: "verificacion", mensaje: `¡Celular verificado! Se acreditaron +${puntosAcreditados} puntos de referido en tus concursos 🎉`, datos: { link: "/perfil" } } }).catch(() => {});
       }
     } catch (e) { console.error("[SMS verificar] Error acreditando puntos:", e); }
 
