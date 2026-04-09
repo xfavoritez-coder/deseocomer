@@ -192,6 +192,12 @@ function ConcursoDetallePage() {
   const [joinLoading, setJoinLoading] = useState(false);
   const [joinError, setJoinError] = useState("");
   const [showPhoneModal, setShowPhoneModal] = useState(false);
+  // Auto-open phone modal from notification link
+  useEffect(() => {
+    if (searchParams.get("verificar") === "tel" && isAuthenticated && user && !user.telefonoVerificado) {
+      setShowPhoneModal(true);
+    }
+  }, [isAuthenticated, user]);
   const [showCondiciones, setShowCondiciones] = useState(false);
   const [phoneInput, setPhoneInput] = useState("");
   const [phoneError, setPhoneError] = useState("");

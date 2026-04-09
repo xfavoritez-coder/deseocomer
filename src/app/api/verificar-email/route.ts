@@ -121,7 +121,7 @@ export async function GET(req: NextRequest) {
                 const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
                 prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
               } else {
-                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}"! Verifica tu celular para activar tus +3 puntos de referido 📱`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}"! Verifica tu celular para activar tus +3 puntos de referido 📱`, datos: { concursoSlug: cSlug, abrirVerificarTel: true } } }).catch(() => {});
               }
 
               // Notificación al referidor
