@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const userId = _req.nextUrl.searchParams.get("userId");
     const participantes = await prisma.participanteConcurso.findMany({
       where: { concurso: { OR: [{ id }, { slug: id }] }, estado: { not: "descalificado" } },
       select: {
@@ -15,7 +16,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       orderBy: { puntos: "desc" },
       take: 20,
     });
-    return NextResponse.json({ participantes }, {
+    // If the requesting user isn't in the top 20, check if they're participating
+    let meParticipating = false;
+    if (userId && !participantes.some(p => p.usuarioId === userId)) {
+      const myPart = await prisma.participanteConcurso.findFirst({
+        where: { concurso: { OR: [{ id }, { slug: id }] }, usuarioId: userId, estado: { not: "descalificado" } },
+        select: { id: true },
+      });
+      meParticipating = !!myPart;
+    }
+    return NextResponse.json({ participantes, meParticipating }, {
       headers: {
         "Cache-Control": "public, s-maxage=5, stale-while-revalidate=15",
       },

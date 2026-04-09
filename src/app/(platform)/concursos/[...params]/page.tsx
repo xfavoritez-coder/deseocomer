@@ -119,12 +119,15 @@ function ConcursoDetallePage() {
           const _fn = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length-1][0]}.` : p[0]; };
           setConcursoData({ ...built, estado: data.estado ?? "activo", modalidadConcurso: data.modalidadConcurso ?? "meritos", ganadorActualNombre: data.ganadorActual?.nombre ? _fn(data.ganadorActual.nombre) : null, premioConfirmadoAt: data.premioConfirmadoAt ?? null, fotoGanador: data.fotoGanador ?? null, fechaActivacion: data.fechaActivacion ?? null, listaEsperaCount: data._count?.listaEspera ?? 0, descalificados: data.descalificados ?? 0 });
           setTimer(getTimeLeft(built.endsAt)); setRanking(built.ranking); setConcursoId(data.slug || data.id);
-          // Mark participation checked from initial load data
+          // Mark participation from initial load data (top 6 only)
           if (user && data.participantes) {
             const me = (data.participantes as { usuarioId?: string; puntos?: number }[]).find(p => p.usuarioId === user.id);
-            setIsParticipating(!!me);
-            if (me) setMyRefs(me.puntos ?? 0);
-            setParticipationChecked(true);
+            if (me) {
+              setIsParticipating(true);
+              setMyRefs(me.puntos ?? 0);
+              setParticipationChecked(true);
+            }
+            // If not found in top 6, don't mark as checked — refreshRanking will verify
           }
           // Redirect from ID to slug if needed
           if (data.slug && slug !== data.slug && slug === data.id) {
@@ -265,14 +268,15 @@ function ConcursoDetallePage() {
   const initialLoadDone = useRef(false);
   const refreshRanking = useCallback(() => {
     if (!slug) return;
-    fetch(`/api/concursos/${encodeURIComponent(slug)}/ranking`).then(r => r.ok ? r.json() : null).then(data => {
+    const rankUrl = user ? `/api/concursos/${encodeURIComponent(slug)}/ranking?userId=${user.id}` : `/api/concursos/${encodeURIComponent(slug)}/ranking`;
+    fetch(rankUrl).then(r => r.ok ? r.json() : null).then(data => {
       if (data) {
         const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
         setRanking(newRanking);
         if (user) {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
-          setIsParticipating(!!me);
+          setIsParticipating(!!me || !!data.meParticipating);
           setParticipationChecked(true);
           // Check if user was surpassed
           if (isAuthenticated) {
