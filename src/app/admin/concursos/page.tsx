@@ -62,10 +62,11 @@ export default function AdminConcursos() {
   const [editDescripcion, setEditDescripcion] = useState("");
   const [editCondiciones, setEditCondiciones] = useState("");
   const [editFechaFin, setEditFechaFin] = useState("");
+  const [editModalidad, setEditModalidad] = useState("meritos");
   const [editError, setEditError] = useState("");
   const [accionLoading, setAccionLoading] = useState("");
   const [creando, setCreando] = useState(false);
-  const [crearForm, setCrearForm] = useState({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "" });
+  const [crearForm, setCrearForm] = useState({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "", modalidad: "meritos" });
   const [localesList, setLocalesList] = useState<{ id: string; nombre: string }[]>([]);
   const [crearError, setCrearError] = useState("");
 
@@ -93,13 +94,13 @@ export default function AdminConcursos() {
     try {
       const res = await adminFetch("/api/concursos", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localId: crearForm.localId, premio: crearForm.premio, descripcion: crearForm.descripcion.trim() || null, condiciones: crearForm.condiciones.trim() || null, fechaFin, imagenUrl: crearForm.imagenUrl || null }),
+        body: JSON.stringify({ localId: crearForm.localId, premio: crearForm.premio, descripcion: crearForm.descripcion.trim() || null, condiciones: crearForm.condiciones.trim() || null, fechaFin, imagenUrl: crearForm.imagenUrl || null, modalidadConcurso: crearForm.modalidad }),
       });
       if (!res.ok) { const d = await res.json(); setCrearError(d.error ?? "Error al crear"); return; }
       const nuevo = await res.json();
       setConcursos(prev => [nuevo, ...prev]);
       setCreando(false);
-      setCrearForm({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "" });
+      setCrearForm({ localId: "", premio: "", descripcion: "", condiciones: "", duracion: "7", imagenUrl: "", modalidad: "meritos" });
     } catch { setCrearError("Error de conexión"); }
   };
 
@@ -165,6 +166,7 @@ export default function AdminConcursos() {
     setEditDescripcion(sel.descripcion ?? "");
     setEditCondiciones(sel.condiciones ?? "");
     setEditFechaFin(new Date(sel.fechaFin).toISOString().slice(0, 16));
+    setEditModalidad(sel.modalidadConcurso ?? "meritos");
     setEditError("");
     setEditando(true);
   };
@@ -175,7 +177,7 @@ export default function AdminConcursos() {
     try {
       const res = await adminFetch(`/api/admin/concursos/${sel.id}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ premio: editPremio, descripcion: editDescripcion.trim() || null, condiciones: editCondiciones.trim() || null, fechaFin: new Date(editFechaFin).toISOString(), imagenUrl: sel.imagenUrl || null }),
+        body: JSON.stringify({ premio: editPremio, descripcion: editDescripcion.trim() || null, condiciones: editCondiciones.trim() || null, fechaFin: new Date(editFechaFin).toISOString(), imagenUrl: sel.imagenUrl || null, modalidadConcurso: editModalidad }),
       });
       if (!res.ok) { const d = await res.json(); setEditError(d.error ?? "Error al guardar"); return; }
       const updated = await res.json();
@@ -289,6 +291,13 @@ export default function AdminConcursos() {
                 <option value="7">7 dias</option>
                 <option value="14">14 dias</option>
                 <option value="30">30 dias</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Modalidad</label>
+              <select style={EDIT_INPUT} value={crearForm.modalidad} onChange={e => setCrearForm(f => ({ ...f, modalidad: e.target.value }))}>
+                <option value="meritos">🏆 Mérito</option>
+                <option value="sorteo">🎲 Sorteo</option>
               </select>
             </div>
             <div>
@@ -535,6 +544,13 @@ export default function AdminConcursos() {
                   <div>
                     <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Condiciones</label>
                     <textarea style={{ ...EDIT_INPUT, resize: "vertical", minHeight: "50px" }} value={editCondiciones} onChange={e => setEditCondiciones(e.target.value)} placeholder="Opcional" />
+                  </div>
+                  <div>
+                    <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Modalidad</label>
+                    <select style={EDIT_INPUT} value={editModalidad} onChange={e => setEditModalidad(e.target.value)}>
+                      <option value="meritos">🏆 Mérito</option>
+                      <option value="sorteo">🎲 Sorteo</option>
+                    </select>
                   </div>
                   <div>
                     <label style={{ fontFamily: "Georgia", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", display: "block", marginBottom: "4px" }}>Foto del concurso</label>
