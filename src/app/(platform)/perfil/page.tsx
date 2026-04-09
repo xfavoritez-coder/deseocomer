@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -45,12 +45,91 @@ function timeAgo(ts: number): string {
   return `hace ${days}d`;
 }
 
+const COMIDAS_DEFAULT = ["Pizza", "Sushi", "Hamburguesa", "Mexicano", "Vegano", "Vegetariano", "Saludable", "Pastas", "Pollo", "Mariscos", "Carnes / Parrilla", "Árabe", "Peruano", "Ramen", "Café", "Postres", "Brunch", "Empanadas", "Poke Bowl"];
+
+function CompletarComidasModal({ onClose, userId }: { onClose: () => void; userId?: string }) {
+  const [estilo, setEstilo] = useState("");
+  const [comidas, setComidas] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [cats, setCats] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/categorias").then(r => r.json()).then(d => { if (Array.isArray(d)) setCats(d.map((c: { nombre: string }) => c.nombre)); }).catch(() => {});
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (s.estiloAlimentario) setEstilo(s.estiloAlimentario);
+      if (Array.isArray(s.comidasFavoritas) && s.comidasFavoritas.length > 0) setComidas(s.comidasFavoritas);
+    } catch {}
+  }, []);
+
+  const save = async () => {
+    if (comidas.length < 2) return;
+    setSaving(true);
+    try {
+      const s = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      const uid = userId || s.id;
+      if (uid) {
+        await fetch("/api/usuarios/preferencias", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: uid, estiloAlimentario: estilo, comidasFavoritas: comidas }) });
+        s.estiloAlimentario = estilo;
+        s.comidasFavoritas = comidas;
+        localStorage.setItem("deseocomer_session", JSON.stringify(s));
+      }
+    } catch {}
+    setSaving(false);
+    onClose();
+  };
+
+  const lista = cats.length > 0 ? cats : COMIDAS_DEFAULT;
+
+  return (<>
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 9998, backdropFilter: "blur(4px)" }} />
+    <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 9999, width: "92%", maxWidth: 480, maxHeight: "85vh", overflow: "auto", background: "rgba(20,12,35,0.98)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 20, padding: "28px 24px", boxShadow: "0 0 60px rgba(0,0,0,0.8)" }}>
+      <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)", fontSize: "0.9rem", cursor: "pointer" }}>✕</button>
+      <p style={{ fontSize: 28, textAlign: "center", marginBottom: 8 }}>🍽️</p>
+      <h3 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1.1rem", color: "var(--accent)", textAlign: "center", marginBottom: 6 }}>¿Qué te gusta comer?</h3>
+      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.5)", textAlign: "center", marginBottom: 20, lineHeight: 1.5 }}>Selecciona al menos 2 para personalizar tu experiencia</p>
+
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Estilo</p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {[{ value: "", emoji: "🍽️", label: "Como de todo" }, { value: "vegetariano", emoji: "🌱", label: "Vegetariano" }, { value: "vegano", emoji: "🌿", label: "Vegano" }].map(opt => (
+            <button key={opt.label} onClick={() => setEstilo(estilo === opt.value ? "" : opt.value)} style={{ padding: "7px 14px", borderRadius: 12, cursor: "pointer", border: estilo === opt.value ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.1)", background: estilo === opt.value ? "rgba(232,168,76,0.12)" : "transparent", color: estilo === opt.value ? "var(--accent)" : "rgba(240,234,214,0.5)", fontFamily: "var(--font-lato)", fontSize: "0.82rem" }}>{opt.emoji} {opt.label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "rgba(240,234,214,0.4)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>Comidas favoritas ({comidas.length}/5)</p>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {lista.map(c => {
+            const sel2 = comidas.includes(c);
+            const maxed = comidas.length >= 5 && !sel2;
+            return <button key={c} onClick={() => setComidas(prev => sel2 ? prev.filter(x => x !== c) : maxed ? prev : [...prev, c])} style={{ padding: "6px 12px", borderRadius: 16, border: sel2 ? "1px solid var(--accent)" : "1px solid rgba(255,255,255,0.08)", background: sel2 ? "rgba(232,168,76,0.15)" : "transparent", color: sel2 ? "var(--accent)" : maxed ? "rgba(240,234,214,0.2)" : "rgba(240,234,214,0.5)", fontFamily: "var(--font-lato)", fontSize: "0.8rem", cursor: maxed ? "default" : "pointer", opacity: maxed ? 0.3 : 1 }}>{c}</button>;
+          })}
+        </div>
+      </div>
+
+      <button onClick={save} disabled={comidas.length < 2 || saving} style={{ width: "100%", padding: 14, background: comidas.length >= 2 ? "var(--accent)" : "rgba(232,168,76,0.3)", color: "#1a0e05", fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", fontWeight: 700, border: "none", borderRadius: 14, cursor: comidas.length >= 2 ? "pointer" : "default", textTransform: "uppercase", letterSpacing: "0.08em" }}>{saving ? "Guardando..." : "¡Listo!"}</button>
+    </div>
+  </>);
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function PerfilPage() {
+export default function PerfilPageWrapper() {
+  return <Suspense><PerfilPage /></Suspense>;
+}
+
+function PerfilPage() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<TabKey>("concursos");
+  const [showCompletarModal, setShowCompletarModal] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("completar") === "comidas") setShowCompletarModal(true);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) router.replace("/login?next=/perfil");
@@ -148,6 +227,9 @@ export default function PerfilPage() {
         {tab === "genio" && <TabGenio />}
         {tab === "perfil" && <TabPerfil user={user} logout={logout} router={router} />}
       </div>
+
+      {/* Modal completar comidas favoritas */}
+      {showCompletarModal && <CompletarComidasModal onClose={() => { setShowCompletarModal(false); window.history.replaceState(null, "", "/perfil"); }} userId={user?.id} />}
 
       <Footer />
 

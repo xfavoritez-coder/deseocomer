@@ -26,9 +26,9 @@ export default function SubirFoto({ onUpload, folder = "general", label = "Subir
     if (preview) setPreviewUrl(preview);
   }, [preview]);
 
-  const compressImage = (file: File, maxWidth = 1200, quality = 0.8): Promise<File> => {
+  const compressImage = (file: File, maxWidth = 800, quality = 0.75): Promise<File> => {
     return new Promise((resolve) => {
-      if (file.size < 500 * 1024) { resolve(file); return; } // Skip if <500KB
+      if (file.size < 100 * 1024) { resolve(file); return; } // Skip if <100KB
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");

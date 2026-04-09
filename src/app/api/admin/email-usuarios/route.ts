@@ -234,11 +234,10 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, s
     : "";
 
   const fotoHtml = imagenUrl
-    ? `<a href="${url}" style="display:block;margin-bottom:20px;border-radius:14px;overflow:hidden"><img src="${imagenUrl}" alt="${premio}" style="width:100%;height:200px;object-fit:cover;display:block" /></a>`
+    ? `<a href="${url}" style="display:block;width:80%;margin:0 auto 20px;border-radius:14px;overflow:hidden"><img src="${imagenUrl}" alt="${premio}" style="width:100%;height:150px;object-fit:cover;display:block" /></a>`
     : "";
 
   return wrapEmail(`
-    ${fotoHtml}
     <div style="text-align:center;margin-bottom:16px">
       ${modalidadBadge}
     </div>
@@ -246,6 +245,7 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, s
     <div style="text-align:center;margin-bottom:16px">
       ${logoHtml}<span style="color:#f0ead6;font-size:16px;font-weight:bold;vertical-align:middle">${local}</span>
     </div>
+    ${fotoHtml}
     <a href="${url}" style="text-decoration:none"><div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center">
       <p style="font-size:22px;color:#f5d080;font-weight:bold;margin:0">🏆 ${premio}</p>
     </div></a>
