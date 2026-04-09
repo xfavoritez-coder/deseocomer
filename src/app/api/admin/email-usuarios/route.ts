@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       let htmlBody = "";
 
       if (plantilla === "nuevo_concurso" && concursoId) {
-        const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true, logoUrl: true } } } });
+        const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true, logoUrl: true, portadaUrl: true } } } });
         if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
         const esSorteo = concurso.modalidadConcurso === "sorteo";
         asunto = `[PRUEBA] ${esSorteo ? "🎲 ¡Sorteo: " + concurso.premio + " gratis!" : "🏆 Nuevo concurso: gana " + concurso.premio}`;
-        htmlBody = buildNuevoConcursoHtml({ premio: concurso.premio, local: concurso.local.nombre, logoUrl: concurso.local.logoUrl, esSorteo, slug: concurso.slug || concurso.id });
+        htmlBody = buildNuevoConcursoHtml({ premio: concurso.premio, local: concurso.local.nombre, logoUrl: concurso.local.logoUrl, imagenUrl: concurso.imagenUrl || concurso.local.portadaUrl, esSorteo, slug: concurso.slug || concurso.id });
       } else if (plantilla === "concurso_por_terminar" && concursoId) {
         const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true } }, _count: { select: { participantes: true } } } });
         if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     if (plantilla === "nuevo_concurso" && concursoId) {
       const concurso = await prisma.concurso.findFirst({
         where: { OR: [{ id: concursoId }, { slug: concursoId }] },
-        include: { local: { select: { nombre: true, logoUrl: true } } },
+        include: { local: { select: { nombre: true, logoUrl: true, portadaUrl: true } } },
       });
       if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
 
@@ -125,13 +125,14 @@ export async function POST(req: NextRequest) {
         premio: concurso.premio,
         local: concurso.local.nombre,
         logoUrl: concurso.local.logoUrl,
+        imagenUrl: concurso.imagenUrl || concurso.local.portadaUrl,
         esSorteo,
         slug,
       });
     } else if (plantilla === "concurso_por_terminar" && concursoId) {
       const concurso = await prisma.concurso.findFirst({
         where: { OR: [{ id: concursoId }, { slug: concursoId }] },
-        include: { local: { select: { nombre: true } }, _count: { select: { participantes: true } } },
+        include: { local: { select: { nombre: true, portadaUrl: true } }, _count: { select: { participantes: true } } },
       });
       if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
 
@@ -218,7 +219,7 @@ function wrapEmail(content: string) {
 </div></body></html>`;
 }
 
-function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; esSorteo: boolean; slug: string }) {
+function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; imagenUrl: string | null; esSorteo: boolean; slug: string }) {
   const url = `https://deseocomer.com/concursos/${slug}`;
   const modalidadBadge = esSorteo
     ? `<span style="display:inline-block;background:#ec4899;color:#fff;font-size:12px;font-weight:bold;padding:4px 14px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px">🎲 SORTEO</span>`
@@ -232,17 +233,22 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug }: { pr
     ? `<img src="${logoUrl}" alt="${local}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(232,168,76,0.3);margin-right:12px;vertical-align:middle" />`
     : "";
 
+  const fotoHtml = imagenUrl
+    ? `<a href="${url}" style="display:block;margin-bottom:20px;border-radius:14px;overflow:hidden"><img src="${imagenUrl}" alt="${premio}" style="width:100%;height:200px;object-fit:cover;display:block" /></a>`
+    : "";
+
   return wrapEmail(`
-    <div style="text-align:center;margin-bottom:20px">
+    ${fotoHtml}
+    <div style="text-align:center;margin-bottom:16px">
       ${modalidadBadge}
     </div>
-    <h2 style="color:#e8a84c;font-size:24px;margin-top:0;margin-bottom:8px;text-align:center">{{nombre}}, ¡nuevo concurso!</h2>
+    <a href="${url}" style="text-decoration:none"><h2 style="color:#e8a84c;font-size:24px;margin-top:0;margin-bottom:8px;text-align:center">{{nombre}}, ¡nuevo concurso!</h2></a>
     <div style="text-align:center;margin-bottom:16px">
       ${logoHtml}<span style="color:#f0ead6;font-size:16px;font-weight:bold;vertical-align:middle">${local}</span>
     </div>
-    <div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center">
+    <a href="${url}" style="text-decoration:none"><div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center">
       <p style="font-size:22px;color:#f5d080;font-weight:bold;margin:0">🏆 ${premio}</p>
-    </div>
+    </div></a>
     ${modalidadMsg}
     <div style="text-align:center;margin-bottom:20px">
       <a href="${url}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">${esSorteo ? "Entrar al sorteo →" : "Participar ahora →"}</a>
