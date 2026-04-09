@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
         const esSorteo = concurso.modalidadConcurso === "sorteo";
         asunto = `[PRUEBA] ${esSorteo ? "🎲 ¡Sorteo: " + concurso.premio + " gratis!" : "🏆 Nuevo concurso: gana " + concurso.premio}`;
-        htmlBody = buildNuevoConcursoHtml({ premio: concurso.premio, local: concurso.local.nombre, logoUrl: concurso.local.logoUrl, esSorteo, slug: concurso.slug || concurso.id, descripcion: concurso.descripcion });
+        htmlBody = buildNuevoConcursoHtml({ premio: concurso.premio, local: concurso.local.nombre, logoUrl: concurso.local.logoUrl, esSorteo, slug: concurso.slug || concurso.id });
       } else if (plantilla === "concurso_por_terminar" && concursoId) {
         const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true } }, _count: { select: { participantes: true } } } });
         if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
@@ -127,7 +127,6 @@ export async function POST(req: NextRequest) {
         logoUrl: concurso.local.logoUrl,
         esSorteo,
         slug,
-        descripcion: concurso.descripcion,
       });
     } else if (plantilla === "concurso_por_terminar" && concursoId) {
       const concurso = await prisma.concurso.findFirst({
@@ -219,7 +218,7 @@ function wrapEmail(content: string) {
 </div></body></html>`;
 }
 
-function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug, descripcion }: { premio: string; local: string; logoUrl: string | null; esSorteo: boolean; slug: string; descripcion: string | null }) {
+function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; esSorteo: boolean; slug: string }) {
   const url = `https://deseocomer.com/concursos/${slug}`;
   const modalidadBadge = esSorteo
     ? `<span style="display:inline-block;background:#ec4899;color:#fff;font-size:12px;font-weight:bold;padding:4px 14px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px">🎲 SORTEO</span>`
@@ -233,8 +232,6 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug, descri
     ? `<img src="${logoUrl}" alt="${local}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(232,168,76,0.3);margin-right:12px;vertical-align:middle" />`
     : "";
 
-  const desc = descripcion ? `<p style="color:#c0a060;font-size:14px;line-height:1.6;margin-bottom:20px;text-align:center;font-style:italic">${descripcion.length > 150 ? descripcion.substring(0, 150) + "..." : descripcion}</p>` : "";
-
   return wrapEmail(`
     <div style="text-align:center;margin-bottom:20px">
       ${modalidadBadge}
@@ -244,10 +241,8 @@ function buildNuevoConcursoHtml({ premio, local, logoUrl, esSorteo, slug, descri
       ${logoHtml}<span style="color:#f0ead6;font-size:16px;font-weight:bold;vertical-align:middle">${local}</span>
     </div>
     <div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:14px;padding:20px;margin-bottom:20px;text-align:center">
-      <p style="font-size:14px;color:rgba(240,234,214,0.5);margin:0 0 6px;text-transform:uppercase;letter-spacing:0.1em">Premio</p>
       <p style="font-size:22px;color:#f5d080;font-weight:bold;margin:0">🏆 ${premio}</p>
     </div>
-    ${desc}
     ${modalidadMsg}
     <div style="text-align:center;margin-bottom:20px">
       <a href="${url}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">${esSorteo ? "Entrar al sorteo →" : "Participar ahora →"}</a>
