@@ -40,17 +40,21 @@ export async function POST(req: NextRequest) {
         id: true, nombre: true, email: true,
         geniePerfil: true,
         estiloAlimentario: true,
+        comidasFavoritas: true,
       },
     });
 
-    // Filter by categoria favorita (from geniePerfil)
+    // Filter by categoria favorita (from geniePerfil OR comidasFavoritas)
     if (filtros?.categoriaFavorita) {
       const cat = filtros.categoriaFavorita.toLowerCase();
       usuarios = usuarios.filter(u => {
+        // Check geniePerfil.gustos.categorias
         const gp = u.geniePerfil as { gustos?: { categorias?: Record<string, number> } } | null;
         const cats = gp?.gustos?.categorias;
-        if (!cats) return false;
-        return Object.keys(cats).some(k => k.toLowerCase().includes(cat));
+        if (cats && Object.keys(cats).some(k => k.toLowerCase().includes(cat))) return true;
+        // Check comidasFavoritas (set during registration)
+        if (u.comidasFavoritas?.some((c: string) => c.toLowerCase().includes(cat))) return true;
+        return false;
       });
     }
 
