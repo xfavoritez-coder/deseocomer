@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resend } from "@/lib/resend";
+import { nivel2Html } from "@/emails/nivel2Html";
 
 export async function GET(req: NextRequest) {
   try {
@@ -97,6 +99,14 @@ export async function GET(req: NextRequest) {
                     });
                     const refDirectoNombre = refParticipante ? (await prisma.usuario.findUnique({ where: { id: referidor.id }, select: { nombre: true } }))?.nombre?.split(" ")[0] : "tu referido";
                     prisma.notificacion.create({ data: { usuarioId: referidorNivel2Id, tipo: "nivel2", mensaje: `La red de ${refDirectoNombre ?? "tu referido"} te sumó +2 puntos en "${premioCorto}" 🧞`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                    // Email nivel 2 — una sola vez en la vida
+                    const n2User = await prisma.usuario.findUnique({ where: { id: referidorNivel2Id }, select: { email: true, nombre: true, emailNivel2Enviado: true } });
+                    if (n2User && !n2User.emailNivel2Enviado) {
+                      const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <noreply@deseocomer.com>";
+                      resend.emails.send({ from, to: n2User.email, subject: `🧞 ${n2User.nombre.split(/\s+/)[0]}, ¡tu red te está sumando puntos!`, html: nivel2Html({ nombre: n2User.nombre, referidoDirectoNombre: refDirectoNombre ?? "tu referido", premioConcurso: concurso.premio, concursoSlug: cSlug }) }).then(() => {
+                        prisma.usuario.update({ where: { id: referidorNivel2Id! }, data: { emailNivel2Enviado: true } }).catch(() => {});
+                      }).catch(() => {})
+                    }
                   } else {
                     await prisma.participanteConcurso.update({
                       where: { id: nivel2Part.id },

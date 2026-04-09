@@ -41,6 +41,7 @@ model Usuario {
   totalConcursosGanados         Int      @default(0)
   mejorPosicion                 Int?
   primerApoyoNotificado Boolean  @default(false)
+  emailNivel2Enviado    Boolean  @default(false)
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
 
