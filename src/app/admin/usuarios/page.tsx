@@ -587,7 +587,7 @@ export default function AdminUsuarios() {
                 </div>
               )}
               <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)", margin: 0 }}>{u.ipRegistro && u.ipRegistro !== "unknown" ? u.ipRegistro : ""}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")}</p>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>{new Date(u.createdAt).toLocaleDateString("es-CL")} <span style={{ color: "rgba(240,234,214,0.3)" }}>{new Date(u.createdAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}</span></p>
             </div>
           </div>
         ))}

@@ -733,19 +733,7 @@ function ConcursoDetallePage() {
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
         <div style={{ position: "absolute", inset: 0, background: isProgramado ? "linear-gradient(to bottom, rgba(10,8,18,0.2) 0%, rgba(10,8,18,0.96) 100%)" : "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
         {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
-        {esSorteo && (
-          <div style={{ position: "absolute", top: isProgramado ? 50 : 20, right: 14, zIndex: 3 }}>
-            <button onClick={(e) => { e.preventDefault(); setSorteoInfoOpen(v => !v); }} style={{ background: "rgba(236,72,153,0.12)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#ec4899", border: "1px solid rgba(236,72,153,0.3)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>🎲 Sorteo <span style={{ fontSize: 9, opacity: 0.7, marginLeft: 2 }}>ⓘ</span></button>
-            {sorteoInfoOpen && <>
-              <div onClick={() => setSorteoInfoOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 3 }} />
-              <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 260, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRadius: 14, padding: "14px 16px", zIndex: 4, boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
-                <div style={{ position: "absolute", top: -6, right: 20, width: 12, height: 12, background: "rgba(20,10,30,0.98)", border: "1px solid rgba(236,72,153,0.4)", borderRight: "none", borderBottom: "none", transform: "rotate(45deg)" }} />
-                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, color: "#e8a84c", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>🎲 Modalidad sorteo</p>
-                <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.7)", lineHeight: 1.6, margin: 0 }}>El ganador se elige <strong style={{ color: "#f5d080" }}>al azar</strong> entre todos los participantes. Es gratis y cualquiera dentro puede ganar.</p>
-              </div>
-            </>}
-          </div>
-        )}
+        {/* Badge sorteo removido del hero — la info de sorteo se muestra en el banner debajo */}
         {/* Back */}
         <Link href="/concursos" style={{ position: "absolute", top: "20px", left: 14, zIndex: 3, background: "rgba(10,8,18,0.75)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 6, padding: "5px 10px", fontFamily: "var(--font-cinzel)", fontSize: "11px", color: "rgba(240,234,214,0.55)", textDecoration: "none" }}>← Concursos</Link>
         {/* Bottom content */}

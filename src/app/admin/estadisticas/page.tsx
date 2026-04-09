@@ -103,6 +103,8 @@ export default function EstadisticasPage() {
     try {
       await adminFetch("/api/cron/calcular-stats-admin");
       loadCache();
+      // Also refresh search/page stats
+      adminFetch("/api/stats").then(r => r.json()).then(setStats).catch(() => {});
     } catch {}
     setRecalculando(false);
   };
