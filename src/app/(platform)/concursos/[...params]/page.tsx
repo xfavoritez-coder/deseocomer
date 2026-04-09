@@ -734,29 +734,28 @@ function ConcursoDetallePage() {
           : <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #2d1a08, #1a0e05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem" }}>🏆</div>}
         <div style={{ position: "absolute", inset: 0, background: isProgramado ? "linear-gradient(to bottom, rgba(10,8,18,0.2) 0%, rgba(10,8,18,0.96) 100%)" : "linear-gradient(to bottom, rgba(10,8,18,0.05) 0%, rgba(10,8,18,0.94) 100%)" }} />
         {isProgramado && <div style={{ position: "absolute", top: 20, right: 14, zIndex: 3, background: "rgba(167,139,250,0.12)", border: "1px solid rgba(167,139,250,0.3)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-cinzel)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a78bfa" }}>🔮 Próximamente</div>}
-        {/* Badge modalidad — solo móvil */}
+        {/* Badge cinta diagonal modalidad — solo móvil */}
         {!isProgramado && (
-          <div className="dc-cd-modalidad-badge" style={{ position: "absolute", top: 16, right: 14, zIndex: 3, overflow: "hidden" }}>
+          <div className="dc-cd-modalidad-badge" style={{ position: "absolute", top: -10, right: -40, zIndex: 3, width: 160, overflow: "visible", transform: "rotate(45deg)" }}>
             <div style={{
               background: esSorteo
-                ? "linear-gradient(135deg, rgba(232,168,76,0.95), rgba(245,208,128,0.95))"
-                : "linear-gradient(135deg, rgba(61,100,210,0.95), rgba(120,160,255,0.95))",
-              color: esSorteo ? "#1a0e05" : "#fff",
+                ? "#ec4899"
+                : "#3db89e",
+              color: "#fff",
               fontFamily: "var(--font-cinzel)",
               fontSize: 10,
               fontWeight: 700,
               textTransform: "uppercase",
-              letterSpacing: "0.1em",
-              padding: "5px 14px 5px 10px",
-              borderRadius: "4px 4px 0 12px",
-              boxShadow: esSorteo
-                ? "0 2px 12px rgba(232,168,76,0.4)"
-                : "0 2px 12px rgba(61,100,210,0.4)",
+              letterSpacing: "0.12em",
+              padding: "6px 0",
+              textAlign: "center",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
               display: "flex",
               alignItems: "center",
-              gap: 5,
+              justifyContent: "center",
+              gap: 4,
             }}>
-              <span style={{ fontSize: 12 }}>{esSorteo ? "🎲" : "🏆"}</span>
+              <span style={{ fontSize: 10 }}>{esSorteo ? "🎲" : "🏆"}</span>
               {esSorteo ? "Sorteo" : "Mérito"}
             </div>
           </div>
