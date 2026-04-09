@@ -36,11 +36,8 @@ export async function GET(req: NextRequest) {
         skip,
         take: limit,
         select: {
-          id: true, nombre: true, email: true, tipo: true, telefono: true, fotoUrl: true,
-          emailVerificado: true, emailVerificadoAt: true,
-          telefonoVerificado: true, telefonoVerificadoAt: true, ipRegistro: true,
-          cumpleDia: true, cumpleMes: true, cumpleAnio: true, createdAt: true,
-          estiloAlimentario: true, comidasFavoritas: true,
+          id: true, nombre: true, email: true, tipo: true, fotoUrl: true,
+          emailVerificado: true, telefonoVerificado: true, ipRegistro: true, createdAt: true,
           _count: { select: { favoritos: true, resenas: true, participaciones: true } },
         },
       }),

@@ -38,6 +38,7 @@ export default function AdminUsuarios() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsuarios, setTotalUsuarios] = useState(0);
   const [loadingList, setLoadingList] = useState(true);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const [busqDebounced, setBusqDebounced] = useState("");
 
   const fetchUsuarios = (p: number, q: string, filtro?: string, orden?: string) => {
@@ -93,6 +94,20 @@ export default function AdminUsuarios() {
   });
 
   const resetModes = () => { setEditMode(false); setPassMode(false); setDeleteConfirm(false); setDescalificarConfirm(false); };
+
+  const selectUser = async (u: U) => {
+    resetModes();
+    setLoadingDetail(true);
+    setSel(u); // show immediately with basic data
+    try {
+      const res = await adminFetch(`/api/admin/usuarios/${u.id}?detail=true`);
+      if (res.ok) {
+        const detail = await res.json();
+        setSel({ ...u, ...detail });
+      }
+    } catch {}
+    setLoadingDetail(false);
+  };
 
   const handleDescalificar = async () => {
     if (!sel) return;
@@ -369,7 +384,7 @@ export default function AdminUsuarios() {
                         if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; }
                       } catch {}
                     }
-                    if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); }
+                    if (u) { setUserHistory(prev => [...prev, sel]); selectUser(u); }
                   }} style={{ background: "none", border: "none", color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textDecoration: "underline" }}>{r.referidoPorNombre}</button>
                 </p>
               )}
@@ -386,7 +401,7 @@ export default function AdminUsuarios() {
                     <div key={ref.id} style={{ padding: "8px 10px", marginBottom: "4px", background: ref.verificado ? "rgba(61,184,158,0.04)" : "rgba(255,80,80,0.03)", border: `1px solid ${ref.verificado ? "rgba(61,184,158,0.12)" : "rgba(255,80,80,0.1)"}`, borderRadius: "8px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
                         <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: ref.verificado ? "#3db89e" : "#ff8080", flexShrink: 0 }} />
-                        <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, textAlign: "left", fontWeight: 600 }}>{ref.nombre}</button>
+                        <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); selectUser(u); } }} style={{ background: "none", border: "none", color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.85rem", cursor: "pointer", padding: 0, textAlign: "left", fontWeight: 600 }}>{ref.nombre}</button>
                         <span style={{ marginLeft: "auto", fontFamily: "Georgia", fontSize: "0.72rem", padding: "2px 8px", borderRadius: "8px", background: ref.verificado ? "rgba(232,168,76,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#e8a84c" : "rgba(240,234,214,0.25)", fontWeight: 700, flexShrink: 0 }}>{ref.verificado ? "+3 pts" : "+3 pendiente"}</span>
                       </div>
                       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", paddingLeft: "12px" }}>
@@ -409,7 +424,7 @@ export default function AdminUsuarios() {
                   {r.referidosNivel2.map((ref) => (
                     <div key={ref.id} style={{ padding: "6px 10px", marginBottom: "3px", background: "rgba(128,64,208,0.03)", border: "1px solid rgba(128,64,208,0.08)", borderRadius: "8px", display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }} />
-                      <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); setSel(u); resetModes(); } }} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.7)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
+                      <button onClick={async () => { let u = usuarios.find(x => x.id === ref.id); if (!u && ref.id) { try { const res = await adminFetch(`/api/admin/usuarios?busq=${encodeURIComponent(ref.id)}&limit=1`); if (res.ok) { const d = await res.json(); if (d.usuarios?.[0]) u = d.usuarios[0]; } } catch {} } if (u) { setUserHistory(prev => [...prev, sel]); selectUser(u); } }} style={{ background: "none", border: "none", color: "rgba(240,234,214,0.7)", fontFamily: "Georgia", fontSize: "0.82rem", cursor: "pointer", padding: 0, textAlign: "left", flex: 1 }}>{ref.nombre}</button>
                       <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", color: "rgba(240,234,214,0.25)" }}>{ref.ipRegistro || ""}</span>
                       <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 6px", borderRadius: "6px", background: ref.verificado ? "rgba(128,64,208,0.1)" : "rgba(255,255,255,0.03)", color: ref.verificado ? "#a070e0" : "rgba(240,234,214,0.2)", flexShrink: 0 }}>{ref.verificado ? "+1 pt" : "pendiente"}</span>
                     </div>
@@ -567,7 +582,7 @@ export default function AdminUsuarios() {
       ) : (
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(u => (
-          <div key={u.id} onClick={() => { setSel(u); resetModes(); }} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", cursor: "pointer" }}>
+          <div key={u.id} onClick={() => selectUser(u)} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", cursor: "pointer" }}>
             <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "linear-gradient(135deg, #c4853a, #e8a84c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, color: "#1a0e05", flexShrink: 0 }}>{u.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: "Georgia", fontSize: "1rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.nombre}</p>

@@ -10,6 +10,24 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   if (authErr) return authErr;
   try {
     const { id } = await params;
+    const detail = req.nextUrl.searchParams.get("detail");
+
+    // Return full user profile for detail view
+    if (detail === "true") {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id },
+        select: {
+          id: true, nombre: true, email: true, tipo: true, telefono: true, fotoUrl: true,
+          emailVerificado: true, emailVerificadoAt: true,
+          telefonoVerificado: true, telefonoVerificadoAt: true, ipRegistro: true,
+          cumpleDia: true, cumpleMes: true, cumpleAnio: true, createdAt: true,
+          estiloAlimentario: true, comidasFavoritas: true,
+          _count: { select: { favoritos: true, resenas: true, participaciones: true } },
+        },
+      });
+      if (!usuario) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+      return NextResponse.json(usuario);
+    }
 
     // 1 query: participaciones del usuario con concurso + local
     const participaciones = await prisma.participanteConcurso.findMany({

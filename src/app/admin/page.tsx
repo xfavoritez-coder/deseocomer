@@ -7,13 +7,10 @@ type S = any;
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<S>(null);
-  const [sospechosos, setSospechosos] = useState<S[]>([]);
 
   const [error, setError] = useState(false);
   useEffect(() => {
     adminFetch("/api/admin/stats").then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(setStats).catch(() => setError(true));
-    // Load precalculated sospechosos from cache (no heavy queries)
-    adminFetch("/api/admin/stats-cache").then(r => r.json()).then(d => { if (d.sospechosos) setSospechosos(d.sospechosos); }).catch(() => {});
   }, []);
 
   if (error) return <div style={{ textAlign: "center", padding: "60px 20px" }}><p style={{ fontSize: "2rem", marginBottom: "12px" }}>⚠️</p><p style={{ color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.9rem" }}>Error al cargar datos. Vuelve a iniciar sesión.</p><a href="/admin/login" style={{ color: "#e8a84c", fontFamily: "Georgia", fontSize: "0.8rem" }}>Ir al login →</a></div>;
@@ -60,27 +57,6 @@ export default function AdminDashboard() {
           </div>
         ))}
       </div>
-
-      {/* Usuarios sospechosos */}
-      {sospechosos.length > 0 && (
-        <div style={{ marginBottom: 24 }}>
-          <h3 style={{ ...TH, color: "#ff6b6b" }}>🚨 Usuarios sospechosos</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {sospechosos.map((s: S, i: number) => (
-              <a key={i} href={`/admin/usuarios?busq=${encodeURIComponent(s.email)}`} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: s.riesgo >= 60 ? "rgba(255,80,80,0.06)" : "rgba(232,168,76,0.04)", border: `1px solid ${s.riesgo >= 60 ? "rgba(255,80,80,0.15)" : "rgba(232,168,76,0.12)"}`, borderRadius: 10, textDecoration: "none", flexWrap: "wrap" }}>
-                <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", padding: "3px 8px", borderRadius: 8, background: s.riesgo >= 60 ? "rgba(255,80,80,0.2)" : s.riesgo >= 30 ? "rgba(232,168,76,0.2)" : "rgba(61,184,158,0.15)", color: s.riesgo >= 60 ? "#ff6b6b" : s.riesgo >= 30 ? "#e8a84c" : "#3db89e", fontWeight: 700, flexShrink: 0 }}>{s.riesgo}%</span>
-                <span style={{ fontFamily: "Georgia", fontSize: "0.88rem", color: "#f0ead6", fontWeight: 600 }}>{s.nombre}</span>
-                <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)" }}>{s.puntos} pts · {s.concurso}</span>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginLeft: "auto" }}>
-                  {s.flags.map((f: string, fi: number) => (
-                    <span key={fi} style={{ fontFamily: "Georgia", fontSize: "0.65rem", padding: "2px 6px", borderRadius: 6, background: "rgba(255,80,80,0.1)", color: "#ff8080" }}>{f}</span>
-                  ))}
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="adm-tables">
         <div>
