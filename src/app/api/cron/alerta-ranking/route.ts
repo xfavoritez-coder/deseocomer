@@ -19,21 +19,45 @@ export async function GET(req: NextRequest) {
   const log: string[] = [];
 
   try {
-    // Only active contests ending in more than 2 hours
+    const en72h = new Date(Date.now() + 72 * 3600000);
+
+    // Only active contests ending within the next 72 hours (but more than 2h left)
     const concursos = await prisma.concurso.findMany({
-      where: { activo: true, cancelado: false, fechaFin: { gt: new Date(Date.now() + 2 * 3600000) } },
-      select: { id: true, slug: true, premio: true },
+      where: {
+        activo: true,
+        cancelado: false,
+        fechaFin: {
+          gt: new Date(Date.now() + 2 * 3600000),
+          lte: en72h,
+        },
+      },
+      select: { id: true, slug: true, premio: true, fechaFin: true },
     });
 
-    // Pre-fetch all recent ranking alerts to avoid N+1 queries
-    const hace48h = new Date(Date.now() - 48 * 3600000);
-    const alertasRecientes = await prisma.notificacion.findMany({
-      where: { tipo: "alerta_ranking", createdAt: { gte: hace48h } },
-      select: { usuarioId: true },
-    });
-    const alertadosSet = new Set(alertasRecientes.map(a => a.usuarioId));
+    // Pre-fetch all ranking alerts for these contests (max 1 per user per contest)
+    const concursoSlugs = concursos.map(c => c.slug || c.id);
+    const alertasPrevias = concursoSlugs.length > 0
+      ? await prisma.notificacion.findMany({
+          where: {
+            tipo: "alerta_ranking",
+            OR: concursoSlugs.map(s => ({
+              datos: { path: ["concursoSlug"], equals: s },
+            })),
+          },
+          select: { usuarioId: true, datos: true },
+        })
+      : [];
+
+    // Build set of "usuarioId:concursoSlug" to check if already alerted for this contest
+    const alertadosSet = new Set<string>();
+    for (const a of alertasPrevias) {
+      const slug = (a.datos as Record<string, string>)?.concursoSlug;
+      if (slug) alertadosSet.add(`${a.usuarioId}:${slug}`);
+    }
 
     for (const c of concursos) {
+      const cSlug = c.slug || c.id;
+
       const top = await prisma.participanteConcurso.findMany({
         where: { concursoId: c.id, estado: { not: "descalificado" } },
         orderBy: { puntos: "desc" },
@@ -47,19 +71,20 @@ export async function GET(req: NextRequest) {
       const segundo = top[1];
       const diff = primero.puntos - segundo.puntos;
       const premioCorto = c.premio.length > 30 ? c.premio.substring(0, 30) + "..." : c.premio;
-      const concursoUrl = `${base}/concursos/${c.slug || c.id}`;
+      const concursoUrl = `${base}/concursos/${cSlug}`;
 
       // Skip if difference is too large (>15 pts = 5 referidos, hard to catch up)
       if (diff > 15) continue;
 
-      // ── Alert to 2nd place: "El 1° te lleva X puntos" ──
-      if (!alertadosSet.has(segundo.usuarioId) && segundo.puntos >= 3) {
+      // ── Alert to 2nd place: "El 1° te lleva X puntos" (max 1 per contest) ──
+      const key2 = `${segundo.usuarioId}:${cSlug}`;
+      if (!alertadosSet.has(key2) && segundo.puntos >= 3) {
         const nombre2 = segundo.usuario.nombre.split(" ")[0];
         const nombre1 = primero.usuario.nombre.split(" ")[0];
         const amigosNecesarios = Math.ceil(diff / 3);
 
         await prisma.notificacion.create({
-          data: { usuarioId: segundo.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre1} te lleva ${diff} puntos en "${premioCorto}". ¡Comparte tu link para alcanzarlo! ⚡`, datos: { concursoSlug: c.slug || c.id } },
+          data: { usuarioId: segundo.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre1} te lleva ${diff} puntos en "${premioCorto}". ¡Comparte tu link para alcanzarlo! ⚡`, datos: { concursoSlug: cSlug } },
         });
 
         try {
@@ -80,45 +105,44 @@ export async function GET(req: NextRequest) {
             ].join("")),
           });
           enviados++;
-          alertadosSet.add(segundo.usuarioId);
+          alertadosSet.add(key2);
           log.push(`[2do] ${nombre2} en "${premioCorto}" (diff: ${diff})`);
         } catch (err) {
           log.push(`[ERROR] email 2do ${segundo.usuario.email}: ${err}`);
         }
       }
 
-      // ── Alert to 1st place: "El 2° se está acercando" (only if diff <= 6 pts) ──
-      if (diff <= 6 && primero.puntos >= 3) {
-        if (!alertadosSet.has(primero.usuarioId)) {
-          const nombre1 = primero.usuario.nombre.split(" ")[0];
-          const nombre2 = segundo.usuario.nombre.split(" ")[0];
+      // ── Alert to 1st place: "El 2° se está acercando" (only if diff <= 6 pts, max 1 per contest) ──
+      const key1 = `${primero.usuarioId}:${cSlug}`;
+      if (diff <= 6 && primero.puntos >= 3 && !alertadosSet.has(key1)) {
+        const nombre1 = primero.usuario.nombre.split(" ")[0];
+        const nombre2 = segundo.usuario.nombre.split(" ")[0];
 
-          await prisma.notificacion.create({
-            data: { usuarioId: primero.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre2} se está acercando en "${premioCorto}". ¡Asegura tu primer lugar compartiendo tu link! 🏆`, datos: { concursoSlug: c.slug || c.id } },
+        await prisma.notificacion.create({
+          data: { usuarioId: primero.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre2} se está acercando en "${premioCorto}". ¡Asegura tu primer lugar compartiendo tu link! 🏆`, datos: { concursoSlug: cSlug } },
+        });
+
+        try {
+          await resend.emails.send({
+            from,
+            to: primero.usuario.email,
+            subject: `🏆 ${nombre2} se acerca a tu primer lugar en "${premioCorto}"`,
+            html: wrap([
+              `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre1}, ¡cuidado con tu primer lugar!</h2>`,
+              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre2}</strong> se está acercando en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Solo te lleva <strong style="color:#e8a84c">${diff} puntos</strong> de ventaja.</p>`,
+              `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
+              `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 Tú (${nombre1})</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
+              `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 ${nombre2}</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
+              `</div>`,
+              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">No dejes que te alcance. Comparte tu link — cada amigo que entre te da <strong style="color:#f5d080">+3 puntos</strong> y asegura tu premio.</p>`,
+              `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
+            ].join("")),
           });
-
-          try {
-            await resend.emails.send({
-              from,
-              to: primero.usuario.email,
-              subject: `🏆 ${nombre2} se acerca a tu primer lugar en "${premioCorto}"`,
-              html: wrap([
-                `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre1}, ¡cuidado con tu primer lugar!</h2>`,
-                `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre2}</strong> se está acercando en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Solo te lleva <strong style="color:#e8a84c">${diff} puntos</strong> de ventaja.</p>`,
-                `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
-                `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 Tú (${nombre1})</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
-                `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 ${nombre2}</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
-                `</div>`,
-                `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">No dejes que te alcance. Comparte tu link — cada amigo que entre te da <strong style="color:#f5d080">+3 puntos</strong> y asegura tu premio.</p>`,
-                `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
-              ].join("")),
-            });
-            enviados++;
-            alertadosSet.add(primero.usuarioId);
-            log.push(`[1ro] ${nombre1} en "${premioCorto}" (diff: ${diff})`);
-          } catch (err) {
-            log.push(`[ERROR] email 1ro ${primero.usuario.email}: ${err}`);
-          }
+          enviados++;
+          alertadosSet.add(key1);
+          log.push(`[1ro] ${nombre1} en "${premioCorto}" (diff: ${diff})`);
+        } catch (err) {
+          log.push(`[ERROR] email 1ro ${primero.usuario.email}: ${err}`);
         }
       }
     }

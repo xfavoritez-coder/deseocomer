@@ -3,6 +3,15 @@ import { prisma } from "@/lib/prisma";
 import { checkAdminAuth } from "@/lib/adminAuth";
 import { resend } from "@/lib/resend";
 
+interface ConcursoData {
+  premio: string;
+  local: string;
+  logoUrl: string | null;
+  imagenUrl: string | null;
+  esSorteo: boolean;
+  slug: string;
+}
+
 // POST: preview (count) or send emails
 export async function POST(req: NextRequest) {
   const authErr = checkAdminAuth(req);
@@ -10,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { action, filtros, plantilla, concursoId, asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl, emailPrueba } = body;
+    const { action, filtros, plantilla, concursoId, concursoIds, asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl, emailPrueba } = body;
 
     // Test mode — send single email to a test address
     if (action === "test") {
@@ -19,7 +28,13 @@ export async function POST(req: NextRequest) {
       let asunto = "";
       let htmlBody = "";
 
-      if (plantilla === "nuevo_concurso" && concursoId) {
+      if (plantilla === "nuevos_concursos" && concursoIds?.length > 0) {
+        const concursosData = await fetchConcursosData(concursoIds);
+        if (concursosData.length === 0) return NextResponse.json({ error: "Concursos no encontrados" }, { status: 404 });
+        asunto = `[PRUEBA] ${buildNuevosConcursosSubject(concursosData)}`;
+        // Test with referidos version
+        htmlBody = buildNuevosConcursosHtml(concursosData, 3);
+      } else if (plantilla === "nuevo_concurso" && concursoId) {
         const concurso = await prisma.concurso.findFirst({ where: { OR: [{ id: concursoId }, { slug: concursoId }] }, include: { local: { select: { nombre: true, logoUrl: true, portadaUrl: true } } } });
         if (!concurso) return NextResponse.json({ error: "Concurso no encontrado" }, { status: 404 });
         const esSorteo = concurso.modalidadConcurso === "sorteo";
@@ -103,9 +118,57 @@ export async function POST(req: NextRequest) {
     }
 
     // Build email content based on template
+    const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
+
+    // ── New "nuevos_concursos" template with referral personalization ──
+    if (plantilla === "nuevos_concursos" && concursoIds?.length > 0) {
+      const concursosData = await fetchConcursosData(concursoIds);
+      if (concursosData.length === 0) return NextResponse.json({ error: "Concursos no encontrados" }, { status: 404 });
+
+      const asunto = buildNuevosConcursosSubject(concursosData);
+
+      // Get referral counts for all users in one query
+      const userIds = usuarios.map(u => u.id);
+      const referidosCounts = await prisma.participanteConcurso.groupBy({
+        by: ["referidorDirectoId"],
+        where: { referidorDirectoId: { in: userIds } },
+        _count: { id: true },
+      });
+      const refMap = new Map<string, number>();
+      for (const r of referidosCounts) {
+        if (r.referidorDirectoId) refMap.set(r.referidorDirectoId, r._count.id);
+      }
+
+      let enviados = 0;
+      let errores = 0;
+      const log: string[] = [];
+      const BATCH = 10;
+
+      for (let i = 0; i < usuarios.length; i += BATCH) {
+        const batch = usuarios.slice(i, i + BATCH);
+        const promises = batch.map(async u => {
+          try {
+            const totalReferidos = refMap.get(u.id) || 0;
+            const html = buildNuevosConcursosHtml(concursosData, totalReferidos)
+              .replace(/\{\{nombre\}\}/g, u.nombre.split(/\s+/)[0]);
+            await resend.emails.send({ from, to: u.email, subject: asunto, html });
+            enviados++;
+            log.push(`✅ ${u.email}${totalReferidos > 0 ? ` (${totalReferidos} refs)` : ""}`);
+          } catch (e) {
+            errores++;
+            log.push(`❌ ${u.email}: ${e instanceof Error ? e.message : "error"}`);
+          }
+        });
+        await Promise.all(promises);
+        if (i + BATCH < usuarios.length) await new Promise(r => setTimeout(r, 300));
+      }
+
+      return NextResponse.json({ ok: true, enviados, errores, total: usuarios.length, log });
+    }
+
+    // ── Existing templates ──
     let asunto = "";
     let htmlBody = "";
-    const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
 
     if (plantilla === "nuevo_concurso" && concursoId) {
       const concurso = await prisma.concurso.findFirst({
@@ -204,6 +267,35 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ concursos });
 }
 
+// ── Helpers ──
+
+async function fetchConcursosData(ids: string[]): Promise<ConcursoData[]> {
+  const concursos = await prisma.concurso.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true, slug: true, premio: true, imagenUrl: true, modalidadConcurso: true,
+      local: { select: { nombre: true, logoUrl: true, portadaUrl: true } },
+    },
+  });
+  return concursos.map(c => ({
+    premio: c.premio,
+    local: c.local.nombre,
+    logoUrl: c.local.logoUrl,
+    imagenUrl: c.imagenUrl || c.local.portadaUrl,
+    esSorteo: c.modalidadConcurso === "sorteo",
+    slug: c.slug || c.id,
+  }));
+}
+
+function buildNuevosConcursosSubject(concursos: ConcursoData[]): string {
+  if (concursos.length === 1) {
+    return concursos[0].esSorteo
+      ? `🎲 ¡Sorteo: ${concursos[0].premio} gratis!`
+      : `🏆 Nuevo concurso: gana ${concursos[0].premio}`;
+  }
+  return `🏆 ${concursos.length} nuevos concursos — ¡participa gratis!`;
+}
+
 function wrapEmail(content: string) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
@@ -217,6 +309,63 @@ function wrapEmail(content: string) {
   </div>
   <div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 · DeseoComer.com</p></div>
 </div></body></html>`;
+}
+
+function buildNuevosConcursosHtml(concursos: ConcursoData[], totalReferidos: number): string {
+  const base = "https://deseocomer.com";
+  const tieneSorteo = concursos.some(c => c.esSorteo);
+  const tieneRanking = concursos.some(c => !c.esSorteo);
+
+  // Build contest cards
+  const cardsHtml = concursos.map(c => {
+    const url = `${base}/concursos/${c.slug}`;
+    const logoHtml = c.logoUrl
+      ? `<img src="${c.logoUrl}" alt="${c.local}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(232,168,76,0.3);margin-right:6px;vertical-align:middle" />`
+      : "";
+    const fotoHtml = c.imagenUrl
+      ? `<a href="${url}" style="display:block;border-radius:12px;overflow:hidden;margin-bottom:12px"><img src="${c.imagenUrl}" alt="${c.premio}" style="width:100%;height:140px;object-fit:cover;display:block" /></a>`
+      : "";
+
+    return `
+      <div style="background:rgba(232,168,76,0.05);border:1px solid rgba(232,168,76,0.18);border-radius:14px;padding:16px;margin-bottom:16px">
+        <div style="margin-bottom:10px">
+          ${logoHtml}<span style="color:rgba(240,234,214,0.7);font-size:13px;vertical-align:middle">${c.local}</span>
+          <span style="float:right;font-size:12px;color:${c.esSorteo ? "#3db89e" : "#e8a84c"};font-weight:bold">${c.esSorteo ? "🎲 Sorteo" : "🏆 Mérito"}</span>
+        </div>
+        ${fotoHtml}
+        <a href="${url}" style="text-decoration:none"><p style="color:#f5d080;font-size:18px;font-weight:bold;margin:0 0 12px;text-align:center">${c.premio}</p></a>
+        <div style="text-align:center">
+          <a href="${url}" style="background-color:#e8a84c;color:#1a0e05;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;padding:12px 28px;border-radius:10px;display:inline-block">${c.esSorteo ? "Entrar al sorteo →" : "Participar →"}</a>
+        </div>
+      </div>`;
+  }).join("");
+
+  // Personalized message based on referral history
+  let introHtml: string;
+
+  if (totalReferidos > 0) {
+    // User with referral network
+    introHtml = `
+      <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px;text-align:center">{{nombre}}, ¡tienes ventaja!</h2>
+      <div style="background:rgba(61,184,158,0.08);border:1px solid rgba(61,184,158,0.2);border-radius:12px;padding:16px;margin-bottom:20px;text-align:center">
+        <p style="color:#3db89e;font-size:16px;margin:0;line-height:1.6">Ya tienes <strong style="font-size:20px">${totalReferidos} ${totalReferidos === 1 ? "amigo" : "amigos"}</strong> que se registraron contigo antes</p>
+        <p style="color:rgba(61,184,158,0.7);font-size:14px;margin:8px 0 0">Pásales tu código y ambos suman puntos en estos nuevos concursos</p>
+      </div>
+      <p style="color:#c0a060;font-size:15px;line-height:1.7;margin-bottom:20px;text-align:center">${concursos.length > 1 ? "Hay" : "Hay un"} ${concursos.length > 1 ? concursos.length + " nuevos concursos" : "nuevo concurso"}. Tus amigos ya conocen DeseoComer — solo necesitan entrar con tu link y <strong style="color:#f5d080">ambos ganan +3 puntos</strong>.</p>`;
+  } else {
+    // User without referrals
+    const modalidadMsg = tieneSorteo && tieneRanking
+      ? "Participa gratis — invita amigos para sumar puntos o simplemente entra al sorteo."
+      : tieneSorteo
+        ? "Solo entra y ya estás participando. ¡Cualquiera dentro puede ganar!"
+        : "Invita amigos, suma puntos y gana. Cada amigo te da +3 puntos.";
+
+    introHtml = `
+      <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px;text-align:center">{{nombre}}, ${concursos.length > 1 ? "¡nuevos concursos!" : "¡nuevo concurso!"}</h2>
+      <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">${modalidadMsg}</p>`;
+  }
+
+  return wrapEmail(`${introHtml}${cardsHtml}`);
 }
 
 function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; imagenUrl: string | null; esSorteo: boolean; slug: string }) {

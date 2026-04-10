@@ -16,6 +16,18 @@ const inputS: React.CSSProperties = { ...selectS };
 const btnS: React.CSSProperties = { padding: "12px 24px", background: "#e8a84c", color: "#1a0e05", fontFamily: "Georgia", fontSize: "0.85rem", fontWeight: 700, border: "none", borderRadius: 10, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" };
 const btnSecS: React.CSSProperties = { ...btnS, background: "transparent", border: "1px solid rgba(232,168,76,0.3)", color: "#e8a84c" };
 
+const checkboxItemS: React.CSSProperties = {
+  display: "flex", alignItems: "center", gap: 8,
+  padding: "8px 12px", background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(232,168,76,0.12)", borderRadius: 8,
+  cursor: "pointer", transition: "border-color 0.2s",
+};
+const checkboxItemSelS: React.CSSProperties = {
+  ...checkboxItemS,
+  background: "rgba(232,168,76,0.06)",
+  border: "1px solid rgba(232,168,76,0.35)",
+};
+
 export default function AdminEmailUsuarios() {
   const [concursos, setConcursos] = useState<Concurso[]>([]);
   const [toast, setToast] = useState("");
@@ -29,6 +41,7 @@ export default function AdminEmailUsuarios() {
   // Template
   const [plantilla, setPlantilla] = useState("nuevo_concurso");
   const [concursoId, setConcursoId] = useState("");
+  const [concursoIds, setConcursoIds] = useState<string[]>([]);
   const [asuntoCustom, setAsuntoCustom] = useState("");
   const [tituloCustom, setTituloCustom] = useState("");
   const [cuerpoCustom, setCuerpoCustom] = useState("");
@@ -79,6 +92,7 @@ export default function AdminEmailUsuarios() {
 
   const handleSend = async () => {
     if (plantilla === "nuevo_concurso" && !concursoId) { show("Selecciona un concurso"); return; }
+    if (plantilla === "nuevos_concursos" && concursoIds.length === 0) { show("Selecciona al menos un concurso"); return; }
     if (plantilla === "concurso_por_terminar" && !concursoId) { show("Selecciona un concurso"); return; }
     if (plantilla === "personalizado" && !asuntoCustom.trim()) { show("Escribe un asunto"); return; }
 
@@ -88,7 +102,8 @@ export default function AdminEmailUsuarios() {
       const res = await adminFetch("/api/admin/email-usuarios", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "send", filtros: buildFiltros(), plantilla, concursoId,
+          action: "send", filtros: buildFiltros(), plantilla,
+          concursoId, concursoIds,
           asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl,
         }),
       });
@@ -101,7 +116,12 @@ export default function AdminEmailUsuarios() {
     setSending(false);
   };
 
+  const toggleConcurso = (id: string) => {
+    setConcursoIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
   const concursoSel = concursos.find(c => c.id === concursoId || c.slug === concursoId);
+  const concursosSel = concursos.filter(c => concursoIds.includes(c.id));
 
   return (
     <div style={{ maxWidth: 700 }}>
@@ -165,13 +185,15 @@ export default function AdminEmailUsuarios() {
 
         <div style={{ marginBottom: 16 }}>
           <label style={labelS}>Tipo de email</label>
-          <select value={plantilla} onChange={e => setPlantilla(e.target.value)} style={selectS}>
-            <option value="nuevo_concurso">🏆 Nuevo concurso</option>
+          <select value={plantilla} onChange={e => { setPlantilla(e.target.value); setConcursoId(""); setConcursoIds([]); }} style={selectS}>
+            <option value="nuevo_concurso">🏆 Nuevo concurso (1)</option>
+            <option value="nuevos_concursos">🏆🏆 Nuevos concursos (varios)</option>
             <option value="concurso_por_terminar">⏰ Concurso por terminar</option>
             <option value="personalizado">✏️ Personalizado</option>
           </select>
         </div>
 
+        {/* Single concurso select */}
         {(plantilla === "nuevo_concurso" || plantilla === "concurso_por_terminar") && (
           <div style={{ marginBottom: 16 }}>
             <label style={labelS}>Seleccionar concurso</label>
@@ -188,6 +210,45 @@ export default function AdminEmailUsuarios() {
                 <p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.6)", margin: 0 }}>
                   <strong style={{ color: "#f5d080" }}>{concursoSel.premio}</strong> — {concursoSel.local.nombre} — {concursoSel.modalidadConcurso === "sorteo" ? "🎲 Sorteo" : "🏆 Mérito"} — {concursoSel.estado}
                 </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Multi concurso select */}
+        {plantilla === "nuevos_concursos" && (
+          <div style={{ marginBottom: 16 }}>
+            <label style={labelS}>Seleccionar concursos ({concursoIds.length} seleccionados)</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
+              {concursos.map(c => {
+                const sel = concursoIds.includes(c.id);
+                return (
+                  <div key={c.id} onClick={() => toggleConcurso(c.id)} style={sel ? checkboxItemSelS : checkboxItemS}>
+                    <div style={{
+                      width: 18, height: 18, borderRadius: 4, flexShrink: 0,
+                      border: sel ? "2px solid #e8a84c" : "2px solid rgba(232,168,76,0.25)",
+                      background: sel ? "#e8a84c" : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      {sel && <span style={{ color: "#1a0e05", fontSize: 12, fontWeight: 900 }}>✓</span>}
+                    </div>
+                    <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: sel ? "#f5d080" : "rgba(240,234,214,0.6)" }}>
+                      {c.modalidadConcurso === "sorteo" ? "🎲" : "🏆"} {c.premio} — {c.local.nombre} ({c.estado})
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            {concursosSel.length > 0 && (
+              <div style={{ marginTop: 10, padding: "10px 14px", background: "rgba(232,168,76,0.06)", borderRadius: 10, border: "1px solid rgba(232,168,76,0.15)" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)", margin: "0 0 4px" }}>
+                  El email mostrara cada concurso con su foto y premio. Usuarios con referidos previos recibiran un mensaje personalizado.
+                </p>
+                {concursosSel.map(c => (
+                  <p key={c.id} style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#f5d080", margin: "2px 0" }}>
+                    {c.modalidadConcurso === "sorteo" ? "🎲" : "🏆"} {c.premio} — {c.local.nombre}
+                  </p>
+                ))}
               </div>
             )}
           </div>
@@ -237,7 +298,8 @@ export default function AdminEmailUsuarios() {
                 const res = await adminFetch("/api/admin/email-usuarios", {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
-                    action: "test", emailPrueba: pruebaEmail, plantilla, concursoId,
+                    action: "test", emailPrueba: pruebaEmail, plantilla,
+                    concursoId, concursoIds,
                     asuntoCustom, tituloCustom, cuerpoCustom, ctaTexto, ctaUrl,
                   }),
                 });
