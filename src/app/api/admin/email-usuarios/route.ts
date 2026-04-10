@@ -141,28 +141,43 @@ export async function POST(req: NextRequest) {
         if (r.referidorDirectoId) refMap.set(r.referidorDirectoId, r._count.id);
       }
 
+      // Build all emails and send via batch API (up to 100 per call)
+      const allEmails = usuarios.map(u => {
+        const totalReferidos = refMap.get(u.id) || 0;
+        const html = buildNuevosConcursosHtml(concursosData, totalReferidos)
+          .replace(/\{\{nombre\}\}/g, u.nombre.split(/\s+/)[0]);
+        return { from, to: u.email, subject: asunto, html };
+      });
+
       let enviados = 0;
       let errores = 0;
       const log: string[] = [];
-      const BATCH = 10;
+      const BATCH = 100;
 
-      for (let i = 0; i < usuarios.length; i += BATCH) {
-        const batch = usuarios.slice(i, i + BATCH);
-        const promises = batch.map(async u => {
-          try {
-            const totalReferidos = refMap.get(u.id) || 0;
-            const html = buildNuevosConcursosHtml(concursosData, totalReferidos)
-              .replace(/\{\{nombre\}\}/g, u.nombre.split(/\s+/)[0]);
-            await resend.emails.send({ from, to: u.email, subject: asunto, html });
-            enviados++;
-            log.push(`✅ ${u.email}${totalReferidos > 0 ? ` (${totalReferidos} refs)` : ""}`);
-          } catch (e) {
-            errores++;
-            log.push(`❌ ${u.email}: ${e instanceof Error ? e.message : "error"}`);
+      for (let i = 0; i < allEmails.length; i += BATCH) {
+        const batch = allEmails.slice(i, i + BATCH);
+        try {
+          const result = await resend.batch.send(batch);
+          if (result.data) {
+            enviados += batch.length;
+            batch.forEach(e => log.push(`✅ ${e.to}`));
+          } else {
+            errores += batch.length;
+            batch.forEach(e => log.push(`❌ ${e.to}: batch error`));
           }
-        });
-        await Promise.all(promises);
-        if (i + BATCH < usuarios.length) await new Promise(r => setTimeout(r, 300));
+        } catch (e) {
+          // Fallback: send individually if batch fails
+          for (const email of batch) {
+            try {
+              await resend.emails.send(email);
+              enviados++;
+              log.push(`✅ ${email.to}`);
+            } catch (err) {
+              errores++;
+              log.push(`❌ ${email.to}: ${err instanceof Error ? err.message : "error"}`);
+            }
+          }
+        }
       }
 
       return NextResponse.json({ ok: true, enviados, errores, total: usuarios.length, log });
@@ -224,28 +239,40 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plantilla no válida" }, { status: 400 });
     }
 
-    // Send in batches
+    // Send via batch API (up to 100 per call)
+    const allEmails = usuarios.map(u => ({
+      from, to: u.email, subject: asunto,
+      html: htmlBody.replace(/\{\{nombre\}\}/g, u.nombre.split(/\s+/)[0]),
+    }));
+
     let enviados = 0;
     let errores = 0;
     const log: string[] = [];
-    const BATCH = 10;
+    const BATCH = 100;
 
-    for (let i = 0; i < usuarios.length; i += BATCH) {
-      const batch = usuarios.slice(i, i + BATCH);
-      const promises = batch.map(async u => {
-        try {
-          const personalHtml = htmlBody.replace(/\{\{nombre\}\}/g, u.nombre.split(/\s+/)[0]);
-          await resend.emails.send({ from, to: u.email, subject: asunto, html: personalHtml });
-          enviados++;
-          log.push(`✅ ${u.email}`);
-        } catch (e) {
-          errores++;
-          log.push(`❌ ${u.email}: ${e instanceof Error ? e.message : "error"}`);
+    for (let i = 0; i < allEmails.length; i += BATCH) {
+      const batch = allEmails.slice(i, i + BATCH);
+      try {
+        const result = await resend.batch.send(batch);
+        if (result.data) {
+          enviados += batch.length;
+          batch.forEach(e => log.push(`✅ ${e.to}`));
+        } else {
+          errores += batch.length;
+          batch.forEach(e => log.push(`❌ ${e.to}: batch error`));
         }
-      });
-      await Promise.all(promises);
-      // Small pause between batches
-      if (i + BATCH < usuarios.length) await new Promise(r => setTimeout(r, 300));
+      } catch (e) {
+        for (const email of batch) {
+          try {
+            await resend.emails.send(email);
+            enviados++;
+            log.push(`✅ ${email.to}`);
+          } catch (err) {
+            errores++;
+            log.push(`❌ ${email.to}: ${err instanceof Error ? err.message : "error"}`);
+          }
+        }
+      }
     }
 
     return NextResponse.json({ ok: true, enviados, errores, total: usuarios.length, log });
