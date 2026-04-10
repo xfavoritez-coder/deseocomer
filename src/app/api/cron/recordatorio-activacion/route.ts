@@ -73,6 +73,8 @@ export async function GET(req: NextRequest) {
     });
 
     const refsPrimer = await cargarReferidores(usuariosPrimer.map(u => u.id));
+    // Prepare all emails first, then send via batch API
+    const emailsPrimer: { from: string; to: string; subject: string; html: string }[] = [];
     for (const u of usuariosPrimer) {
       try {
         const referidorNombre = refsPrimer.get(u.id) ?? null;
@@ -83,17 +85,29 @@ export async function GET(req: NextRequest) {
           referidorNombre,
           tokenVerificacion: token,
         });
-        await resend.emails.send({
+        emailsPrimer.push({
           from,
           to: u.email,
           subject: `🧞 ${u.nombre.split(/\s+/)[0]}, tu cuenta está casi lista — solo falta un clic`,
           html,
         });
-        enviadosPrimer++;
-        log.push(`✅ [48h] ${u.email}`);
       } catch (err) {
         errores++;
         log.push(`❌ [48h] ${u.email}: ${err instanceof Error ? err.message : "error"}`);
+      }
+    }
+    if (emailsPrimer.length > 0) {
+      const BATCH = 100;
+      for (let i = 0; i < emailsPrimer.length; i += BATCH) {
+        const batch = emailsPrimer.slice(i, i + BATCH);
+        try {
+          await resend.batch.send(batch);
+          enviadosPrimer += batch.length;
+          batch.forEach(e => log.push(`✅ [48h] ${e.to}`));
+        } catch (err) {
+          errores += batch.length;
+          batch.forEach(e => log.push(`❌ [48h] ${e.to}: ${err instanceof Error ? err.message : "error"}`));
+        }
       }
     }
 
@@ -110,6 +124,7 @@ export async function GET(req: NextRequest) {
     });
 
     const refsUltimo = await cargarReferidores(usuariosUltimo.map(u => u.id));
+    const emailsUltimo: { from: string; to: string; subject: string; html: string }[] = [];
     for (const u of usuariosUltimo) {
       try {
         const referidorNombre = refsUltimo.get(u.id) ?? null;
@@ -120,17 +135,29 @@ export async function GET(req: NextRequest) {
           referidorNombre,
           tokenVerificacion: token,
         });
-        await resend.emails.send({
+        emailsUltimo.push({
           from,
           to: u.email,
           subject: `😢 ${u.nombre.split(/\s+/)[0]}, este es nuestro último recordatorio`,
           html,
         });
-        enviadosUltimo++;
-        log.push(`✅ [14d] ${u.email}`);
       } catch (err) {
         errores++;
         log.push(`❌ [14d] ${u.email}: ${err instanceof Error ? err.message : "error"}`);
+      }
+    }
+    if (emailsUltimo.length > 0) {
+      const BATCH = 100;
+      for (let i = 0; i < emailsUltimo.length; i += BATCH) {
+        const batch = emailsUltimo.slice(i, i + BATCH);
+        try {
+          await resend.batch.send(batch);
+          enviadosUltimo += batch.length;
+          batch.forEach(e => log.push(`✅ [14d] ${e.to}`));
+        } catch (err) {
+          errores += batch.length;
+          batch.forEach(e => log.push(`❌ [14d] ${e.to}: ${err instanceof Error ? err.message : "error"}`));
+        }
       }
     }
 

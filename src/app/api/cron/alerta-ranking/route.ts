@@ -55,6 +55,10 @@ export async function GET(req: NextRequest) {
       if (slug) alertadosSet.add(`${a.usuarioId}:${slug}`);
     }
 
+    // Collect all emails first, then send via batch API
+    const pendingEmails: { from: string; to: string; subject: string; html: string }[] = [];
+    const pendingMeta: { key: string; logMsg: string }[] = [];
+
     for (const c of concursos) {
       const cSlug = c.slug || c.id;
 
@@ -87,29 +91,24 @@ export async function GET(req: NextRequest) {
           data: { usuarioId: segundo.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre1} te lleva ${diff} puntos en "${premioCorto}". ¡Comparte tu link para alcanzarlo! ⚡`, datos: { concursoSlug: cSlug } },
         });
 
-        try {
-          await resend.emails.send({
-            from,
-            to: segundo.usuario.email,
-            subject: `⚡ ${nombre1} te superó en "${premioCorto}" — ¡aún puedes alcanzarlo!`,
-            html: wrap([
-              `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre2}, ¡la competencia está reñida!</h2>`,
-              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre1}</strong> te lleva ventaja en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Estás en el <strong style="color:#e8a84c">2° lugar</strong>.</p>`,
-              `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
-              `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 ${nombre1}</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
-              `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 Tú (${nombre2})</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
-              amigosNecesarios <= 5 ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(232,168,76,0.15)"><p style="color:#3db89e;font-size:14px;margin:0;text-align:center">Solo <strong>${amigosNecesarios} ${amigosNecesarios === 1 ? "amigo" : "amigos"}</strong> te separan del primer lugar</p></div>` : "",
-              `</div>`,
-              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Cada amigo que entre por tu link te da <strong style="color:#f5d080">+3 puntos</strong> — y a él también. Comparte tu link y recupera el primer lugar.</p>`,
-              `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
-            ].join("")),
-          });
-          enviados++;
-          alertadosSet.add(key2);
-          log.push(`[2do] ${nombre2} en "${premioCorto}" (diff: ${diff})`);
-        } catch (err) {
-          log.push(`[ERROR] email 2do ${segundo.usuario.email}: ${err}`);
-        }
+        alertadosSet.add(key2);
+        pendingEmails.push({
+          from,
+          to: segundo.usuario.email,
+          subject: `⚡ ${nombre1} te superó en "${premioCorto}" — ¡aún puedes alcanzarlo!`,
+          html: wrap([
+            `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre2}, ¡la competencia está reñida!</h2>`,
+            `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre1}</strong> te lleva ventaja en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Estás en el <strong style="color:#e8a84c">2° lugar</strong>.</p>`,
+            `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
+            `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 ${nombre1}</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
+            `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 Tú (${nombre2})</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
+            amigosNecesarios <= 5 ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(232,168,76,0.15)"><p style="color:#3db89e;font-size:14px;margin:0;text-align:center">Solo <strong>${amigosNecesarios} ${amigosNecesarios === 1 ? "amigo" : "amigos"}</strong> te separan del primer lugar</p></div>` : "",
+            `</div>`,
+            `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">Cada amigo que entre por tu link te da <strong style="color:#f5d080">+3 puntos</strong> — y a él también. Comparte tu link y recupera el primer lugar.</p>`,
+            `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
+          ].join("")),
+        });
+        pendingMeta.push({ key: key2, logMsg: `[2do] ${nombre2} en "${premioCorto}" (diff: ${diff})` });
       }
 
       // ── Alert to 1st place: "El 2° se está acercando" (only if diff <= 6 pts, max 1 per contest) ──
@@ -122,27 +121,38 @@ export async function GET(req: NextRequest) {
           data: { usuarioId: primero.usuarioId, tipo: "alerta_ranking", mensaje: `${nombre2} se está acercando en "${premioCorto}". ¡Asegura tu primer lugar compartiendo tu link! 🏆`, datos: { concursoSlug: cSlug } },
         });
 
+        alertadosSet.add(key1);
+        pendingEmails.push({
+          from,
+          to: primero.usuario.email,
+          subject: `🏆 ${nombre2} se acerca a tu primer lugar en "${premioCorto}"`,
+          html: wrap([
+            `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre1}, ¡cuidado con tu primer lugar!</h2>`,
+            `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre2}</strong> se está acercando en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Solo te lleva <strong style="color:#e8a84c">${diff} puntos</strong> de ventaja.</p>`,
+            `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
+            `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 Tú (${nombre1})</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
+            `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 ${nombre2}</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
+            `</div>`,
+            `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">No dejes que te alcance. Comparte tu link — cada amigo que entre te da <strong style="color:#f5d080">+3 puntos</strong> y asegura tu premio.</p>`,
+            `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
+          ].join("")),
+        });
+        pendingMeta.push({ key: key1, logMsg: `[1ro] ${nombre1} en "${premioCorto}" (diff: ${diff})` });
+      }
+    }
+
+    // Send all collected emails via batch API
+    if (pendingEmails.length > 0) {
+      const BATCH = 100;
+      for (let i = 0; i < pendingEmails.length; i += BATCH) {
+        const batch = pendingEmails.slice(i, i + BATCH);
+        const meta = pendingMeta.slice(i, i + BATCH);
         try {
-          await resend.emails.send({
-            from,
-            to: primero.usuario.email,
-            subject: `🏆 ${nombre2} se acerca a tu primer lugar en "${premioCorto}"`,
-            html: wrap([
-              `<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">${nombre1}, ¡cuidado con tu primer lugar!</h2>`,
-              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px"><strong style="color:#f5d080">${nombre2}</strong> se está acercando en el concurso <strong style="color:#f5d080">"${c.premio}"</strong>. Solo te lleva <strong style="color:#e8a84c">${diff} puntos</strong> de ventaja.</p>`,
-              `<div style="background:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px">`,
-              `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#f5d080;font-size:15px;font-weight:bold">🥇 Tú (${nombre1})</span><span style="color:#e8a84c;font-size:18px;font-weight:bold">${primero.puntos} pts</span></div>`,
-              `<div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#c0a060;font-size:15px;font-weight:bold">🥈 ${nombre2}</span><span style="color:#c0a060;font-size:18px;font-weight:bold">${segundo.puntos} pts</span></div>`,
-              `</div>`,
-              `<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">No dejes que te alcance. Comparte tu link — cada amigo que entre te da <strong style="color:#f5d080">+3 puntos</strong> y asegura tu premio.</p>`,
-              `<div style="text-align:center;margin-bottom:16px"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>`,
-            ].join("")),
-          });
-          enviados++;
-          alertadosSet.add(key1);
-          log.push(`[1ro] ${nombre1} en "${premioCorto}" (diff: ${diff})`);
+          await resend.batch.send(batch);
+          enviados += batch.length;
+          meta.forEach(m => log.push(m.logMsg));
         } catch (err) {
-          log.push(`[ERROR] email 1ro ${primero.usuario.email}: ${err}`);
+          meta.forEach((m, j) => log.push(`[ERROR] ${batch[j].to}: ${err}`));
         }
       }
     }

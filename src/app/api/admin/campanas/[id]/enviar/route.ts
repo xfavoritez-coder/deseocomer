@@ -7,8 +7,7 @@ import { buildEmailHtml } from "@/lib/emails/campana-locales";
 // Vercel has 60s timeout — send as many as we can in ~50s, then return.
 // Frontend calls again to continue sending the rest.
 const MAX_DURATION_MS = 50000;
-const LOTE = 10;
-const PAUSA = 500;
+const BATCH_SIZE = 100;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const authErr = checkAdminAuth(req);
@@ -60,18 +59,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     let errores = 0;
     const startTime = Date.now();
 
-    for (let i = 0; i < contactosPendientes.length; i += LOTE) {
-      // Check time budget
+    for (let i = 0; i < contactosPendientes.length; i += BATCH_SIZE) {
       if (Date.now() - startTime > MAX_DURATION_MS) break;
 
-      const lote = contactosPendientes.slice(i, i + LOTE);
+      const batch = contactosPendientes.slice(i, i + BATCH_SIZE);
 
-      for (const contacto of lote) {
-        if (Date.now() - startTime > MAX_DURATION_MS) break;
-
+      // Build all emails for this batch
+      const emails = batch.map(contacto => {
         const trackClickUrl = `${baseUrl}/api/track/click?id=${contacto.id}&url=${encodeURIComponent(baseUrl + "/registro-local")}`;
         const trackOpenUrl = `${baseUrl}/api/track/open?id=${contacto.id}`;
-
         const html = buildEmailHtml({
           nombre: contacto.nombre,
           cuposRestantes,
@@ -79,23 +75,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           trackOpenUrl,
           email: contacto.email,
         });
+        return { from, to: contacto.email, subject: campana.asunto, html };
+      });
 
-        try {
-          await resend.emails.send({ from, to: contacto.email, subject: campana.asunto, html });
-          // Mark as sent successfully (errorEnvio = "" means sent ok)
-          await prisma.contactoCampana.update({ where: { id: contacto.id }, data: { errorEnvio: "" } }).catch(() => {});
-          enviados++;
-        } catch (e: any) {
-          errores++;
-          await prisma.contactoCampana.update({
-            where: { id: contacto.id },
-            data: { errorEnvio: e.message?.slice(0, 200) || "Error desconocido" },
-          }).catch(() => {});
-        }
-      }
-
-      if (i + LOTE < contactosPendientes.length && Date.now() - startTime < MAX_DURATION_MS) {
-        await new Promise(r => setTimeout(r, PAUSA));
+      try {
+        await resend.batch.send(emails);
+        // Mark all as sent successfully
+        await prisma.contactoCampana.updateMany({
+          where: { id: { in: batch.map(c => c.id) } },
+          data: { errorEnvio: "" },
+        });
+        enviados += batch.length;
+      } catch (e: any) {
+        // Batch failed — mark all as error
+        errores += batch.length;
+        await prisma.contactoCampana.updateMany({
+          where: { id: { in: batch.map(c => c.id) } },
+          data: { errorEnvio: e.message?.slice(0, 200) || "Error desconocido" },
+        }).catch(() => {});
       }
     }
 

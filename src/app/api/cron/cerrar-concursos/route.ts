@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
           include: { usuario: { select: { id: true, nombre: true, email: true } } },
           orderBy: { puntos: "desc" },
         },
-        _count: { select: { participantes: true } },
+        _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
       },
     });
 
@@ -119,16 +119,50 @@ export async function GET(req: NextRequest) {
 
       const lider = c.participantes[0];
       const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
+      const esSorteo = c.modalidadConcurso === "sorteo";
+      const totalBoletos = esSorteo ? c.participantes.reduce((acc, p) => acc + Math.max(1, p.puntos), 0) : 0;
       let enviados = 0;
 
-      // Send emails in batches of 10 for performance
-      const BATCH_SIZE = 10;
+      // Send emails via Resend batch API (up to 100 per request)
+      const BATCH_SIZE = 100;
       for (let b = 0; b < c.participantes.length; b += BATCH_SIZE) {
         const batch = c.participantes.slice(b, b + BATCH_SIZE);
-        const results = await Promise.allSettled(batch.map(p => {
+        const emails = batch.map(p => {
           const pos = c.participantes.findIndex(x => x.id === p.id) + 1;
           const esLider = pos === 1;
-          return resend.emails.send({
+          const concursoUrl = `${BASE_URL}/concursos/${c.slug || c.id}`;
+
+          if (esSorteo) {
+            const boletos = Math.max(1, p.puntos);
+            const pct = Math.round((boletos / totalBoletos) * 100);
+            return {
+              from,
+              to: p.usuario.email,
+              subject: `🎲 ¡Último día! El sorteo de "${c.premio}" cierra hoy`,
+              html: `<html><body style="background-color:#1a0e05;font-family:Georgia,serif;margin:0;padding:0">
+<div style="max-width:560px;margin:0 auto;padding:40px 24px">
+<div style="text-align:center;margin-bottom:32px"><p style="font-size:28px;margin:0 0 8px">🧞</p><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.3em;text-transform:uppercase;margin:0">DeseoComer</h1></div>
+<div style="background-color:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:40px 32px">
+<h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px">🎲 ¡El sorteo cierra hoy!</h2>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">Hola ${p.usuario.nombre.split(" ")[0]},</p>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:16px">El sorteo de <strong style="color:#f5d080">"${c.premio}"</strong> de <strong style="color:#e8a84c">${c.local.nombre}</strong> cierra en pocas horas.</p>
+<div style="background-color:rgba(232,168,76,0.08);border:1px solid rgba(232,168,76,0.15);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+<p style="color:rgba(240,234,214,0.5);font-size:14px;margin:0 0 4px">Tus boletos actuales</p>
+<p style="color:#e8a84c;font-size:28px;font-weight:bold;margin:0">${boletos} 🎟️</p>
+<p style="color:rgba(240,234,214,0.5);font-size:14px;margin:4px 0 0">de ${totalBoletos} boletos en juego</p>
+<p style="color:#3db89e;font-size:14px;font-weight:bold;margin:8px 0 0">${pct}% de chances de ganar</p>
+</div>
+<p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">¿Quieres más chances? Cada amigo que entre por tu link te da <strong style="color:#f5d080">+3 boletos</strong> extra — y a él también. Con solo 1 amigo pasas de ${boletos} a ${boletos + 3} boletos.</p>
+<div style="text-align:center"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver sorteo →</a></div>
+<p style="color:#5a4028;font-size:13px;line-height:1.6;text-align:center;margin-top:16px;margin-bottom:0">El ganador se elige al azar entre todos los boletos.<br/>Más boletos = más probabilidad de ganar.</p>
+</div>
+<div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
+</div></body></html>`,
+            };
+          }
+
+          // Modalidad mérito
+          return {
             from,
             to: p.usuario.email,
             subject: `⏰ ¡Última oportunidad! "${c.premio}" cierra hoy`,
@@ -146,14 +180,18 @@ export async function GET(req: NextRequest) {
 ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder tiene ${lider.puntos} puntos</p>` : `<p style="color:#3db89e;font-size:13px;margin:8px 0 0">¡Vas primero! No bajes la guardia</p>`}
 </div>
 <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:24px">${esLider ? "Mantén tu ventaja compartiendo tu link. Cada referido verificado te da hasta +3 puntos." : "Todavía puedes ganar. Comparte tu link con amigos — cada referido verificado te da hasta +3 puntos."}</p>
-<div style="text-align:center"><a href="${BASE_URL}/concursos/${c.slug || c.id}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>
+<div style="text-align:center"><a href="${concursoUrl}" style="background-color:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">Ver mi concurso →</a></div>
 </div>
 <div style="text-align:center;margin-top:32px"><p style="color:#5a4028;font-size:12px">Hecho con 💛 y mucha hambre · DeseoComer.com</p></div>
 </div></body></html>`,
-          });
-        }));
-        enviados += results.filter(r => r.status === "fulfilled").length;
-        results.forEach((r, i) => { if (r.status === "rejected") log.push(`[24H_ERR] ${c.id} - ${batch[i].usuario.email}: ${r.reason}`); });
+          };
+        });
+        try {
+          const result = await resend.batch.send(emails);
+          enviados += result.data?.data?.length ?? emails.length;
+        } catch (batchErr) {
+          log.push(`[24H_ERR] ${c.id} - batch error: ${batchErr}`);
+        }
       }
 
       log.push(`[24H_OK] ${c.id} "${c.premio}" - ${enviados}/${c.participantes.length} emails enviados`);
@@ -428,21 +466,23 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
       });
       log.push(`[ACTIVADO] ${concurso.id} - ${concurso.premio}`);
 
-      // Notificar lista de espera
-      for (const entrada of concurso.listaEspera) {
+      // Notificar lista de espera via batch API
+      if (concurso.listaEspera.length > 0) {
+        const fromEspera = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
+        const emailsEspera = concurso.listaEspera.map(entrada => ({
+          from: fromEspera,
+          to: entrada.email,
+          subject: `🔮 ¡Ya comenzó! ${concurso.premio}`,
+          html: `<div style="background:#1a0e05;font-family:Georgia,serif;padding:40px 24px;max-width:560px;margin:0 auto"><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.2em;text-align:center">🧞 DeseoComer</h1><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:32px;margin-top:24px"><p style="font-size:24px;text-align:center;margin-bottom:16px">🔮</p><h2 style="color:#f5d080;font-size:20px;text-align:center;margin-bottom:12px">¡El concurso que esperabas ya comenzó!</h2><p style="color:#c0a060;font-size:16px;line-height:1.6;text-align:center;margin-bottom:8px">${entrada.nombre ? `Hola ${entrada.nombre},` : "Hola,"}</p><p style="color:#c0a060;font-size:15px;line-height:1.6;text-align:center;margin-bottom:24px">El concurso <strong style="color:#e8a84c">${concurso.premio}</strong> acaba de activarse. ¡Entra ahora y empieza a sumar puntos!</p><div style="text-align:center"><a href="https://deseocomer.com/concursos/${concurso.slug || concurso.id}" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">¡Participar ahora! →</a></div><p style="color:#5a4028;font-size:13px;text-align:center;margin-top:20px;line-height:1.6">💡 Invita amigos para sumar más puntos y aumentar tus chances</p></div></div>`,
+        }));
         try {
-          await resend.emails.send({
-            from: process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>",
-            to: entrada.email,
-            subject: `🔮 ¡Ya comenzó! ${concurso.premio}`,
-            html: `<div style="background:#1a0e05;font-family:Georgia,serif;padding:40px 24px;max-width:560px;margin:0 auto"><h1 style="color:#e8a84c;font-size:20px;letter-spacing:0.2em;text-align:center">🧞 DeseoComer</h1><div style="background:#2d1a08;border-radius:20px;border:1px solid rgba(232,168,76,0.25);padding:32px;margin-top:24px"><p style="font-size:24px;text-align:center;margin-bottom:16px">🔮</p><h2 style="color:#f5d080;font-size:20px;text-align:center;margin-bottom:12px">¡El concurso que esperabas ya comenzó!</h2><p style="color:#c0a060;font-size:16px;line-height:1.6;text-align:center;margin-bottom:8px">${entrada.nombre ? `Hola ${entrada.nombre},` : "Hola,"}</p><p style="color:#c0a060;font-size:15px;line-height:1.6;text-align:center;margin-bottom:24px">El concurso <strong style="color:#e8a84c">${concurso.premio}</strong> acaba de activarse. ¡Entra ahora y empieza a sumar puntos!</p><div style="text-align:center"><a href="https://deseocomer.com/concursos/${concurso.slug || concurso.id}" style="background:#e8a84c;color:#1a0e05;font-size:14px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:16px 40px;border-radius:12px;display:inline-block">¡Participar ahora! →</a></div><p style="color:#5a4028;font-size:13px;text-align:center;margin-top:20px;line-height:1.6">💡 Invita amigos para sumar más puntos y aumentar tus chances</p></div></div>`,
-          });
-          await prisma.listaEsperaConcurso.update({
-            where: { id: entrada.id },
+          await resend.batch.send(emailsEspera);
+          await prisma.listaEsperaConcurso.updateMany({
+            where: { id: { in: concurso.listaEspera.map(e => e.id) } },
             data: { notificado: true },
           });
         } catch (emailErr) {
-          console.error(`[Cron] Error email lista espera ${entrada.email}:`, emailErr);
+          console.error(`[Cron] Error batch lista espera ${concurso.id}:`, emailErr);
         }
       }
     }
