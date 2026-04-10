@@ -1,8 +1,10 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 import SubirFoto from "@/components/SubirFoto";
 import { CATEGORIAS as CATEGORIAS_MASTER, CATEGORIA_EMOJI } from "@/lib/categorias";
+
+const MapaUbicacion = lazy(() => import("@/components/panel/MapaUbicacion"));
 
 const COMUNAS = ["Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vitacura", "San Miguel", "Maipú", "La Florida", "Pudahuel", "Peñalolén", "Macul", "La Reina", "Lo Barnechea", "Huechuraba", "Recoleta", "Independencia", "Estación Central", "Cerrillos", "Cerro Navia", "Conchalí", "El Bosque", "La Cisterna", "La Granja", "La Pintana", "Lo Espejo", "Lo Prado", "Quilicura", "Quinta Normal", "Renca", "San Bernardo", "San Joaquín", "San Ramón", "Padre Hurtado", "Puente Alto", "Pirque", "Colina", "Lampa", "Melipilla", "Talagante", "Pedro Aguirre Cerda", "Buin"];
 
@@ -26,7 +28,9 @@ export default function AdminLocales() {
   const [rejectMotivo, setRejectMotivo] = useState("");
   const [crearMode, setCrearMode] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [crearData, setCrearData] = useState<Record<string, any>>({ nombre: "", email: "", password: "", comuna: "", direccion: "", categorias: [], descripcion: "" });
+  const [crearData, setCrearData] = useState<Record<string, any>>({ nombre: "", email: "", password: "", comuna: "", direccion: "", categorias: [], descripcion: "", lat: 0, lng: 0 });
+  const [crearBuscando, setCrearBuscando] = useState(false);
+  const [editBuscando, setEditBuscando] = useState(false);
   const CATEGORIAS = [...CATEGORIAS_MASTER];
 
   useEffect(() => { adminFetch("/api/admin/locales").then(r => r.json()).then(d => setLocales(Array.isArray(d) ? d : [])).catch(() => {}); }, []);
@@ -123,12 +127,38 @@ export default function AdminLocales() {
       {editMode && (
         <div style={cardS}>
           <p style={cardTitleS}>Editar datos</p>
-          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["direccion", "Dirección"], ["telefono", "Teléfono"], ["instagram", "Instagram"], ["sitioWeb", "Sitio web"]].map(([key, label]) => (
+          {[["nombre", "Nombre local"], ["nombreDueno", "Nombre dueño"], ["celularDueno", "Celular dueño"], ["telefono", "Teléfono"], ["instagram", "Instagram"], ["sitioWeb", "Sitio web"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} value={editData[key] ?? ""} onChange={e => setEditData(d => ({ ...d, [key]: e.target.value }))} />
             </div>
           ))}
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Dirección</label>
+            <div style={{ display: "flex", gap: "6px" }}>
+              <input style={{ ...inputS, flex: 1 }} value={editData.direccion ?? ""} onChange={e => setEditData(d => ({ ...d, direccion: e.target.value }))} placeholder="Ej: Av. Providencia 1234" />
+              <button type="button" disabled={editBuscando || !editData.direccion?.trim()} onClick={async () => {
+                setEditBuscando(true);
+                try {
+                  const q = `${editData.direccion}, ${editData.comuna || "Santiago"}, Chile`;
+                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
+                  const data = await res.json();
+                  if (data[0]) {
+                    setEditData(d => ({ ...d, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }));
+                    show("✓ Ubicación encontrada");
+                  } else { show("No se encontró la dirección"); }
+                } catch { show("Error buscando dirección"); }
+                setEditBuscando(false);
+              }} style={{ ...btnSecS, flex: "none", padding: "8px 14px", fontSize: "0.75rem", whiteSpace: "nowrap" }}>{editBuscando ? "..." : "📍 Buscar"}</button>
+            </div>
+          </div>
+          {(editData.lat || editData.lng) && (
+            <div style={{ marginBottom: "10px" }}>
+              <Suspense fallback={<div style={{ height: 220, background: "rgba(0,0,0,0.2)", borderRadius: 12 }} />}>
+                <MapaUbicacion lat={editData.lat || -33.4489} lng={editData.lng || -70.6693} onChange={(lat, lng) => setEditData(d => ({ ...d, lat, lng }))} />
+              </Suspense>
+            </div>
+          )}
           <div style={{ marginBottom: "10px" }}>
             <label style={labelS}>Comuna</label>
             <select style={inputS} value={editData.comuna ?? ""} onChange={e => setEditData(d => ({ ...d, comuna: e.target.value }))}>
@@ -227,7 +257,7 @@ export default function AdminLocales() {
           <a href={`/locales/${sel.slug || sel.id}?tab=Promociones`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center", color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>⚡ Ver promociones del local</a>
           {!sel.activo && <button onClick={async () => { if (await action("aprobar")) { setSel({ ...sel, activo: true }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, activo: true } : l)); show("✓ Aprobado y notificado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>✓ Aprobar y notificar</button>}
           {!sel.activo && <button onClick={async () => { if (await action("reenviar-activacion")) show("✓ Email de activación enviado"); }} disabled={loading} style={btnOutlineS}>📧 Reenviar email de activación</button>}
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categorias: sel.categorias ?? [], comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categorias: sel.categorias ?? [], comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false, lat: sel.lat ?? 0, lng: sel.lng ?? 0 }); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           <button onClick={() => { resetModes(); setRejectMode(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ {sel.activo ? "Desactivar" : "Rechazar"}</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar</button>
@@ -261,12 +291,38 @@ export default function AdminLocales() {
       ) : (
         <div style={{ ...cardS, marginBottom: "16px" }}>
           <p style={cardTitleS}>Crear nuevo local</p>
-          {[["nombre", "Nombre del local"], ["email", "Email"], ["password", "Contraseña"], ["direccion", "Dirección"]].map(([key, label]) => (
+          {[["nombre", "Nombre del local"], ["email", "Email"], ["password", "Contraseña"]].map(([key, label]) => (
             <div key={key} style={{ marginBottom: "10px" }}>
               <label style={labelS}>{label}</label>
               <input style={inputS} type={key === "password" ? "password" : "text"} value={crearData[key] ?? ""} onChange={e => setCrearData(d => ({ ...d, [key]: e.target.value }))} />
             </div>
           ))}
+          <div style={{ marginBottom: "10px" }}>
+            <label style={labelS}>Dirección</label>
+            <div style={{ display: "flex", gap: "6px" }}>
+              <input style={{ ...inputS, flex: 1 }} value={crearData.direccion ?? ""} onChange={e => setCrearData(d => ({ ...d, direccion: e.target.value }))} placeholder="Ej: Av. Providencia 1234" />
+              <button type="button" disabled={crearBuscando || !crearData.direccion?.trim()} onClick={async () => {
+                setCrearBuscando(true);
+                try {
+                  const q = `${crearData.direccion}, ${crearData.comuna || "Santiago"}, Chile`;
+                  const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`);
+                  const data = await res.json();
+                  if (data[0]) {
+                    setCrearData(d => ({ ...d, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }));
+                    show("✓ Ubicación encontrada");
+                  } else { show("No se encontró la dirección"); }
+                } catch { show("Error buscando dirección"); }
+                setCrearBuscando(false);
+              }} style={{ ...btnSecS, flex: "none", padding: "8px 14px", fontSize: "0.75rem", whiteSpace: "nowrap" }}>{crearBuscando ? "..." : "📍 Buscar"}</button>
+            </div>
+          </div>
+          {(crearData.lat !== 0 || crearData.lng !== 0) && (
+            <div style={{ marginBottom: "10px" }}>
+              <Suspense fallback={<div style={{ height: 220, background: "rgba(0,0,0,0.2)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}><span style={{ color: "rgba(240,234,214,0.3)", fontFamily: "Georgia", fontSize: "0.8rem" }}>Cargando mapa...</span></div>}>
+                <MapaUbicacion lat={crearData.lat} lng={crearData.lng} onChange={(lat, lng) => setCrearData(d => ({ ...d, lat, lng }))} />
+              </Suspense>
+            </div>
+          )}
           <div style={{ marginBottom: "10px" }}>
             <label style={labelS}>Comuna</label>
             <select style={inputS} value={crearData.comuna ?? ""} onChange={e => setCrearData(d => ({ ...d, comuna: e.target.value }))}>

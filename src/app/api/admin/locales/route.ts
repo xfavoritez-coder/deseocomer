@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   const authErr = checkAdminAuth(req);
   if (authErr) return authErr;
   try {
-    const { nombre, email, password, comuna, direccion, categorias, descripcion, telefono, instagram, sitioWeb } = await req.json();
+    const { nombre, email, password, comuna, direccion, categorias, descripcion, telefono, instagram, sitioWeb, lat, lng } = await req.json();
     if (!nombre?.trim() || !email?.trim() || !password?.trim()) {
       return NextResponse.json({ error: "Nombre, email y contraseña son obligatorios" }, { status: 400 });
     }
@@ -44,7 +44,9 @@ export async function POST(req: NextRequest) {
     const exists = await prisma.local.findUnique({ where: { email: email.trim().toLowerCase() } });
     if (exists) return NextResponse.json({ error: "Ya existe un local con ese email" }, { status: 400 });
 
-    const slug = nombre.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    let slug = nombre.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const slugExists = await prisma.local.findUnique({ where: { slug } });
+    if (slugExists) slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
     const hashed = await bcrypt.hash(password, 10);
 
     const local = await prisma.local.create({
@@ -60,6 +62,7 @@ export async function POST(req: NextRequest) {
         telefono: telefono || null,
         instagram: instagram || null,
         sitioWeb: sitioWeb || null,
+        ...(lat && lng ? { lat: Number(lat), lng: Number(lng) } : {}),
         activo: true,
         origenImportacion: "MANUAL_ADMIN",
       },
