@@ -399,7 +399,6 @@ function TabConcursos({ userId, userName }: { userId: string; userName: string }
         <div style={{ marginTop: "10px", paddingTop: "10px", borderTop: "1px solid var(--border-color)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3px", fontSize: "0.75rem", fontFamily: "var(--font-lato)" }}>
           <span style={{ color: "rgba(240,234,214,0.5)" }}>Base</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+1</span>
           {p.bonusRef > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Bonus referido</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{p.bonusRef}</span></>}
-          {p.puntosMadrugador > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Madrugador</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+{p.puntosMadrugador}</span></>}
           {p.puntosReferidosNuevos > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Referidos ({Math.round(p.puntosReferidosNuevos / 3)}×3)</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{p.puntosReferidosNuevos}</span></>}
           {p.puntosReferidosExistentes > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Ref. existentes</span><span style={{ color: "var(--accent)", textAlign: "right" }}>+{p.puntosReferidosExistentes}</span></>}
           {p.puntosNivel2 > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Red nivel 2</span><span style={{ color: "#a070e0", textAlign: "right" }}>+{p.puntosNivel2}</span></>}

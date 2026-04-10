@@ -46,7 +46,6 @@ export default function TerminosPage() {
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.6 Aceptación:</strong> Participar en un concurso implica la aceptación plena de estas condiciones y las específicas del local organizador.</p>
 
           <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.7 Sistema de referidos multinivel:</strong> El sistema de referidos opera en dos niveles. Cuando invitas a alguien a un concurso — sea nuevo en DeseoComer o ya registrado — y esa persona también invita a otros participantes, tú ganas +2 puntos adicionales por cada persona que traigan, con un máximo de 20 puntos acumulables por esta vía en cada concurso.</p>
-          <p style={SUB}><strong style={{ color: "#e8a84c" }}>5.8 Bonus madrugador:</strong> Los primeros 10 participantes de cada concurso reciben automáticamente +2 puntos extra. Este bonus es otorgado por el sistema al momento de unirse y no es acumulable con participaciones posteriores en el mismo concurso.</p>
           <p style={SUB}>Los puntos de segundo nivel quedan sujetos a verificación antifraude y no se acreditan si se detectan registros desde la misma IP o en intervalos de tiempo sospechosamente cortos. DeseoComer se reserva el derecho de anular puntos obtenidos mediante prácticas fraudulentas en cualquier nivel de la cadena de referidos.</p>
 
           <h2 style={H2}>6. Entrega de premios</h2>

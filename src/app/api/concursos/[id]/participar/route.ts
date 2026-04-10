@@ -73,16 +73,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
-    // Bonus madrugador: primeros 10 participantes
-    const totalParticipantes = await prisma.participanteConcurso.count({
-      where: { concursoId: concurso.id }
-    });
-    const esMadrugador = totalParticipantes < 10;
+    // Bonus madrugador desactivado
+    const esMadrugador = false;
 
-    // Create participation: 1 base + 3 bonus referido + 2 bonus madrugador
+    // Create participation: 1 base + 3 bonus referido
     const puntosBase = 1;
     const puntosRefBonus = (referidorDirectoId && !refBloqueado) ? 3 : 0;
-    const puntosMadrugador = esMadrugador ? 2 : 0;
+    const puntosMadrugador = 0;
     const participante = await prisma.participanteConcurso.create({
       data: {
         concursoId: concurso.id, usuarioId, referidoPor: referidoPor || null, puntos: puntosBase + puntosRefBonus + puntosMadrugador,
@@ -95,8 +92,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
     const premioCorto = concurso.premio.length > 30 ? concurso.premio.substring(0, 30) + "..." : concurso.premio;
     const msgEntrada = referidoPor
-      ? `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`
-      : `¡Entraste a "${premioCorto}" con ${totalPts} punto${totalPts > 1 ? "s" : ""}!${esMadrugador ? " (+2 bonus madrugador ⚡)" : " Invita amigos para sumar más 🚀"}`;
+      ? `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por link de referido) 🎉`
+      : `¡Entraste a "${premioCorto}" con ${totalPts} punto${totalPts > 1 ? "s" : ""}! Invita amigos para sumar más 🚀`;
     prisma.notificacion.create({ data: { usuarioId, tipo: "entrada_concurso", mensaje: msgEntrada, datos: { concursoSlug: concurso.slug || concurso.id } } }).catch(() => {});
 
     // Incrementar totalConcursosParticipados
@@ -226,7 +223,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
-    return NextResponse.json({ ...participante, esMadrugador, totalParticipantes: totalParticipantes + 1 }, { status: 201 });
+    return NextResponse.json({ ...participante, esMadrugador }, { status: 201 });
   } catch (error) {
     console.error("[API /concursos/[id]/participar]", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

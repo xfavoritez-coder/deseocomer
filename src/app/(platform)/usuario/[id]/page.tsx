@@ -124,7 +124,6 @@ export default function PerfilUsuarioPage() {
                 d.referidosNuevos > 0 && { label: "Referidos nuevos", value: d.referidosNuevos, icon: "🆕" },
                 d.referidosExistentes > 0 && { label: "Referidos existentes", value: d.referidosExistentes, icon: "👥" },
                 d.nivel2 > 0 && { label: "Red de referidos", value: d.nivel2, icon: "🔗" },
-                d.madrugador > 0 && { label: "Bonus madrugador", value: d.madrugador, icon: "⚡" },
                 d.apoyos > 0 && { label: "Apoyos recibidos", value: d.apoyos, icon: "💛" },
               ].filter(Boolean) as { label: string; value: number; icon: string }[];
               return (

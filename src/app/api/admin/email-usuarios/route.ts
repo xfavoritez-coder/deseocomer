@@ -63,17 +63,19 @@ export async function POST(req: NextRequest) {
 
     // Build where clause from filters
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = { emailVerificado: true };
+    const where: any = {};
 
-    if (filtros?.emailVerificado === false) where.emailVerificado = false;
+    if (filtros?.emailVerificado === true) where.emailVerificado = true;
+    else if (filtros?.emailVerificado === false) where.emailVerificado = false;
+    // "todos" = no filter on emailVerificado
+
     if (filtros?.telefonoVerificado === true) where.telefonoVerificado = true;
     if (filtros?.telefonoVerificado === false) where.telefonoVerificado = false;
-    if (filtros?.estiloAlimentario && filtros.estiloAlimentario !== "todos") {
-      if (filtros.estiloAlimentario === "como_de_todo") {
-        where.estiloAlimentario = "";
-      } else {
-        where.estiloAlimentario = filtros.estiloAlimentario;
-      }
+
+    // Multi-select estilos alimentarios
+    if (filtros?.estilosAlimentarios?.length > 0) {
+      const estiloValues = filtros.estilosAlimentarios.map((e: string) => e === "como_de_todo" ? "" : e);
+      where.estiloAlimentario = { in: estiloValues };
     }
     if (filtros?.haParticipado === true) {
       where.participaciones = { some: {} };

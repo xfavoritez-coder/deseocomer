@@ -428,7 +428,6 @@ export default function AdminConcursos() {
                         {/* Points breakdown */}
                         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 8 }}>
                           <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(240,234,214,0.05)", color: "rgba(240,234,214,0.5)" }}>Base +1</span>
-                          {investigacion.participante.madrugador > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(232,168,76,0.08)", color: "#e8a84c" }}>Madrugador +{investigacion.participante.madrugador}</span>}
                           {investigacion.participante.bonusRef > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>Bonus ref +{investigacion.participante.bonusRef}</span>}
                           {investigacion.participante.refNuevos > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>Ref nuevos +{investigacion.participante.refNuevos}</span>}
                           {investigacion.participante.refExistentes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.68rem", padding: "2px 7px", borderRadius: 8, background: "rgba(61,184,158,0.06)", color: "#3db89e" }}>Ref existentes +{investigacion.participante.refExistentes}</span>}

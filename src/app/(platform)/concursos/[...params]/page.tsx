@@ -660,28 +660,6 @@ function ConcursoDetallePage() {
           </span>
         </div>
       )}
-      {/* Bonus madrugador integrado en ranking — solo méritos */}
-      {!isEnded && !isProgramado && !esSorteo && (() => {
-        const totalParts = c.participantes ?? 0;
-        if (totalParts >= 10) return null;
-        const spots = 10 - totalParts;
-        return (
-          <div style={{ borderTop: "1px solid rgba(232,168,76,0.12)", padding: "12px 14px", background: "rgba(232,168,76,0.03)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 14 }}>⚡</span>
-              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: 11, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em" }}>Bonus madrugador</span>
-              <span style={{ marginLeft: "auto", fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c" }}>+2 pts</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ flex: 1, height: 5, background: "rgba(232,168,76,0.1)", borderRadius: 5, overflow: "hidden" }}>
-                <div style={{ width: `${(totalParts / 10) * 100}%`, height: "100%", background: "linear-gradient(to right, #e8a84c, #f5d080)", borderRadius: 5, transition: "width 0.3s" }} />
-              </div>
-              <span style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(232,168,76,0.6)", whiteSpace: "nowrap" }}>{spots} de 10</span>
-            </div>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: 11, color: "rgba(240,234,214,0.35)", margin: "6px 0 0", lineHeight: 1.4 }}>Los primeros 10 en entrar reciben +2 puntos extra</p>
-          </div>
-        );
-      })()}
     </div>
   );
 
@@ -818,10 +796,10 @@ function ConcursoDetallePage() {
               {c.ganadorActualNombre && (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 }}>
                   <p style={{ fontFamily: "var(--font-lato)", fontSize: 16, color: "rgba(240,234,214,0.7)", margin: 0 }}>Ganador: <strong style={{ color: "#e8a84c" }}>{c.ganadorActualNombre}</strong></p>
-                  <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 8, background: "rgba(232,168,76,0.12)", border: "1px solid rgba(232,168,76,0.25)", color: "#e8a84c", fontFamily: "var(--font-lato)", whiteSpace: "nowrap", cursor: "help" }} title="Estamos confirmando que el ganador pueda retirar su premio. Este proceso toma unos días.">verificando</span>
+                  <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 8, background: dbEstado === "en_revision" ? "rgba(255,180,50,0.12)" : "rgba(232,168,76,0.12)", border: `1px solid ${dbEstado === "en_revision" ? "rgba(255,180,50,0.25)" : "rgba(232,168,76,0.25)"}`, color: dbEstado === "en_revision" ? "#ffb432" : "#e8a84c", fontFamily: "var(--font-lato)", whiteSpace: "nowrap" }}>{dbEstado === "en_revision" ? "en revisión" : "coordinando entrega"}</span>
                 </div>
               )}
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", lineHeight: 1.6 }}>Estamos coordinando con el ganador y el local la entrega del premio</p>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.35)", lineHeight: 1.6 }}>{dbEstado === "en_revision" ? "Estamos verificando al ganador antes de coordinar la entrega" : "Estamos coordinando con el ganador y el local la entrega del premio"}</p>
             </div>
           )}
           {dbEstado === "completado" && (
@@ -882,15 +860,6 @@ function ConcursoDetallePage() {
                 <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 16, color: "#a78bfa", textTransform: "uppercase", marginBottom: 8 }}>Este concurso aún no ha comenzado</p>
                 <p style={{ fontFamily: "var(--font-lato)", fontSize: 13, color: "rgba(240,234,214,0.5)", lineHeight: 1.6, marginBottom: 12 }}>Sé de los primeros en entrar. Avisaremos cuando empiece para que tengas ventaja sobre los demás.</p>
                 {listaEsperaTotal > 0 && <span style={{ display: "inline-block", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: 20, padding: "4px 12px", fontFamily: "var(--font-lato)", fontSize: 12, color: "#a78bfa", marginBottom: 12 }}>👁 {listaEsperaTotal} personas esperando</span>}
-
-                {/* Incentivo bonus madrugador */}
-                <div style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 12, padding: "14px 16px", marginBottom: 16, display: "flex", gap: 12, alignItems: "flex-start", textAlign: "left" }}>
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>⚡</span>
-                  <div>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: 12, fontWeight: 700, color: "#e8a84c", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Ventaja para los primeros</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: 12, color: "rgba(240,234,214,0.55)", lineHeight: 1.5 }}>Los <strong style={{ color: "rgba(240,234,214,0.8)" }}>primeros 10 en entrar</strong> cuando el concurso se active reciben <strong style={{ color: "#e8a84c" }}>+2 puntos extra</strong> automáticamente. ¡Anótate y entra antes que todos!</p>
-                  </div>
-                </div>
 
                 {/* Formulario lista de espera */}
                 {listaRegistrado ? (
@@ -1076,7 +1045,6 @@ function ConcursoDetallePage() {
   { icon: "🎟️", pts: "+1", label: "Al entrar", id: "tt1", ttTitle: "Al entrar al concurso", ttText: "Por unirte ganas 1 punto base. Si entraste por el link de un amigo, ambos ganan 3 puntos adicionales automáticamente.", ttPts: "+1 punto (o +4 si entraste por un link)" },
   { icon: "🆕", pts: "+3", label: "Referido nuevo en DC", id: "tt2", ttTitle: "Referido nuevo", ttText: "Comparte tu link. Cuando alguien nuevo se registra en DeseoComer por ti, ambos ganan 3 puntos. Es la forma más potente de sumar.", ttPts: "+3 puntos para cada uno" },
   { icon: "👥", pts: "+1", label: "Amigo ya registrado", id: "tt3", ttTitle: "Amigo ya registrado", ttText: "¿Tienes amigos en DeseoComer? Compárteles tu código o link para que participen en este concurso. Ganas 1 punto por cada uno.", ttPts: "+1 punto" },
-  { icon: "⚡", pts: "+2", label: "Bonus madrugador", id: "tt4", ttTitle: "Bonus madrugador ⚡", ttText: "Los primeros 10 en unirse a este concurso reciben 2 puntos extra automáticamente. ¡Entra rápido cuando salga un concurso nuevo!", ttPts: "+2 puntos extra" },
   { icon: "🔗", pts: "+2", label: "Red de referidos", id: "tt5", ttTitle: "Red de referidos", ttText: "Cuando invitas a alguien a un concurso y esa persona invita a otros, tú también ganas +2 puntos por cada uno que traigan. Máximo 20 puntos por esta vía.", ttPts: "+2 puntos por cada uno" },
   { icon: "💛", pts: "+1", label: "Al recibir apoyo", id: "tt6", ttTitle: "Al recibir apoyo", ttText: "Cuando otro participante toca el corazón en tu perfil del ranking, tú ganas +1 punto. Solo puedes recibir un apoyo por persona cada 24 horas.", ttPts: "+1 punto para ti" },
 ].map((s, idx) => {

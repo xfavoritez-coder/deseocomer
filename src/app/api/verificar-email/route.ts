@@ -49,11 +49,11 @@ export async function GET(req: NextRequest) {
                 referidorNivel2Id = refParticipante.referidorDirectoId;
               }
 
-              const totalPart = await prisma.participanteConcurso.count({ where: { concursoId: concurso.id } });
-              const esMadrugador = totalPart < 10;
+              // Bonus madrugador desactivado
+              const esMadrugador = false;
               const puntosBase = 1;
               const puntosRefBonus = 3;
-              const puntosMadrugador = esMadrugador ? 2 : 0;
+              const puntosMadrugador = 0;
 
               // Referral points stay PENDING until phone is verified
               const telVerificado = usuario.telefonoVerificado;
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
               // Notificación al nuevo participante
               if (telVerificado) {
                 const totalPts = puntosBase + puntosRefBonus + puntosMadrugador;
-                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por referido${esMadrugador ? ", +2 madrugador" : ""}) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
+                prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}" con ${totalPts} puntos! (+1 base, +3 por referido) 🎉`, datos: { concursoSlug: cSlug } } }).catch(() => {});
               } else {
                 prisma.notificacion.create({ data: { usuarioId: usuario.id, tipo: "entrada_concurso", mensaje: `¡Entraste a "${premioCorto}"! Verifica tu celular para activar tus +3 puntos de referido 📱`, datos: { concursoSlug: cSlug, abrirVerificarTel: true } } }).catch(() => {});
               }

@@ -124,6 +124,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   try {
     const { id } = await params;
     await prisma.participanteConcurso.deleteMany({ where: { concursoId: id } });
+    await prisma.listaEsperaConcurso.deleteMany({ where: { concursoId: id } });
     await prisma.concurso.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (error) {

@@ -33,10 +33,11 @@ export default function AdminEmailUsuarios() {
   const [toast, setToast] = useState("");
 
   // Filters
-  const [estiloAlimentario, setEstiloAlimentario] = useState("todos");
+  const [estilosAlimentarios, setEstilosAlimentarios] = useState<string[]>([]);
   const [categoriaFavorita, setCategoriaFavorita] = useState("");
   const [haParticipado, setHaParticipado] = useState<"cualquiera" | "si" | "no">("cualquiera");
   const [telefonoVerificado, setTelefonoVerificado] = useState<"cualquiera" | "si" | "no">("cualquiera");
+  const [emailVerificado, setEmailVerificado] = useState<"todos" | "si" | "no">("si");
 
   // Template
   const [plantilla, setPlantilla] = useState("nuevo_concurso");
@@ -67,12 +68,15 @@ export default function AdminEmailUsuarios() {
   const buildFiltros = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const f: any = {};
-    if (estiloAlimentario !== "todos") f.estiloAlimentario = estiloAlimentario;
+    if (estilosAlimentarios.length > 0) f.estilosAlimentarios = estilosAlimentarios;
     if (categoriaFavorita) f.categoriaFavorita = categoriaFavorita;
     if (haParticipado === "si") f.haParticipado = true;
     if (haParticipado === "no") f.haParticipado = false;
     if (telefonoVerificado === "si") f.telefonoVerificado = true;
     if (telefonoVerificado === "no") f.telefonoVerificado = false;
+    if (emailVerificado === "si") f.emailVerificado = true;
+    else if (emailVerificado === "no") f.emailVerificado = false;
+    else f.emailVerificado = "todos";
     return f;
   };
 
@@ -135,13 +139,19 @@ export default function AdminEmailUsuarios() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
           <div>
-            <label style={labelS}>Estilo alimentario</label>
-            <select value={estiloAlimentario} onChange={e => setEstiloAlimentario(e.target.value)} style={selectS}>
-              <option value="todos">Todos</option>
-              <option value="como_de_todo">🍽️ Come de todo</option>
-              <option value="vegetariano">🌱 Vegetariano</option>
-              <option value="vegano">🌿 Vegano</option>
-            </select>
+            <label style={labelS}>Estilo alimentario {estilosAlimentarios.length > 0 && `(${estilosAlimentarios.length})`}</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {[
+                { value: "como_de_todo", label: "🍽️ Come de todo" },
+                { value: "vegetariano", label: "🌱 Vegetariano" },
+                { value: "vegano", label: "🌿 Vegano" },
+              ].map(opt => {
+                const sel2 = estilosAlimentarios.includes(opt.value);
+                return (
+                  <button key={opt.value} type="button" onClick={() => setEstilosAlimentarios(prev => sel2 ? prev.filter(v => v !== opt.value) : [...prev, opt.value])} style={{ padding: "6px 12px", borderRadius: 8, border: sel2 ? "1px solid rgba(232,168,76,0.4)" : "1px solid rgba(232,168,76,0.15)", background: sel2 ? "rgba(232,168,76,0.12)" : "transparent", color: sel2 ? "#e8a84c" : "rgba(240,234,214,0.5)", fontFamily: "Georgia", fontSize: "0.78rem", cursor: "pointer" }}>{opt.label}</button>
+                );
+              })}
+            </div>
           </div>
 
           <div>
@@ -167,6 +177,15 @@ export default function AdminEmailUsuarios() {
               <option value="cualquiera">Cualquiera</option>
               <option value="si">Sí</option>
               <option value="no">No</option>
+            </select>
+          </div>
+
+          <div>
+            <label style={labelS}>Email verificado</label>
+            <select value={emailVerificado} onChange={e => setEmailVerificado(e.target.value as "todos" | "si" | "no")} style={selectS}>
+              <option value="todos">Todos</option>
+              <option value="si">Sí (verificados)</option>
+              <option value="no">No (sin verificar)</option>
             </select>
           </div>
         </div>

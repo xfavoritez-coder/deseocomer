@@ -332,7 +332,6 @@ export default function AdminUsuarios() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", padding: "8px 10px", background: "rgba(255,255,255,0.02)", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.04)", fontSize: "0.72rem", fontFamily: "Georgia" }}>
                       <span style={{ color: "rgba(240,234,214,0.5)" }}>Base</span><span style={{ color: "#e8a84c", textAlign: "right" }}>+{ptsBase}</span>
                       {ptsRefBonus > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Bonus referido</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{ptsRefBonus}</span></>}
-                      {ptsMadrugador > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Madrugador</span><span style={{ color: "#e8a84c", textAlign: "right" }}>+{ptsMadrugador}</span></>}
                       {directosVerificados > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Referidos ({directosVerificados} × 3)</span><span style={{ color: "#3db89e", textAlign: "right" }}>+{ptsDirectos}</span></>}
                       {directosNoVerif > 0 && <><span style={{ color: "rgba(255,130,80,0.6)", fontStyle: "italic" }}>{directosNoVerif} ref sin verificar</span><span style={{ color: "rgba(255,130,80,0.4)", textAlign: "right", fontStyle: "italic" }}>pendiente</span></>}
                       {ptsNivel2 > 0 && <><span style={{ color: "rgba(240,234,214,0.5)" }}>Nivel 2</span><span style={{ color: "#a070e0", textAlign: "right" }}>+{ptsNivel2}</span></>}

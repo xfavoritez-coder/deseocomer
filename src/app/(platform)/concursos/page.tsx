@@ -342,9 +342,6 @@ export default function ConcursosPage() {
                     <div style={{ fontFamily: "var(--font-cinzel)", fontSize: 17, color: "#f5d080", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.03em", lineHeight: 1.2, marginBottom: 4, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}><span style={{ fontSize: 16 }}>🏆 </span>{c.premio}</div>
                     {c.descripcionPremio && <p style={{ fontFamily: "var(--font-lato)", fontSize: 14, color: "rgba(240,234,214,0.38)", fontStyle: "italic", lineHeight: 1.35, marginBottom: 12, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden", textOverflow: "ellipsis" }}>{c.descripcionPremio}</p>}
 
-                    {c.estado !== "programado" && c.participantes < 10 && (
-                      <span style={{ fontFamily: "var(--font-lato)", fontSize: 10, color: "#e8a84c", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 10 }}>⚡ +2 pts bonus primeros 10</span>
-                    )}
 
                     {/* Programado countdown */}
                     {c.estado === "programado" && (() => {
@@ -371,9 +368,6 @@ export default function ConcursosPage() {
                                 </div>
                               ))}
                             </div>
-                          </div>
-                          <div style={{ textAlign: "center" }}>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 20, padding: "3px 10px", fontFamily: "var(--font-cinzel)", fontSize: "10px", fontWeight: 700, color: "#e8a84c", whiteSpace: "nowrap" as const }}>⚡ Bonus +2 pts · primeros 10</span>
                           </div>
                         </div>
                       );

@@ -207,7 +207,6 @@ export default function ActividadUsuario() {
                 {c.puntosReferidosExistentes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(61,184,158,0.08)", color: "#3db89e" }}>Ref existentes: +{c.puntosReferidosExistentes}</span>}
                 {c.puntosNivel2 > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(128,64,208,0.1)", color: "#a070e0" }}>Nivel 2: +{c.puntosNivel2}</span>}
                 {c.puntosNivel2Pendientes > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(255,100,100,0.08)", color: "#ff8080" }}>N2 pendientes: {c.puntosNivel2Pendientes}</span>}
-                {c.esMadrugador && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(232,168,76,0.08)", color: "#e8a84c" }}>⚡ Madrugador +{c.puntosMadrugador}</span>}
                 {c.puntosApoyos > 0 && <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", padding: "3px 10px", borderRadius: 10, background: "rgba(224,80,144,0.1)", color: "#e05090" }}>💛 Apoyos: +{c.puntosApoyos}</span>}
               </div>
               <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.25)", marginTop: 4 }}>Participó: {new Date(c.createdAt).toLocaleString("es-CL")}</p>

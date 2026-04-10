@@ -116,7 +116,6 @@ export default async function ComoFuncionaPage() {
             {[
               { icon: "🆕", pts: "+3", color: "#e8a84c", label: "Traes a alguien nuevo a DeseoComer", highlight: true },
               { icon: "👥", pts: "+2", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
-              { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
               { icon: "🔗", pts: "+2", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
               { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
               { icon: "💛", pts: "+1", color: "#2a7a6f", label: "Al recibir apoyo de otro participante", highlight: false },
@@ -142,11 +141,6 @@ export default async function ComoFuncionaPage() {
               </p>
             </div>
             <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", fontStyle: "italic" }}>Límite: puedes acumular hasta 20 puntos extra por los referidos de tus referidos en cada concurso.</p>
-          </div>
-
-          <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
-            <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "var(--accent)", marginBottom: 12 }}>Bonus madrugador ⚡</h3>
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.7 }}>Los primeros 10 participantes de cada concurso de méritos reciben +2 puntos extra automáticamente. ¡Entra rápido cuando se publique un concurso nuevo!</p>
           </div>
 
           <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: "24px", marginTop: 20 }}>
