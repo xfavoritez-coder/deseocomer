@@ -293,7 +293,7 @@ function buildNuevosConcursosSubject(concursos: ConcursoData[]): string {
       ? `🎲 ¡Sorteo: ${concursos[0].premio} gratis!`
       : `🏆 Nuevo concurso: gana ${concursos[0].premio}`;
   }
-  return `🏆 ${concursos.length} nuevos concursos — ¡participa gratis!`;
+  return `🏆 ${concursos.length} nuevos concursos para ti — ¡participa gratis!`;
 }
 
 function wrapEmail(content: string) {
@@ -343,36 +343,53 @@ function buildNuevosConcursosHtml(concursos: ConcursoData[], totalReferidos: num
   // Personalized message based on referral history
   let introHtml: string;
 
+  const todosSorteo = concursos.every(c => c.esSorteo);
+  const algunSorteo = concursos.some(c => c.esSorteo);
+
   if (totalReferidos > 0) {
     // User with referral network
+    const subtextoRef = todosSorteo
+      ? "Pásales tu link — mientras más amigos entren, más chances tienes de ganar"
+      : algunSorteo
+        ? "Pásales tu link y ambos suman puntos. En los sorteos, más amigos = más chances"
+        : "Pásales tu link y ambos suman puntos en estos nuevos concursos";
+
     introHtml = `
       <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px;text-align:center">{{nombre}}, ¡tienes ventaja!</h2>
       <div style="background:rgba(61,184,158,0.08);border:1px solid rgba(61,184,158,0.2);border-radius:12px;padding:16px;margin-bottom:20px;text-align:center">
         <p style="color:#3db89e;font-size:16px;margin:0;line-height:1.6">Ya tienes <strong style="font-size:20px">${totalReferidos} ${totalReferidos === 1 ? "amigo" : "amigos"}</strong> que se registraron contigo antes</p>
-        <p style="color:rgba(61,184,158,0.7);font-size:14px;margin:8px 0 0">Pásales tu código y ambos suman puntos en estos nuevos concursos</p>
-      </div>
-      <p style="color:#c0a060;font-size:15px;line-height:1.7;margin-bottom:20px;text-align:center">${concursos.length > 1 ? "Hay" : "Hay un"} ${concursos.length > 1 ? concursos.length + " nuevos concursos" : "nuevo concurso"}. Tus amigos ya conocen DeseoComer — solo necesitan entrar con tu link y <strong style="color:#f5d080">ambos ganan +3 puntos</strong>.</p>`;
+        <p style="color:rgba(61,184,158,0.7);font-size:14px;margin:8px 0 0">${subtextoRef}</p>
+      </div>`;
   } else {
     // User without referrals
-    const modalidadMsg = tieneSorteo && tieneRanking
-      ? "Participa gratis — invita amigos para sumar puntos o simplemente entra al sorteo."
-      : tieneSorteo
-        ? "Solo entra y ya estás participando. ¡Cualquiera dentro puede ganar!"
-        : "Invita amigos, suma puntos y gana. Cada amigo te da +3 puntos.";
+    const modalidadMsg = todosSorteo
+      ? "Solo entra y ya estás participando. ¡Cualquiera dentro puede ganar!"
+      : algunSorteo
+        ? "Participa gratis — invita amigos para sumar puntos o simplemente entra al sorteo."
+        : "Invita amigos, suma puntos y gana. Cada amigo que entre por tu link te da +3 puntos.";
 
     introHtml = `
       <h2 style="color:#e8a84c;font-size:22px;margin-top:0;margin-bottom:16px;text-align:center">{{nombre}}, ${concursos.length > 1 ? "¡nuevos concursos!" : "¡nuevo concurso!"}</h2>
       <p style="color:#c0a060;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">${modalidadMsg}</p>`;
   }
 
-  return wrapEmail(`${introHtml}${cardsHtml}`);
+  let cierreHtml: string;
+  if (todosSorteo) {
+    cierreHtml = `<p style="color:#5a4028;font-size:13px;line-height:1.6;text-align:center;margin-top:8px">El ganador se elige al azar entre todos los participantes. Entra gratis y ya estás participando — cualquiera dentro puede ganar.</p>`;
+  } else if (algunSorteo) {
+    cierreHtml = `<p style="color:#5a4028;font-size:13px;line-height:1.6;text-align:center;margin-top:8px">Todos los concursos son gratis. En sorteos, el ganador se elige al azar. En méritos, comparte tu link y suma puntos para ganar.</p>`;
+  } else {
+    cierreHtml = `<p style="color:#5a4028;font-size:13px;line-height:1.6;text-align:center;margin-top:8px">Comparte tu link en WhatsApp — cada amigo que entre suma puntos para ambos.</p>`;
+  }
+
+  return wrapEmail(`${introHtml}${cardsHtml}${cierreHtml}`);
 }
 
 function buildNuevoConcursoHtml({ premio, local, logoUrl, imagenUrl, esSorteo, slug }: { premio: string; local: string; logoUrl: string | null; imagenUrl: string | null; esSorteo: boolean; slug: string }) {
   const url = `https://deseocomer.com/concursos/${slug}`;
   const modalidadMsg = esSorteo
     ? `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Es modalidad <strong>sorteo</strong> — solo entra y ya estás participando. <strong style="color:#e8a84c">Cualquiera dentro puede ganar</strong>. Es gratis.</p>`
-    : `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Invita amigos, suma puntos y <strong style="color:#e8a84c">gana el premio</strong>. Cada amigo que entre por tu link te da +3 puntos.</p>`;
+    : `<p style="color:#f5d080;font-size:16px;line-height:1.7;margin-bottom:20px;text-align:center">Invita amigos, suma puntos y <strong style="color:#e8a84c">gana el premio</strong>. Cada amigo nuevo te da +3 puntos, cada amigo ya registrado +2 puntos.</p>`;
 
   const logoHtml = logoUrl
     ? `<img src="${logoUrl}" alt="${local}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(232,168,76,0.3);margin-right:8px;vertical-align:middle" />`

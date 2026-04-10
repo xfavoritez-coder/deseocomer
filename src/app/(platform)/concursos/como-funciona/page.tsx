@@ -115,7 +115,7 @@ export default async function ComoFuncionaPage() {
           <div className="cf-puntos">
             {[
               { icon: "🆕", pts: "+3", color: "#e8a84c", label: "Traes a alguien nuevo a DeseoComer", highlight: true },
-              { icon: "👥", pts: "+1", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
+              { icon: "👥", pts: "+2", color: "#e8a84c", label: "Traes a un amigo ya registrado al concurso", highlight: true },
               { icon: "⚡", pts: "+2", color: "#e8a84c", label: "Eres de los primeros 10 en participar (bonus madrugador)", highlight: true },
               { icon: "🔗", pts: "+2", color: "#3db89e", label: "Referido de tu referido (nivel 2)", highlight: false },
               { icon: "🎟️", pts: "+1", color: "#3db89e", label: "Al registrarte en el concurso", highlight: false },
@@ -136,7 +136,7 @@ export default async function ComoFuncionaPage() {
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", lineHeight: 1.8, margin: 0 }}>
                 <strong style={{ color: "var(--accent)" }}>Ejemplo:</strong><br/>
                 Invitas a María (nueva en DC) → <strong style={{ color: "#3db89e" }}>+3 puntos</strong> para ti<br/>
-                Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+1 punto</strong> para ti<br/>
+                Invitas a Pedro (ya registrado) → <strong style={{ color: "#3db89e" }}>+2 puntos</strong> para ti<br/>
                 María invita a Juan → +3 para María, <strong style={{ color: "#3db89e" }}>+2 para ti</strong><br/>
                 María invita a Ana → +3 para María, <strong style={{ color: "#3db89e" }}>+2 para ti</strong>
               </p>
