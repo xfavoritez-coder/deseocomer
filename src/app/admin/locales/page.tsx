@@ -11,8 +11,13 @@ const COMUNAS = ["Providencia", "Santiago Centro", "Ñuñoa", "Las Condes", "Vit
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type L = any;
 
+type HorarioDia = { activo: boolean; abre: string; cierra: string };
+const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const DEFAULT_HORARIOS: HorarioDia[] = DIAS_SEMANA.map(() => ({ activo: true, abre: "12:00", cierra: "22:00" }));
+
 export default function AdminLocales() {
   const [locales, setLocales] = useState<L[]>([]);
+  const [localesGoogle, setLocalesGoogle] = useState<L[]>([]);
   const [busq, setBusq] = useState("");
   const [filtro, setFiltro] = useState("todos");
   const [sel, setSel] = useState<L | null>(null);
@@ -21,6 +26,7 @@ export default function AdminLocales() {
   const [editMode, setEditMode] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [editData, setEditData] = useState<Record<string, any>>({});
+  const [editHorarios, setEditHorarios] = useState<HorarioDia[]>(DEFAULT_HORARIOS);
   const [passMode, setPassMode] = useState(false);
   const [newPass, setNewPass] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -49,7 +55,9 @@ export default function AdminLocales() {
 
   const pendientes = locales.filter(l => !l.activo).length;
   const activos = locales.filter(l => l.activo).length;
-  const filtered = locales.filter(l => {
+  const isGoogleFilter = filtro === "importados";
+  const sourceList = isGoogleFilter ? localesGoogle : locales;
+  const filtered = sourceList.filter(l => {
     if (busq && !l.nombre?.toLowerCase().includes(busq.toLowerCase()) && !l.email?.toLowerCase().includes(busq.toLowerCase())) return false;
     if (filtro === "activos" && !l.activo) return false;
     if (filtro === "pendientes" && (l.activo || l.origenImportacion === "GOOGLE_PLACES")) return false;
@@ -206,8 +214,22 @@ export default function AdminLocales() {
             <label style={labelS}>Portada</label>
             <SubirFoto folder="locales/portadas" preview={editData.portadaUrl || null} label="Subir portada" height="120px" onUpload={url => setEditData(d => ({ ...d, portadaUrl: url }))} />
           </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label style={{ ...labelS, marginBottom: "8px" }}>Horarios</label>
+            {DIAS_SEMANA.map((dia, i) => (
+              <div key={dia} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                <input type="checkbox" checked={editHorarios[i]?.activo ?? true} onChange={e => setEditHorarios(h => h.map((d, j) => j === i ? { ...d, activo: e.target.checked } : d))} style={{ accentColor: "#e8a84c", width: "16px", height: "16px" }} />
+                <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.7)", width: "80px" }}>{dia}</span>
+                {editHorarios[i]?.activo ? (<>
+                  <input type="time" value={editHorarios[i]?.abre ?? "12:00"} onChange={e => setEditHorarios(h => h.map((d, j) => j === i ? { ...d, abre: e.target.value } : d))} style={{ ...inputS, width: "auto", padding: "6px 8px", fontSize: "0.78rem" }} />
+                  <span style={{ color: "rgba(240,234,214,0.3)" }}>—</span>
+                  <input type="time" value={editHorarios[i]?.cierra ?? "22:00"} onChange={e => setEditHorarios(h => h.map((d, j) => j === i ? { ...d, cierra: e.target.value } : d))} style={{ ...inputS, width: "auto", padding: "6px 8px", fontSize: "0.78rem" }} />
+                </>) : <span style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "#ff6b6b" }}>Cerrado</span>}
+              </div>
+            ))}
+          </div>
           <div style={{ display: "flex", gap: "8px" }}>
-            <button onClick={async () => { if (await action("editar", editData)) { setSel({ ...sel, ...editData }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, ...editData } : l)); setEditMode(false); show("✓ Datos actualizados"); } }} disabled={loading} style={btnPrimaryS}>{loading ? "..." : "Guardar"}</button>
+            <button onClick={async () => { const payload = { ...editData, horarios: editHorarios }; if (await action("editar", payload)) { setSel({ ...sel, ...payload }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, ...payload } : l)); setEditMode(false); show("✓ Datos actualizados"); } }} disabled={loading} style={btnPrimaryS}>{loading ? "..." : "Guardar"}</button>
             <button onClick={() => setEditMode(false)} style={btnSecS}>Cancelar</button>
           </div>
         </div>
@@ -257,7 +279,7 @@ export default function AdminLocales() {
           <a href={`/locales/${sel.slug || sel.id}?tab=Promociones`} target="_blank" rel="noopener" style={{ ...btnOutlineS, textDecoration: "none", textAlign: "center", color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>⚡ Ver promociones del local</a>
           {!sel.activo && <button onClick={async () => { if (await action("aprobar")) { setSel({ ...sel, activo: true }); setLocales(p => p.map(l => l.id === sel.id ? { ...l, activo: true } : l)); show("✓ Aprobado y notificado"); } }} disabled={loading} style={{ ...btnOutlineS, color: "#3db89e", borderColor: "rgba(61,184,158,0.4)" }}>✓ Aprobar y notificar</button>}
           {!sel.activo && <button onClick={async () => { if (await action("reenviar-activacion")) show("✓ Email de activación enviado"); }} disabled={loading} style={btnOutlineS}>📧 Reenviar email de activación</button>}
-          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categorias: sel.categorias ?? [], comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false, lat: sel.lat ?? 0, lng: sel.lng ?? 0 }); }} style={btnOutlineS}>✏️ Editar datos</button>
+          <button onClick={() => { resetModes(); setEditMode(true); setEditData({ nombre: sel.nombre ?? "", nombreDueno: sel.nombreDueno ?? "", celularDueno: sel.celularDueno ?? "", categorias: sel.categorias ?? [], comuna: sel.comuna ?? "", direccion: sel.direccion ?? "", telefono: sel.telefono ?? "", instagram: sel.instagram ?? "", sitioWeb: sel.sitioWeb ?? "", descripcion: sel.descripcion ?? "", logoUrl: sel.logoUrl ?? "", portadaUrl: sel.portadaUrl ?? "", sirveEnMesa: sel.sirveEnMesa ?? true, tieneDelivery: sel.tieneDelivery ?? false, tieneRetiro: sel.tieneRetiro ?? false, lat: sel.lat ?? 0, lng: sel.lng ?? 0 }); setEditHorarios(Array.isArray(sel.horarios) && sel.horarios.length === 7 ? sel.horarios : DEFAULT_HORARIOS); }} style={btnOutlineS}>✏️ Editar datos</button>
           <button onClick={() => { resetModes(); setPassMode(true); }} style={btnOutlineS}>🔑 Cambiar contraseña</button>
           <button onClick={() => { resetModes(); setRejectMode(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>✗ {sel.activo ? "Desactivar" : "Rechazar"}</button>
           <button onClick={() => { resetModes(); setDeleteConfirm(true); }} style={{ ...btnOutlineS, color: "#ff8080", borderColor: "rgba(255,80,80,0.3)" }}>🗑️ Eliminar</button>
@@ -280,8 +302,8 @@ export default function AdminLocales() {
 
       <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
         <input style={{ ...inputS, flex: 1, minWidth: "150px" }} placeholder="Buscar..." value={busq} onChange={e => setBusq(e.target.value)} />
-        {["todos", "pendientes", "reclamados", "activos"].map(f => (
-          <button key={f} onClick={() => setFiltro(f)} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.78rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? "#e8a84c" : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f}</button>
+        {["todos", "pendientes", "reclamados", "activos", "importados"].map(f => (
+          <button key={f} onClick={() => { setFiltro(f); if (f === "importados" && localesGoogle.length === 0) { adminFetch("/api/admin/locales?incluir=google").then(r => r.json()).then(d => setLocalesGoogle(Array.isArray(d) ? d : [])).catch(() => {}); } }} style={{ padding: "6px 12px", borderRadius: "6px", fontFamily: "Georgia", fontSize: "0.78rem", textTransform: "uppercase", cursor: "pointer", background: filtro === f ? (f === "importados" ? "#7b9aff" : "#e8a84c") : "transparent", color: filtro === f ? "#0a0812" : "rgba(240,234,214,0.5)", border: filtro === f ? "none" : "1px solid rgba(255,255,255,0.1)" }}>{f === "importados" ? "Google" : f}</button>
         ))}
       </div>
 
@@ -366,17 +388,24 @@ export default function AdminLocales() {
         </div>
       )}
 
+      {isGoogleFilter && <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: "12px" }}>Locales importados desde Google Places ({filtered.length}). Puedes editarlos o eliminarlos.</p>}
+
       {/* Card list (mobile-friendly) */}
       <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {filtered.map(l => (
           <div key={l.id} onClick={() => { setSel(l); resetModes(); }} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 14px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "10px", cursor: "pointer" }}>
             <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: l.logoUrl ? "transparent" : "linear-gradient(135deg, #2a7a6f, #3db89e)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#fff", flexShrink: 0, overflow: "hidden", border: "1px solid rgba(232,168,76,0.2)" }}>{l.logoUrl ? <img src={l.logoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : l.nombre?.charAt(0).toUpperCase()}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.nombre}</p>
-              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{l.email}</p>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <p style={{ fontFamily: "Georgia", fontSize: "0.85rem", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.nombre}</p>
+                {l.origenImportacion === "GOOGLE_PLACES" && <span style={{ fontSize: "0.65rem", padding: "1px 6px", borderRadius: "4px", background: "rgba(123,154,255,0.12)", border: "1px solid rgba(123,154,255,0.3)", color: "#7b9aff", flexShrink: 0 }}>Google</span>}
+              </div>
+              <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>{isGoogleFilter ? (l.comuna ?? "Sin comuna") + (l.googleRating ? ` · ⭐ ${l.googleRating}` : "") : l.email}</p>
             </div>
             {l.activo ? (
               <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#3db89e", flexShrink: 0 }}>✓</span>
+            ) : isGoogleFilter ? (
+              <button onClick={async (e) => { e.stopPropagation(); setLoading(true); try { const r = await adminFetch(`/api/admin/locales/${l.id}`, { method: "DELETE" }); if (r.ok) { setLocalesGoogle(p => p.filter(x => x.id !== l.id)); show("✓ Eliminado"); } } catch {} setLoading(false); }} style={{ padding: "4px 10px", background: "rgba(255,80,80,0.12)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: "6px", color: "#ff6b6b", fontFamily: "Georgia", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Eliminar</button>
             ) : (
               <button onClick={async (e) => { e.stopPropagation(); setLoading(true); try { const res = await adminFetch(`/api/admin/locales/${l.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accion: "aprobar" }) }); if (res.ok) { setLocales(p => p.map(x => x.id === l.id ? { ...x, activo: true } : x)); show("✓ " + l.nombre + " activado"); } } catch {} setLoading(false); }} style={{ padding: "4px 10px", background: "rgba(61,184,158,0.15)", border: "1px solid rgba(61,184,158,0.4)", borderRadius: "6px", color: "#3db89e", fontFamily: "Georgia", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer", flexShrink: 0, whiteSpace: "nowrap" }}>Activar</button>
             )}

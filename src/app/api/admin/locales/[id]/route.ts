@@ -107,6 +107,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
           ...(body.comunasDelivery !== undefined && { comunasDelivery: body.comunasDelivery }),
           ...(body.tieneRetiro !== undefined && { tieneRetiro: Boolean(body.tieneRetiro) }),
           ...(body.linkPedido !== undefined && { linkPedido: body.linkPedido }),
+          ...(body.horarios !== undefined && { horarios: body.horarios }),
         },
       });
       const { password: _, ...safe } = updated;

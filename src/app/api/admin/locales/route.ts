@@ -7,14 +7,17 @@ export async function GET(req: NextRequest) {
   const authErr = checkAdminAuth(req);
   if (authErr) return authErr;
   try {
+    const incluir = req.nextUrl.searchParams.get("incluir");
     const locales = await prisma.local.findMany({
-      where: {
-        OR: [
-          { origenImportacion: null },
-          { origenImportacion: { not: "GOOGLE_PLACES" } },
-          { origenImportacion: "GOOGLE_PLACES", reclamadoEn: { not: null } },
-        ],
-      },
+      where: incluir === "google"
+        ? { origenImportacion: "GOOGLE_PLACES" }
+        : {
+            OR: [
+              { origenImportacion: null },
+              { origenImportacion: { not: "GOOGLE_PLACES" } },
+              { origenImportacion: "GOOGLE_PLACES", reclamadoEn: { not: null } },
+            ],
+          },
       orderBy: { createdAt: "desc" },
       select: {
         id: true, slug: true, nombre: true, nombreDueno: true, celularDueno: true, email: true, telefono: true,
@@ -22,6 +25,7 @@ export async function GET(req: NextRequest) {
         lat: true, lng: true, instagram: true, sitioWeb: true, descripcion: true, historia: true,
         activo: true, captadorCodigo: true, createdAt: true, estadoLocal: true, origenImportacion: true, reclamadoEn: true,
         sirveEnMesa: true, tieneDelivery: true, comunasDelivery: true, tieneRetiro: true, linkPedido: true,
+        horarios: true, vistas: true, googlePlaceId: true, googleRating: true,
         _count: { select: { concursos: true, promociones: true, favoritos: true, resenas: true } },
       },
     });

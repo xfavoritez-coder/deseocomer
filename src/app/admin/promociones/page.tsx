@@ -7,7 +7,7 @@ import SubirFoto from "@/components/SubirFoto";
 type P = any;
 
 const TIPO_LABEL: Record<string, string> = { promo: "Promoción", "Promoción": "Promoción", happy_hour: "Promoción", descuento: "Promoción", "Descuento %": "Promoción", "2x1": "Promoción", combo: "Promoción", Combo: "Promoción", cupon: "Promoción", precio_especial: "Promoción", Regalo: "Promoción", cumpleanos: "Cumpleaños", "Cumpleaños": "Cumpleaños" };
-const DIAS_NOMBRE = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+const DIAS_NOMBRE = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export default function AdminPromociones() {
   const [promos, setPromos] = useState<P[]>([]);

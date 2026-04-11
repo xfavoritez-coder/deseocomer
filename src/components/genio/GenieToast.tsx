@@ -183,7 +183,21 @@ export default function GenieToast() {
         setQuickRec(rec);
         setIsOpen(true);
       } else {
+        // Fetch async and show result when ready
+        const params = new URLSearchParams();
+        if (favCat) params.set("categoria", favCat);
         setIsOpen(true);
+        fetch(`/api/locales/recomendar?${params}`).then(r => r.json()).then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            const catLower = (favCat ?? "").toLowerCase();
+            const primary = data.filter((l: any) => (l.categorias?.[0] ?? "").toLowerCase() === catLower);
+            const base = primary.length >= 3 ? primary : data;
+            const pool = base.filter((l: any) => (l.googleRating ?? 0) >= 4.0);
+            const candidates = pool.length >= 3 ? pool : base;
+            const pick = candidates[Math.floor(Math.random() * Math.min(5, candidates.length))];
+            if (pick) setQuickRec(pick);
+          }
+        }).catch(() => {});
       }
       return;
     }
