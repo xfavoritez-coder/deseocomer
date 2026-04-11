@@ -738,17 +738,22 @@ function TabPerfil({ user, logout, router }: { user: { nombre: string; email: st
     p.notifCumple = form.notifCumple;
     p.notifUrgente = form.notifUrgente;
     saveProfile(p);
-    // Persist birthday to DB
-    if (form.cumpleDia && form.cumpleMes) {
-      try {
-        const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
-        if (session.id) {
+    try {
+      const session = JSON.parse(localStorage.getItem("deseocomer_session") ?? "{}");
+      if (session.id) {
+        // Persist name and phone to DB
+        await fetch(`/api/usuarios/${session.id}/perfil`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nombre: form.nombre, telefono: form.telefono }) });
+        // Update local session with new name
+        session.nombre = form.nombre;
+        localStorage.setItem("deseocomer_session", JSON.stringify(session));
+        // Persist birthday to DB
+        if (form.cumpleDia && form.cumpleMes) {
           await fetch("/api/usuarios/cumpleanos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ usuarioId: session.id, dia: form.cumpleDia, mes: form.cumpleMes, anio: form.cumpleAno || null }) });
           localStorage.setItem("deseocomer_user_birthday", JSON.stringify({ dia: form.cumpleDia, mes: form.cumpleMes }));
           localStorage.setItem("genio_cumple_solicitado", "true");
         }
-      } catch {}
-    }
+      }
+    } catch {}
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };

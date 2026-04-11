@@ -13,7 +13,7 @@ export default function AnimacionSorteo({ ganadorNombre, totalBoletos, onClose }
   const [confetti, setConfetti] = useState<{ id: number; x: number; color: string; delay: number; dur: number }[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFase("ganador"), 3500);
+    const timer = setTimeout(() => setFase("ganador"), 5000);
     return () => clearTimeout(timer);
   }, []);
 
