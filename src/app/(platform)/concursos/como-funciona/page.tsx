@@ -164,29 +164,108 @@ export default async function ComoFuncionaPage() {
         {/* Concurso de sorteo */}
         <section style={{ marginBottom: "clamp(48px,8vw,96px)" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>🎲 Modalidad sorteo</p>
-          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.3 }}>¿Cómo funciona un sorteo?</h2>
+          <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.5rem,3vw,2.2rem)", color: "#f5d080", textAlign: "center", marginBottom: "12px", lineHeight: 1.3 }}>¿Cómo funciona un sorteo?</h2>
+          <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.9rem,1.5vw,1rem)", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: "clamp(28px,4vw,48px)", lineHeight: 1.7, maxWidth: 520, margin: "0 auto clamp(28px,4vw,48px)" }}>Imagina una bolsa llena de boletos con nombres. El sistema mete la mano y saca uno al azar.</p>
 
-          <div style={{ maxWidth: 560, margin: "0 auto" }}>
+          <div style={{ maxWidth: 600, margin: "0 auto" }}>
+
+            {/* Paso a paso visual */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 0, marginBottom: 32 }}>
               {[
-                { icon: "✅", title: "Entra gratis", desc: "Regístrate y únete al sorteo. No cuesta nada." },
-                { icon: "🎲", title: "Se sortea", desc: "Al cierre se elige un ganador al azar entre todos." },
+                { icon: "✅", title: "Entra gratis", desc: "Te unes al sorteo y recibes tu primer boleto." },
+                { icon: "🎟️", title: "Suma boletos", desc: "Cada amigo que invitas te da boletos extra." },
+                { icon: "🎲", title: "Se sortea", desc: "Al cierre se saca un boleto al azar." },
               ].map((paso, i, arr) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start" }}>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", width: 180 }}>
-                    <div style={{ width: 56, height: 56, borderRadius: "50%", background: i === arr.length - 1 ? "rgba(232,168,76,0.15)" : "rgba(232,168,76,0.06)", border: `1px solid ${i === arr.length - 1 ? "rgba(232,168,76,0.4)" : "rgba(232,168,76,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, marginBottom: 12 }}>{paso.icon}</div>
-                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", fontWeight: 700, color: "#f5d080", margin: "0 0 6px" }}>{paso.title}</p>
-                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.55, margin: 0 }}>{paso.desc}</p>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", width: 160 }}>
+                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: i === arr.length - 1 ? "rgba(236,72,153,0.15)" : "rgba(236,72,153,0.06)", border: `1px solid ${i === arr.length - 1 ? "rgba(236,72,153,0.4)" : "rgba(236,72,153,0.15)"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 10 }}>{paso.icon}</div>
+                    <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.88rem", fontWeight: 700, color: "#f5d080", margin: "0 0 6px" }}>{paso.title}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.55, margin: 0 }}>{paso.desc}</p>
                   </div>
-                  {i < arr.length - 1 && <div style={{ display: "flex", alignItems: "center", height: 56, padding: "0 8px" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: 20, color: "rgba(232,168,76,0.3)" }}>→</span></div>}
+                  {i < arr.length - 1 && <div style={{ display: "flex", alignItems: "center", height: 52, padding: "0 4px" }}><span style={{ fontFamily: "var(--font-lato)", fontSize: 18, color: "rgba(236,72,153,0.3)" }}>→</span></div>}
                 </div>
               ))}
             </div>
 
-            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 16, padding: 24, textAlign: "center" }}>
-              <p style={{ fontSize: 32, marginBottom: 12 }}>🎲</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "1rem", color: "rgba(240,234,214,0.7)", lineHeight: 1.7, marginBottom: 12 }}>En un concurso de sorteo, <strong style={{ color: "#f5d080" }}>el ganador se elige al azar</strong> entre todos los participantes. Es gratis y <strong style={{ color: "#e8a84c" }}>cualquiera dentro puede ganar</strong>.</p>
-              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.88rem", color: "rgba(240,234,214,0.4)", lineHeight: 1.6 }}>Opcional: invita amigos para que ellos también tengan la oportunidad de participar.</p>
+            {/* Ilustración: la bolsa de boletos */}
+            <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 20, padding: "28px 24px", marginBottom: 20 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "#ec4899", textAlign: "center", marginBottom: 20 }}>Ejemplo: un sorteo con 3 participantes</p>
+
+              {/* Participantes con boletos visuales */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+                {[
+                  { nombre: "Ana", boletos: 10, color: "#ec4899", emoji: "👩" },
+                  { nombre: "Pedro", boletos: 4, color: "#e8a84c", emoji: "👨" },
+                  { nombre: "Luis", boletos: 1, color: "#3db89e", emoji: "🧑" },
+                ].map(p => (
+                  <div key={p.nombre} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, width: 90, flexShrink: 0 }}>
+                      <span style={{ fontSize: 20 }}>{p.emoji}</span>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#f0ead6" }}>{p.nombre}</span>
+                    </div>
+                    <div style={{ flex: 1, display: "flex", gap: 3, flexWrap: "wrap", alignItems: "center" }}>
+                      {Array.from({ length: p.boletos }).map((_, i) => (
+                        <div key={i} style={{ width: 22, height: 14, borderRadius: 3, background: `color-mix(in srgb, ${p.color} 60%, transparent)`, border: `1px solid ${p.color}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <span style={{ fontSize: 7, color: p.color }}>🎟</span>
+                        </div>
+                      ))}
+                    </div>
+                    <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", flexShrink: 0, width: 55, textAlign: "right" }}>{p.boletos} boleto{p.boletos > 1 ? "s" : ""}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bolsa visual */}
+              <div style={{ textAlign: "center", marginBottom: 20 }}>
+                <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center" }}>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: 8 }}>Se mezclan en la bolsa: <strong style={{ color: "#f0ead6" }}>15 boletos</strong> en total</p>
+                  <div style={{ width: 140, height: 100, borderRadius: "0 0 50% 50% / 0 0 40% 40%", background: "rgba(236,72,153,0.08)", border: "2px solid rgba(236,72,153,0.25)", borderTop: "2px dashed rgba(236,72,153,0.15)", display: "flex", alignItems: "center", justifyContent: "center", gap: 2, flexWrap: "wrap", padding: "14px 12px 8px", position: "relative", overflow: "hidden" }}>
+                    {Array.from({ length: 5 }).map((_, i) => <div key={`a${i}`} style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(236,72,153,0.5)", transform: `rotate(${-20 + i * 15}deg)` }} />)}
+                    {Array.from({ length: 3 }).map((_, i) => <div key={`b${i}`} style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(232,168,76,0.5)", transform: `rotate(${10 + i * 20}deg)` }} />)}
+                    <div style={{ width: 12, height: 8, borderRadius: 2, background: "rgba(61,184,158,0.5)", transform: "rotate(5deg)" }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Chances */}
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
+                {[
+                  { nombre: "Ana", pct: "67%", color: "#ec4899" },
+                  { nombre: "Pedro", pct: "27%", color: "#e8a84c" },
+                  { nombre: "Luis", pct: "6%", color: "#3db89e" },
+                ].map(p => (
+                  <div key={p.nombre} style={{ background: `color-mix(in srgb, ${p.color} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${p.color} 30%, transparent)`, borderRadius: 10, padding: "10px 16px", textAlign: "center", minWidth: 90 }}>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.3rem", fontWeight: 900, color: p.color, margin: "0 0 2px" }}>{p.pct}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", margin: 0 }}>{p.nombre}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "rgba(240,234,214,0.55)", textAlign: "center", lineHeight: 1.7 }}>Ana tiene <strong style={{ color: "#ec4899" }}>10 de 15</strong> boletos, asi que tiene un 67% de chances. Pero Luis, con <strong style={{ color: "#3db89e" }}>solo 1 boleto</strong>, igual puede ganar — es menos probable, pero posible.</p>
+            </div>
+
+            {/* Cómo sumar boletos */}
+            <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 16, padding: 24, marginBottom: 20 }}>
+              <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.05rem", color: "#ec4899", marginBottom: 14, textAlign: "center" }}>¿Cómo sumo boletos?</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {[
+                  { boletos: "1", desc: "Al entrar al sorteo", icon: "🎟️" },
+                  { boletos: "+3", desc: "Invitas a alguien nuevo a DC", icon: "🆕" },
+                  { boletos: "+2", desc: "Invitas a un amigo ya registrado", icon: "👥" },
+                  { boletos: "+2", desc: "Referido de tu referido (nivel 2)", icon: "🔗" },
+                ].map((b, i) => (
+                  <div key={i} style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: "12px", textAlign: "center" }}>
+                    <span style={{ fontSize: 18 }}>{b.icon}</span>
+                    <p style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.2rem", fontWeight: 900, color: "#ec4899", margin: "4px 0 2px" }}>{b.boletos}</p>
+                    <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.5)", lineHeight: 1.4, margin: 0 }}>{b.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Nota final */}
+            <div style={{ background: "rgba(236,72,153,0.04)", border: "1px solid rgba(236,72,153,0.15)", borderRadius: 16, padding: "20px 24px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.6)", lineHeight: 1.7, margin: 0 }}>El sorteo es <strong style={{ color: "#f5d080" }}>gratis, justo y transparente</strong>. Cualquiera dentro puede ganar — invitar amigos solo aumenta tus chances, nunca las garantiza.</p>
             </div>
           </div>
         </section>
