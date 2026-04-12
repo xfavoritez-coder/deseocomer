@@ -246,8 +246,8 @@ export async function emailAudienciaLocal(
     .join("");
 
   const comidasHtml = data.comidasTop.length > 0
-    ? data.comidasTop.map(c => `<span style="color:#f5d080">${c.nombre}</span> <span style="color:#5a4028">(${c.count})</span>`).join(" · ")
-    : `<span style="color:#5a4028">Sin datos aún</span>`;
+    ? data.comidasTop.map(c => `<span style="color:#f5d080">${c.nombre}</span> <span style="color:#c0a060">(${c.count})</span>`).join(" · ")
+    : `<span style="color:#c0a060">Sin datos aún</span>`;
 
   await resend.emails.send({
     from: FROM(),
@@ -267,7 +267,7 @@ export async function emailAudienciaLocal(
       p("Desde tu panel puedes ver el detalle de cada participante, filtrar por preferencias y descargar todo en CSV para tus campañas de marketing."),
       btn(data.panelUrl, "Ver mi audiencia"),
       divider(),
-      p(`<em style="color:#5a4028">Estos datos son oro para tu negocio: úsalos para crear promociones dirigidas, campañas de email, o simplemente para conocer mejor a quienes ya mostraron interés en ti.</em>`),
+      p(`<em style="color:#c0a060">Estos datos son oro para tu negocio: úsalos para crear promociones dirigidas, campañas de email, o simplemente para conocer mejor a quienes ya mostraron interés en ti.</em>`),
       p("El equipo de DeseoComer 🧞"),
     ].join("")),
   });

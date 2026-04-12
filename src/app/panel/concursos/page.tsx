@@ -365,36 +365,6 @@ export default function PanelConcursos() {
           );
         })()}
 
-        {/* Ranking / Participantes */}
-        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
-          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
-            {terminado ? "🏆 Resultado final" : "📊 Ranking actual"}
-          </p>
-          {participantes === 0 ? (
-            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", textAlign: "center", padding: "20px 0" }}>
-              Aún no hay participantes. ¡Comparte el link!
-            </p>
-          ) : (
-            <div>
-              {(detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0)).slice(0, 10).map((p: Concurso, i: number) => (
-                <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0", borderBottom: "1px solid var(--border-color)" }}>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: i < 3 ? "var(--accent)" : "var(--text-muted)", width: "24px", textAlign: "center" }}>
-                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
-                  </span>
-                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", flex: 1 }}>
-                    {p.usuario?.nombre ?? "Participante"}
-                    {reportedIds.has(p.id) && <span style={{ marginLeft: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "4px", padding: "1px 6px", color: "#e8a84c" }}>En revisión</span>}
-                  </span>
-                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)" }}>
-                    {p.puntos ?? 0} pts
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-        </div>
-
         {/* Audiencia — solo concursos terminados con participantes */}
         {terminado && participantes > 0 && (
           <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
@@ -514,6 +484,35 @@ export default function PanelConcursos() {
             })()}
           </div>
         )}
+
+        {/* Ranking / Participantes */}
+        <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
+          <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", marginBottom: "12px" }}>
+            {terminado ? "🏆 Resultado final" : "📊 Ranking actual"}
+          </p>
+          {participantes === 0 ? (
+            <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", textAlign: "center", padding: "20px 0" }}>
+              Aún no hay participantes. ¡Comparte el link!
+            </p>
+          ) : (
+            <div>
+              {(detalle.participantes ?? []).sort((a: Concurso, b: Concurso) => (b.puntos ?? 0) - (a.puntos ?? 0)).slice(0, 10).map((p: Concurso, i: number) => (
+                <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0", borderBottom: "1px solid var(--border-color)" }}>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: i < 3 ? "var(--accent)" : "var(--text-muted)", width: "24px", textAlign: "center" }}>
+                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
+                  </span>
+                  <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-primary)", flex: 1 }}>
+                    {p.usuario?.nombre ?? "Participante"}
+                    {reportedIds.has(p.id) && <span style={{ marginLeft: "6px", fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", background: "rgba(232,168,76,0.15)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: "4px", padding: "1px 6px", color: "#e8a84c" }}>En revisión</span>}
+                  </span>
+                  <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.8rem", color: "var(--oasis-bright)" }}>
+                    {p.puntos ?? 0} pts
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Formulario de edición (solo sin participantes) */}
         {editando && sinParticipantes && (
@@ -912,6 +911,12 @@ export default function PanelConcursos() {
                 {/* Ver concurso público */}
                 <button onClick={e => { e.stopPropagation(); window.open(`/concursos/${c.slug || c.id}`, "_blank"); }} style={{ flex: 0, background: "transparent", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 10px", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "rgba(240,234,214,0.3)", cursor: "pointer" }}>↗</button>
               </div>
+              {/* Ver audiencia: solo concursos terminados con participantes */}
+              {ended && parts > 0 && c.estado !== "cancelado" && (
+                <div style={{ padding: "0 12px 8px" }}>
+                  <button onClick={e => { e.stopPropagation(); setDetalle(c); setAudiencia(a => ({ ...a, open: true, loading: true })); setTimeout(() => { const s = getSession(); fetch(`/api/concursos/${c.id}/audiencia?localId=${s.id}`).then(r => r.ok ? r.json() : null).then(data => { if (data) setAudiencia(a => ({ ...a, data, loading: false })); else setAudiencia(a => ({ ...a, loading: false })); }).catch(() => setAudiencia(a => ({ ...a, loading: false }))); }, 100); }} style={{ width: "100%", background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 8, padding: "6px 0", fontFamily: "var(--font-cinzel)", fontSize: 10, color: "var(--accent)", cursor: "pointer" }}>📊 Ver audiencia</button>
+                </div>
+              )}
             </div>
           );
         })}
