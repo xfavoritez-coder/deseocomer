@@ -259,22 +259,26 @@ function ConcursoDetallePage() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ usuarioId: user.id, referidoPor: refUserId }),
     }).then(() => {
-      // Reload ranking from lightweight endpoint
-      fetch(`/api/concursos/${encodeURIComponent(slug)}/ranking`).then(r => r.ok ? r.json() : null).then(data => {
-        if (data) {
-          const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" }));
-          setRanking(newRanking);
-        }
-      }).catch(() => {});
+      // Reload ranking from lightweight endpoint (delay + cache bust to ensure DB write is visible)
+      setTimeout(() => {
+        const rankUrl = `/api/concursos/${encodeURIComponent(slug)}/ranking?_t=${Date.now()}`;
+        fetch(rankUrl, { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(data => {
+          if (data) {
+            const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string; codigoRef?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "", codigoRef: p.usuario?.codigoRef ?? "" }));
+            setRanking(newRanking);
+          }
+        }).catch(() => {});
+      }, 500);
     }).catch(() => {});
     setRefToast(true); setTimeout(() => setRefToast(false), 4000);
   }, [authLoading, isAuthenticated, user, concursoId, refUserId]);
 
   const initialLoadDone = useRef(false);
-  const refreshRanking = useCallback(() => {
+  const refreshRanking = useCallback((bustCache = false) => {
     if (!slug) return;
-    const rankUrl = user ? `/api/concursos/${encodeURIComponent(slug)}/ranking?userId=${user.id}` : `/api/concursos/${encodeURIComponent(slug)}/ranking`;
-    fetch(rankUrl).then(r => r.ok ? r.json() : null).then(data => {
+    const base = user ? `/api/concursos/${encodeURIComponent(slug)}/ranking?userId=${user.id}` : `/api/concursos/${encodeURIComponent(slug)}/ranking`;
+    const rankUrl = bustCache ? `${base}${base.includes("?") ? "&" : "?"}_t=${Date.now()}` : base;
+    fetch(rankUrl, bustCache ? { cache: "no-store" } : undefined).then(r => r.ok ? r.json() : null).then(data => {
       if (data) {
         const newRanking = (data.participantes ?? []).map((p: { id?: string; usuarioId?: string; usuario?: { nombre?: string }; puntos?: number }) => ({ nombre: p.usuario?.nombre ?? "Participante", referidos: p.puntos ?? 0, usuarioId: p.usuarioId ?? "", participanteId: p.id ?? "" }));
         setRanking(newRanking);
@@ -282,7 +286,9 @@ function ConcursoDetallePage() {
         if (user) {
           const me = (data.participantes ?? []).find((p: { usuarioId?: string }) => p.usuarioId === user.id);
           setMyRefs(me?.puntos ?? 0);
-          setIsParticipating(!!me || !!data.meParticipating);
+          const foundInRanking = !!me || !!data.meParticipating;
+          // Don't override isParticipating to false if user just joined (cache may be stale)
+          setIsParticipating(prev => foundInRanking || prev);
           setParticipationChecked(true);
           // Check if user was surpassed
           if (isAuthenticated) {
@@ -479,7 +485,7 @@ function ConcursoDetallePage() {
       setIsParticipating(true);
       setRecienUnido(true);
       addInteraccion("concurso_participado", { id: String(concursoId || ""), localId: c?.localId || "" });
-      refreshRanking();
+      setTimeout(() => refreshRanking(true), 500);
     } catch {} finally { setJoinLoading(false); }
   };
 

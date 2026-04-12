@@ -215,6 +215,7 @@ model Concurso {
   fechaActivacion   DateTime?
   fechaPropuestaAt  DateTime?
   fechaPropuesta    String?
+  audienciaNotificadoAt DateTime?
 
   createdAt         DateTime @default(now())
 

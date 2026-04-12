@@ -91,7 +91,7 @@ export async function emailLocal(
   await resend.emails.send({
     from: FROM(),
     to: localEmail,
-    subject: `🏆 Tu concurso terminó — Coordina la entrega del premio`,
+    subject: `🏆 Tu concurso terminó — Envía la fecha al ganador`,
     html: wrap([
       h2("🏆 Tu concurso ha finalizado"),
       p(`Hola ${data.local.nombre},`),
@@ -100,7 +100,7 @@ export async function emailLocal(
       `<div style="margin-bottom:16px">${sectionTitle("GANADOR")}${section("Nombre", ganador.nombre)}${section("Email", ganador.email)}${ganador.telefono ? section("Teléfono", ganador.telefono) : ""}</div>`,
       divider(),
       `<div style="margin-bottom:16px">${sectionTitle("PRÓXIMO PASO")}${p("Haz click en el botón de abajo para indicar cuándo puede el ganador retirar su premio. Le enviaremos la fecha directamente por email.")}</div>`,
-      btn(coordinarUrl, "Coordinar entrega del premio"),
+      btn(coordinarUrl, "Enviar fecha al ganador"),
       divider(),
       strong(`CÓDIGO DE VERIFICACIÓN: ${data.codigoEntrega}`),
       p("Cuando el ganador se presente, pídele este código para verificar su identidad."),
@@ -224,7 +224,56 @@ export async function emailExpiracion(
   });
 }
 
-// ─── 8. Email disputa al admin ──────────────────────────────────────────────
+// ─── 8. Email audiencia al local ─────────────────────────────────────────
+
+interface AudienciaData {
+  concursoId: string;
+  titulo: string;
+  localNombre: string;
+  totalParticipantes: number;
+  estilos: { label: string; emoji: string; count: number }[];
+  comidasTop: { nombre: string; count: number }[];
+  panelUrl: string;
+}
+
+export async function emailAudienciaLocal(
+  data: AudienciaData,
+  localEmail: string,
+) {
+  const estilosHtml = data.estilos
+    .filter(e => e.count > 0)
+    .map(e => section(e.emoji + " " + e.label, String(e.count)))
+    .join("");
+
+  const comidasHtml = data.comidasTop.length > 0
+    ? data.comidasTop.map(c => `<span style="color:#f5d080">${c.nombre}</span> <span style="color:#5a4028">(${c.count})</span>`).join(" · ")
+    : `<span style="color:#5a4028">Sin datos aún</span>`;
+
+  await resend.emails.send({
+    from: FROM(),
+    to: localEmail,
+    subject: `📊 Los datos de tu audiencia de "${data.titulo}" están listos`,
+    html: wrap([
+      h2("📊 Tu concurso generó audiencia real"),
+      p(`Hola ${data.localNombre},`),
+      p(`Tu concurso <strong style="color:#f5d080">"${data.titulo}"</strong> atrajo a <strong style="color:#e8a84c">${data.totalParticipantes} personas</strong> interesadas en tu local. Eso no es solo un ganador — es una base de datos de clientes potenciales.`),
+      divider(),
+      `<div style="margin-bottom:16px">${sectionTitle("RESUMEN")}${section("Participantes", String(data.totalParticipantes))}</div>`,
+      divider(),
+      `<div style="margin-bottom:16px">${sectionTitle("GUSTOS DE TU AUDIENCIA")}${estilosHtml}</div>`,
+      divider(),
+      `<div style="margin-bottom:16px">${sectionTitle("COMIDAS FAVORITAS MÁS POPULARES")}${p(comidasHtml)}</div>`,
+      divider(),
+      p("Desde tu panel puedes ver el detalle de cada participante, filtrar por preferencias y descargar todo en CSV para tus campañas de marketing."),
+      btn(data.panelUrl, "Ver mi audiencia"),
+      divider(),
+      p(`<em style="color:#5a4028">Estos datos son oro para tu negocio: úsalos para crear promociones dirigidas, campañas de email, o simplemente para conocer mejor a quienes ya mostraron interés en ti.</em>`),
+      p("El equipo de DeseoComer 🧞"),
+    ].join("")),
+  });
+}
+
+// ─── 9. Email disputa al admin ──────────────────────────────────────────────
 
 export async function emailDisputaAdmin(
   data: ConcursoEmailData,

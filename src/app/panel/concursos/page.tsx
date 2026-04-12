@@ -47,6 +47,7 @@ export default function PanelConcursos() {
   const [abrirEditando, setAbrirEditando] = useState(false);
   const [filtroPanel, setFiltroPanel] = useState<"todos" | "activos" | "pendientes" | "entregados">("todos");
   const [sharePrompt, setSharePrompt] = useState(false);
+  const [audiencia, setAudiencia] = useState<{ loading: boolean; data: any; open: boolean; filtro: string }>({ loading: false, data: null, open: false, filtro: "todos" });
 
   useEffect(() => {
     const s = getSession();
@@ -209,7 +210,7 @@ export default function PanelConcursos() {
           </div>
         </>)}
 
-        <button onClick={() => { setDetalle(null); setEditando(false); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
+        <button onClick={() => { setDetalle(null); setEditando(false); setAudiencia({ loading: false, data: null, open: false, filtro: "todos" }); }} style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", marginBottom: "20px" }}>← Volver a concursos</button>
 
         {/* Header */}
         <a href={terminado ? `/concursos/${detalle.slug || detalle.id}` : undefined} target={terminado ? "_blank" : undefined} rel={terminado ? "noopener" : undefined} style={{ display: "block", background: "rgba(45,26,8,0.85)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: "16px", overflow: "hidden", marginBottom: "20px", textDecoration: "none", cursor: terminado ? "pointer" : "default" }}>
@@ -393,6 +394,126 @@ export default function PanelConcursos() {
           )}
 
         </div>
+
+        {/* Audiencia — solo concursos terminados con participantes */}
+        {terminado && participantes > 0 && (
+          <div style={{ background: "rgba(45,26,8,0.85)", border: "1px solid var(--border-color)", borderRadius: "14px", padding: "16px", marginBottom: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: audiencia.open ? "12px" : 0 }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)", margin: 0 }}>
+                📊 Tu audiencia
+              </p>
+              <button onClick={async () => {
+                if (audiencia.open) { setAudiencia(a => ({ ...a, open: false })); return; }
+                if (audiencia.data) { setAudiencia(a => ({ ...a, open: true })); return; }
+                const s = getSession();
+                setAudiencia(a => ({ ...a, loading: true, open: true }));
+                try {
+                  const res = await fetch(`/api/concursos/${detalle.id}/audiencia?localId=${s.id}`);
+                  if (res.ok) {
+                    const data = await res.json();
+                    setAudiencia(a => ({ ...a, data, loading: false }));
+                  } else setAudiencia(a => ({ ...a, loading: false }));
+                } catch { setAudiencia(a => ({ ...a, loading: false })); }
+              }} style={{ background: "none", border: "1px solid rgba(232,168,76,0.25)", borderRadius: 8, padding: "6px 14px", fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", color: "var(--accent)", cursor: "pointer" }}>
+                {audiencia.open ? "Ocultar" : "Ver audiencia"}
+              </button>
+            </div>
+
+            {audiencia.open && audiencia.loading && (
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.85rem", color: "var(--text-muted)", textAlign: "center", padding: "20px 0" }}>Cargando...</p>
+            )}
+
+            {audiencia.open && audiencia.data && (() => {
+              const d = audiencia.data;
+              const estilos = (d.stats?.estilos ?? []).filter((e: any) => e.count > 0);
+              const comidas = d.stats?.comidasTop ?? [];
+              const filtrados = audiencia.filtro === "todos"
+                ? d.participantes
+                : d.participantes.filter((p: any) => {
+                    const e = (p.estiloAlimentario ?? "").toLowerCase();
+                    if (audiencia.filtro === "vegano") return e === "vegano";
+                    if (audiencia.filtro === "vegetariano") return e === "vegetariano";
+                    return e !== "vegano" && e !== "vegetariano";
+                  });
+
+              const descargarCSV = () => {
+                const headers = ["Posición", "Nombre", "Email", "Teléfono", "Ciudad", "Estilo Alimentario", "Comidas Favoritas", "Puntos"];
+                const rows = (d.participantes ?? []).map((p: any) => [
+                  p.posicion, p.nombre, p.email, p.telefono, p.ciudad,
+                  p.estiloAlimentario || "Come de todo",
+                  (p.comidasFavoritas ?? []).join("; "),
+                  p.puntos,
+                ]);
+                const csv = [headers, ...rows].map((r: any[]) => r.map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+                const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url; a.download = `audiencia-${detalle.slug || detalle.id}.csv`;
+                a.click(); URL.revokeObjectURL(url);
+              };
+
+              return (
+                <div>
+                  {/* Stats */}
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "12px", flexWrap: "wrap" }}>
+                    {estilos.map((e: any) => (
+                      <div key={e.label} style={{ background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "8px 12px", flex: 1, minWidth: "80px", textAlign: "center" }}>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "1.1rem", margin: 0 }}>{e.emoji}</p>
+                        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", color: "#e8a84c", margin: "2px 0 0", fontWeight: 700 }}>{e.count}</p>
+                        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.68rem", color: "var(--text-muted)", margin: 0 }}>{e.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Comidas top */}
+                  {comidas.length > 0 && (
+                    <div style={{ marginBottom: "12px" }}>
+                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.4)", marginBottom: "6px" }}>Comidas favoritas</p>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        {comidas.map((c: any) => (
+                          <span key={c.nombre} style={{ background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: "12px", padding: "4px 10px", fontFamily: "var(--font-lato)", fontSize: "0.75rem", color: "#f5d080" }}>
+                            {c.nombre} <span style={{ color: "var(--text-muted)" }}>({c.count})</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Filtros */}
+                  <div style={{ display: "flex", gap: "6px", marginBottom: "10px", flexWrap: "wrap" }}>
+                    {[{ v: "todos", l: "Todos" }, { v: "comeDeTodo", l: "🥩 Come de todo" }, { v: "vegetariano", l: "🌱 Vegetariano" }, { v: "vegano", l: "🌿 Vegano" }].map(f => (
+                      <button key={f.v} onClick={() => setAudiencia(a => ({ ...a, filtro: f.v }))} style={{ background: audiencia.filtro === f.v ? "rgba(232,168,76,0.15)" : "transparent", border: audiencia.filtro === f.v ? "1px solid var(--accent)" : "1px solid var(--border-color)", borderRadius: 16, padding: "5px 12px", fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: audiencia.filtro === f.v ? "var(--accent)" : "var(--text-muted)", cursor: "pointer" }}>
+                        {f.l}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tabla */}
+                  <div style={{ maxHeight: "300px", overflowY: "auto", borderRadius: 8 }}>
+                    {filtrados.map((p: any) => (
+                      <div key={p.email} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 4px", borderBottom: "1px solid var(--border-color)", fontSize: "0.8rem" }}>
+                        <span style={{ fontFamily: "var(--font-cinzel)", color: "var(--text-muted)", width: "22px", textAlign: "center", flexShrink: 0 }}>{p.posicion}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-primary)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.nombre}</p>
+                          <p style={{ fontFamily: "var(--font-lato)", color: "var(--text-muted)", margin: 0, fontSize: "0.72rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.email}</p>
+                        </div>
+                        <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "var(--text-muted)", flexShrink: 0 }}>
+                          {p.estiloAlimentario === "vegano" ? "🌿" : p.estiloAlimentario === "vegetariano" ? "🌱" : "🥩"}
+                        </span>
+                        <span style={{ fontFamily: "var(--font-cinzel)", color: "var(--oasis-bright)", flexShrink: 0 }}>{p.puntos} pts</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Descargar CSV */}
+                  <button onClick={descargarCSV} style={{ width: "100%", marginTop: "12px", padding: "12px", background: "rgba(232,168,76,0.1)", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 10, fontFamily: "var(--font-cinzel)", fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Descargar CSV
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        )}
 
         {/* Formulario de edición (solo sin participantes) */}
         {editando && sinParticipantes && (

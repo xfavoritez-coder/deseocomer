@@ -8,6 +8,7 @@ import {
   emailAcreditacion,
   emailNuevoGanador,
   emailExpiracion,
+  emailAudienciaLocal,
 } from "@/lib/emails/concurso-cierre";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://deseocomer.com";
@@ -442,6 +443,81 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
           } catch {}
           log.push(`[EXPIRADO] ${c.id} - sin más candidatos`);
         }
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // PASO 3: Email de audiencia al local (12h después de finalizar)
+    // ════════════════════════════════════════════════════════════════════════
+
+    const hace4h = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+    const concursosParaAudiencia = await prisma.concurso.findMany({
+      where: {
+        estado: { in: ["finalizado", "completado"] },
+        audienciaNotificadoAt: null,
+        localNotificadoAt: { not: null, lte: hace4h },
+      },
+      include: {
+        local: { select: { id: true, email: true, nombre: true } },
+        participantes: {
+          where: { estado: { not: "descalificado" } },
+          include: {
+            usuario: {
+              select: { estiloAlimentario: true, comidasFavoritas: true },
+            },
+          },
+        },
+        _count: { select: { participantes: { where: { estado: { not: "descalificado" } } } } },
+      },
+    });
+
+    for (const c of concursosParaAudiencia) {
+      const total = c._count.participantes;
+      if (total === 0) continue;
+
+      // Contar estilos alimentarios
+      let veganos = 0, vegetarianos = 0, comeDeTodo = 0;
+      const comidasCount: Record<string, number> = {};
+
+      for (const p of c.participantes) {
+        const estilo = p.usuario.estiloAlimentario?.toLowerCase() ?? "";
+        if (estilo === "vegano") veganos++;
+        else if (estilo === "vegetariano") vegetarianos++;
+        else comeDeTodo++;
+
+        for (const comida of p.usuario.comidasFavoritas ?? []) {
+          const key = comida.trim();
+          if (key) comidasCount[key] = (comidasCount[key] ?? 0) + 1;
+        }
+      }
+
+      const comidasTop = Object.entries(comidasCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([nombre, count]) => ({ nombre, count }));
+
+      try {
+        await emailAudienciaLocal({
+          concursoId: c.id,
+          titulo: c.premio,
+          localNombre: c.local.nombre,
+          totalParticipantes: total,
+          estilos: [
+            { label: "Come de todo", emoji: "🥩", count: comeDeTodo },
+            { label: "Vegetarianos", emoji: "🌱", count: vegetarianos },
+            { label: "Veganos", emoji: "🌿", count: veganos },
+          ],
+          comidasTop,
+          panelUrl: `${BASE_URL}/panel/concursos`,
+        }, c.local.email);
+
+        await prisma.concurso.update({
+          where: { id: c.id },
+          data: { audienciaNotificadoAt: now },
+        });
+        log.push(`[AUDIENCIA] ${c.id} "${c.premio}" - email enviado a ${c.local.email} (${total} participantes)`);
+      } catch (e) {
+        log.push(`[ERROR_AUDIENCIA] ${c.id} - ${e}`);
       }
     }
 

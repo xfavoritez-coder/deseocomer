@@ -53,40 +53,8 @@ export async function GET(
   const esSorteo = concurso.modalidadConcurso === "sorteo";
   const esProximamente = concurso.estado === "programado";
 
-  // Check if ends today
-  const now = new Date();
-  const fechaFin = new Date(concurso.fechaFin);
-  const terminaHoy = !esProximamente && concurso.activo &&
-    fechaFin.getFullYear() === now.getFullYear() &&
-    fechaFin.getMonth() === now.getMonth() &&
-    fechaFin.getDate() === now.getDate();
-
-  // Format closing hour
-  const horaCierre = terminaHoy
-    ? `${String(fechaFin.getHours()).padStart(2, "0")}:${String(fechaFin.getMinutes()).padStart(2, "0")} hrs`
-    : "";
-
   // Theme per type
-  const theme = terminaHoy
-    ? {
-        badgeColor: "#e05555",
-        badgeText: "\u00daLTIMA OPORTUNIDAD",
-        overlayColor: "rgba(10,8,18,0.6)",
-        gradientTop: "rgba(40,8,8,0.8)",
-        accentColor: "#ff8080",
-        titleColor: "#ffd4d4",
-        emoji: "\u23F0",           // ⏰
-        headerText: "Este concurso termina HOY",
-        subtitulo: "\u00daltimas horas para participar gratis",
-        cta: "Entra antes de que cierre",
-        ctaIcon: "\u{1F6A8}",     // 🚨
-        ctaBg: "rgba(224,85,85,0.15)",
-        ctaBorder: "rgba(224,85,85,0.5)",
-        ctaIconBg: "rgba(224,85,85,0.15)",
-        ctaIconBorder: "rgba(224,85,85,0.4)",
-        dividerColor: "rgba(224,85,85,0.3)",
-      }
-    : esProximamente
+  const theme = esProximamente
     ? {
         badgeColor: "#a78bfa",
         badgeText: "PR\u00d3XIMAMENTE",
@@ -158,9 +126,9 @@ export async function GET(
         {/* Bottom gradient */}
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "520px", background: `linear-gradient(to top, ${theme.gradientTop}, transparent)`, display: "flex" }} />
         {/* Badge ribbon */}
-        <div style={{ position: "absolute", top: "88px", right: "-112px", width: terminaHoy ? "620px" : "560px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", transform: "rotate(45deg)" }}>
+        <div style={{ position: "absolute", top: "88px", right: "-112px", width: "560px", backgroundColor: theme.badgeColor, padding: "24px 0", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", transform: "rotate(45deg)" }}>
           <span style={{ fontSize: "32px" }}>{theme.emoji}</span>
-          <span style={{ fontFamily: "Cinzel", fontSize: terminaHoy ? "30px" : "36px", fontWeight: 700, color: esSorteo ? "#ffffff" : "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
+          <span style={{ fontFamily: "Cinzel", fontSize: "36px", fontWeight: 700, color: esSorteo ? "#ffffff" : "#0a0812", letterSpacing: "0.1em" }}>{theme.badgeText}</span>
         </div>
         {/* Content */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "240px 96px", gap: "40px" }}>
@@ -201,10 +169,6 @@ export async function GET(
               <span style={{ fontFamily: "Lato", fontSize: "36px", fontWeight: 700, color: "rgba(240,234,214,0.65)", textAlign: "center", letterSpacing: "0.06em", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>{(theme as {ctaSubtext: string}).ctaSubtext}</span>
             )}
           </div>
-          {/* Closing time for termina hoy */}
-          {terminaHoy && (
-            <span style={{ fontFamily: "Lato", fontSize: "40px", fontWeight: 700, color: "#e05555", textAlign: "center", textShadow: "0 2px 8px rgba(0,0,0,0.8)" }}>Cierra a las {horaCierre}</span>
-          )}
         </div>
       </div>
     ),
