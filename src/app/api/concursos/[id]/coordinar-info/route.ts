@@ -61,6 +61,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const from = process.env.FROM_EMAIL ? `DeseoComer <${process.env.FROM_EMAIL}>` : "DeseoComer <onboarding@resend.dev>";
     const ganadorNombre = concurso.ganadorActual.nombre.split(" ")[0];
 
+    // Save proposed date to DB so panel reflects the state change
+    await prisma.concurso.update({
+      where: { id: concurso.id },
+      data: { fechaPropuestaAt: new Date(), fechaPropuesta: fecha },
+    });
+
     await resend.emails.send({
       from,
       to: concurso.ganadorActual.email,
