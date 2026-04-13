@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   if (secret !== process.env.CRON_SECRET) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const from = `DeseoComer <${process.env.FROM_EMAIL || "noreply@deseocomer.com"}>`;
-  const results = { dia2: 0, dia5: 0, dia10: 0, errors: 0 };
+  const results = { dia2: 0, dia5: 0, errors: 0 };
 
   try {
     const locales = await prisma.local.findMany({
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
     // Collect emails and DB updates, then send via batch API
     const emailsToSend: { from: string; to: string; subject: string; html: string }[] = [];
     const dbUpdates: (() => Promise<void>)[] = [];
-    const resultTypes: ("dia2" | "dia5" | "dia10")[] = [];
+    const resultTypes: ("dia2" | "dia5")[] = [];
 
     for (const local of locales) {
       if (!local.activadoAt) continue;
@@ -101,31 +101,6 @@ export async function GET(req: NextRequest) {
         resultTypes.push("dia5");
       }
 
-      // DÍA 10 — Solo si NO ha publicado nada
-      if (dias >= 10 && !local.recordatorio10d && local._count.concursos === 0 && local._count.promociones === 0) {
-        emailsToSend.push({
-          from, to: local.email,
-          subject: `${local.nombre}, tu local lleva 10 días sin actividad`,
-          html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border-radius:12px">
-            <div style="text-align:center;padding:24px;background:linear-gradient(135deg,#e8a84c,#d4922a);border-radius:12px;margin-bottom:24px">
-              <p style="font-size:28px;margin:0 0 8px">🧞</p>
-              <h1 style="color:#fff;font-size:18px;margin:0">Te echamos de menos</h1>
-            </div>
-            <p style="font-size:15px;color:#333;line-height:1.6">Hola <strong>${nombre}</strong>,</p>
-            <p style="font-size:15px;color:#555;line-height:1.6">Tu local <strong>${local.nombre}</strong> lleva 10 días en DeseoComer pero aún no has publicado ningún concurso ni promoción.</p>
-            <p style="font-size:15px;color:#555;line-height:1.6">Los locales que publican en sus primeros días consiguen mucha más visibilidad porque los usuarios activos descubren los locales nuevos primero.</p>
-            <p style="font-size:15px;color:#555;line-height:1.6">Publicar toma menos de 3 minutos. Si necesitas ayuda, escríbenos y te guiamos paso a paso.</p>
-            <div style="display:flex;gap:8px;justify-content:center;margin:24px 0">
-              <a href="https://deseocomer.com/login-local" style="background:#e8a84c;color:#0a0812;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:700;display:inline-block;font-size:14px">Entrar al panel →</a>
-              <a href="https://deseocomer.com/contacto" style="background:#fff;color:#c47f1a;padding:14px 24px;border-radius:10px;text-decoration:none;font-weight:700;display:inline-block;font-size:14px;border:1px solid #e8a84c">Pedir ayuda</a>
-            </div>
-            <hr style="border:none;border-top:1px solid #eee;margin:20px 0" />
-            <p style="font-size:12px;color:#aaa;text-align:center">El equipo de DeseoComer 🧞</p>
-          </div>`,
-        });
-        dbUpdates.push(async () => { await prisma.local.update({ where: { id: local.id }, data: { recordatorio10d: true } }); });
-        resultTypes.push("dia10");
-      }
     }
 
     // Send all emails via batch API, then run DB updates for successful sends

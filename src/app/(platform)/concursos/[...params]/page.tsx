@@ -681,7 +681,9 @@ function ConcursoDetallePage() {
   const condicionesLocal = c.condiciones || "";
   const condicionesCortas = condicionesLocal.length > 200 ? condicionesLocal.slice(0, 200) + "..." : condicionesLocal;
   if (condicionesLocal) allRules.push(condicionesCortas);
-  allRules.push("Debes estar registrado en DeseoComer para entrar.", "El ganador es quien más puntos tenga al cierre del concurso.");
+  const reglaSorteo = "El ganador se elige por sorteo al cierre del concurso. Cada punto equivale a un boleto: más puntos, más chances de ganar.";
+  const reglaMeritos = "El ganador es quien más puntos tenga al cierre del concurso.";
+  allRules.push("Debes estar registrado en DeseoComer para entrar.", c.modalidadConcurso === "sorteo" ? reglaSorteo : reglaMeritos);
   allRules.push(...condicionesSistema);
 
   return (

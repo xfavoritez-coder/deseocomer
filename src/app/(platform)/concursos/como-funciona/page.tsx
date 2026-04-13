@@ -162,6 +162,32 @@ export default async function ComoFuncionaPage() {
           </div>
         </section>
 
+        {/* ── SECCIÓN 2B: Modalidad mérito ── */}
+        <section style={{ marginBottom: "clamp(56px,8vw,96px)" }}>
+          <div style={{ maxWidth: 600, margin: "0 auto" }}>
+            <div style={{ background: "rgba(232,168,76,0.04)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 20, padding: "clamp(20px,4vw,32px) clamp(16px,3vw,28px)" }}>
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "#e8a84c", textAlign: "center", marginBottom: 14 }}>Otra modalidad</p>
+              <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem,2vw,1.4rem)", color: "#f5d080", textAlign: "center", marginBottom: 14, lineHeight: 1.3 }}>Concursos por mérito</h3>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "clamp(0.85rem,1.3vw,0.95rem)", color: "rgba(240,234,214,0.55)", lineHeight: 1.7, textAlign: "center", marginBottom: 16 }}>
+                Algunos concursos funcionan por <strong style={{ color: "#e8a84c" }}>mérito</strong> en vez de sorteo. En esta modalidad, gana directamente quien tenga más puntos al cierre. No hay azar — el primer lugar se lleva el premio.
+              </p>
+              <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+                <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "14px 20px", textAlign: "center", flex: "1 1 0", minWidth: 140 }}>
+                  <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>🎲</span>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#ec4899", marginBottom: 4, fontWeight: 700 }}>Sorteo</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.5 }}>Más puntos = más boletos = más chances. Pero cualquiera puede ganar.</p>
+                </div>
+                <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "14px 20px", textAlign: "center", flex: "1 1 0", minWidth: 140 }}>
+                  <span style={{ fontSize: 22, display: "block", marginBottom: 6 }}>🏆</span>
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "#e8a84c", marginBottom: 4, fontWeight: 700 }}>Mérito</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.45)", lineHeight: 1.5 }}>Gana el primer lugar. Quien más puntos tenga al cierre se lleva el premio.</p>
+                </div>
+              </div>
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", textAlign: "center", marginTop: 14, fontStyle: "italic" }}>La modalidad aparece indicada en cada concurso antes de participar.</p>
+            </div>
+          </div>
+        </section>
+
         {/* ── SECCIÓN 3: Cómo sumar boletos ── */}
         <section style={{ marginBottom: "clamp(56px,8vw,96px)" }}>
           <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.75rem", letterSpacing: "0.35em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", textAlign: "center", marginBottom: "10px" }}>Tus boletos</p>
