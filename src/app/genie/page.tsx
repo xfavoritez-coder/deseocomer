@@ -300,11 +300,10 @@ export default function GeniePage() {
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem,1.5vw,0.7rem)", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.nombre}</p>
                       <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: 0 }}>{d.local?.nombre} · ${Number(d.precio).toLocaleString("es-CL")}</p>
                     </div>
-                    {isSel && (
-                      <div style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "#3db89e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff" }}>✓</div>
-                    )}
+                    {/* Checkbox top-right — always visible */}
+                    <button onClick={(e) => { e.stopPropagation(); toggleSelect(d.id); }} style={{ position: "absolute", top: 6, right: 6, width: 26, height: 26, borderRadius: 6, background: isSel ? "#3db89e" : "rgba(0,0,0,0.5)", border: isSel ? "2px solid #3db89e" : "2px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", cursor: "pointer", padding: 0 }}>{isSel ? "✓" : ""}</button>
                     {/* Preview button */}
-                    <button onClick={(e) => { e.stopPropagation(); setPreviewDish(d); }} style={{ position: "absolute", top: 6, left: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", cursor: "pointer", padding: 0 }}>🔍</button>
+                    <button onClick={(e) => { e.stopPropagation(); setPreviewDish(d); }} style={{ position: "absolute", top: 6, left: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", cursor: "pointer", padding: 0 }}>🔍</button>
                   </div>
                 );
               })}

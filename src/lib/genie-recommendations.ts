@@ -224,5 +224,29 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
     return fallback;
   }
 
-  return scored.slice(0, 3);
+  // Number of recommendations based on hunger
+  // LIGHT: 1 dish, MEDIUM: 2 dishes, HEAVY: 3 dishes (entry + main + extra)
+  const hungerCount = ctx.ctxHunger?.toUpperCase() === "LIGHT" ? 1
+    : ctx.ctxHunger?.toUpperCase() === "HEAVY" ? 3
+    : 2;
+
+  const results = scored.slice(0, hungerCount);
+
+  // Add role tags based on position and hunger
+  if (hungerCount >= 3 && results.length >= 3) {
+    // Try to make first one a STARTER if available
+    const starterIdx = results.findIndex(r => r.categoria === "STARTER");
+    if (starterIdx > 0) {
+      const [starter] = results.splice(starterIdx, 1);
+      results.unshift(starter);
+    }
+    results[0].role = "Entrada";
+    results[1].role = "Plato principal";
+    results[2].role = "Complemento";
+  } else if (hungerCount >= 2 && results.length >= 2) {
+    results[0].role = "Plato principal";
+    results[1].role = "Tambien te puede gustar";
+  }
+
+  return results;
 }

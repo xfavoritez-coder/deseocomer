@@ -4,38 +4,12 @@ import { useRouter } from "next/navigation";
 
 const STEPS = [
   {
-    key: "ctxCompany",
-    title: "Con quien vas?",
-    options: [
-      { v: "SOLO", emoji: "🧑", l: "Solo" },
-      { v: "PAREJA", emoji: "💑", l: "En pareja" },
-      { v: "AMIGOS", emoji: "👯", l: "Con amigos" },
-      { v: "FAMILIA", emoji: "👨‍👩‍👧‍👦", l: "Con familia" },
-    ],
-  },
-  {
     key: "ctxHunger",
     title: "Cuanta hambre tienes?",
     options: [
-      { v: "LIGHT", emoji: "🥗", l: "Poca" },
-      { v: "MEDIUM", emoji: "🍽️", l: "Normal" },
-      { v: "HEAVY", emoji: "🍔", l: "Mucha" },
-    ],
-  },
-  {
-    key: "ctxOccasion",
-    title: "Cual es la ocasion?",
-    options: [
-      { v: "SOLO_COMER", emoji: "🍽️", l: "Solo sali a comer" },
-      { v: "ALMUERZO_RAPIDO", emoji: "⚡", l: "Almuerzo rapido" },
-      { v: "CENA_TRANQUILA", emoji: "🕯️", l: "Cena tranquila" },
-      { v: "ALGO_ESPECIAL", emoji: "✨", l: "Algo especial" },
-      { v: "TRABAJAR_AQUI", emoji: "💻", l: "Trabajar aqui" },
-      { v: "CUMPLEANOS", emoji: "🎂", l: "Cumpleanos" },
-      { v: "CITA_ROMANTICA", emoji: "❤️", l: "Cita romantica" },
-      { v: "JUNTA_AMIGOS", emoji: "🍻", l: "Junta de amigos" },
-      { v: "CON_NINOS", emoji: "👶", l: "Con ninos" },
-      { v: "FAMILIAR", emoji: "🏠", l: "Familiar" },
+      { v: "LIGHT", emoji: "🥗", l: "Poca", sub: "algo liviano" },
+      { v: "MEDIUM", emoji: "🍽️", l: "Normal", sub: "un plato esta bien" },
+      { v: "HEAVY", emoji: "🍔", l: "Mucha", sub: "entrada + plato o mas" },
     ],
   },
 ];
@@ -89,12 +63,15 @@ export default function GenieContext() {
           <div>
             <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.2rem,3vw,1.5rem)", color: "#f5d080", textAlign: "center", marginBottom: 20 }}>{currentStep.title}</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {currentStep.options.map(o => {
+              {currentStep.options.map((o: any) => {
                 const active = answers[currentStep.key] === o.v;
                 return (
                   <button key={o.v} onClick={() => selectOption(currentStep.key, o.v)} style={{ padding: "16px 18px", background: active ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.03)", border: active ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.08)", borderRadius: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 14, textAlign: "left" }}>
                     <span style={{ fontSize: 24 }}>{o.emoji}</span>
-                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.92rem", color: active ? "#e8a84c" : "#f0ead6" }}>{o.l}</span>
+                    <div>
+                      <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.92rem", color: active ? "#e8a84c" : "#f0ead6", display: "block" }}>{o.l}</span>
+                      {o.sub && <span style={{ fontFamily: "var(--font-lato)", fontSize: "0.72rem", color: "rgba(240,234,214,0.35)" }}>{o.sub}</span>}
+                    </div>
                   </button>
                 );
               })}

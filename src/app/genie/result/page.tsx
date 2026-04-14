@@ -131,6 +131,10 @@ export default function GenieResult() {
             <img src={main.imagenUrl} alt={main.nombre} style={{ width: "100%", height: 220, objectFit: "cover" }} />
           )}
           <div style={{ padding: "16px 18px" }}>
+            {/* Role label */}
+            {main.role && (
+              <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(240,234,214,0.35)", marginBottom: 6 }}>{main.role}</p>
+            )}
             {/* Tags */}
             {main.tags?.length > 0 && (
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
@@ -164,6 +168,9 @@ export default function GenieResult() {
               <img src={rec.imagenUrl} alt={rec.nombre} style={{ width: 100, height: 100, objectFit: "cover", flexShrink: 0 }} />
             )}
             <div style={{ padding: "12px 14px", flex: 1, minWidth: 0 }}>
+              {rec.role && (
+                <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.6rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(240,234,214,0.3)", margin: "0 0 3px" }}>{rec.role}</p>
+              )}
               {rec.tags?.length > 0 && (
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 4 }}>
                   {rec.tags.slice(0, 2).map((t: string) => (
