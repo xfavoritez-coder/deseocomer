@@ -11,6 +11,22 @@ const HUNGER_LABELS: Record<string, string> = { LIGHT: "Liviano", MEDIUM: "Norma
 const INGREDIENT_CATS = ["PROTEIN", "VEGETABLE", "FRUIT", "DAIRY", "CARB", "SAUCE", "SPICE", "OTHER"];
 const CAT_LABELS: Record<string, string> = { PROTEIN: "Proteina", VEGETABLE: "Vegetal", FRUIT: "Fruta", DAIRY: "Lacteo", CARB: "Carbohidrato", SAUCE: "Salsa", SPICE: "Especia", OTHER: "Otro" };
 
+const DISH_CATEGORIES: { v: string; l: string }[] = [
+  { v: "BREAKFAST", l: "Desayuno" }, { v: "BRUNCH", l: "Brunch" }, { v: "SALAD", l: "Ensalada" },
+  { v: "SOUP", l: "Sopa" }, { v: "STARTER", l: "Entrada" }, { v: "MAIN_COURSE", l: "Plato de fondo" },
+  { v: "PASTA", l: "Pasta" }, { v: "PIZZA", l: "Pizza" }, { v: "SUSHI", l: "Sushi" },
+  { v: "WOK", l: "Wok" }, { v: "GRILL", l: "Carnes a la parrilla" }, { v: "SEAFOOD", l: "Mariscos" },
+  { v: "VEGETARIAN", l: "Vegetariano" }, { v: "VEGAN", l: "Vegano" }, { v: "SANDWICH", l: "Sándwich" },
+  { v: "BURGER", l: "Hamburguesa" }, { v: "HOT_DOG", l: "Hot dog" }, { v: "TACOS", l: "Tacos" },
+  { v: "EMPANADAS", l: "Empanadas" }, { v: "SNACK", l: "Snack" }, { v: "DESSERT", l: "Postre" },
+  { v: "ICE_CREAM", l: "Helado" }, { v: "JUICE", l: "Jugo" }, { v: "DRINK", l: "Bebida" },
+  { v: "COFFEE", l: "Café" }, { v: "TEA", l: "Té" }, { v: "SMOOTHIE", l: "Smoothie" },
+  { v: "COCKTAIL", l: "Cóctel" }, { v: "BEER", l: "Cerveza" }, { v: "WINE", l: "Vino" },
+  { v: "COMBO", l: "Combo" }, { v: "DAILY_MENU", l: "Menú del día" }, { v: "SHARING", l: "Para compartir" },
+  { v: "OTHER", l: "Otro" },
+];
+const DISH_CAT_MAP: Record<string, string> = Object.fromEntries(DISH_CATEGORIES.map(c => [c.v, c.l]));
+
 const S = {
   card: { background: "rgba(45,26,8,0.7)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 14, padding: "16px 20px", marginBottom: 12 } as React.CSSProperties,
   input: { width: "100%", padding: "10px 14px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 8, color: "#f0ead6", fontFamily: "Georgia", fontSize: "0.88rem", outline: "none", boxSizing: "border-box" as const },
@@ -31,6 +47,7 @@ export default function AdminMenus() {
   const [toast, setToast] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editDish, setEditDish] = useState<Dish | null>(null);
+  const [filtroCat, setFiltroCat] = useState("");
   const allLocalesRef = useRef<Local[]>([]);
 
   // Load all locals once
@@ -130,17 +147,26 @@ export default function AdminMenus() {
       {/* Dishes list */}
       {selLocal && !formOpen && (
         <>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)" }}>{dishes.length} plato{dishes.length !== 1 ? "s" : ""}</span>
             <button onClick={() => { setEditDish(null); setFormOpen(true); }} style={S.btn}>+ Agregar plato</button>
           </div>
+
+          {dishes.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <select value={filtroCat} onChange={e => setFiltroCat(e.target.value)} style={{ ...S.input, maxWidth: 220, fontSize: "0.8rem", padding: "6px 10px" }}>
+                <option value="">Todas las categorias</option>
+                {DISH_CATEGORIES.map(c => <option key={c.v} value={c.v}>{c.l}</option>)}
+              </select>
+            </div>
+          )}
 
           {loading ? (
             <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.4)", textAlign: "center", padding: 40 }}>Cargando...</p>
           ) : dishes.length === 0 ? (
             <p style={{ fontFamily: "Georgia", color: "rgba(240,234,214,0.3)", textAlign: "center", padding: 40 }}>Sin platos. Agrega el primero.</p>
           ) : (
-            dishes.map(d => (
+            dishes.filter(d => !filtroCat || d.categoria === filtroCat).map(d => (
               <div key={d.id} style={{ ...S.card, display: "flex", gap: 14, alignItems: "center" }}>
                 {d.imagenUrl ? (
                   <img src={d.imagenUrl} alt="" style={{ width: 64, height: 64, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} />
@@ -150,7 +176,7 @@ export default function AdminMenus() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontFamily: "Georgia", fontSize: "0.92rem", color: "#f5d080", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.nombre}</p>
                   <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", margin: "2px 0 0" }}>
-                    {d.categoria} · ${Number(d.precio).toLocaleString("es-CL")}
+                    {DISH_CAT_MAP[d.categoria] ?? d.categoria} · ${Number(d.precio).toLocaleString("es-CL")}
                     {d.hungerLevel && ` · ${HUNGER_LABELS[d.hungerLevel] ?? d.hungerLevel}`}
                   </p>
                   {d.ingredientTags?.length > 0 && (
@@ -345,7 +371,10 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
         <div style={{ display: "flex", gap: 12 }}>
           <div style={{ flex: 2 }}>
             <label style={S.label}>Categoria *</label>
-            <input style={S.input} value={categoria} onChange={e => setCategoria(e.target.value)} placeholder="Ej: Platos de fondo" />
+            <select style={S.input} value={categoria} onChange={e => setCategoria(e.target.value)}>
+              <option value="">Seleccionar...</option>
+              {DISH_CATEGORIES.map(c => <option key={c.v} value={c.v}>{c.l}</option>)}
+            </select>
           </div>
           <div style={{ flex: 1 }}>
             <label style={S.label}>Precio (CLP) *</label>
