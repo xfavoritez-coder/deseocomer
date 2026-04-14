@@ -13,11 +13,11 @@ const RESTRICTION_MAP: Record<string, string[]> = {
 
 export async function getInitialDishes(userId?: string, sessionId?: string, excludeIds: string[] = []) {
   // Get user profile if exists
-  let profile: { avoidIngredients: string[]; dietaryRestrictions: string[]; fitnessMode: string | null } | null = null;
+  let profile: { avoidIngredients: string[]; dietaryRestrictions: string[]; fitnessMode: string | null; favoriteIngredients: string[] } | null = null;
   if (userId) {
     profile = await prisma.userTasteProfile.findUnique({
       where: { userId },
-      select: { avoidIngredients: true, dietaryRestrictions: true, fitnessMode: true },
+      select: { avoidIngredients: true, dietaryRestrictions: true, fitnessMode: true, favoriteIngredients: true },
     });
   }
 
