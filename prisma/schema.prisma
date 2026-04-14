@@ -235,6 +235,10 @@ model Interaction {
   weatherCondition String?
   weatherHumidity  Int?
 
+  // Ubicación del usuario
+  userLat   Float?
+  userLng   Float?
+
   // Metadata
   hour      Int?
   dayOfWeek Int?
