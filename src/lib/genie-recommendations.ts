@@ -54,14 +54,26 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
   const hasIngredientData = Object.keys(ingredientCounts).length > 0;
 
   // Get user profile
-  let profile: { avoidIngredients: string[]; dietaryRestrictions: string[]; fitnessMode: string | null } | null = null;
+  let profile: { avoidIngredients: string[]; dietaryRestrictions: string[]; fitnessMode: string | null; favoriteIngredients: string[] } | null = null;
   if (userId) {
     profile = await prisma.userTasteProfile.findUnique({
       where: { userId },
-      select: { avoidIngredients: true, dietaryRestrictions: true, fitnessMode: true },
+      select: { avoidIngredients: true, dietaryRestrictions: true, fitnessMode: true, favoriteIngredients: true },
     });
   }
+  // Build avoid set from profile + dietary restrictions
+  const RESTRICTION_INGREDIENTS: Record<string, string[]> = {
+    "vegetariano": ["pollo", "carne", "cerdo", "vacuno", "cordero", "tocino", "jamón", "pepperoni", "lomo", "mechada", "beef"],
+    "vegano": ["pollo", "carne", "cerdo", "vacuno", "cordero", "tocino", "jamón", "pepperoni", "lomo", "mechada", "beef", "queso", "queso crema", "crema", "mozzarella", "cheddar", "parmesano", "mantequilla", "huevo", "salmón", "camarón", "ebi"],
+    "sin mariscos": ["camarón", "ebi", "pulpo", "calamar", "jaiba"],
+    "sin cerdo": ["cerdo", "tocino", "jamón", "pepperoni"],
+    "sin lácteos": ["queso", "queso crema", "crema", "mozzarella", "cheddar", "parmesano", "mantequilla", "ricota"],
+  };
   const avoidSet = new Set(profile?.avoidIngredients?.map(i => i.toLowerCase()) ?? []);
+  for (const restriction of profile?.dietaryRestrictions ?? []) {
+    const mapped = RESTRICTION_INGREDIENTS[restriction.toLowerCase()];
+    if (mapped) mapped.forEach(i => avoidSet.add(i));
+  }
 
   // Get previously loved ingredient names
   const lovedIngredients = new Set<string>();
@@ -79,12 +91,16 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
   const hungerKey = ctx.ctxHunger?.toUpperCase() ?? "MEDIUM";
   const allowedHunger = HUNGER_MAP[hungerKey] ?? ["LIGHT", "MEDIUM", "HEAVY"];
 
+  // Exclude non-food categories from recommendations
+  const FOOD_ONLY_EXCLUDE = ["DESSERT", "ICE_CREAM", "COFFEE", "TEA", "SMOOTHIE", "JUICE", "DRINK", "BEER", "WINE", "COCKTAIL", "OTHER"];
+
   // 2. Fetch candidates
   const candidates = await prisma.menuItem.findMany({
     where: {
       isAvailable: true,
       imagenUrl: { not: null },
       id: { notIn: ctx.selectedDishIds },
+      categoria: { notIn: FOOD_ONLY_EXCLUDE },
     },
     include: {
       ingredientTags: { include: { ingredient: true } },
@@ -109,18 +125,30 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
       const ings = c.ingredientTags.map(t => t.ingredient.name);
       const ingCats = c.ingredientTags.map(t => t.ingredient.category);
 
-      // Shared ingredients with session profile
+      // Shared ingredients with session profile — strongest signal
+      let sharedCount = 0;
       for (const ing of ings) {
-        if (ingredientCounts[ing]) score += 3;
+        if (ingredientCounts[ing]) { score += 5; sharedCount++; }
+      }
+      // Bonus for high overlap ratio
+      if (ings.length > 0 && sharedCount > 0) {
+        const overlapRatio = sharedCount / ings.length;
+        score += Math.round(overlapRatio * 10); // up to +10 for 100% overlap
       }
 
-      // Category match fallback (when dishes have no ingredient data)
+      // Category match — important signal
       if (selectedCategoryCounts[c.categoria]) {
-        score += hasIngredientData ? 1 : 5; // Strong boost when no ingredient data
+        score += 8; // Always strong: if user picked sushi, recommend sushi
       }
 
-      // Same local boost (user liked dishes from this local)
-      if (selectedLocalIds.has(c.localId)) score += 2;
+      // Same local boost
+      if (selectedLocalIds.has(c.localId)) score += 3;
+
+      // Favorite ingredients from user profile
+      const favSet = new Set((profile?.favoriteIngredients ?? []).map(i => i.toLowerCase()));
+      for (const ing of ings) {
+        if (favSet.has(ing.toLowerCase())) score += 3;
+      }
 
       // Hunger level match
       if (c.hungerLevel && allowedHunger.includes(c.hungerLevel)) score += 2;
