@@ -192,6 +192,7 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
         hungerLevel: c.hungerLevel,
         avgRating: c.avgRating,
         totalRatings: c._count.ratings,
+        role: null as string | null,
         totalLoved: c.totalLoved,
         ingredients: ings,
         local: c.local,
@@ -218,7 +219,7 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
         ingredients: c.ingredientTags.map(t => t.ingredient.name),
         local: c.local, distanceKm,
         distanceLabel: distanceKm !== null ? formatDistance(distanceKm) : null,
-        tags: [], score: 0,
+        tags: [], score: 0, role: null as string | null,
       };
     });
     return fallback;
