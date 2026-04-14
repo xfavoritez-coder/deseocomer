@@ -426,6 +426,10 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
               const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
               await emailNuevoGanador(emailData, nuevoGanador, siguiente.orden, diasSiguiente, urls.confirm, urls.disputa);
               await emailLocal({ ...emailData, coordinarUrl }, c.local.email, nuevoGanador);
+              await prisma.concurso.update({
+                where: { id: c.id },
+                data: { localNotificadoAt: now, fechaPropuestaAt: null, fechaPropuesta: null },
+              });
               log.push(`[PASO_SIGUIENTE] ${c.id} - ${siguiente.orden}° lugar: ${nuevoGanador.email}`);
             } catch (e) { log.push(`[ERROR_EMAIL] ${c.id} nuevo ganador - ${e}`); }
           }
