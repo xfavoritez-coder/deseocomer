@@ -35,7 +35,7 @@ export default function GenieResult() {
       const coords = coordsRaw ? JSON.parse(coordsRaw) : { lat: -33.4569, lng: -70.6483 };
 
       // Fetch weather silently
-      let weather = { weatherTemp: null, weatherCondition: null, weatherHumidity: null };
+      let weather: { weatherTemp: number | null; weatherCondition: string | null; weatherHumidity: number | null } = { weatherTemp: null, weatherCondition: null, weatherHumidity: null };
       try {
         const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current=temperature_2m,weathercode,relativehumidity_2m`);
         if (wRes.ok) {
