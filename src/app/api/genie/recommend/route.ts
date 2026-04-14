@@ -4,14 +4,14 @@ import { getRecommendations } from "@/lib/genie-recommendations";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { selectedDishIds, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, userLat, userLng, userId, sessionId } = body;
+    const { selectedDishIds, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, userLat, userLng, userId, sessionId, weatherTemp, weatherCondition } = body;
 
     if (!selectedDishIds?.length) {
       return NextResponse.json({ error: "Selecciona al menos un plato" }, { status: 400 });
     }
 
     const recommendations = await getRecommendations(
-      { selectedDishIds, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, userLat, userLng },
+      { selectedDishIds, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, userLat, userLng, weatherTemp, weatherCondition },
       userId,
       sessionId,
     );

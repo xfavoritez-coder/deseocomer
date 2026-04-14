@@ -20,6 +20,8 @@ export default function GenieResult() {
   const { user } = useAuth();
   const [recs, setRecs] = useState<Rec[]>([]);
   const [loading, setLoading] = useState(true);
+  const [postres, setPostres] = useState<Rec[]>([]);
+  const [bebidas, setBebidas] = useState<Rec[]>([]);
 
   useEffect(() => {
     const run = async () => {
@@ -83,10 +85,30 @@ export default function GenieResult() {
             userLng: coords.lng,
             userId: user?.id || null,
             sessionId: sid,
+            weatherTemp: weather.weatherTemp,
+            weatherCondition: weather.weatherCondition,
           }),
         });
         const data = await res.json();
-        setRecs(Array.isArray(data) ? data : []);
+        const recsArr = Array.isArray(data) ? data : [];
+        setRecs(recsArr);
+
+        // Save timestamp for postre timing
+        localStorage.setItem("genieLastResultAt", String(Date.now()));
+
+        // Fetch extras from recommended local(s)
+        if (recsArr.length > 0) {
+          const localId = recsArr[0].local?.id;
+          if (localId) {
+            Promise.all([
+              fetch(`/api/genie/extras?localId=${localId}&type=postres`).then(r => r.json()).catch(() => []),
+              fetch(`/api/genie/extras?localId=${localId}&type=bebidas`).then(r => r.json()).catch(() => []),
+            ]).then(([p, b]) => {
+              setPostres(Array.isArray(p) ? p : []);
+              setBebidas(Array.isArray(b) ? b : []);
+            });
+          }
+        }
       } catch {}
       setLoading(false);
     };
@@ -185,8 +207,40 @@ export default function GenieResult() {
           </div>
         ))}
 
+        {/* Bebidas */}
+        {bebidas.length > 0 && (
+          <div style={{ marginTop: 20 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", marginBottom: 8 }}>PARA ACOMPAÑAR</p>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {bebidas.map((b: Rec) => (
+                <div key={b.id} style={{ minWidth: 120, background: "rgba(45,26,8,0.5)", border: "1px solid rgba(232,168,76,0.08)", borderRadius: 12, padding: 10, textAlign: "center", flexShrink: 0 }}>
+                  {b.imagenUrl && <img src={b.imagenUrl} alt="" style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8, marginBottom: 6 }} />}
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "#f0ead6", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.nombre}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "rgba(240,234,214,0.3)", margin: 0 }}>${Number(b.precio).toLocaleString("es-CL")}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Postres */}
+        {postres.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.72rem", letterSpacing: "0.12em", color: "rgba(240,234,214,0.35)", marginBottom: 8 }}>DESPUES DE COMER, VUELVE POR EL POSTRE 🍰</p>
+            <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+              {postres.map((p: Rec) => (
+                <div key={p.id} style={{ minWidth: 120, background: "rgba(45,26,8,0.5)", border: "1px solid rgba(236,72,153,0.1)", borderRadius: 12, padding: 10, textAlign: "center", flexShrink: 0 }}>
+                  {p.imagenUrl && <img src={p.imagenUrl} alt="" style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8, marginBottom: 6 }} />}
+                  <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "#f0ead6", margin: "0 0 2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.nombre}</p>
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.65rem", color: "rgba(240,234,214,0.3)", margin: 0 }}>${Number(p.precio).toLocaleString("es-CL")}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
-        <button onClick={() => { sessionStorage.removeItem("genieSelectedDishes"); sessionStorage.removeItem("genieContext"); router.push("/genie"); }} style={{ width: "100%", marginTop: 14, padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>
+        <button onClick={() => { sessionStorage.removeItem("genieSelectedDishes"); sessionStorage.removeItem("genieContext"); router.push("/genie"); }} style={{ width: "100%", marginTop: 16, padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>
           Ver mas opciones
         </button>
       </div>

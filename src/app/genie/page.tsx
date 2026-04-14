@@ -31,7 +31,8 @@ function getSessionId(): string {
 export default function GeniePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [phase, setPhase] = useState<"loading" | "onboarding" | "dishes">("loading");
+  const [phase, setPhase] = useState<"loading" | "onboarding" | "feedback" | "dishes">("loading");
+  const [pendingFeedback, setPendingFeedback] = useState<{ interactionId: string; dishName: string; dishImage: string | null } | null>(null);
 
   // Onboarding state
   const [obStep, setObStep] = useState(0);
@@ -54,18 +55,56 @@ export default function GeniePage() {
     if (!user) {
       // Guest: check localStorage for onboarding done (persists across sessions)
       const done = localStorage.getItem("genieOnboardingDone");
-      if (done === "true") { setPhase("dishes"); requestGeo(); }
+      if (done === "true") { checkFeedback(); requestGeo(); }
       else setPhase("onboarding");
       return;
     }
     fetch(`/api/genie/onboarding?userId=${user.id}`)
       .then(r => r.json())
       .then(d => {
-        if (d.onboardingDone) { setPhase("dishes"); requestGeo(); }
+        if (d.onboardingDone) { checkFeedback(); requestGeo(); }
         else setPhase("onboarding");
       })
       .catch(() => setPhase("onboarding"));
   }, [user, authLoading]);
+
+  // Check for pending feedback before showing dishes
+  const checkFeedback = async () => {
+    const sid = getSessionId();
+    const params = new URLSearchParams({ sessionId: sid });
+    if (user?.id) params.set("userId", user.id);
+    try {
+      const res = await fetch(`/api/genie/pending-feedback?${params}`);
+      const data = await res.json();
+      if (data?.interactionId) {
+        setPendingFeedback(data);
+        setPhase("feedback");
+        return;
+      }
+    } catch {}
+    // Check for postres (20-60 min after last session)
+    const lastResult = localStorage.getItem("genieLastResultAt");
+    if (lastResult) {
+      const elapsed = Date.now() - Number(lastResult);
+      if (elapsed >= 20 * 60 * 1000 && elapsed <= 60 * 60 * 1000) {
+        localStorage.removeItem("genieLastResultAt");
+        sessionStorage.setItem("genieShowPostres", "true");
+      }
+    }
+    setPhase("dishes");
+  };
+
+  const submitFeedback = async (score: "LOVED" | "MEH" | "DISLIKED") => {
+    if (!pendingFeedback) return;
+    const sid = getSessionId();
+    await fetch("/api/genie/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ interactionId: pendingFeedback.interactionId, score, userId: user?.id || null, sessionId: sid }),
+    });
+    setPendingFeedback(null);
+    setPhase("dishes");
+  };
 
   // Geolocation
   const requestGeo = useCallback(() => {
@@ -253,6 +292,35 @@ export default function GeniePage() {
     );
   }
 
+  // ── FEEDBACK ──
+  if (phase === "feedback" && pendingFeedback) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#0a0812", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <p style={{ fontSize: 32, marginBottom: 12 }}>🧞</p>
+        {pendingFeedback.dishImage && (
+          <img src={pendingFeedback.dishImage} alt="" style={{ width: 160, height: 160, objectFit: "cover", borderRadius: 20, marginBottom: 16 }} />
+        )}
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.1rem,3vw,1.4rem)", color: "#f5d080", textAlign: "center", marginBottom: 6 }}>
+          Como estuvo?
+        </h2>
+        <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.92rem", color: "#e8a84c", textAlign: "center", marginBottom: 20 }}>{pendingFeedback.dishName}</p>
+
+        <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 340 }}>
+          {([["LOVED", "😍", "Me encanto"], ["MEH", "😐", "Regular"], ["DISLIKED", "😕", "No era lo mio"]] as const).map(([score, emoji, label]) => (
+            <button key={score} onClick={() => submitFeedback(score)} style={{ flex: 1, padding: "18px 8px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, cursor: "pointer", textAlign: "center" }}>
+              <span style={{ fontSize: 32, display: "block", marginBottom: 6 }}>{emoji}</span>
+              <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.7rem", color: "rgba(240,234,214,0.5)" }}>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        <button onClick={() => { setPendingFeedback(null); setPhase("dishes"); }} style={{ marginTop: 16, padding: 10, background: "transparent", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.2)", cursor: "pointer" }}>
+          Saltar
+        </button>
+      </div>
+    );
+  }
+
   // ── LOADING ──
   if (phase === "loading" || loadingDishes) {
     return (
@@ -311,9 +379,6 @@ export default function GeniePage() {
               {selected.size > 0 ? "Quiero ver mas opciones" : "Ver otros platos"}
             </button>
 
-            <button onClick={() => router.push("/genie/grupo")} style={{ width: "100%", marginTop: 8, padding: 12, background: "transparent", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.25)", cursor: "pointer" }}>
-              Estoy con alguien? Crear sala grupal →
-            </button>
           </>
         )}
 
@@ -334,6 +399,11 @@ export default function GeniePage() {
                       <span key={ing} style={{ padding: "2px 8px", borderRadius: 8, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.15)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "#f5d080" }}>{ing}</span>
                     ))}
                   </div>
+                )}
+                {(previewDish.avgRating != null || previewDish.totalLoved > 0) && (
+                  <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.4)", marginBottom: 12 }}>
+                    {previewDish.totalLoved > 0 && <span style={{ color: "#3db89e" }}>{previewDish.totalLoved} personas lo recomiendan</span>}
+                  </p>
                 )}
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => { toggleSelect(previewDish.id); setPreviewDish(null); }} style={{ flex: 1, padding: 12, background: selected.has(previewDish.id) ? "rgba(255,80,80,0.1)" : "#3db89e", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: selected.has(previewDish.id) ? "#ff6b6b" : "#fff", cursor: "pointer" }}>

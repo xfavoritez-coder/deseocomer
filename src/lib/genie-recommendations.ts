@@ -8,7 +8,16 @@ interface GenieContext {
   ctxOccasion?: string;
   userLat?: number;
   userLng?: number;
+  weatherTemp?: number;
+  weatherCondition?: string;
 }
+
+// Cold weather → boost warm/hearty dishes
+const COLD_BOOST_CATS = ["SOUP", "WOK", "MAIN_COURSE"];
+const COLD_BOOST_INGS = ["caldo", "crema de", "ramen", "fideos", "guiso"];
+// Hot weather → boost fresh/light dishes
+const HOT_BOOST_CATS = ["SALAD", "SUSHI"];
+const HOT_BOOST_INGS = ["ceviche", "pepino", "palta", "ensalada", "fresco"];
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -166,6 +175,23 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
         if (carbCount > proteinCount) score -= 2;
       } else if (profile?.fitnessMode === "GAINING") {
         if (c.hungerLevel === "HEAVY") score += 2;
+      }
+
+      // Weather-based scoring
+      if (ctx.weatherTemp != null) {
+        const isCold = ctx.weatherTemp < 15;
+        const isHot = ctx.weatherTemp > 25;
+        if (isCold) {
+          if (COLD_BOOST_CATS.includes(c.categoria)) score += 3;
+          if (ings.some(i => COLD_BOOST_INGS.some(k => i.toLowerCase().includes(k)))) score += 2;
+        }
+        if (isHot) {
+          if (HOT_BOOST_CATS.includes(c.categoria)) score += 3;
+          if (ings.some(i => HOT_BOOST_INGS.some(k => i.toLowerCase().includes(k)))) score += 2;
+        }
+      }
+      if (ctx.weatherCondition === "rain" || ctx.weatherCondition === "drizzle") {
+        if (COLD_BOOST_CATS.includes(c.categoria)) score += 2; // Rainy = comfort food
       }
 
       // Distance
