@@ -5,16 +5,8 @@
   "installCommand": "npm install",
   "crons": [
     {
-      "path": "/api/cron/cerrar-concursos",
-      "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/contar-comunas",
-      "schedule": "0 */4 * * *"
-    },
-    {
-      "path": "/api/cron/calcular-stats-admin",
-      "schedule": "0 */6 * * *"
+      "path": "/api/cron/diario",
+      "schedule": "0 8 * * *"
     }
   ]
 }
