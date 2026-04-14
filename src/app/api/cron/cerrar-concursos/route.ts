@@ -6,15 +6,14 @@ import {
   emailGanador,
   emailLocal,
   emailAcreditacion,
-  emailNuevoGanador,
   emailExpiracion,
   emailAudienciaLocal,
 } from "@/lib/emails/concurso-cierre";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://deseocomer.com";
 
-// Días para reclamar según posición: 1° = 7d, 2° = 5d, 3° = 3d
-const DIAS_RECLAMO: Record<number, number> = { 1: 7, 2: 5, 3: 3 };
+// Días para reclamar el premio
+const DIAS_RECLAMO = 7;
 
 function generarCodigo() {
   const num = Math.floor(100000 + Math.random() * 900000);
@@ -30,33 +29,6 @@ function confirmUrls(concursoId: string, token: string) {
     confirm: `${BASE_URL}/concursos/confirmar?id=${concursoId}&token=${token}&respuesta=si`,
     disputa: `${BASE_URL}/concursos/confirmar?id=${concursoId}&token=${token}&respuesta=no`,
   };
-}
-
-function obtenerOrdenGanadorActual(c: {
-  ganadorActualId: string | null;
-  ganador1Id: string | null;
-  ganador2Id: string | null;
-  ganador3Id: string | null;
-}): number {
-  if (c.ganadorActualId === c.ganador1Id) return 1;
-  if (c.ganadorActualId === c.ganador2Id) return 2;
-  if (c.ganadorActualId === c.ganador3Id) return 3;
-  return 1;
-}
-
-function obtenerSiguienteGanador(c: {
-  ganadorActualId: string | null;
-  ganador1Id: string | null;
-  ganador2Id: string | null;
-  ganador3Id: string | null;
-}): { id: string; orden: number } | null {
-  if (c.ganadorActualId === c.ganador1Id && c.ganador2Id) {
-    return { id: c.ganador2Id, orden: 2 };
-  }
-  if (c.ganadorActualId === c.ganador2Id && c.ganador3Id) {
-    return { id: c.ganador3Id, orden: 3 };
-  }
-  return null;
 }
 
 function diasDesde(date: Date | null): number {
@@ -380,11 +352,9 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
       if (!c.ganadorActual || !c.ganadorNotificadoAt) continue;
 
       const diasNotificado = diasDesde(c.ganadorNotificadoAt);
-      const orden = obtenerOrdenGanadorActual(c);
-      const diasLimite = DIAS_RECLAMO[orden] ?? 7;
 
       // 2a. 48h sin contacto → enviar email con código al ganador
-      if (diasNotificado >= 2 && !c.segundoNotificadoAt && orden === 1) {
+      if (diasNotificado >= 2 && !c.segundoNotificadoAt) {
         const emailData = {
           concursoId: c.id, titulo: c.premio, premio: c.premio, codigoEntrega: c.codigoEntrega!,
           local: { nombre: c.local.nombre, direccion: c.local.direccion, comuna: c.local.comuna, telefono: c.local.telefono },
@@ -396,57 +366,19 @@ ${!esLider ? `<p style="color:#ff8080;font-size:13px;margin:8px 0 0">El líder t
         } catch (e) { log.push(`[ERROR_EMAIL] ${c.id} acreditacion - ${e}`); }
       }
 
-      // 2b. Pasó el plazo y no confirmó → pasar al siguiente
-      if (diasNotificado >= diasLimite && !c.premioConfirmadoAt && !c.disputaAt) {
-        const siguiente = obtenerSiguienteGanador(c);
-
-        if (siguiente) {
-          const token = generarToken();
-          const diasSiguiente = DIAS_RECLAMO[siguiente.orden] ?? 3;
-          await prisma.concurso.update({
-            where: { id: c.id },
-            data: {
-              ganadorActualId: siguiente.id,
-              ganadorDescartadoRazon: "no_reclamo",
-              ganadorNotificadoAt: now,
-              segundoNotificadoAt: null,
-              confirmacionToken: token,
-            },
-          });
-
-          const nuevoGanador = await prisma.usuario.findUnique({ where: { id: siguiente.id }, select: { nombre: true, email: true, telefono: true } });
-          if (nuevoGanador) {
-            const emailData = {
-              concursoId: c.id, titulo: c.premio, premio: c.premio, codigoEntrega: c.codigoEntrega!,
-              local: { nombre: c.local.nombre, direccion: c.local.direccion, comuna: c.local.comuna, telefono: c.local.telefono },
-            };
-            const urls = confirmUrls(c.id, token);
-
-            try {
-              const coordinarUrl = `${BASE_URL}/concursos/coordinar?id=${c.id}&token=${token}`;
-              await emailNuevoGanador(emailData, nuevoGanador, siguiente.orden, diasSiguiente, urls.confirm, urls.disputa);
-              await emailLocal({ ...emailData, coordinarUrl }, c.local.email, nuevoGanador);
-              await prisma.concurso.update({
-                where: { id: c.id },
-                data: { localNotificadoAt: now, fechaPropuestaAt: null, fechaPropuesta: null },
-              });
-              log.push(`[PASO_SIGUIENTE] ${c.id} - ${siguiente.orden}° lugar: ${nuevoGanador.email}`);
-            } catch (e) { log.push(`[ERROR_EMAIL] ${c.id} nuevo ganador - ${e}`); }
-          }
-        } else {
-          // No hay más candidatos → expirar
-          await prisma.concurso.update({
-            where: { id: c.id },
-            data: { estado: "expirado", premioExpiradoAt: now },
-          });
-          try {
-            await emailExpiracion(
-              { nombre: c.ganadorActual.nombre, email: c.ganadorActual.email },
-              c.premio,
-            );
-          } catch {}
-          log.push(`[EXPIRADO] ${c.id} - sin más candidatos`);
-        }
+      // 2b. Pasó el plazo y no confirmó → expirar
+      if (diasNotificado >= DIAS_RECLAMO && !c.premioConfirmadoAt && !c.disputaAt) {
+        await prisma.concurso.update({
+          where: { id: c.id },
+          data: { estado: "expirado", premioExpiradoAt: now, ganadorDescartadoRazon: "no_reclamo" },
+        });
+        try {
+          await emailExpiracion(
+            { nombre: c.ganadorActual.nombre, email: c.ganadorActual.email },
+            c.premio,
+          );
+        } catch {}
+        log.push(`[EXPIRADO] ${c.id} - ganador no reclamó`);
       }
     }
 
