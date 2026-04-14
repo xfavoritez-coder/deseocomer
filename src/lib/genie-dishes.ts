@@ -43,11 +43,15 @@ export async function getInitialDishes(userId?: string, sessionId?: string, excl
 
   const allExcludeIds = [...excludeIds, ...dislikedIds];
 
-  // Fetch candidate dishes
+  // Categories to exclude from initial selection (desserts, coffee, etc)
+  const FOOD_ONLY_EXCLUDE = ["DESSERT", "ICE_CREAM", "COFFEE", "TEA", "SMOOTHIE", "JUICE", "DRINK", "BEER", "WINE", "COCKTAIL", "OTHER"];
+
+  // Fetch candidate dishes (food only, no desserts/drinks)
   const dishes = await prisma.menuItem.findMany({
     where: {
       isAvailable: true,
       imagenUrl: { not: null },
+      categoria: { notIn: FOOD_ONLY_EXCLUDE },
       ...(allExcludeIds.length > 0 ? { id: { notIn: allExcludeIds } } : {}),
     },
     include: {
@@ -85,7 +89,28 @@ export async function getInitialDishes(userId?: string, sessionId?: string, excl
     });
   }
 
-  return filtered.slice(0, 9).map(d => ({
+  // Balance across locals: pick max 3 per local, round-robin
+  const byLocal: Record<string, typeof filtered> = {};
+  for (const d of filtered) {
+    const lid = d.local.id;
+    if (!byLocal[lid]) byLocal[lid] = [];
+    byLocal[lid].push(d);
+  }
+  const balanced: typeof filtered = [];
+  const localQueues = Object.values(byLocal);
+  let idx = 0;
+  while (balanced.length < 9 && localQueues.some(q => q.length > 0)) {
+    for (const queue of localQueues) {
+      if (balanced.length >= 9) break;
+      if (queue.length > 0) {
+        balanced.push(queue.shift()!);
+      }
+    }
+    idx++;
+    if (idx > 20) break;
+  }
+
+  return balanced.slice(0, 9).map(d => ({
     id: d.id,
     nombre: d.nombre,
     categoria: d.categoria,
