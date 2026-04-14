@@ -222,6 +222,7 @@ model Interaction {
 
   userId     String?
   sessionId  String
+  visitId    String?
   menuItemId String
 
   action        InteractionAction

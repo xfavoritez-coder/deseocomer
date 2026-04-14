@@ -6,15 +6,20 @@ import { useAuth } from "@/contexts/AuthContext";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Dish = any;
 
-const RESTRICTIONS = [
+const DIET_TYPES = [
+  { v: "como de todo", emoji: "🍽️", l: "Como de todo" },
+  { v: "vegetariano", emoji: "🌱", l: "Vegetariano" },
+  { v: "vegano", emoji: "🌿", l: "Vegano" },
+  { v: "pescetariano", emoji: "🐟", l: "Pescetariano" },
+];
+
+const ALLERGIES = [
   { v: "sin gluten", l: "Sin gluten" },
-  { v: "vegetariano", l: "Vegetariano" },
-  { v: "vegano", l: "Vegano" },
   { v: "sin mariscos", l: "Sin mariscos" },
-  { v: "sin cerdo", l: "Sin cerdo" },
-  { v: "sin lácteos", l: "Sin lacteos" },
   { v: "sin frutos secos", l: "Sin frutos secos" },
-  { v: "como de todo", l: "Como de todo" },
+  { v: "sin lácteos", l: "Sin lacteos" },
+  { v: "sin cerdo", l: "Sin cerdo" },
+  { v: "ninguna", l: "Ninguna" },
 ];
 
 const FITNESS_OPTIONS = [
@@ -27,16 +32,20 @@ const FITNESS_OPTIONS = [
 function getSessionId(): string {
   return localStorage.getItem("genie_session_id") ?? "";
 }
+function getVisitId(): string {
+  return sessionStorage.getItem("genieVisitId") ?? "";
+}
 
 export default function GeniePage() {
   const router = useRouter();
   const { user } = useAuth();
-  const [phase, setPhase] = useState<"loading" | "onboarding" | "feedback" | "dishes">("loading");
+  const [phase, setPhase] = useState<"loading" | "onboarding" | "feedback" | "dishes" | "solo_or_group">("loading");
   const [pendingFeedback, setPendingFeedback] = useState<{ interactionId: string; dishName: string; dishImage: string | null } | null>(null);
 
   // Onboarding state
   const [obStep, setObStep] = useState(0);
-  const [restrictions, setRestrictions] = useState<string[]>([]);
+  const [dietType, setDietType] = useState("");
+  const [allergies, setAllergies] = useState<string[]>([]);
   const [fitnessMode, setFitnessMode] = useState("NONE");
   const [savingOb, setSavingOb] = useState(false);
 
@@ -164,6 +173,7 @@ export default function GeniePage() {
             action: "VIEWED",
             userId: user?.id || null,
             sessionId: sid,
+            visitId: getVisitId(),
           }),
         }).catch(() => {});
       }
@@ -193,8 +203,11 @@ export default function GeniePage() {
 
     // Save selected to session
     sessionStorage.setItem("genieSelectedDishes", JSON.stringify([...selected]));
-    router.push("/genie/context");
+    setPhase("solo_or_group");
   };
+
+  const goSolo = () => router.push("/genie/context");
+  const goGroup = () => router.push("/genie/grupo");
 
   const handleOtherDishes = () => {
     // Register IGNORED for non-selected current dishes
@@ -215,7 +228,14 @@ export default function GeniePage() {
 
   const saveOnboarding = async () => {
     setSavingOb(true);
-    const finalRestrictions = restrictions.includes("como de todo") ? [] : restrictions;
+    const finalRestrictions = [
+      ...(dietType && dietType !== "como de todo" ? [dietType] : []),
+      ...allergies.filter(a => a !== "ninguna"),
+    ];
+    const onboardingData = { dietType, allergies, fitnessMode, dietaryRestrictions: finalRestrictions };
+    // Save to localStorage for guests
+    localStorage.setItem("genieOnboardingData", JSON.stringify(onboardingData));
+
     await fetch("/api/genie/onboarding", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -238,36 +258,59 @@ export default function GeniePage() {
       <div style={{ minHeight: "100vh", background: "#0a0812", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 20px" }}>
         <p style={{ fontSize: 40, marginBottom: 12 }}>🧞</p>
         <h1 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.4rem,4vw,1.8rem)", color: "#f5d080", textAlign: "center", marginBottom: 8 }}>El Genio quiere conocerte</h1>
-        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: 32, maxWidth: 400 }}>Solo 2 preguntas para recomendarte mejor.</p>
+        <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.9rem", color: "rgba(240,234,214,0.45)", textAlign: "center", marginBottom: 32, maxWidth: 400 }}>3 preguntas rapidas para recomendarte mejor.</p>
 
         {/* Progress */}
         <div style={{ display: "flex", gap: 8, marginBottom: 28, width: "100%", maxWidth: 300 }}>
-          {[0, 1].map(i => <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= obStep ? "#e8a84c" : "rgba(232,168,76,0.15)" }} />)}
+          {[0, 1, 2].map(i => <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i <= obStep ? "#e8a84c" : "rgba(232,168,76,0.15)" }} />)}
         </div>
 
+        {/* Step 0: Diet type */}
         {obStep === 0 && (
           <div style={{ width: "100%", maxWidth: 400 }}>
-            <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", textAlign: "center", marginBottom: 16 }}>Que NO comes?</h2>
+            <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", textAlign: "center", marginBottom: 16 }}>Que tipo de alimentacion tienes?</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {RESTRICTIONS.map(r => {
-                const active = restrictions.includes(r.v);
+              {DIET_TYPES.map(d => {
+                const active = dietType === d.v;
                 return (
-                  <button key={r.v} onClick={() => {
-                    if (r.v === "como de todo") setRestrictions(["como de todo"]);
-                    else setRestrictions(prev => prev.filter(x => x !== "como de todo").includes(r.v) ? prev.filter(x => x !== r.v) : [...prev.filter(x => x !== "como de todo"), r.v]);
-                  }} style={{ padding: "14px 18px", background: active ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.03)", border: active ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.08)", borderRadius: 12, fontFamily: "var(--font-lato)", fontSize: "0.92rem", color: active ? "#e8a84c" : "rgba(240,234,214,0.6)", cursor: "pointer", textAlign: "left" }}>
-                    {active ? "✓ " : ""}{r.l}
+                  <button key={d.v} onClick={() => { setDietType(d.v); setTimeout(() => setObStep(1), 200); }} style={{ padding: "16px 18px", background: active ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.03)", border: active ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.08)", borderRadius: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, textAlign: "left" }}>
+                    <span style={{ fontSize: 22 }}>{d.emoji}</span>
+                    <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.92rem", color: active ? "#e8a84c" : "#f0ead6" }}>{d.l}</span>
                   </button>
                 );
               })}
             </div>
-            <button onClick={() => setObStep(1)} style={{ width: "100%", marginTop: 20, padding: 14, background: "#e8a84c", color: "#0a0812", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, cursor: "pointer" }}>Siguiente</button>
           </div>
         )}
 
+        {/* Step 1: Allergies */}
         {obStep === 1 && (
           <div style={{ width: "100%", maxWidth: 400 }}>
-            <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", textAlign: "center", marginBottom: 16 }}>Como andas ahora?</h2>
+            <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", textAlign: "center", marginBottom: 16 }}>Tienes alguna alergia o restriccion?</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {ALLERGIES.map(a => {
+                const active = allergies.includes(a.v);
+                return (
+                  <button key={a.v} onClick={() => {
+                    if (a.v === "ninguna") setAllergies(["ninguna"]);
+                    else setAllergies(prev => prev.filter(x => x !== "ninguna").includes(a.v) ? prev.filter(x => x !== a.v) : [...prev.filter(x => x !== "ninguna"), a.v]);
+                  }} style={{ padding: "14px 18px", background: active ? "rgba(232,168,76,0.12)" : "rgba(255,255,255,0.03)", border: active ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.08)", borderRadius: 12, fontFamily: "var(--font-lato)", fontSize: "0.92rem", color: active ? "#e8a84c" : "rgba(240,234,214,0.6)", cursor: "pointer", textAlign: "left" }}>
+                    {active ? "✓ " : ""}{a.l}
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+              <button onClick={() => setObStep(0)} style={{ flex: 1, padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", cursor: "pointer" }}>Atras</button>
+              <button onClick={() => setObStep(2)} style={{ flex: 2, padding: 14, background: "#e8a84c", color: "#0a0812", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, cursor: "pointer" }}>Siguiente</button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Fitness mode */}
+        {obStep === 2 && (
+          <div style={{ width: "100%", maxWidth: 400 }}>
+            <h2 style={{ fontFamily: "var(--font-cinzel)", fontSize: "1rem", color: "#e8a84c", textAlign: "center", marginBottom: 16 }}>En que modo estas?</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {FITNESS_OPTIONS.map(f => {
                 const active = fitnessMode === f.v;
@@ -283,11 +326,31 @@ export default function GeniePage() {
               })}
             </div>
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-              <button onClick={() => setObStep(0)} style={{ flex: 1, padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", cursor: "pointer" }}>Atras</button>
+              <button onClick={() => setObStep(1)} style={{ flex: 1, padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.3)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.85rem", color: "#e8a84c", cursor: "pointer" }}>Atras</button>
               <button onClick={saveOnboarding} disabled={savingOb} style={{ flex: 2, padding: 14, background: "#e8a84c", color: "#0a0812", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.9rem", fontWeight: 700, cursor: "pointer", opacity: savingOb ? 0.5 : 1 }}>{savingOb ? "Guardando..." : "Listo, recomiendame"}</button>
             </div>
           </div>
         )}
+      </div>
+    );
+  }
+
+  // ── SOLO OR GROUP ──
+  if (phase === "solo_or_group") {
+    return (
+      <div style={{ minHeight: "100vh", background: "#0a0812", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <p style={{ fontSize: 32, marginBottom: 12 }}>🧞</p>
+        <h2 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "clamp(1.2rem,3.5vw,1.5rem)", color: "#f5d080", textAlign: "center", marginBottom: 24 }}>Estas solo o con alguien?</h2>
+        <div style={{ width: "100%", maxWidth: 340, display: "flex", flexDirection: "column", gap: 10 }}>
+          <button onClick={goSolo} style={{ padding: "18px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 24 }}>🧑</span>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", color: "#f0ead6" }}>Voy solo</span>
+          </button>
+          <button onClick={goGroup} style={{ padding: "18px 20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 14 }}>
+            <span style={{ fontSize: 24 }}>👥</span>
+            <span style={{ fontFamily: "var(--font-cinzel)", fontSize: "0.95rem", color: "#f0ead6" }}>Estoy con alguien</span>
+          </button>
+        </div>
       </div>
     );
   }

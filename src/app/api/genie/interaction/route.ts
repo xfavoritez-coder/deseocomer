@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { menuItemIds, action, userId, sessionId, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, weatherTemp, weatherCondition, weatherHumidity, userLat, userLng } = body;
+    const { menuItemIds, action, userId, sessionId, visitId, ctxCompany, ctxHunger, ctxBudget, ctxOccasion, weatherTemp, weatherCondition, weatherHumidity, userLat, userLng } = body;
 
     if (!menuItemIds?.length || !action || !sessionId) {
       return NextResponse.json({ error: "Campos requeridos faltantes" }, { status: 400 });
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
         action,
         userId: userId || null,
         sessionId,
+        visitId: visitId || null,
         ctxCompany: ctxCompany || null,
         ctxHunger: ctxHunger || null,
         ctxBudget: ctxBudget ? Number(ctxBudget) : null,

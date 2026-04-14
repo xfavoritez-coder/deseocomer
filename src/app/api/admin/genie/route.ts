@@ -28,18 +28,21 @@ export async function GET(req: NextRequest) {
         hour: true,
         dayOfWeek: true,
         createdAt: true,
+        visitId: true,
         menuItem: { select: { nombre: true, categoria: true, imagenUrl: true, ingredients: true, local: { select: { nombre: true } } } },
       },
     });
 
-    // Group by session
-    const sessions: Record<string, { sessionId: string; userId: string | null; firstSeen: string; lastSeen: string; actions: typeof interactions; context: any; weather: any; location: any; insight: any }> = {};
+    // Group by visitId (or sessionId+time window as fallback)
+    const sessions: Record<string, { sessionId: string; visitId: string | null; userId: string | null; firstSeen: string; lastSeen: string; actions: typeof interactions; context: any; weather: any; location: any; insight: any }> = {};
 
     for (const i of interactions) {
-      const sid = i.sessionId;
+      // Use visitId if available, otherwise fallback to sessionId
+      const sid = i.visitId || i.sessionId;
       if (!sessions[sid]) {
         sessions[sid] = {
-          sessionId: sid,
+          sessionId: i.sessionId,
+          visitId: i.visitId,
           userId: i.userId,
           firstSeen: i.createdAt.toISOString(),
           lastSeen: i.createdAt.toISOString(),
@@ -95,7 +98,7 @@ export async function GET(req: NextRequest) {
       if (topCat) conclusions.push(`Prefiere ${topCat.toLowerCase()}`);
       if (topIngs.length > 0) conclusions.push(`Le gusta: ${topIngs.join(", ")}`);
       if (topLocal) conclusions.push(`Atrae ${topLocal}`);
-      if (selectRate > 0) conclusions.push(`Tasa seleccion: ${selectRate}%`);
+      if (selectRate > 0) conclusions.push(`Selecciono ${selected.length} de ${viewed.length} platos vistos (${selectRate}%)`);
       if (s.context?.ctxHunger) conclusions.push(`Hambre: ${s.context.ctxHunger}`);
       if (s.context?.ctxCompany) conclusions.push(`Con: ${s.context.ctxCompany}`);
 

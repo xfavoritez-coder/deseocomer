@@ -25,6 +25,10 @@ export default function GenieLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     getSessionId();
+    // Generate a new visitId each time the genie is opened
+    if (!sessionStorage.getItem("genieVisitId")) {
+      sessionStorage.setItem("genieVisitId", crypto.randomUUID());
+    }
     setReady(true);
   }, []);
 

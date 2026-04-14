@@ -30,26 +30,52 @@ export default function GeniePerfil() {
   useEffect(() => {
     if (isLoading) return;
     const uid = user?.id;
-    if (!uid) { setLoading(false); return; }
-    Promise.all([
-      fetch(`/api/perfil/preferencias?userId=${uid}`).then(r => r.json()),
-      fetch(`/api/genie/interaction?userId=${uid}&last=10`).then(r => r.ok ? r.json() : []).catch(() => []),
-    ]).then(([prof, hist]) => {
-      setProfile(prof);
-      setHistory(Array.isArray(hist) ? hist : []);
+    if (!uid) {
+      // Guest: load from localStorage
+      try {
+        const raw = localStorage.getItem("genieOnboardingData");
+        if (raw) {
+          const data = JSON.parse(raw);
+          setProfile({
+            dietaryRestrictions: data.dietaryRestrictions ?? [],
+            fitnessMode: data.fitnessMode ?? null,
+            riskProfile: "BALANCED",
+            favoriteIngredients: [],
+            avoidIngredients: [],
+            onboardingDone: true,
+          });
+        }
+      } catch {}
       setLoading(false);
-      initialized.current = true;
-    });
+      return;
+    }
+    fetch(`/api/perfil/preferencias?userId=${uid}`)
+      .then(r => r.json())
+      .then(prof => {
+        setProfile(prof);
+        setLoading(false);
+        initialized.current = true;
+      });
   }, [user, isLoading]);
 
   const save = (data: Record<string, unknown>) => {
-    if (!user || !initialized.current) return;
+    if (!initialized.current && !profile) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      fetch(`/api/perfil/preferencias?userId=${user.id}`, {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      }).then(() => { setToast("Guardado 🧞"); setTimeout(() => setToast(""), 2000); });
+      if (user) {
+        fetch(`/api/perfil/preferencias?userId=${user.id}`, {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }).then(() => { setToast("Guardado 🧞"); setTimeout(() => setToast(""), 2000); });
+      } else {
+        // Guest: save to localStorage
+        try {
+          const raw = localStorage.getItem("genieOnboardingData");
+          const current = raw ? JSON.parse(raw) : {};
+          localStorage.setItem("genieOnboardingData", JSON.stringify({ ...current, ...data }));
+          setToast("Guardado 🧞"); setTimeout(() => setToast(""), 2000);
+        } catch {}
+      }
     }, 500);
   };
 
@@ -92,7 +118,7 @@ export default function GeniePerfil() {
           )}
         </div>
 
-        {user && profile && (
+        {profile && (
           <>
             {/* Restricciones */}
             <section style={{ marginBottom: 24 }}>
