@@ -155,7 +155,188 @@ model MenuItem {
   destacado   Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  local       Local    @relation(fields: [localId], references: [id])
+  // Ingredientes y perfil
+  ingredients     String[]
+  ingredientTags  IngredientTag[]
+
+  // Perfil de plato
+  hungerLevel     HungerLevel?
+  isAvailable     Boolean         @default(true)
+  availableFrom   String?
+  availableTo     String?
+
+  // Stats calculados
+  totalViews      Int             @default(0)
+  totalSelected   Int             @default(0)
+  totalLoved      Int             @default(0)
+  avgRating       Float?
+
+  local           Local           @relation(fields: [localId], references: [id])
+  interactions    Interaction[]
+  ratings         DishRating[]
+}
+
+enum HungerLevel {
+  LIGHT
+  MEDIUM
+  HEAVY
+}
+
+// ─── Ingredientes normalizados ──────────────────────────────────────────
+
+model Ingredient {
+  id          String             @id @default(cuid())
+  name        String             @unique
+  category    IngredientCategory
+  createdAt   DateTime           @default(now())
+  dishes      IngredientTag[]
+}
+
+enum IngredientCategory {
+  PROTEIN
+  VEGETABLE
+  FRUIT
+  DAIRY
+  CARB
+  SAUCE
+  SPICE
+  OTHER
+}
+
+model IngredientTag {
+  id           String     @id @default(cuid())
+  menuItemId   String
+  ingredientId String
+
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@unique([menuItemId, ingredientId])
+}
+
+// ─── Interacciones del usuario con platos ────────────────────────────────
+
+model Interaction {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  userId     String?
+  sessionId  String
+  menuItemId String
+
+  action        InteractionAction
+  ctxCompany    CompanyContext?
+  ctxHunger     HungerLevel?
+  ctxBudget     Int?
+  ctxOccasion   OccasionContext?
+
+  // Clima
+  weatherTemp      Float?
+  weatherCondition String?
+  weatherHumidity  Int?
+
+  // Metadata
+  hour      Int?
+  dayOfWeek Int?
+
+  menuItem  MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([menuItemId])
+}
+
+enum InteractionAction {
+  VIEWED
+  SELECTED
+  IGNORED
+  LOVED
+  MEH
+  DISLIKED
+}
+
+enum CompanyContext {
+  SOLO
+  PAREJA
+  AMIGOS
+  FAMILIA
+}
+
+enum OccasionContext {
+  ALMUERZO_RAPIDO
+  CENA_TRANQUILA
+  ALGO_ESPECIAL
+  TRABAJAR_AQUI
+  CUMPLEANOS
+  CITA_ROMANTICA
+  JUNTA_AMIGOS
+  CON_NINOS
+  FAMILIAR
+}
+
+// ─── Ratings de platos ──────────────────────────────────────────────────
+
+model DishRating {
+  id         String      @id @default(cuid())
+  createdAt  DateTime    @default(now())
+
+  userId     String?
+  sessionId  String
+  menuItemId String
+
+  score      RatingScore
+  comment    String?
+
+  menuItem   MenuItem    @relation(fields: [menuItemId], references: [id])
+
+  @@unique([userId, menuItemId])
+  @@index([menuItemId])
+}
+
+enum RatingScore {
+  LOVED
+  MEH
+  DISLIKED
+}
+
+// ─── Perfil de gusto del usuario ────────────────────────────────────────
+
+model UserTasteProfile {
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+
+  userId    String   @unique
+  sessionId String?
+
+  favoriteIngredients String[]
+  avoidIngredients    String[]
+
+  typicalHunger    HungerLevel?
+  typicalCompany   CompanyContext?
+  typicalBudget    Int?
+
+  coldWeatherPrefs  String[]
+  hotWeatherPrefs   String[]
+
+  onboardingDone      Boolean     @default(false)
+  dietaryRestrictions String[]
+  riskProfile         RiskProfile @default(BALANCED)
+
+  fitnessMode      FitnessMode?
+  fitnessUpdatedAt DateTime?
+}
+
+enum FitnessMode {
+  GAINING
+  CUTTING
+  MAINTAINING
+  NONE
+}
+
+enum RiskProfile {
+  SAFE
+  BALANCED
+  EXPLORER
 }
 
 enum EstadoConcurso {

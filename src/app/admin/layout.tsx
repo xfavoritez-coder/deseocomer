@@ -13,6 +13,7 @@ const NAV = [
   { icon: "📋", label: "Lista Espera", href: "/admin/lista-espera" },
   { icon: "🧞", label: "Mensajes", href: "/admin/mensajes" },
   { icon: "🍽️", label: "Comidas", href: "/admin/comidas-sugeridas" },
+  { icon: "📋", label: "Menús", href: "/admin/menus" },
   { icon: "📧", label: "Campañas", href: "/admin/campanas" },
   { icon: "📨", label: "Email Usuarios", href: "/admin/email-usuarios" },
   { icon: "🗺️", label: "Importados", href: "/admin/locales-importados" },
