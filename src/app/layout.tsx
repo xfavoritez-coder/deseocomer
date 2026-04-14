@@ -5,8 +5,6 @@ import "leaflet/dist/leaflet.css";
 import ThemeProvider from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { GenieProvider } from "@/contexts/GenieContext";
-import GenieLampara from "@/components/genio/GenieButton";
-import GenieContextual from "@/components/GenieContextual";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import BannerVerificacion from "@/components/layout/BannerVerificacion";
 import LiveActivityToast from "@/components/layout/LiveActivityToast";
@@ -88,8 +86,6 @@ export default function RootLayout({
             <AuthProvider>
               <GenieProvider>
                 {children}
-                <GenieLampara />
-                <GenieContextual />
                 <LiveActivityToast />
               </GenieProvider>
             </AuthProvider>
