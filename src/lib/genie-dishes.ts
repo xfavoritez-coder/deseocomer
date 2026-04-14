@@ -74,24 +74,47 @@ export async function getInitialDishes(userId?: string, sessionId?: string, excl
     });
   }
 
-  // Apply fitness mode ordering
-  if (profile?.fitnessMode === "CUTTING") {
-    filtered.sort((a, b) => {
-      const aProtein = a.ingredientTags.filter(t => t.ingredient.category === "PROTEIN").length;
-      const bProtein = b.ingredientTags.filter(t => t.ingredient.category === "PROTEIN").length;
-      return bProtein - aProtein;
-    });
-  } else if (profile?.fitnessMode === "GAINING") {
-    filtered.sort((a, b) => {
-      const aHeavy = a.hungerLevel === "HEAVY" ? 1 : 0;
-      const bHeavy = b.hungerLevel === "HEAVY" ? 1 : 0;
-      return bHeavy - aHeavy;
-    });
-  }
+  // Personalized scoring
+  const favSet = new Set((profile?.favoriteIngredients ?? []).map(i => i.toLowerCase()));
+
+  const scored = filtered.map(d => {
+    let score = 0;
+    const ings = [
+      ...d.ingredients.map(i => i.toLowerCase()),
+      ...d.ingredientTags.map(t => t.ingredient.name.toLowerCase()),
+    ];
+
+    // +3 per favorite ingredient match
+    for (const ing of ings) {
+      if (favSet.has(ing)) score += 3;
+    }
+
+    // +2 for high ratings, +1 for loved count
+    if (d.avgRating && d.avgRating > 0.7) score += 2;
+    if (d.totalLoved > 3) score += 1;
+
+    // +1 for destacado
+    if (d.destacado) score += 1;
+
+    // Fitness mode boost
+    if (profile?.fitnessMode === "CUTTING") {
+      score += d.ingredientTags.filter(t => t.ingredient.category === "PROTEIN").length;
+      score -= d.ingredientTags.filter(t => t.ingredient.category === "CARB").length;
+    } else if (profile?.fitnessMode === "GAINING") {
+      if (d.hungerLevel === "HEAVY") score += 2;
+    }
+
+    // Small random factor to keep it fresh each time
+    score += Math.random() * 2;
+
+    return { ...d, _score: score };
+  });
+
+  scored.sort((a, b) => b._score - a._score);
 
   // Balance across locals: pick max 3 per local, round-robin
-  const byLocal: Record<string, typeof filtered> = {};
-  for (const d of filtered) {
+  const byLocal: Record<string, typeof scored> = {};
+  for (const d of scored) {
     const lid = d.local.id;
     if (!byLocal[lid]) byLocal[lid] = [];
     byLocal[lid].push(d);
