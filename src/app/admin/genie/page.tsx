@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,6 +13,21 @@ export default function AdminGenie() {
   const [data, setData] = useState<{ stats: any; sessions: Session[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [geoCache, setGeoCache] = useState<Record<string, string>>({});
+
+  const reverseGeocode = useCallback(async (lat: number, lng: number) => {
+    const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+    if (geoCache[key]) return;
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=16&addressdetails=1`, { headers: { "Accept-Language": "es" } });
+      const d = await res.json();
+      const addr = d.address ?? {};
+      const parts = [addr.road, addr.suburb || addr.neighbourhood, addr.city || addr.town || addr.village, addr.state, addr.country].filter(Boolean);
+      setGeoCache(prev => ({ ...prev, [key]: parts.join(", ") || `${lat.toFixed(4)}, ${lng.toFixed(4)}` }));
+    } catch {
+      setGeoCache(prev => ({ ...prev, [key]: `${lat.toFixed(4)}, ${lng.toFixed(4)}` }));
+    }
+  }, [geoCache]);
 
   useEffect(() => {
     adminFetch("/api/admin/genie")
@@ -102,11 +117,15 @@ export default function AdminGenie() {
                       {WEATHER_EMOJI[s.weather.condition]} {s.weather.temp}°C | {s.weather.condition} | {s.weather.humidity}% humedad
                     </p>
                   )}
-                  {s.location && (
-                    <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.3)", margin: "4px 0" }}>
-                      📍 {s.location.lat?.toFixed(4)}, {s.location.lng?.toFixed(4)}
-                    </p>
-                  )}
+                  {s.location && (() => {
+                    const geoKey = `${s.location.lat?.toFixed(4)},${s.location.lng?.toFixed(4)}`;
+                    if (!geoCache[geoKey]) reverseGeocode(s.location.lat, s.location.lng);
+                    return (
+                      <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "rgba(240,234,214,0.4)", margin: "4px 0" }}>
+                        📍 {geoCache[geoKey] || "Cargando ubicación..."}
+                      </p>
+                    );
+                  })()}
 
                   {/* Actions timeline */}
                   <div style={{ marginTop: 10 }}>

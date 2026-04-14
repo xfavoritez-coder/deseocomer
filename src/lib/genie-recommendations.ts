@@ -35,16 +35,23 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
     include: { ingredientTags: { include: { ingredient: true } } },
   });
 
-  // Build session ingredient profile
+  // Build session profile: ingredients + categories of selected dishes
   const ingredientCounts: Record<string, number> = {};
   const ingredientCategories: Record<string, string> = {};
+  const selectedCategoryCounts: Record<string, number> = {};
+  const selectedLocalIds = new Set<string>();
+
   for (const dish of selectedDishes) {
+    // Track dish categories as fallback when no ingredients
+    selectedCategoryCounts[dish.categoria] = (selectedCategoryCounts[dish.categoria] ?? 0) + 1;
+    selectedLocalIds.add(dish.localId);
     for (const tag of dish.ingredientTags) {
       const name = tag.ingredient.name;
       ingredientCounts[name] = (ingredientCounts[name] ?? 0) + 1;
       ingredientCategories[name] = tag.ingredient.category;
     }
   }
+  const hasIngredientData = Object.keys(ingredientCounts).length > 0;
 
   // Get user profile
   let profile: { avoidIngredients: string[]; dietaryRestrictions: string[]; fitnessMode: string | null } | null = null;
@@ -106,6 +113,14 @@ export async function getRecommendations(ctx: GenieContext, userId?: string, ses
       for (const ing of ings) {
         if (ingredientCounts[ing]) score += 3;
       }
+
+      // Category match fallback (when dishes have no ingredient data)
+      if (selectedCategoryCounts[c.categoria]) {
+        score += hasIngredientData ? 1 : 5; // Strong boost when no ingredient data
+      }
+
+      // Same local boost (user liked dishes from this local)
+      if (selectedLocalIds.has(c.localId)) score += 2;
 
       // Hunger level match
       if (c.hungerLevel && allowedHunger.includes(c.hungerLevel)) score += 2;

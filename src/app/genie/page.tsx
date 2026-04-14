@@ -47,16 +47,24 @@ export default function GeniePage() {
   const geoRequested = useRef(false);
 
   // Check onboarding status
+  const { isLoading: authLoading } = useAuth();
   useEffect(() => {
-    if (!user) { setPhase("dishes"); requestGeo(); return; }
+    if (authLoading) return; // Wait for auth to resolve
+    if (!user) {
+      // Guest: check sessionStorage for onboarding done
+      const done = sessionStorage.getItem("genieOnboardingDone");
+      if (done === "true") { setPhase("dishes"); requestGeo(); }
+      else setPhase("onboarding");
+      return;
+    }
     fetch(`/api/genie/onboarding?userId=${user.id}`)
       .then(r => r.json())
       .then(d => {
         if (d.onboardingDone) { setPhase("dishes"); requestGeo(); }
         else setPhase("onboarding");
       })
-      .catch(() => setPhase("dishes"));
-  }, [user]);
+      .catch(() => setPhase("onboarding"));
+  }, [user, authLoading]);
 
   // Geolocation
   const requestGeo = useCallback(() => {
@@ -175,6 +183,7 @@ export default function GeniePage() {
       }),
     });
     setSavingOb(false);
+    sessionStorage.setItem("genieOnboardingDone", "true");
     setPhase("dishes");
     requestGeo();
   };
