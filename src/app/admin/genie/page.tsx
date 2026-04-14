@@ -127,6 +127,21 @@ export default function AdminGenie() {
                     );
                   })()}
 
+                  {/* Insight */}
+                  {s.insight?.conclusion && (
+                    <div style={{ background: "rgba(232,168,76,0.06)", border: "1px solid rgba(232,168,76,0.15)", borderRadius: 10, padding: "10px 14px", marginTop: 10, marginBottom: 8 }}>
+                      <p style={{ fontFamily: "Georgia", fontSize: "0.78rem", color: "#e8a84c", margin: "0 0 6px", fontWeight: 700 }}>Perfil de sesion</p>
+                      <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "rgba(240,234,214,0.55)", margin: 0, lineHeight: 1.6 }}>{s.insight.conclusion}</p>
+                      {s.insight.topIngredients?.length > 0 && (
+                        <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                          {s.insight.topIngredients.map((ing: string) => (
+                            <span key={ing} style={{ padding: "2px 6px", borderRadius: 6, background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", fontFamily: "Georgia", fontSize: "0.65rem", color: "#3db89e" }}>{ing}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Actions timeline */}
                   <div style={{ marginTop: 10 }}>
                     {s.actions.map((a: any, i: number) => (

@@ -45,14 +45,16 @@ export default function GeniePage() {
   const [loadingDishes, setLoadingDishes] = useState(false);
   const seenIdsRef = useRef<string[]>([]);
   const geoRequested = useRef(false);
+  const [previewDish, setPreviewDish] = useState<Dish | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Check onboarding status
   const { isLoading: authLoading } = useAuth();
   useEffect(() => {
     if (authLoading) return; // Wait for auth to resolve
     if (!user) {
-      // Guest: check sessionStorage for onboarding done
-      const done = sessionStorage.getItem("genieOnboardingDone");
+      // Guest: check localStorage for onboarding done (persists across sessions)
+      const done = localStorage.getItem("genieOnboardingDone");
       if (done === "true") { setPhase("dishes"); requestGeo(); }
       else setPhase("onboarding");
       return;
@@ -157,14 +159,18 @@ export default function GeniePage() {
   };
 
   const handleOtherDishes = () => {
-    // Register IGNORED for all current dishes
+    // Register IGNORED for non-selected current dishes
     const sid = getSessionId();
-    fetch("/api/genie/interaction", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ menuItemIds: dishes.map(d => d.id), action: "IGNORED", userId: user?.id || null, sessionId: sid }),
-    }).catch(() => {});
+    const ignoredIds = dishes.filter(d => !selected.has(d.id)).map(d => d.id);
+    if (ignoredIds.length > 0) {
+      fetch("/api/genie/interaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ menuItemIds: ignoredIds, action: "IGNORED", userId: user?.id || null, sessionId: sid }),
+      }).catch(() => {});
+    }
 
+    // Keep selected dishes, exclude all seen from next load
     seenIdsRef.current.push(...dishes.map(d => d.id));
     loadDishes();
   };
@@ -183,7 +189,7 @@ export default function GeniePage() {
       }),
     });
     setSavingOb(false);
-    sessionStorage.setItem("genieOnboardingDone", "true");
+    localStorage.setItem("genieOnboardingDone", "true");
     setPhase("dishes");
     requestGeo();
   };
@@ -272,22 +278,33 @@ export default function GeniePage() {
           <p style={{ fontFamily: "var(--font-lato)", color: "rgba(240,234,214,0.3)", textAlign: "center", padding: 40 }}>No hay platos disponibles aun. Vuelve pronto.</p>
         ) : (
           <>
+            {/* Selected count */}
+            {selected.size > 0 && (
+              <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#3db89e", textAlign: "center", marginBottom: 10 }}>
+                {selected.size} seleccionado{selected.size > 1 ? "s" : ""} — toca para ver en grande
+              </p>
+            )}
+
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 20 }}>
               {dishes.map((d: Dish) => {
                 const isSel = selected.has(d.id);
                 return (
-                  <button key={d.id} onClick={() => toggleSelect(d.id)} style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", border: isSel ? "2px solid #3db89e" : "2px solid transparent", cursor: "pointer", background: "rgba(45,26,8,0.6)", padding: 0 }}>
+                  <button key={d.id}
+                    onClick={() => toggleSelect(d.id)}
+                    onDoubleClick={(e) => { e.preventDefault(); setPreviewDish(d); }}
+                    onTouchStart={() => { longPressTimer.current = setTimeout(() => setPreviewDish(d), 500); }}
+                    onTouchEnd={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
+                    onTouchMove={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
+                    style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", border: isSel ? "2px solid #3db89e" : "2px solid transparent", cursor: "pointer", background: "rgba(45,26,8,0.6)", padding: 0 }}>
                     {d.imagenUrl ? (
                       <img src={d.imagenUrl} alt={d.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isSel ? 0.7 : 1, transition: "opacity 0.15s" }} />
                     ) : (
                       <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>🍽️</div>
                     )}
-                    {/* Name overlay */}
                     <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", padding: "20px 6px 6px" }}>
                       <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem,1.5vw,0.7rem)", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.nombre}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: 0 }}>${Number(d.precio).toLocaleString("es-CL")}</p>
+                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: 0 }}>{d.local?.nombre} · ${Number(d.precio).toLocaleString("es-CL")}</p>
                     </div>
-                    {/* Check */}
                     {isSel && (
                       <div style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "#3db89e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff" }}>✓</div>
                     )}
@@ -297,12 +314,43 @@ export default function GeniePage() {
             </div>
 
             <button onClick={handleNext} disabled={selected.size === 0} style={{ width: "100%", padding: 16, background: selected.size > 0 ? "#e8a84c" : "rgba(232,168,76,0.15)", color: selected.size > 0 ? "#0a0812" : "rgba(240,234,214,0.3)", border: "none", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: "0.92rem", fontWeight: 700, cursor: selected.size > 0 ? "pointer" : "default", marginBottom: 10 }}>
-              Estos me tincan →
+              {selected.size > 0 ? `Estos me tincan (${selected.size}) →` : "Selecciona al menos 1"}
             </button>
 
             <button onClick={handleOtherDishes} style={{ width: "100%", padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>
-              Ver otros platos
+              {selected.size > 0 ? "Quiero ver mas opciones" : "Ver otros platos"}
             </button>
+          </>
+        )}
+
+        {/* Preview modal */}
+        {previewDish && (
+          <>
+            <div onClick={() => setPreviewDish(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 100 }} />
+            <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "min(90vw, 400px)", zIndex: 101, borderRadius: 20, overflow: "hidden", background: "#1a0e05", border: "1px solid rgba(232,168,76,0.2)" }}>
+              {previewDish.imagenUrl && (
+                <img src={previewDish.imagenUrl} alt={previewDish.nombre} style={{ width: "100%", height: 280, objectFit: "cover" }} />
+              )}
+              <div style={{ padding: "16px 20px" }}>
+                <h3 style={{ fontFamily: "var(--font-cinzel-decorative)", fontSize: "1.1rem", color: "#f5d080", marginBottom: 4 }}>{previewDish.nombre}</h3>
+                <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.82rem", color: "rgba(240,234,214,0.45)", marginBottom: 8 }}>{previewDish.local?.nombre} · ${Number(previewDish.precio).toLocaleString("es-CL")}</p>
+                {previewDish.ingredients?.length > 0 && (
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 12 }}>
+                    {previewDish.ingredients.map((ing: string) => (
+                      <span key={ing} style={{ padding: "2px 8px", borderRadius: 8, background: "rgba(232,168,76,0.08)", border: "1px solid rgba(232,168,76,0.15)", fontFamily: "var(--font-lato)", fontSize: "0.7rem", color: "#f5d080" }}>{ing}</span>
+                    ))}
+                  </div>
+                )}
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => { toggleSelect(previewDish.id); setPreviewDish(null); }} style={{ flex: 1, padding: 12, background: selected.has(previewDish.id) ? "rgba(255,80,80,0.1)" : "#3db89e", border: "none", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", fontWeight: 700, color: selected.has(previewDish.id) ? "#ff6b6b" : "#fff", cursor: "pointer" }}>
+                    {selected.has(previewDish.id) ? "Quitar" : "Me tinca"}
+                  </button>
+                  <button onClick={() => setPreviewDish(null)} style={{ padding: "12px 20px", background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 12, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>
+                    Cerrar
+                  </button>
+                </div>
+              </div>
+            </div>
           </>
         )}
       </div>
