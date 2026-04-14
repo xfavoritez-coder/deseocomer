@@ -219,17 +219,17 @@ export default function AdminMenus() {
 
 function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish: Dish | null; onSaved: (d: Dish) => void; onCancel: () => void }) {
   const [nombre, setNombre] = useState(dish?.nombre ?? "");
-  const [categoria, setCategoria] = useState(dish?.categoria ?? "");
   const [descripcion, setDescripcion] = useState(dish?.descripcion ?? "");
   const [precio, setPrecio] = useState(dish?.precio?.toString() ?? "");
   const [destacado, setDestacado] = useState(dish?.destacado ?? false);
   const [hungerLevel, setHungerLevel] = useState(dish?.hungerLevel ?? "");
-  const [isAvailable, setIsAvailable] = useState(dish?.isAvailable ?? true);
   const [availableFrom, setAvailableFrom] = useState(dish?.availableFrom ?? "");
   const [availableTo, setAvailableTo] = useState(dish?.availableTo ?? "");
   const [imagenUrl, setImagenUrl] = useState(dish?.imagenUrl ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showMore, setShowMore] = useState(false);
+  const [inferredCat, setInferredCat] = useState(dish?.categoria ?? "MAIN_COURSE");
 
   // Image upload
   const [uploading, setUploading] = useState(false);
@@ -245,6 +245,14 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
   const [newIngName, setNewIngName] = useState("");
   const [newIngCat, setNewIngCat] = useState("OTHER");
   const [showNewIng, setShowNewIng] = useState(false);
+
+  // Infer category when ingredients change
+  useEffect(() => {
+    if (selectedIngredients.length === 0) { setInferredCat("MAIN_COURSE"); return; }
+    const names = selectedIngredients.map(i => i.name);
+    const { inferCategory } = require("@/lib/dish-utils");
+    setInferredCat(inferCategory(names, Number(precio) || undefined));
+  }, [selectedIngredients, precio]);
 
   // Search ingredients
   useEffect(() => {
@@ -308,24 +316,23 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
     setUploading(false);
   };
 
+  const canSave = imagenUrl && nombre.trim() && precio && selectedIngredients.length > 0 && hungerLevel;
+
   const handleSave = async () => {
-    if (!nombre.trim() || !categoria.trim() || !precio) {
-      setError("Nombre, categoria y precio son requeridos");
-      return;
-    }
+    if (!canSave) return;
     setSaving(true);
     setError("");
 
     const body = {
       localId,
       nombre: nombre.trim(),
-      categoria: categoria.trim(),
+      categoria: inferredCat,
       descripcion: descripcion.trim(),
       precio: Number(precio),
       imagenUrl,
       destacado,
       hungerLevel: hungerLevel || null,
-      isAvailable,
+      isAvailable: true,
       availableFrom: availableFrom || null,
       availableTo: availableTo || null,
       ingredients: selectedIngredients.map(i => i.name),
@@ -351,6 +358,16 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
     setSaving(false);
   };
 
+  const hungerBtn = (val: string, emoji: string, label: string) => {
+    const active = hungerLevel === val;
+    return (
+      <button key={val} onClick={() => setHungerLevel(val)} style={{ flex: 1, padding: "12px 8px", background: active ? "rgba(232,168,76,0.15)" : "rgba(255,255,255,0.03)", border: active ? "1px solid #e8a84c" : "1px solid rgba(255,255,255,0.08)", borderRadius: 10, cursor: "pointer", textAlign: "center" }}>
+        <span style={{ fontSize: 20, display: "block", marginBottom: 2 }}>{emoji}</span>
+        <span style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: active ? "#e8a84c" : "rgba(240,234,214,0.5)" }}>{label}</span>
+      </button>
+    );
+  };
+
   return (
     <div style={S.card}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -361,82 +378,43 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
       {error && <div style={{ background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.3)", borderRadius: 8, padding: "8px 12px", marginBottom: 12 }}><p style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "#ff6b6b", margin: 0 }}>{error}</p></div>}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {/* Nombre */}
+        {/* 1. Foto */}
         <div>
-          <label style={S.label}>Nombre *</label>
-          <input style={S.input} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Ej: Pad Thai de camarones" />
-        </div>
-
-        {/* Categoria + Precio */}
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ flex: 2 }}>
-            <label style={S.label}>Categoria *</label>
-            <select style={S.input} value={categoria} onChange={e => setCategoria(e.target.value)}>
-              <option value="">Seleccionar...</option>
-              {DISH_CATEGORIES.map(c => <option key={c.v} value={c.v}>{c.l}</option>)}
-            </select>
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={S.label}>Precio (CLP) *</label>
-            <input style={S.input} type="number" value={precio} onChange={e => setPrecio(e.target.value)} placeholder="8990" />
-          </div>
-        </div>
-
-        {/* Descripcion */}
-        <div>
-          <label style={S.label}>Descripcion</label>
-          <textarea style={{ ...S.input, resize: "vertical", minHeight: 60 }} value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Descripcion del plato (opcional)" />
-        </div>
-
-        {/* Hunger level + Disponibilidad */}
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <label style={S.label}>Porcion</label>
-            <select style={S.input} value={hungerLevel} onChange={e => setHungerLevel(e.target.value)}>
-              <option value="">Sin especificar</option>
-              <option value="LIGHT">Liviano</option>
-              <option value="MEDIUM">Normal</option>
-              <option value="HEAVY">Abundante</option>
-            </select>
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={S.label}>Disponible desde</label>
-            <input style={S.input} type="time" value={availableFrom} onChange={e => setAvailableFrom(e.target.value)} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <label style={S.label}>Hasta</label>
-            <input style={S.input} type="time" value={availableTo} onChange={e => setAvailableTo(e.target.value)} />
-          </div>
-        </div>
-
-        {/* Toggles */}
-        <div style={{ display: "flex", gap: 20 }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", cursor: "pointer" }}>
-            <input type="checkbox" checked={destacado} onChange={e => setDestacado(e.target.checked)} /> Destacado
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", cursor: "pointer" }}>
-            <input type="checkbox" checked={isAvailable} onChange={e => setIsAvailable(e.target.checked)} /> Disponible
-          </label>
-        </div>
-
-        {/* Image */}
-        <div>
-          <label style={S.label}>Foto</label>
-          {imagenUrl && <img src={imagenUrl} alt="" style={{ width: 120, height: 90, objectFit: "cover", borderRadius: 8, marginBottom: 8 }} />}
+          <label style={S.label}>Foto *</label>
+          {imagenUrl ? (
+            <div style={{ position: "relative", marginBottom: 8 }}>
+              <img src={imagenUrl} alt="" style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 12 }} />
+              <button onClick={() => fileRef.current?.click()} style={{ position: "absolute", bottom: 8, right: 8, ...S.btnOutline, padding: "6px 12px", fontSize: "0.72rem", background: "rgba(0,0,0,0.6)" }}>Cambiar</button>
+            </div>
+          ) : (
+            <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{ width: "100%", height: 140, background: "rgba(232,168,76,0.04)", border: "2px dashed rgba(232,168,76,0.2)", borderRadius: 12, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <span style={{ fontSize: 28 }}>{uploading ? "⏳" : "📷"}</span>
+              <span style={{ fontFamily: "Georgia", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)" }}>{uploading ? "Subiendo..." : "Subir foto del plato"}</span>
+            </button>
+          )}
           <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageUpload} style={{ display: "none" }} />
-          <button onClick={() => fileRef.current?.click()} disabled={uploading} style={{ ...S.btnOutline, opacity: uploading ? 0.5 : 1 }}>
-            {uploading ? "Subiendo..." : imagenUrl ? "Cambiar foto" : "Subir foto"}
-          </button>
           {imgSizes && (
-            <p style={{ fontFamily: "Georgia", fontSize: "0.75rem", color: "#3db89e", marginTop: 6 }}>
+            <p style={{ fontFamily: "Georgia", fontSize: "0.72rem", color: "#3db89e", marginTop: 4 }}>
               {formatBytes(imgSizes.original)} → {formatBytes(imgSizes.optimized)}
             </p>
           )}
         </div>
 
-        {/* Ingredients */}
+        {/* 2. Nombre */}
         <div>
-          <label style={S.label}>Ingredientes</label>
+          <label style={S.label}>Nombre *</label>
+          <input style={S.input} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Ej: Pad Thai de camarones" />
+        </div>
+
+        {/* 3. Precio */}
+        <div>
+          <label style={S.label}>Precio (CLP) *</label>
+          <input style={S.input} type="number" value={precio} onChange={e => setPrecio(e.target.value)} placeholder="8990" />
+        </div>
+
+        {/* 4. Ingredientes + categoria inferida */}
+        <div>
+          <label style={S.label}>Ingredientes *</label>
           {selectedIngredients.length > 0 && (
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
               {selectedIngredients.map(ing => (
@@ -457,7 +435,14 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
               ))}
             </div>
           )}
-          <button onClick={() => setShowNewIng(!showNewIng)} style={{ ...S.btnOutline, marginTop: 8, fontSize: "0.75rem", padding: "6px 12px" }}>+ Nuevo ingrediente</button>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+            <button onClick={() => setShowNewIng(!showNewIng)} style={{ ...S.btnOutline, fontSize: "0.72rem", padding: "5px 10px" }}>+ Nuevo</button>
+            {selectedIngredients.length > 0 && (
+              <span style={{ padding: "4px 10px", borderRadius: 10, background: "rgba(61,184,158,0.08)", border: "1px solid rgba(61,184,158,0.2)", fontFamily: "Georgia", fontSize: "0.7rem", color: "#3db89e" }}>
+                Categoria: {DISH_CAT_MAP[inferredCat] ?? inferredCat}
+              </span>
+            )}
+          </div>
           {showNewIng && (
             <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
               <input style={{ ...S.input, flex: 2 }} value={newIngName} onChange={e => setNewIngName(e.target.value)} placeholder="Nombre" />
@@ -469,10 +454,46 @@ function DishForm({ localId, dish, onSaved, onCancel }: { localId: string; dish:
           )}
         </div>
 
+        {/* 5. Hunger level - 3 big buttons */}
+        <div>
+          <label style={S.label}>Porcion *</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            {hungerBtn("LIGHT", "🥗", "Liviano")}
+            {hungerBtn("MEDIUM", "🍽️", "Normal")}
+            {hungerBtn("HEAVY", "🍖", "Abundante")}
+          </div>
+        </div>
+
+        {/* 6. More details (collapsed) */}
+        <button onClick={() => setShowMore(!showMore)} style={{ background: "none", border: "none", fontFamily: "Georgia", fontSize: "0.78rem", color: "rgba(240,234,214,0.35)", cursor: "pointer", textAlign: "left", padding: 0 }}>
+          {showMore ? "Menos detalles −" : "Mas detalles +"}
+        </button>
+        {showMore && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: "8px 0" }}>
+            <div>
+              <label style={S.label}>Descripcion</label>
+              <textarea style={{ ...S.input, resize: "vertical", minHeight: 60 }} value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Descripcion del plato (opcional)" />
+            </div>
+            <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={S.label}>Disponible desde</label>
+                <input style={S.input} type="time" value={availableFrom} onChange={e => setAvailableFrom(e.target.value)} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={S.label}>Hasta</label>
+                <input style={S.input} type="time" value={availableTo} onChange={e => setAvailableTo(e.target.value)} />
+              </div>
+            </div>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: "Georgia", fontSize: "0.82rem", color: "#f0ead6", cursor: "pointer" }}>
+              <input type="checkbox" checked={destacado} onChange={e => setDestacado(e.target.checked)} /> Destacado
+            </label>
+          </div>
+        )}
+
         {/* Save */}
-        <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
+        <div style={{ display: "flex", gap: 12 }}>
           <button onClick={onCancel} style={{ ...S.btnOutline, flex: 1 }}>Cancelar</button>
-          <button onClick={handleSave} disabled={saving} style={{ ...S.btn, flex: 2, opacity: saving ? 0.5 : 1 }}>
+          <button onClick={handleSave} disabled={saving || !canSave} style={{ ...S.btn, flex: 2, opacity: (saving || !canSave) ? 0.4 : 1 }}>
             {saving ? "Guardando..." : dish ? "Guardar cambios" : "Crear plato"}
           </button>
         </div>
