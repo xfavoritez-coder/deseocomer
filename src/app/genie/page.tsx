@@ -46,7 +46,6 @@ export default function GeniePage() {
   const seenIdsRef = useRef<string[]>([]);
   const geoRequested = useRef(false);
   const [previewDish, setPreviewDish] = useState<Dish | null>(null);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Check onboarding status
   const { isLoading: authLoading } = useAuth();
@@ -116,7 +115,7 @@ export default function GeniePage() {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         setDishes(data);
-        setSelected(new Set());
+        // Don't clear selections — keep previously selected dishes
         // Register VIEWED
         fetch("/api/genie/interaction", {
           method: "POST",
@@ -281,7 +280,7 @@ export default function GeniePage() {
             {/* Selected count */}
             {selected.size > 0 && (
               <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "#3db89e", textAlign: "center", marginBottom: 10 }}>
-                {selected.size} seleccionado{selected.size > 1 ? "s" : ""} — toca para ver en grande
+                {selected.size} seleccionado{selected.size > 1 ? "s" : ""}
               </p>
             )}
 
@@ -289,13 +288,9 @@ export default function GeniePage() {
               {dishes.map((d: Dish) => {
                 const isSel = selected.has(d.id);
                 return (
-                  <button key={d.id}
-                    onClick={() => toggleSelect(d.id)}
-                    onDoubleClick={(e) => { e.preventDefault(); setPreviewDish(d); }}
-                    onTouchStart={() => { longPressTimer.current = setTimeout(() => setPreviewDish(d), 500); }}
-                    onTouchEnd={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
-                    onTouchMove={() => { if (longPressTimer.current) clearTimeout(longPressTimer.current); }}
-                    style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", border: isSel ? "2px solid #3db89e" : "2px solid transparent", cursor: "pointer", background: "rgba(45,26,8,0.6)", padding: 0 }}>
+                  <div key={d.id}
+                    style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", border: isSel ? "2px solid #3db89e" : "2px solid transparent", cursor: "pointer", background: "rgba(45,26,8,0.6)" }}
+                    onClick={() => toggleSelect(d.id)}>
                     {d.imagenUrl ? (
                       <img src={d.imagenUrl} alt={d.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isSel ? 0.7 : 1, transition: "opacity 0.15s" }} />
                     ) : (
@@ -308,7 +303,9 @@ export default function GeniePage() {
                     {isSel && (
                       <div style={{ position: "absolute", top: 6, right: 6, width: 24, height: 24, borderRadius: "50%", background: "#3db89e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff" }}>✓</div>
                     )}
-                  </button>
+                    {/* Preview button */}
+                    <button onClick={(e) => { e.stopPropagation(); setPreviewDish(d); }} style={{ position: "absolute", top: 6, left: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#fff", cursor: "pointer", padding: 0 }}>🔍</button>
+                  </div>
                 );
               })}
             </div>
