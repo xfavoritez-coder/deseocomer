@@ -290,20 +290,14 @@ export default function GeniePage() {
                 return (
                   <div key={d.id}
                     style={{ position: "relative", aspectRatio: "1", borderRadius: 14, overflow: "hidden", border: isSel ? "2px solid #3db89e" : "2px solid transparent", cursor: "pointer", background: "rgba(45,26,8,0.6)" }}
-                    onClick={() => toggleSelect(d.id)}>
+                    onClick={() => setPreviewDish(d)}>
                     {d.imagenUrl ? (
                       <img src={d.imagenUrl} alt={d.nombre} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: isSel ? 0.7 : 1, transition: "opacity 0.15s" }} />
                     ) : (
                       <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>🍽️</div>
                     )}
-                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", padding: "20px 6px 6px" }}>
-                      <p style={{ fontFamily: "var(--font-cinzel)", fontSize: "clamp(0.55rem,1.5vw,0.7rem)", color: "#f0ead6", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.nombre}</p>
-                      <p style={{ fontFamily: "var(--font-lato)", fontSize: "0.6rem", color: "rgba(240,234,214,0.4)", margin: 0 }}>{d.local?.nombre} · ${Number(d.precio).toLocaleString("es-CL")}</p>
-                    </div>
-                    {/* Checkbox top-right — always visible */}
+                    {/* Checkbox top-right */}
                     <button onClick={(e) => { e.stopPropagation(); toggleSelect(d.id); }} style={{ position: "absolute", top: 6, right: 6, width: 26, height: 26, borderRadius: 6, background: isSel ? "#3db89e" : "rgba(0,0,0,0.5)", border: isSel ? "2px solid #3db89e" : "2px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, color: "#fff", cursor: "pointer", padding: 0 }}>{isSel ? "✓" : ""}</button>
-                    {/* Preview button */}
-                    <button onClick={(e) => { e.stopPropagation(); setPreviewDish(d); }} style={{ position: "absolute", top: 6, left: 6, width: 24, height: 24, borderRadius: "50%", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", cursor: "pointer", padding: 0 }}>🔍</button>
                   </div>
                 );
               })}
@@ -315,6 +309,10 @@ export default function GeniePage() {
 
             <button onClick={handleOtherDishes} style={{ width: "100%", padding: 14, background: "transparent", border: "1px solid rgba(232,168,76,0.2)", borderRadius: 14, fontFamily: "var(--font-cinzel)", fontSize: "0.82rem", color: "rgba(240,234,214,0.4)", cursor: "pointer" }}>
               {selected.size > 0 ? "Quiero ver mas opciones" : "Ver otros platos"}
+            </button>
+
+            <button onClick={() => router.push("/genie/grupo")} style={{ width: "100%", marginTop: 8, padding: 12, background: "transparent", border: "none", fontFamily: "var(--font-lato)", fontSize: "0.78rem", color: "rgba(240,234,214,0.25)", cursor: "pointer" }}>
+              Estoy con alguien? Crear sala grupal →
             </button>
           </>
         )}
